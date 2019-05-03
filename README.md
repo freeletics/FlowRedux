@@ -1,7 +1,7 @@
-# RxRedux
+# FlowRedux
 
 [![CircleCI](https://circleci.com/gh/freeletics/RxRedux.svg?style=svg)](https://circleci.com/gh/freeletics/FlowFedux)
-[![Download](https://maven-badges.herokuapp.com/maven-central/com.freeletics.rxredux/rxredux/badge.svg) ](https://maven-badges.herokuapp.com/maven-central/com.freeletics.flowredux/flowredux)
+[![Download](https://maven-badges.herokuapp.com/maven-central/com.freeletics.flowredux/flowredux/badge.svg) ](https://maven-badges.herokuapp.com/maven-central/com.freeletics.flowredux/flowredux)
 
 This project is still WIP.
 
