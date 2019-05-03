@@ -1,0 +1,103 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'shot'
+
+kapt {
+    arguments {
+        arg("moshi.generated", "javax.annotation.Generated")
+    }
+}
+
+shot {
+    appId = 'com.freeletics.rxredux'
+}
+
+android {
+    compileSdkVersion versions.compileSdk
+    defaultConfig {
+        applicationId "com.freeletics.rxredux"
+        targetSdkVersion versions.targetSdk
+        minSdkVersion versions.minSdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "com.freeletics.rxredux.SampleAppRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    sourceSets {
+        test {
+            java.srcDirs += ['src/testSpec/java']
+            resources.srcDirs += ['src/testSpec/resources']
+        }
+
+        androidTest {
+            java.srcDirs += ['src/testSpec/java']
+            resources.srcDirs += ['src/testSpec/resources']
+        }
+    }
+
+    testOptions {
+        animationsDisabled = true
+    }
+
+    lintOptions {
+        disable 'GoogleAppIndexingWarning','InvalidPackage'
+    }
+}
+
+dependencies {
+    implementation libraries.kotlinStdlib
+    implementation supportLibraries.appCompat
+    implementation supportLibraries.recyclerView
+    implementation supportLibraries.constraintLayout
+    implementation supportLibraries.design
+    implementation supportLibraries.viewModel
+    implementation libraries.retrofit
+    implementation libraries.retrofitRxJava
+    implementation libraries.retrofitMoshi
+    implementation libraries.rxRelay
+    implementation libraries.rxJava
+    implementation libraries.rxAndroid
+    implementation libraries.timber
+    implementation libraries.rxBinding
+    implementation libraries.okhttp
+    implementation libraries.moshiKotlin
+    implementation libraries.moshi
+
+    kapt libraries.moshiCodeGen
+    implementation libraries.moshi
+    implementation libraries.dagger
+    kapt libraries.daggerCompiler
+    implementation project(':library')
+    implementation testLibraries.okhttpTls
+
+    testImplementation testLibraries.junit
+    testImplementation testLibraries.androidArchTesting
+    testImplementation testLibraries.mockWebServer
+    testImplementation libraries.moshiKotlin
+    testImplementation libraries.moshi
+
+    kaptTest libraries.daggerCompiler
+    androidTestImplementation testLibraries.junit
+    androidTestImplementation testLibraries.testRunner
+    androidTestImplementation testLibraries.espresso
+    androidTestImplementation testLibraries.espressoContrib
+    androidTestImplementation testLibraries.testRules
+    androidTestImplementation testLibraries.screengrab
+    androidTestImplementation testLibraries.deviceAnimationsRule
+    androidTestImplementation testLibraries.mockWebServer
+    androidTestImplementation libraries.moshiKotlin
+    androidTestImplementation libraries.moshi
+}

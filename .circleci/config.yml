@@ -1,0 +1,72 @@
+version: 2.1
+
+orbs:
+  gradle-publish: freeletics/gradle-publish@1.0.4
+
+# Common anchors
+# PR cache anchors
+gradle_cache_key: &gradle_cache_key
+  key: v1-dependencies-{{ checksum "dependencies.gradle" }}
+restore_gradle_cache: &restore_gradle_cache
+  restore_cache:
+    <<: *gradle_cache_key
+save_gradle_cache: &save_gradle_cache
+  save_cache:
+    <<: *gradle_cache_key
+    paths:
+      - ~/.gradle/caches
+      - ~/.gradle/wrapper
+
+executors:
+  android:
+    docker:
+      - image: circleci/android:api-28
+    working_directory: ~/repo
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xmx1536m"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.incremental=false"
+      TERM: dumb
+
+jobs:
+  build_and_test:
+    executor: android
+    steps:
+      - checkout
+      - *restore_gradle_cache
+      - run:
+          name: Build library
+          command: ./gradlew :library:build
+      - run:
+          name: Run library tests
+          command: ./gradlew :library:test
+     # - run:
+     #     name: Build sample
+     #     command: ./gradlew :sample:assembleDebug
+     # - run:
+     #     name: Run sample tests
+     #     command: ./gradlew :sample:testDebug
+      - *save_gradle_cache
+
+workflows:
+  version: 2
+
+  master-pipeline:
+    jobs:
+      - build_and_test:
+          filters:
+            branches:
+              only:
+                - master
+      - gradle-publish/publish_artifacts:
+          executor: gradle-publish/circleci-android
+          context: "android-maven-publish"
+          requires:
+            - build_and_test
+
+  check-pr:
+    jobs:
+      - build_and_test:
+          filters:
+            branches:
+              ignore:
+                - master

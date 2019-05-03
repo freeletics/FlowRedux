@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">RxRedux France</string>
+    <string name="unexpected_error">Une erreur inattendue s\'est produite.</string>
+    <string name="unexpected_error_retry">Une erreur inattendue s\'est produite.\nCliquez ici pour réessayer.</string>
+</resources>
