@@ -34,6 +34,7 @@ ext.versions = [
         espresso               : '3.0.2',
         screengrab             : '1.2.0',
         deviceAnimationsRule   : '0.0.2',
+        kotlintest             : '3.3.2',
 ]
 
 ext.libraries = [
@@ -79,7 +80,9 @@ ext.testLibraries = [
         espresso            : "com.android.support.test.espresso:espresso-core:$versions.espresso",
         espressoContrib     : "com.android.support.test.espresso:espresso-contrib:$versions.espresso",
         screengrab          : "tools.fastlane:screengrab:$versions.screengrab",
-        deviceAnimationsRule: "com.github.VictorAlbertos:DeviceAnimationTestRule:$versions.deviceAnimationsRule"
+        deviceAnimationsRule: "com.github.VictorAlbertos:DeviceAnimationTestRule:$versions.deviceAnimationsRule",
+        coroutinesTest      : "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutines",
+        kotlintest          : "io.kotlintest:kotlintest-runner-junit5:$versions.kotlintest"
 ]
 
 ext.gradlePlugins = [
