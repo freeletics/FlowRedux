@@ -1,5 +1,6 @@
 package com.freeletics.rxredux
 
+/*
 import com.freeletics.flowredux.ReducerException
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.StateAccessor
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.map
 import org.junit.Assert
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
-/*
+
 class ObservableReduxTest {
 
     @Test

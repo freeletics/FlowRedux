@@ -18,9 +18,8 @@ if (gradle.ext.isCiServer) {
 }
 
 dependencies {
-    implementation libraries.kotlinStdlib
-    implementation libraries.rxJava
-    implementation libraries.coroutines
+    api libraries.kotlinStdlib
+    api libraries.coroutines
 
     testImplementation testLibraries.junit
 }
