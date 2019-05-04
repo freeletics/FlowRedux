@@ -86,8 +86,8 @@ fun <A, S> Flow<A>.reduxStore(
 
 @UseExperimental(FlowPreview::class)
 fun main() = runBlocking {
-    val sideEffect1: SideEffect<String, Int> = { action: Flow<Int>, stateAccessor: StateAccessor<String> ->
-        action.flatMapConcat { action ->
+    val sideEffect1: SideEffect<String, Int> = { actions, stateAccessor ->
+        actions.flatMapConcat { action ->
             println("-- SF1: Got action $action . current state ${stateAccessor()}")
             if (action < 3)
                 flowOf(3)
@@ -95,8 +95,8 @@ fun main() = runBlocking {
                 emptyFlow()
         }
     }
-    val sideEffect2: SideEffect<String, Int> = { action: Flow<Int>, stateAccessor: StateAccessor<String> ->
-        action.flatMap { action ->
+    val sideEffect2: SideEffect<String, Int> = { actions, stateAccessor ->
+        actions.flatMapConcat { action ->
             println("-- SF2: Got action $action . current state ${stateAccessor()}")
             if (action < 3)
                 flowOf(4)
