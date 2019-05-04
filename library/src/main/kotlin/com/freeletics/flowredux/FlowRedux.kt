@@ -1,21 +1,15 @@
 package com.freeletics.flowredux
 
 import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.broadcastIn
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.delayEach
-import kotlinx.coroutines.flow.delayFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMap
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.reduce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -37,7 +31,7 @@ fun <A, S> Flow<A>.reduxStore(
 
     coroutineScope {
 
-        val actionBroadcastChannel: BroadcastChannel<A> = this@reduxStore.broadcastIn(this)
+        val actionBroadcastChannel: BroadcastChannel<A> = BroadcastChannel(1)
         val actionBroadcastChannelAsFlow: Flow<A> = actionBroadcastChannel.asFlow()
 
         launch {
@@ -78,8 +72,8 @@ fun <A, S> Flow<A>.reduxStore(
 }
 
 fun main() = runBlocking {
-    val sideEffect1: SideEffect<String, Int> = { action: Flow<Int>, stateAccessor: StateAccessor<String> ->
-        action.flatMap { action ->
+    val sideEffect1: SideEffect<String, Int> = { actions: Flow<Int>, stateAccessor: StateAccessor<String> ->
+        actions.flatMap { action ->
             println("-- SF1: Got action $action . current state ${stateAccessor()}")
             if (action != 3)
                 flowOf(3)
