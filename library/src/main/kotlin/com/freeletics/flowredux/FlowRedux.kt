@@ -45,14 +45,13 @@ fun <A, S> Flow<A>.reduxStore(
         val actionBroadcastChannel: BroadcastChannel<A> = this@reduxStore.broadcastIn(this)
         val actionBroadcastChannelAsFlow: Flow<A> = actionBroadcastChannel.asFlow()
 
-        launch {
-
-            for (sideEffect in sideEffects) {
+        for (sideEffect in sideEffects) {
+            launch {
                 println("Subscribing sideeffect")
-
                 sideEffect(actionBroadcastChannelAsFlow, stateAccessor).collect { action: A ->
-                    // change state
                     println("Got action $action from sideeffect")
+
+                    // Change state
                     mutex.lock()
                     val newState: S = reducer(currentState, action)
                     currentState = newState
@@ -62,11 +61,13 @@ fun <A, S> Flow<A>.reduxStore(
                     // broadcast action
                     actionBroadcastChannel.send(action)
                 }
+                println("Completed sideeffect")
             }
         }
 
+        println("Subscribing upstream")
         collect { action: A ->
-            println("Received Action $action from upstream")
+            println("Received action $action from upstream")
 
             // Change State
             mutex.lock()
@@ -78,6 +79,7 @@ fun <A, S> Flow<A>.reduxStore(
             // React on actions from upstream by broadcasting Actions to SideEffects
             actionBroadcastChannel.send(action)
         }
+        println("Completed upstream")
     }
 
 }
@@ -87,8 +89,17 @@ fun main() = runBlocking {
     val sideEffect1: SideEffect<String, Int> = { action: Flow<Int>, stateAccessor: StateAccessor<String> ->
         action.flatMapConcat { action ->
             println("-- SF1: Got action $action . current state ${stateAccessor()}")
-            if (action != 3)
+            if (action < 3)
                 flowOf(3)
+            else
+                emptyFlow()
+        }
+    }
+    val sideEffect2: SideEffect<String, Int> = { action: Flow<Int>, stateAccessor: StateAccessor<String> ->
+        action.flatMap { action ->
+            println("-- SF2: Got action $action . current state ${stateAccessor()}")
+            if (action < 3)
+                flowOf(4)
             else
                 emptyFlow()
         }
@@ -104,7 +115,7 @@ fun main() = runBlocking {
         //.delayFlow(1000)
         .reduxStore(
             initialStateSupplier = { "Start" },
-            sideEffects = listOf(sideEffect1)
+            sideEffects = listOf(sideEffect1, sideEffect2)
         ) { state, action ->
             state + action
         }
