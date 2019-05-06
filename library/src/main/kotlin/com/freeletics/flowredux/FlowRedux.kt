@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.delayEach
 import kotlinx.coroutines.flow.delayFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMap
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -84,7 +85,7 @@ fun <A, S> Flow<A>.reduxStore(
 @UseExperimental(FlowPreview::class)
 fun main() = runBlocking {
     val sideEffect1: SideEffect<String, Int> = { action: Flow<Int>, stateAccessor: StateAccessor<String> ->
-        action.flatMap { action ->
+        action.flatMapConcat { action ->
             println("-- SF1: Got action $action . current state ${stateAccessor()}")
             if (action != 3)
                 flowOf(3)
