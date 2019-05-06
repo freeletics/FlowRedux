@@ -1,5 +1,7 @@
 package com.freeletics.flowredux
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
@@ -20,6 +22,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 
+@FlowPreview
+@UseExperimental(ExperimentalCoroutinesApi::class)
 fun <A, S> Flow<A>.reduxStore(
     initialStateSupplier: () -> S,
     sideEffects: Iterable<SideEffect<S, A>>,
@@ -27,7 +31,7 @@ fun <A, S> Flow<A>.reduxStore(
 ): Flow<S> = flow {
 
     var currentState: S = initialStateSupplier()
-    val mutex: Mutex = Mutex()
+    val mutex = Mutex()
     val stateAccessor: StateAccessor<S> = { currentState }
 
     println("Emitting initial state")
@@ -77,6 +81,7 @@ fun <A, S> Flow<A>.reduxStore(
 
 }
 
+@UseExperimental(FlowPreview::class)
 fun main() = runBlocking {
     val sideEffect1: SideEffect<String, Int> = { action: Flow<Int>, stateAccessor: StateAccessor<String> ->
         action.flatMap { action ->
