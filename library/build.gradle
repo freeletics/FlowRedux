@@ -22,6 +22,8 @@ dependencies {
     api libraries.coroutines
 
     testImplementation testLibraries.junit
+    testImplementation testLibraries.kotlintest
+    testImplementation testLibraries.coroutinesTest
 }
 
 sourceCompatibility = "1.7"

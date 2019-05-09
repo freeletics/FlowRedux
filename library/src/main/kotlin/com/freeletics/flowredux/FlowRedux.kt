@@ -3,22 +3,15 @@ package com.freeletics.flowredux
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.broadcastIn
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.delayEach
-import kotlinx.coroutines.flow.delayFlow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMap
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.reduce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -42,18 +35,19 @@ fun <A, S> Flow<A>.reduxStore(
 
     coroutineScope {
 
-        val actionBroadcastChannel: BroadcastChannel<A> = this@reduxStore.broadcastIn(this)
+        val actionBroadcastChannel: BroadcastChannel<A> = BroadcastChannel(100)
         val actionBroadcastChannelAsFlow: Flow<A> = actionBroadcastChannel.asFlow()
 
         for (sideEffect in sideEffects) {
             launch {
                 println("Subscribing sideeffect")
                 sideEffect(actionBroadcastChannelAsFlow, stateAccessor).collect { action: A ->
-                    println("Got action $action from sideeffect")
+                    println("Received action $action from sideeffect")
 
                     // Change state
                     mutex.lock()
                     val newState: S = reducer(currentState, action)
+                    println("Reduce from sideeffect: $currentState with $action -> $newState")
                     currentState = newState
                     mutex.unlock()
                     emit(newState)
@@ -72,6 +66,7 @@ fun <A, S> Flow<A>.reduxStore(
             // Change State
             mutex.lock()
             val newState: S = reducer(currentState, action)
+            println("Reduce from upstream: $currentState with $action -> $newState")
             currentState = newState
             mutex.unlock()
             emit(newState)
@@ -80,14 +75,16 @@ fun <A, S> Flow<A>.reduxStore(
             actionBroadcastChannel.send(action)
         }
         println("Completed upstream")
+
+        actionBroadcastChannel.cancel()
     }
 
 }
 
 @UseExperimental(FlowPreview::class)
 fun main() = runBlocking {
-    val sideEffect1: SideEffect<String, Int> = { action: Flow<Int>, stateAccessor: StateAccessor<String> ->
-        action.flatMapConcat { action ->
+    val sideEffect1: SideEffect<String, Int> = { actions, stateAccessor ->
+        actions.flatMapConcat { action ->
             println("-- SF1: Got action $action . current state ${stateAccessor()}")
             if (action < 3)
                 flowOf(3)
@@ -95,11 +92,13 @@ fun main() = runBlocking {
                 emptyFlow()
         }
     }
-    val sideEffect2: SideEffect<String, Int> = { action: Flow<Int>, stateAccessor: StateAccessor<String> ->
-        action.flatMap { action ->
+    val sideEffect2: SideEffect<String, Int> = { actions, stateAccessor ->
+        actions.flatMapConcat { action ->
             println("-- SF2: Got action $action . current state ${stateAccessor()}")
             if (action < 3)
                 flowOf(4)
+            else if (action < 4)
+                flowOf(5)
             else
                 emptyFlow()
         }
