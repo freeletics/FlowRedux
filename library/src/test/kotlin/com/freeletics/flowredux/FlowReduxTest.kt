@@ -94,7 +94,6 @@ class FlowReduxTest {
     }
 
     @Test
-    @Ignore
     @UseExperimental(ExperimentalCoroutinesApi::class)
     fun `store with 2 simple side effects`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
@@ -172,6 +171,7 @@ class FlowReduxTest {
     }
 
     @Test
+    @Ignore
     @UseExperimental(ExperimentalCoroutinesApi::class)
     fun `store with 2 side effects which react to side effect actions`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
