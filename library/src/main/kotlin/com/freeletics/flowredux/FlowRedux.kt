@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.sync.Mutex
 
 @ExperimentalCoroutinesApi
 @FlowPreview
@@ -20,7 +19,6 @@ fun <A, S> Flow<A>.reduxStore(
 ): Flow<S> = flow {
 
     var currentState: S = initialStateSupplier()
-    val mutex = Mutex()
     val stateAccessor: StateAccessor<S> = { currentState }
     val loopback: BroadcastChannel<A> = BroadcastChannel(100)
 
@@ -32,11 +30,9 @@ fun <A, S> Flow<A>.reduxStore(
         println("$origin: action $action received")
 
         // Change state
-        mutex.lock()
         val newState: S = reducer(currentState, action)
         println("$origin: reducing $currentState with $action -> $newState")
         currentState = newState
-        mutex.unlock()
         emit(newState)
 
         // broadcast action
