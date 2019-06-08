@@ -27,6 +27,7 @@ fun <A, S> Flow<A>.reduxStore(
     var currentState: S = initialStateSupplier()
     val mutex = Mutex()
     val stateAccessor: StateAccessor<S> = { currentState }
+    val loopback: BroadcastChannel<A> = BroadcastChannel(100)
 
     println("Emitting initial state")
 
@@ -34,14 +35,11 @@ fun <A, S> Flow<A>.reduxStore(
     emit(currentState)
 
     coroutineScope {
-
-        val actionBroadcastChannel: BroadcastChannel<A> = BroadcastChannel(100)
-        val actionBroadcastChannelAsFlow: Flow<A> = actionBroadcastChannel.asFlow()
-
+        val loopbackFlow = loopback.asFlow()
         for (sideEffect in sideEffects) {
             launch {
                 println("Subscribing sideeffect")
-                sideEffect(actionBroadcastChannelAsFlow, stateAccessor).collect { action: A ->
+                sideEffect(loopbackFlow, stateAccessor).collect { action: A ->
                     println("Received action $action from sideeffect")
 
                     // Change state
@@ -53,7 +51,7 @@ fun <A, S> Flow<A>.reduxStore(
                     emit(newState)
 
                     // broadcast action
-                    actionBroadcastChannel.send(action)
+                    loopback.send(action)
                 }
                 println("Completed sideeffect")
             }
@@ -72,11 +70,10 @@ fun <A, S> Flow<A>.reduxStore(
             emit(newState)
 
             // React on actions from upstream by broadcasting Actions to SideEffects
-            actionBroadcastChannel.send(action)
+            loopback.send(action)
         }
         println("Completed upstream")
-
-        actionBroadcastChannel.cancel()
+        loopback.cancel()
     }
 
 }
