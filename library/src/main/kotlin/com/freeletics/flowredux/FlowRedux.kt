@@ -36,16 +36,16 @@ fun <A, S> Flow<A>.reduxStore(
 
     coroutineScope {
         val loopbackFlow = loopback.asFlow()
-        for (sideEffect in sideEffects) {
+        sideEffects.forEachIndexed { index, sideEffect ->
             launch {
-                println("Subscribing sideeffect")
+                println("Subscribing to SideEffect$index")
                 sideEffect(loopbackFlow, stateAccessor).collect { action: A ->
-                    println("Received action $action from sideeffect")
+                    println("SideEffect$index: action $action received")
 
                     // Change state
                     mutex.lock()
                     val newState: S = reducer(currentState, action)
-                    println("Reduce from sideeffect: $currentState with $action -> $newState")
+                    println("SideEffect$index: $currentState with $action -> $newState")
                     currentState = newState
                     mutex.unlock()
                     emit(newState)
@@ -53,18 +53,18 @@ fun <A, S> Flow<A>.reduxStore(
                     // broadcast action
                     loopback.send(action)
                 }
-                println("Completed sideeffect")
+                println("Completed SideEffect$index")
             }
         }
 
-        println("Subscribing upstream")
+        println("Subscribing to upstream")
         collect { action: A ->
-            println("Received action $action from upstream")
+            println("Upstream: action $action received")
 
             // Change State
             mutex.lock()
             val newState: S = reducer(currentState, action)
-            println("Reduce from upstream: $currentState with $action -> $newState")
+            println("Upstream: $currentState with $action -> $newState")
             currentState = newState
             mutex.unlock()
             emit(newState)
@@ -74,6 +74,7 @@ fun <A, S> Flow<A>.reduxStore(
         }
         println("Completed upstream")
         loopback.cancel()
+        println("Cancelled loopback")
     }
 
 }
