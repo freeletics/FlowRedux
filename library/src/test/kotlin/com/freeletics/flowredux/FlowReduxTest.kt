@@ -166,8 +166,8 @@ class FlowReduxTest {
         }
 
         store.toList() shouldContainExactly listOf("", "1", "16", "167", "1678", "16789", "167892", "1678926", "16789267", "167892678", "1678926789")
-        sideEffect1Actions shouldContainExactly listOf(1, 6, 7, 2, 6, 7)
-        sideEffect2Actions shouldContainExactly listOf(1, 6, 7, 2, 6, 7)
+        sideEffect1Actions shouldContainExactly listOf(1, 6, 7, 8, 9, 2, 6, 7, 8, 9)
+        sideEffect2Actions shouldContainExactly listOf(1, 6, 7, 8, 9, 2, 6, 7, 8, 9)
     }
 
     @Test
