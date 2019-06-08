@@ -28,44 +28,33 @@ fun <A, S> Flow<A>.reduxStore(
     println("Emitting initial state")
     emit(currentState)
 
+    suspend fun callReducer(origin: String, action: A) {
+        println("$origin: action $action received")
+
+        // Change state
+        mutex.lock()
+        val newState: S = reducer(currentState, action)
+        println("$origin: reducing $currentState with $action -> $newState")
+        currentState = newState
+        mutex.unlock()
+        emit(newState)
+
+        // broadcast action
+        loopback.send(action)
+    }
+
     coroutineScope {
         val loopbackFlow = loopback.asFlow()
         sideEffects.forEachIndexed { index, sideEffect ->
             launch {
                 println("Subscribing to SideEffect$index")
-                sideEffect(loopbackFlow, stateAccessor).collect { action: A ->
-                    println("SideEffect$index: action $action received")
-
-                    // Change state
-                    mutex.lock()
-                    val newState: S = reducer(currentState, action)
-                    println("SideEffect$index: $currentState with $action -> $newState")
-                    currentState = newState
-                    mutex.unlock()
-                    emit(newState)
-
-                    // broadcast action
-                    loopback.send(action)
-                }
+                sideEffect(loopbackFlow, stateAccessor).collect { callReducer("SideEffect$index", it) }
                 println("Completed SideEffect$index")
             }
         }
 
         println("Subscribing to upstream")
-        collect { action: A ->
-            println("Upstream: action $action received")
-
-            // Change State
-            mutex.lock()
-            val newState: S = reducer(currentState, action)
-            println("Upstream: $currentState with $action -> $newState")
-            currentState = newState
-            mutex.unlock()
-            emit(newState)
-
-            // React on actions from upstream by broadcasting Actions to SideEffects
-            loopback.send(action)
-        }
+        collect { callReducer("Upstream", it) }
         println("Completed upstream")
         loopback.cancel()
         println("Cancelled loopback")
