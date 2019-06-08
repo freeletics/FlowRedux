@@ -1,5 +1,6 @@
 package com.freeletics.flowredux
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 
-@UseExperimental(FlowPreview::class)
+@UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
 fun main() = runBlocking {
     val sideEffect1: SideEffect<String, Int> = { actions, stateAccessor ->
         actions.flatMapConcat { action ->
