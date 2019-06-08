@@ -33,6 +33,7 @@ class FlowReduxTest {
     }
 
     @Test
+    @Ignore
     fun `store with unconnected empty side effect`() = runBlockingTest {
         val sideEffect1: SideEffect<String, Int> = { _, _ -> emptyFlow() }
 
@@ -88,7 +89,6 @@ class FlowReduxTest {
     }
 
     @Test
-    @Ignore
     fun `store with 2 simple side effects`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
@@ -126,7 +126,6 @@ class FlowReduxTest {
     }
 
     @Test
-    @Ignore
     fun `store with 2 multi value side effects`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
@@ -164,7 +163,7 @@ class FlowReduxTest {
     }
 
     @Test
-    @Ignore
+    @Ignore("select is biased which will cause the first sideeffect to be prioritized, order: 1687926879")
     fun `store with 2 side effects which react to side effect actions`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->

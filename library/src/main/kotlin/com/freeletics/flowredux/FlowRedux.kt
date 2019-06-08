@@ -6,9 +6,9 @@ import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.produceIn
+import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.Mutex
 
 @ExperimentalCoroutinesApi
@@ -44,19 +44,34 @@ fun <A, S> Flow<A>.reduxStore(
     }
 
     coroutineScope {
+        val upstreamChannel = produceIn(this)
         val loopbackFlow = loopback.asFlow()
-        sideEffects.forEachIndexed { index, sideEffect ->
-            launch {
-                println("Subscribing to SideEffect$index")
-                sideEffect(loopbackFlow, stateAccessor).collect { callReducer("SideEffect$index", it) }
-                println("Completed SideEffect$index")
+        val sideEffectChannels = sideEffects.map { it(loopbackFlow, stateAccessor).produceIn(this) }
+
+        while (!upstreamChannel.isClosedForReceive || sideEffectChannels.any { !it.isClosedForReceive }) {
+            select<Unit> {
+                sideEffectChannels.forEachIndexed { index, sideEffectChannel ->
+                    if (!sideEffectChannel.isClosedForReceive) {
+                        // the replacement is an extension function with the same name and the IDE always prefers this one
+                        @Suppress("DEPRECATION", "EXPERIMENTAL_API_USAGE")
+                        sideEffectChannel.onReceiveOrNull { action ->
+                            if (action != null) {
+                                callReducer("SideEffect$index", action)
+                            }
+                        }
+                    }
+                }
+
+                if (!upstreamChannel.isClosedForReceive) {
+                    // the replacement is an extension function with the same name and the IDE always prefers this one
+                    @Suppress("DEPRECATION", "EXPERIMENTAL_API_USAGE")
+                    upstreamChannel.onReceiveOrNull { action ->
+                        if (action != null) {
+                            callReducer("Upstream", action)
+                        }
+                    }
+                }
             }
         }
-
-        println("Subscribing to upstream")
-        collect { callReducer("Upstream", it) }
-        println("Completed upstream")
-        loopback.cancel()
-        println("Cancelled loopback")
     }
 }
