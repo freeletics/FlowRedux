@@ -20,7 +20,7 @@ fun <A, S> Flow<A>.reduxStore(
 
     var currentState: S = initialStateSupplier()
     val stateAccessor: StateAccessor<S> = { currentState }
-    val loopback: BroadcastChannel<A> = BroadcastChannel(100)
+    val loopback: BroadcastChannel<A> = BroadcastChannel(1)
 
     // Emit the initial state
     println("Emitting initial state")
