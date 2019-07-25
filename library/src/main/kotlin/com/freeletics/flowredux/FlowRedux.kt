@@ -22,54 +22,52 @@ fun <A, S> Flow<A>.reduxStore(
     var currentState: S = initialStateSupplier()
     val mutex = Mutex()
     val stateAccessor: StateAccessor<S> = { currentState }
+    val loopback: BroadcastChannel<A> = BroadcastChannel(100)
 
     // Emit the initial state
     println("Emitting initial state")
     emit(currentState)
 
     coroutineScope {
-
-        val actionBroadcastChannel: BroadcastChannel<A> = BroadcastChannel(100)
-        val actionBroadcastChannelAsFlow: Flow<A> = actionBroadcastChannel.asFlow()
-
-        for (sideEffect in sideEffects) {
+        val loopbackFlow = loopback.asFlow()
+        sideEffects.forEachIndexed { index, sideEffect ->
             launch {
-                println("Subscribing sideeffect")
-                sideEffect(actionBroadcastChannelAsFlow, stateAccessor).collect { action: A ->
-                    println("Received action $action from sideeffect")
+                println("Subscribing to SideEffect$index")
+                sideEffect(loopbackFlow, stateAccessor).collect { action: A ->
+                    println("SideEffect$index: action $action received")
 
                     // Change state
                     mutex.lock()
                     val newState: S = reducer(currentState, action)
-                    println("Reduce from sideeffect: $currentState with $action -> $newState")
+                    println("SideEffect$index: $currentState with $action -> $newState")
                     currentState = newState
                     mutex.unlock()
                     emit(newState)
 
                     // broadcast action
-                    actionBroadcastChannel.send(action)
+                    loopback.send(action)
                 }
-                println("Completed sideeffect")
+                println("Completed SideEffect$index")
             }
         }
 
-        println("Subscribing upstream")
+        println("Subscribing to upstream")
         collect { action: A ->
-            println("Received action $action from upstream")
+            println("Upstream: action $action received")
 
             // Change State
             mutex.lock()
             val newState: S = reducer(currentState, action)
-            println("Reduce from upstream: $currentState with $action -> $newState")
+            println("Upstream: $currentState with $action -> $newState")
             currentState = newState
             mutex.unlock()
             emit(newState)
 
             // React on actions from upstream by broadcasting Actions to SideEffects
-            actionBroadcastChannel.send(action)
+            loopback.send(action)
         }
         println("Completed upstream")
-
-        actionBroadcastChannel.cancel()
+        loopback.cancel()
+        println("Cancelled loopback")
     }
 }
