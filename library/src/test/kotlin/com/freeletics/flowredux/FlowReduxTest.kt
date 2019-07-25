@@ -1,7 +1,5 @@
-package com.freeletics.rxredux
+package com.freeletics.flowredux
 
-import com.freeletics.flowredux.SideEffect
-import com.freeletics.flowredux.reduxStore
 import io.kotlintest.matchers.collections.shouldContainExactly
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -17,13 +15,12 @@ import org.junit.Ignore
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
 
-@UseExperimental(FlowPreview::class)
+@UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class FlowReduxTest {
 
     private val counter = AtomicInteger()
 
     @Test
-    @UseExperimental(ExperimentalCoroutinesApi::class)
     fun `store without side effects`() = runBlockingTest {
         val store = flow {
             emit(counter.incrementAndGet())
@@ -36,8 +33,7 @@ class FlowReduxTest {
     }
 
     @Test
-    @UseExperimental(ExperimentalCoroutinesApi::class)
-    fun `store with empty side effect`() = runBlockingTest {
+    fun `store with unconnected empty side effect`() = runBlockingTest {
         val sideEffect1: SideEffect<String, Int> = { _, _ -> emptyFlow() }
 
         val store = flow {
@@ -51,8 +47,7 @@ class FlowReduxTest {
     }
 
     @Test
-    @UseExperimental(ExperimentalCoroutinesApi::class)
-    fun `store with empty flatMapped side effect`() = runBlockingTest {
+    fun `store with empty side effect`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
             actions.flatMapConcat { sideEffect1Actions.add(it); emptyFlow<Int>() }
@@ -70,7 +65,6 @@ class FlowReduxTest {
     }
 
     @Test
-    @UseExperimental(ExperimentalCoroutinesApi::class)
     fun `store with 2 empty side effects`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
@@ -94,12 +88,11 @@ class FlowReduxTest {
     }
 
     @Test
-    @UseExperimental(ExperimentalCoroutinesApi::class)
     fun `store with 2 simple side effects`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
             actions.flatMapConcat {
-                sideEffect1Actions.add(it);
+                sideEffect1Actions.add(it)
                 if (it < 6) {
                     flowOf(6)
                 } else {
@@ -132,13 +125,12 @@ class FlowReduxTest {
     }
 
     @Test
-    @UseExperimental(ExperimentalCoroutinesApi::class)
     @Ignore
     fun `store with 2 multi value side effects`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
             actions.flatMapConcat {
-                sideEffect1Actions.add(it);
+                sideEffect1Actions.add(it)
                 if (it < 6) {
                     flowOf(6, 7)
                 } else {
@@ -172,13 +164,12 @@ class FlowReduxTest {
 
     @Test
     @Ignore
-    @UseExperimental(ExperimentalCoroutinesApi::class)
     fun `store with 2 side effects which react to side effect actions`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
             actions.flatMapConcat {
                 println("SF0: got $it")
-                sideEffect1Actions.add(it);
+                sideEffect1Actions.add(it)
                 if (it < 6) {
                     flowOf(6)
                 } else if (it < 7) {

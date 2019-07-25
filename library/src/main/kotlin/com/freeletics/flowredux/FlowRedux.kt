@@ -4,20 +4,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 
+@ExperimentalCoroutinesApi
 @FlowPreview
-@UseExperimental(ExperimentalCoroutinesApi::class)
 fun <A, S> Flow<A>.reduxStore(
     initialStateSupplier: () -> S,
     sideEffects: Iterable<SideEffect<S, A>>,
@@ -28,9 +23,8 @@ fun <A, S> Flow<A>.reduxStore(
     val mutex = Mutex()
     val stateAccessor: StateAccessor<S> = { currentState }
 
-    println("Emitting initial state")
-
     // Emit the initial state
+    println("Emitting initial state")
     emit(currentState)
 
     coroutineScope {
@@ -78,5 +72,4 @@ fun <A, S> Flow<A>.reduxStore(
 
         actionBroadcastChannel.cancel()
     }
-
 }
