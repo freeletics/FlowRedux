@@ -29,7 +29,7 @@ ext.versions = [
         junit                  : '4.12',
         kotlinMockito          : '1.5.0',
         assertJ                : '3.8.0',
-        karumi                 : '2.2.0',
+        karumi                 : '3.0.2',
         testRunner             : '1.0.2',
         espresso               : '3.0.2',
         screengrab             : '1.2.0',
