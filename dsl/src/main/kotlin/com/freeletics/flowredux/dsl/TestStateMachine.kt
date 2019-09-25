@@ -38,13 +38,16 @@ val sm = flow<MyAction> {
 
 suspend fun onAction2(
     getState: () -> State,
-    setState: (State) -> State,
+    setState: SetState<State>,
     action: MyAction.Action2
 ) {
 
     delay(100) // Could be an http request ... but you could also lunch a new flow here
     val value = Random.nextInt()
 
+    setState {
+        State.S2(value)
+    }
 }
 
 fun main() = runBlocking {

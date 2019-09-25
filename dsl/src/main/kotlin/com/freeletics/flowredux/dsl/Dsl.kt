@@ -118,11 +118,16 @@ class FlowReduxStoreBuilder<S : Any, A : Any>() {
         onAction: OnActionSideEffectBuilder<out S, out A>
     ): Flow<Action<A>> =
         flow {
+
+            val setStateInterceptor = object : SetState<S> {
+                override fun invoke(p1: (currentState: S) -> S) {
+
+                }
+            }
+
             onAction.setStateSideEffect.invoke(
                 stateAccessor,
-                {
-
-                },
+                setStateInterceptor,
                 action
             )
         }
@@ -178,4 +183,6 @@ class OnActionSideEffectBuilder<S : Any, A : Any>(
 }
 
 
-typealias SetStateSideEffect<S, A> = suspend (getState: StateAccessor<S>, setState: (currentState: S) -> S, action: A) -> Unit
+typealias SetStateSideEffect<S, A> = suspend (getState: StateAccessor<S>, setState: SetState<S>, action: A) -> Unit
+
+typealias SetState<S> = ((currentState: S) -> S) -> Unit
