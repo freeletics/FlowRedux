@@ -14,7 +14,7 @@ ext.versions = [
         rxAndroid              : '2.1.1',
         rxBinding              : '2.2.0',
         rxKotlin               : '2.3.0',
-        rxRelay                : '2.1.0',
+        rxRelay                : '2.1.1',
         rxReplayingShare       : '2.1.1',
         okhttp                 : '3.14.1',
 
