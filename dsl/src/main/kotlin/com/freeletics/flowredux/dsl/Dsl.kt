@@ -35,7 +35,7 @@ fun <S : Any, A : Any> Flow<A>.reduxStoreDsl(
 class FlowReduxStoreBuilder<S : Any, A : Any>() {
 
     // TODO is there a better workaround to hide implementation details like this while keep inline fun()
-    val _inStateBuilders = ArrayList<InStateSideEffectBuilder<out S, out S, out A>>()
+    val _inStateBuilders = ArrayList<InStateSideEffectBuilder<S, S, A>>()
 
     inline fun <reified SubState : S> inState(
         block: InStateSideEffectBuilder<S, SubState, A>.() -> Unit
@@ -98,8 +98,8 @@ class FlowReduxStoreBuilder<S : Any, A : Any>() {
     private fun actionsFilterFactory(
         actions: Flow<Action<A>>,
         state: StateAccessor<S>,
-        builder: InStateSideEffectBuilder<out S, out S, out A>,
-        onAction: OnActionSideEffectBuilder<out S, out A>
+        builder: InStateSideEffectBuilder<S, S, A>,
+        onAction: OnActionSideEffectBuilder<S, A>
     ): Flow<A> =
         actions.filter { action ->
             builder.subStateClass.isSubclassOf(state()::class) &&
@@ -115,7 +115,7 @@ class FlowReduxStoreBuilder<S : Any, A : Any>() {
     private fun <SubAction : A> setStateSideEffectFactory(
         action: SubAction,
         stateAccessor: StateAccessor<S>,
-        onAction: OnActionSideEffectBuilder<out S, out A>
+        onAction: OnActionSideEffectBuilder<S, A>
     ): Flow<Action<A>> =
         flow {
 
@@ -138,7 +138,7 @@ class InStateSideEffectBuilder<S : Any, SubState : S, A : Any>(
 ) {
 
     // TODO is there a better workaround to hide implementation details like this while keep inline fun()
-    val _onActionSideEffectBuilders = ArrayList<OnActionSideEffectBuilder<out S, out A>>()
+    val _onActionSideEffectBuilders = ArrayList<OnActionSideEffectBuilder<S, A>>()
 
     inline fun <reified SubAction : A> on(
         flatMapPolicy: OnActionSideEffectBuilder.FlatMapPolicy =
