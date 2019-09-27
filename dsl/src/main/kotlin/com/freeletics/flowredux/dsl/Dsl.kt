@@ -32,10 +32,10 @@ fun <S : Any, A : Any> Flow<A>.reduxStoreDsl(
     //  See TODO in SelfReducableAction.kt
 }
 
-class FlowReduxStoreBuilder<S : Any, A : Any>() {
+class FlowReduxStoreBuilder<S : Any, A : Any> {
 
     // TODO is there a better workaround to hide implementation details like this while keep inline fun()
-    val _inStateBuilders = ArrayList<InStateSideEffectBuilder<S, S, A>>()
+    val _inStateBuilders = ArrayList<InStateSideEffectBuilder<S, out S, A>>()
 
     inline fun <reified SubState : S> inState(
         block: InStateSideEffectBuilder<S, SubState, A>.() -> Unit
@@ -57,7 +57,12 @@ class FlowReduxStoreBuilder<S : Any, A : Any>() {
                     ): Flow<Action<A>> {
                         return when (onAction.flatMapPolicy) {
                             OnActionSideEffectBuilder.FlatMapPolicy.LATEST ->
-                                actionsFilterFactory(actions, state, builder, onAction)
+                                actionsFilterFactory(
+                                    actions,
+                                    state,
+                                    builder.subStateClass,
+                                    onAction
+                                )
                                     .flatMapLatest { action ->
                                         setStateSideEffectFactory(
                                             action = action,
@@ -67,7 +72,12 @@ class FlowReduxStoreBuilder<S : Any, A : Any>() {
                                     }
 
                             OnActionSideEffectBuilder.FlatMapPolicy.MERGE ->
-                                actionsFilterFactory(actions, state, builder, onAction)
+                                actionsFilterFactory(
+                                    actions,
+                                    state,
+                                    builder.subStateClass,
+                                    onAction
+                                )
                                     .flatMapMerge { action ->
                                         setStateSideEffectFactory(
                                             action = action,
@@ -77,7 +87,12 @@ class FlowReduxStoreBuilder<S : Any, A : Any>() {
                                     }
 
                             OnActionSideEffectBuilder.FlatMapPolicy.CONCAT ->
-                                actionsFilterFactory(actions, state, builder, onAction)
+                                actionsFilterFactory(
+                                    actions,
+                                    state,
+                                    builder.subStateClass,
+                                    onAction
+                                )
                                     .flatMapConcat { action ->
                                         setStateSideEffectFactory(
                                             action = action,
@@ -96,18 +111,18 @@ class FlowReduxStoreBuilder<S : Any, A : Any>() {
      * Flow of (sub)action
      */
     private fun actionsFilterFactory(
-        actions: Flow<Action<A>>,
+        actions: Flow<Action<out A>>,
         state: StateAccessor<S>,
-        builder: InStateSideEffectBuilder<S, S, A>,
-        onAction: OnActionSideEffectBuilder<S, A>
+        subStateClass: KClass<out S>,
+        onAction: OnActionSideEffectBuilder<S, out A>
     ): Flow<A> =
         actions.filter { action ->
-            builder.subStateClass.isSubclassOf(state()::class) &&
+            subStateClass.isSubclassOf(state()::class) &&
                 action is ExternalWrappedAction &&
-                onAction.subActionClass.isSubclassOf(action.action::class)
+                onAction.subActionClass.isInstance(action.action::class)
         }.map {
             when (it) {
-                is ExternalWrappedAction<A> -> onAction.subActionClass.cast(it.action)
+                is ExternalWrappedAction<*> -> onAction.subActionClass.cast(it.action)
                 is SelfReducableAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
             }
         }
@@ -121,7 +136,6 @@ class FlowReduxStoreBuilder<S : Any, A : Any>() {
 
             val setStateInterceptor = object : SetState<S> {
                 override fun invoke(p1: (currentState: S) -> S) {
-
                 }
             }
 
