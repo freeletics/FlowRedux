@@ -35,18 +35,20 @@ fun <S : Any, A : Any> Flow<A>.reduxStoreDsl(
 class FlowReduxStoreBuilder<S : Any, A : Any> {
 
     // TODO is there a better workaround to hide implementation details like this while keep inline fun()
-    val _inStateBuilders = ArrayList<InStateSideEffectBuilder<S, out S, A>>()
+    val _inStateBuilders = ArrayList<InStateBlock<S, out S, A>>()
 
     inline fun <reified SubState : S> inState(
-        block: InStateSideEffectBuilder<S, SubState, A>.() -> Unit
+        block: InStateBlock<S, SubState, A>.() -> Unit
     ) {
         // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
-        val builder = InStateSideEffectBuilder<S, SubState, A>(SubState::class)
+        val builder = InStateBlock<S, SubState, A>(SubState::class)
         block(builder)
         _inStateBuilders.add(builder)
     }
 
     // TODO observe sideeffects that observe other flows
+
+
     internal fun generateSideEffects(): List<SideEffect<S, Action<A>>> =
         _inStateBuilders.flatMap { builder ->
             builder._onActionSideEffectBuilders.map { onAction ->
@@ -64,7 +66,7 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
                                     onAction
                                 )
                                     .flatMapLatest { action ->
-                                        setStateSideEffectFactory(
+                                        onActionSideEffectFactory(
                                             action = action,
                                             stateAccessor = state,
                                             onAction = onAction
@@ -79,7 +81,7 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
                                     onAction
                                 )
                                     .flatMapMerge { action ->
-                                        setStateSideEffectFactory(
+                                        onActionSideEffectFactory(
                                             action = action,
                                             stateAccessor = state,
                                             onAction = onAction
@@ -94,7 +96,7 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
                                     onAction
                                 )
                                     .flatMapConcat { action ->
-                                        setStateSideEffectFactory(
+                                        onActionSideEffectFactory(
                                             action = action,
                                             stateAccessor = state,
                                             onAction = onAction
@@ -127,10 +129,10 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
             }
         }
 
-    private fun <SubAction : A> setStateSideEffectFactory(
+    private fun <SubAction : A> onActionSideEffectFactory(
         action: SubAction,
         stateAccessor: StateAccessor<S>,
-        onAction: OnActionSideEffectBuilder<S, A>
+        onAction: OnActionSideEffectBuilder<S, SubAction>
     ): Flow<Action<A>> =
         flow {
 
@@ -139,7 +141,7 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
                 }
             }
 
-            onAction.setStateSideEffect.invoke(
+            onAction.onActionBlock.invoke(
                 stateAccessor,
                 setStateInterceptor,
                 action
@@ -147,7 +149,7 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
         }
 }
 
-class InStateSideEffectBuilder<S : Any, SubState : S, A : Any>(
+class InStateBlock<S : Any, SubState : S, A : Any>(
     internal val subStateClass: KClass<SubState>
 ) {
 
@@ -157,13 +159,13 @@ class InStateSideEffectBuilder<S : Any, SubState : S, A : Any>(
     inline fun <reified SubAction : A> on(
         flatMapPolicy: OnActionSideEffectBuilder.FlatMapPolicy =
             OnActionSideEffectBuilder.FlatMapPolicy.LATEST,
-        noinline sideEffect: SetStateSideEffect<S, SubAction>
+        noinline block: OnActionBlock<S, SubAction>
     ) {
 
-        val builder = OnActionSideEffectBuilder(
+        val builder = OnActionSideEffectBuilder<S, SubAction>(
             flatMapPolicy = flatMapPolicy,
             subActionClass = SubAction::class,
-            setStateSideEffect = sideEffect
+            onActionBlock = block
         )
 
         _onActionSideEffectBuilders.add(builder)
@@ -174,9 +176,9 @@ class InStateSideEffectBuilder<S : Any, SubState : S, A : Any>(
 }
 
 class OnActionSideEffectBuilder<S : Any, A : Any>(
-    internal val subActionClass: KClass<A>,
+    internal val subActionClass: KClass<out A>,
     internal val flatMapPolicy: FlatMapPolicy,
-    internal val setStateSideEffect: SetStateSideEffect<S, A>
+    internal val onActionBlock: OnActionBlock<S, A>
 ) {
 
     // TODO find better name
@@ -197,6 +199,6 @@ class OnActionSideEffectBuilder<S : Any, A : Any>(
 }
 
 
-typealias SetStateSideEffect<S, A> = suspend (getState: StateAccessor<S>, setState: SetState<S>, action: A) -> Unit
+typealias OnActionBlock<S, A> = suspend (getState: StateAccessor<S>, setState: SetState<S>, action: A) -> Unit
 
 typealias SetState<S> = ((currentState: S) -> S) -> Unit

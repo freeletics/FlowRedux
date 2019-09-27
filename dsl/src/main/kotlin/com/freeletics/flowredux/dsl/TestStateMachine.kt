@@ -26,7 +26,7 @@ val sm = flow<MyAction> {
 
         }
 
-        on<MyAction.Action2>(sideEffect = ::onAction2)
+        on<MyAction.Action2>(block = ::onAction2)
     }
 
 
