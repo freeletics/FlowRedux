@@ -11,8 +11,6 @@ import kotlinx.coroutines.flow.Flow
  * (i.e using filter or ofType operator)
  * @param state [StateAccessor] to get the latest state of the state machine
  */
-// @FlowPreview would be nicer because it's viral and let's the user know that this is using an
-// experimental API, but can't be used on a typealias. It's ok though because reduxStore has it.
 // TODO find better name?
 typealias SideEffect<S, A> = (actions: Flow<A>, state: StateAccessor<S>) -> Flow<A>
 
