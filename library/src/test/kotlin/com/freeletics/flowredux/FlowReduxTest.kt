@@ -88,6 +88,7 @@ class FlowReduxTest {
     }
 
     @Test
+    @Ignore
     fun `store with 2 simple side effects`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
