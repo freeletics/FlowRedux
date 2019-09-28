@@ -34,7 +34,7 @@ ext.versions = [
         espresso               : '3.0.2',
         screengrab             : '1.2.0',
         deviceAnimationsRule   : '0.0.2',
-        kotlintest             : '3.3.2',
+        kotlintest             : '3.4.2',
 ]
 
 ext.libraries = [
