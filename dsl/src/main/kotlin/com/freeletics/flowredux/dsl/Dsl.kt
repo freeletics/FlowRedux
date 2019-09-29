@@ -3,6 +3,7 @@ package com.freeletics.flowredux.dsl
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.StateAccessor
 import com.freeletics.flowredux.reduxStore
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
@@ -10,6 +11,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.startWith
 import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.cast
@@ -21,8 +24,8 @@ fun <S : Any, A : Any> Flow<A>.reduxStoreDsl(
     val builder = FlowReduxStoreBuilder<S, A>()
     block(builder)
 
-    return this.map { ExternalWrappedAction(it) }
-        .reduxStore<Action<A>, S>(
+    return this.map { ExternalWrappedAction<S, A>(it) }
+        .reduxStore<Action<S, A>, S>(
             initialStateSupplier = { initialState },
             reducer = ::reducer,
             sideEffects = builder.generateSideEffects()
@@ -48,15 +51,14 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
 
     // TODO observe sideeffects that observe other flows
 
-
-    internal fun generateSideEffects(): List<SideEffect<S, Action<A>>> =
+    internal fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> =
         _inStateBuilders.flatMap { builder ->
             builder._onActionSideEffectBuilders.map { onAction ->
-                object : SideEffect<S, Action<A>> {
+                object : SideEffect<S, Action<S, A>> {
                     override fun invoke(
-                        actions: Flow<Action<A>>,
+                        actions: Flow<Action<S, A>>,
                         state: StateAccessor<S>
-                    ): Flow<Action<A>> {
+                    ): Flow<Action<S, A>> {
                         return when (onAction.flatMapPolicy) {
                             OnActionSideEffectBuilder.FlatMapPolicy.LATEST ->
                                 actionsFilterFactory(
@@ -113,18 +115,19 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
      * Flow of (sub)action
      */
     private fun actionsFilterFactory(
-        actions: Flow<Action<out A>>,
+        actions: Flow<Action<S, out A>>,
         state: StateAccessor<S>,
         subStateClass: KClass<out S>,
         onAction: OnActionSideEffectBuilder<S, out A>
     ): Flow<A> =
         actions.filter { action ->
+            println("filter $action")
             subStateClass.isSubclassOf(state()::class) &&
                 action is ExternalWrappedAction &&
                 onAction.subActionClass.isInstance(action.action::class)
         }.map {
             when (it) {
-                is ExternalWrappedAction<*> -> onAction.subActionClass.cast(it.action)
+                is ExternalWrappedAction<*, *> -> onAction.subActionClass.cast(it.action)
                 is SelfReducableAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
             }
         }
@@ -133,11 +136,14 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
         action: A,
         stateAccessor: StateAccessor<S>,
         onAction: OnActionSideEffectBuilder<S, A>
-    ): Flow<Action<A>> =
+    ): Flow<Action<S, A>> =
         flow {
 
             val setStateInterceptor = object : SetState<S> {
                 override fun invoke(p1: (currentState: S) -> S) {
+                    println("would like to set state because $action")
+                    // emit(SelfReducableAction<S, A>(p1))
+                    // TODO make this suspend somehow
                 }
             }
 
@@ -154,7 +160,7 @@ class InStateBlock<S : Any, SubState : S, A : Any>(
 ) {
 
     // TODO is there a better workaround to hide implementation details like this while keep inline fun()
-    val _onActionSideEffectBuilders = ArrayList<OnActionSideEffectBuilder<S,  A>>()
+    val _onActionSideEffectBuilders = ArrayList<OnActionSideEffectBuilder<S, A>>()
 
     inline fun <reified SubAction : A> on(
         flatMapPolicy: OnActionSideEffectBuilder.FlatMapPolicy =
