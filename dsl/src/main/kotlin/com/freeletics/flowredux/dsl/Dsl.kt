@@ -129,10 +129,10 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
             }
         }
 
-    private fun <SubAction : A> onActionSideEffectFactory(
-        action: SubAction,
+    private fun onActionSideEffectFactory(
+        action: A,
         stateAccessor: StateAccessor<S>,
-        onAction: OnActionSideEffectBuilder<S, SubAction>
+        onAction: OnActionSideEffectBuilder<S, A>
     ): Flow<Action<A>> =
         flow {
 
@@ -154,7 +154,7 @@ class InStateBlock<S : Any, SubState : S, A : Any>(
 ) {
 
     // TODO is there a better workaround to hide implementation details like this while keep inline fun()
-    val _onActionSideEffectBuilders = ArrayList<OnActionSideEffectBuilder<S, A>>()
+    val _onActionSideEffectBuilders = ArrayList<OnActionSideEffectBuilder<S,  A>>()
 
     inline fun <reified SubAction : A> on(
         flatMapPolicy: OnActionSideEffectBuilder.FlatMapPolicy =
@@ -162,10 +162,10 @@ class InStateBlock<S : Any, SubState : S, A : Any>(
         noinline block: OnActionBlock<S, SubAction>
     ) {
 
-        val builder = OnActionSideEffectBuilder<S, SubAction>(
+        val builder = OnActionSideEffectBuilder<S, A>(
             flatMapPolicy = flatMapPolicy,
             subActionClass = SubAction::class,
-            onActionBlock = block
+            onActionBlock = block as OnActionBlock<S, A>
         )
 
         _onActionSideEffectBuilders.add(builder)
