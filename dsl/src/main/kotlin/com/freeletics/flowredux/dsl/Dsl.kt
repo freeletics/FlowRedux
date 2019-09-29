@@ -5,6 +5,7 @@ import com.freeletics.flowredux.StateAccessor
 import com.freeletics.flowredux.reduxStore
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
@@ -108,6 +109,8 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
                     }
                 }
             }
+        }.also {
+            println("Generated ${it.size} sideeffects")
         }
 
     /**
@@ -120,36 +123,35 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
         subStateClass: KClass<out S>,
         onAction: OnActionSideEffectBuilder<S, out A>
     ): Flow<A> =
-        actions.filter { action ->
-            println("filter $action")
-            subStateClass.isSubclassOf(state()::class) &&
-                action is ExternalWrappedAction &&
-                onAction.subActionClass.isInstance(action.action::class)
-        }.map {
-            when (it) {
-                is ExternalWrappedAction<*, *> -> onAction.subActionClass.cast(it.action)
-                is SelfReducableAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
+        actions
+            .filter { action ->
+                val conditionHolds = subStateClass.isSubclassOf(state()::class) &&
+                    action is ExternalWrappedAction &&
+                    onAction.subActionClass.isSubclassOf(action.action::class)
+
+                println("filter $action $conditionHolds")
+
+                conditionHolds
+
+            }.map {
+                when (it) {
+                    is ExternalWrappedAction<*, *> -> onAction.subActionClass.cast(it.action)
+                    is SelfReducableAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
+                }
             }
-        }
 
     private fun onActionSideEffectFactory(
         action: A,
         stateAccessor: StateAccessor<S>,
         onAction: OnActionSideEffectBuilder<S, A>
     ): Flow<Action<S, A>> =
-        flow {
-
-            val setStateInterceptor = object : SetState<S> {
-                override fun invoke(p1: (currentState: S) -> S) {
-                    println("would like to set state because $action")
-                    // emit(SelfReducableAction<S, A>(p1))
-                    // TODO make this suspend somehow
-                }
-            }
-
+        channelFlow {
             onAction.onActionBlock.invoke(
                 stateAccessor,
-                setStateInterceptor,
+                {
+                    println("would like to set state because $action to ${it(stateAccessor())}")
+                    send(SelfReducableAction<S, A>(it))
+                },
                 action
             )
         }
@@ -207,4 +209,4 @@ class OnActionSideEffectBuilder<S : Any, A : Any>(
 
 typealias OnActionBlock<S, A> = suspend (getState: StateAccessor<S>, setState: SetState<S>, action: A) -> Unit
 
-typealias SetState<S> = ((currentState: S) -> S) -> Unit
+typealias SetState<S> = suspend ((currentState: S) -> S) -> Unit

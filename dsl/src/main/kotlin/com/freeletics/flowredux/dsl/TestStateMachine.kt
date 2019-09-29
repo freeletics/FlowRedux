@@ -1,15 +1,19 @@
 package com.freeletics.flowredux.dsl
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 sealed class State {
     object S1 : State() {
-        override fun toString(): String ="S1"
+        override fun toString(): String = "S1"
     }
+
     data class S2(val value: Int) : State()
 }
 
@@ -17,12 +21,14 @@ sealed class MyAction {
     object Action1 : MyAction() {
         override fun toString(): String = "Action1"
     }
-    object Action2 : MyAction(){
+
+    object Action2 : MyAction() {
         override fun toString(): String = "Action2"
     }
 }
 
 val sm = flow<MyAction> {
+    delay(1000)
     emit(MyAction.Action1)
     emit(MyAction.Action2)
 }.reduxStoreDsl<State, MyAction>(State.S1) {
@@ -60,7 +66,9 @@ suspend fun onAction2(
 }
 
 fun main() = runBlocking {
-    sm.collect {
-        println(it)
+    withContext(Dispatchers.IO) {
+        sm.collect {
+            println(it)
+        }
     }
 }
