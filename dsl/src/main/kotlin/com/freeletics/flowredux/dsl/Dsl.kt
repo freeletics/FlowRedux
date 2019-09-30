@@ -145,12 +145,12 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
         stateAccessor: StateAccessor<S>,
         onAction: OnActionSideEffectBuilder<S, A>
     ): Flow<Action<S, A>> =
-        channelFlow {
+        flow {
             onAction.onActionBlock.invoke(
                 stateAccessor,
                 {
                     println("would like to set state because $action to ${it(stateAccessor())}")
-                    send(SelfReducableAction<S, A>(it))
+                    emit(SelfReducableAction<S, A>(it))
                 },
                 action
             )
