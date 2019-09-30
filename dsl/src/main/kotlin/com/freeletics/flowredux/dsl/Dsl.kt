@@ -3,17 +3,13 @@ package com.freeletics.flowredux.dsl
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.StateAccessor
 import com.freeletics.flowredux.reduxStore
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.startWith
 import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.cast
@@ -39,7 +35,7 @@ fun <S : Any, A : Any> Flow<A>.reduxStoreDsl(
 class FlowReduxStoreBuilder<S : Any, A : Any> {
 
     // TODO is there a better workaround to hide implementation details like this while keep inline fun()
-    val _inStateBuilders = ArrayList<InStateBlock<S, out S, A>>()
+    val builderBlocks = ArrayList<StoreWideBlock<S, A>>()
 
     inline fun <reified SubState : S> inState(
         block: InStateBlock<S, SubState, A>.() -> Unit
@@ -47,71 +43,103 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
         // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
         val builder = InStateBlock<S, SubState, A>(SubState::class)
         block(builder)
-        _inStateBuilders.add(builder)
+        builderBlocks.add(builder)
     }
 
     // TODO observe sideeffects that observe other flows
 
     internal fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> =
-        _inStateBuilders.flatMap { builder ->
-            builder._onActionSideEffectBuilders.map { onAction ->
-                object : SideEffect<S, Action<S, A>> {
-                    override fun invoke(
-                        actions: Flow<Action<S, A>>,
-                        state: StateAccessor<S>
-                    ): Flow<Action<S, A>> {
-                        return when (onAction.flatMapPolicy) {
-                            OnActionSideEffectBuilder.FlatMapPolicy.LATEST ->
-                                actionsFilterFactory(
-                                    actions,
-                                    state,
-                                    builder.subStateClass,
-                                    onAction
-                                )
-                                    .flatMapLatest { action ->
-                                        onActionSideEffectFactory(
-                                            action = action,
-                                            stateAccessor = state,
-                                            onAction = onAction
-                                        )
-                                    }
-
-                            OnActionSideEffectBuilder.FlatMapPolicy.MERGE ->
-                                actionsFilterFactory(
-                                    actions,
-                                    state,
-                                    builder.subStateClass,
-                                    onAction
-                                )
-                                    .flatMapMerge { action ->
-                                        onActionSideEffectFactory(
-                                            action = action,
-                                            stateAccessor = state,
-                                            onAction = onAction
-                                        )
-                                    }
-
-                            OnActionSideEffectBuilder.FlatMapPolicy.CONCAT ->
-                                actionsFilterFactory(
-                                    actions,
-                                    state,
-                                    builder.subStateClass,
-                                    onAction
-                                )
-                                    .flatMapConcat { action ->
-                                        onActionSideEffectFactory(
-                                            action = action,
-                                            stateAccessor = state,
-                                            onAction = onAction
-                                        )
-                                    }
-                        }
-                    }
-                }
-            }
+        builderBlocks.flatMap { builder ->
+            builder.generateSideEffect()
         }.also {
             println("Generated ${it.size} sideeffects")
         }
+}
+
+class InStateBlock<S : Any, SubState : S, A : Any>(
+    internal val subStateClass: KClass<SubState>
+) : StoreWideBlock<S, A>() {
+
+    // TODO is there a better workaround to hide implementation details like this while keep inline fun()
+    val _onActionSideEffectBuilders = ArrayList<OnActionSideEffectBuilder<S, A>>()
+
+    inline fun <reified SubAction : A> on(
+        flatMapPolicy: OnActionSideEffectBuilder.FlatMapPolicy =
+            OnActionSideEffectBuilder.FlatMapPolicy.LATEST,
+        noinline block: OnActionBlock<S, SubAction>
+    ) {
+
+        @Suppress("UNCHECKED_CAST")
+        val builder = OnActionSideEffectBuilder<S, A>(
+            flatMapPolicy = flatMapPolicy,
+            subActionClass = SubAction::class,
+            onActionBlock = block as OnActionBlock<S, A>
+        )
+
+        _onActionSideEffectBuilders.add(builder)
+    }
+
+    // TODO function to observe as long as we are in that state (i.e. observe a database as long
+    //  as we are in that state.
+
+    override fun generateSideEffect(): List<SideEffect<S, Action<S, A>>> {
+
+        return _onActionSideEffectBuilders.map { onAction ->
+            object : SideEffect<S, Action<S, A>> {
+                override fun invoke(
+                    actions: Flow<Action<S, A>>,
+                    state: StateAccessor<S>
+                ): Flow<Action<S, A>> {
+                    return when (onAction.flatMapPolicy) {
+                        OnActionSideEffectBuilder.FlatMapPolicy.LATEST ->
+                            actionsFilterFactory(
+                                actions,
+                                state,
+                                subStateClass,
+                                onAction
+                            )
+                                .flatMapLatest { action ->
+                                    onActionSideEffectFactory(
+                                        action = action,
+                                        stateAccessor = state,
+                                        onAction = onAction
+                                    )
+                                }
+
+                        OnActionSideEffectBuilder.FlatMapPolicy.MERGE ->
+                            actionsFilterFactory(
+                                actions,
+                                state,
+                                subStateClass,
+                                onAction
+                            )
+                                .flatMapMerge { action ->
+                                    onActionSideEffectFactory(
+                                        action = action,
+                                        stateAccessor = state,
+                                        onAction = onAction
+                                    )
+                                }
+
+                        OnActionSideEffectBuilder.FlatMapPolicy.CONCAT ->
+                            actionsFilterFactory(
+                                actions,
+                                state,
+                                subStateClass,
+                                onAction
+                            )
+                                .flatMapConcat { action ->
+                                    onActionSideEffectFactory(
+                                        action = action,
+                                        stateAccessor = state,
+                                        onAction = onAction
+                                    )
+                                }
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Creates a Flow that filters for a given (sub)state and (sub)action and returns a
@@ -125,6 +153,7 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
     ): Flow<A> =
         actions
             .filter { action ->
+                // TODO use .isInstance() instead of isSubclassOf() as it should work in kotlin native
                 val conditionHolds = subStateClass.isSubclassOf(state()::class) &&
                     action is ExternalWrappedAction &&
                     onAction.subActionClass.isSubclassOf(action.action::class)
@@ -135,7 +164,7 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
 
             }.map {
                 when (it) {
-                    is ExternalWrappedAction<*, *> -> onAction.subActionClass.cast(it.action)
+                    is ExternalWrappedAction<*, *> -> onAction.subActionClass.cast(it.action) // TODO kotlin native supported?
                     is SelfReducableAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
                 }
             }
@@ -155,32 +184,6 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
                 action
             )
         }
-}
-
-class InStateBlock<S : Any, SubState : S, A : Any>(
-    internal val subStateClass: KClass<SubState>
-) {
-
-    // TODO is there a better workaround to hide implementation details like this while keep inline fun()
-    val _onActionSideEffectBuilders = ArrayList<OnActionSideEffectBuilder<S, A>>()
-
-    inline fun <reified SubAction : A> on(
-        flatMapPolicy: OnActionSideEffectBuilder.FlatMapPolicy =
-            OnActionSideEffectBuilder.FlatMapPolicy.LATEST,
-        noinline block: OnActionBlock<S, SubAction>
-    ) {
-
-        val builder = OnActionSideEffectBuilder<S, A>(
-            flatMapPolicy = flatMapPolicy,
-            subActionClass = SubAction::class,
-            onActionBlock = block as OnActionBlock<S, A>
-        )
-
-        _onActionSideEffectBuilders.add(builder)
-    }
-
-    // TODO function to observe as long as we are in that state (i.e. observe a database as long
-    //  as we are in that state.
 }
 
 class OnActionSideEffectBuilder<S : Any, A : Any>(
@@ -204,6 +207,21 @@ class OnActionSideEffectBuilder<S : Any, A : Any>(
          */
         CONCAT
     }
+}
+
+/**
+ * Observe for the lifetime of the whole redux store.
+ * This observation of a flow is independent from any state the store is in nor from actions
+ * that have been triggered.
+ *
+ * A typical usecase would be something like observing a database.
+ */
+class StoreWideObserveBuilder<S> {
+    var setState: SetState<S>? = null
+}
+
+sealed class StoreWideBlock<S, A> {
+    internal abstract fun generateSideEffect(): List<SideEffect<S, Action<S, A>>>
 }
 
 
