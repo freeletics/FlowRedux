@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
@@ -32,6 +33,12 @@ val sm = flow<MyAction> {
     emit(MyAction.Action1)
     emit(MyAction.Action2)
 }.reduxStoreDsl<State, MyAction>(State.S1) {
+
+    observe(flowOf(1, 2, 3)) { value, getState, setState ->
+        setState {
+            State.S2(value)
+        }
+    }
 
     inState<State.S1> {
 
