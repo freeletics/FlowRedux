@@ -29,7 +29,6 @@ sealed class MyAction {
 }
 
 val sm = flow<MyAction> {
-    delay(1000)
     emit(MyAction.Action1)
     emit(MyAction.Action2)
 }.reduxStoreDsl<State, MyAction>(State.S1) {

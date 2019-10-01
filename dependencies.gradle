@@ -1,24 +1,23 @@
 ext.versions = [
-        agp                    : '3.4.0',
+        agp                    : '3.5.0',
         compileSdk             : 28,
         targetSdk              : 28,
         minSdk                 : 21,
 
         mavenPublish           : '0.8.0',
         dokka                  : '0.9.18',
-
-        coroutines             : '1.3.1',
-        dagger                 : '2.22.1',
-        kotlin                 : '1.3.31',
-        rxJava                 : '2.2.8',
+        coroutines             : '1.3.2',
+        dagger                 : '2.24',
+        kotlin                 : '1.3.50',
+        rxJava                 : '2.2.12',
         rxAndroid              : '2.1.1',
         rxBinding              : '2.2.0',
-        rxKotlin               : '2.3.0',
-        rxRelay                : '2.1.0',
-        rxReplayingShare       : '2.1.1',
-        okhttp                 : '3.14.1',
+        rxKotlin               : '2.4.0',
+        rxRelay                : '2.1.1',
+        rxReplayingShare       : '2.2.0',
+        okhttp                 : '4.2.0',
 
-        retrofit               : '2.5.0',
+        retrofit               : '2.6.2',
         moshi                  : '1.8.0',
         timber                 : '4.7.1',
 
@@ -29,12 +28,12 @@ ext.versions = [
         junit                  : '4.12',
         kotlinMockito          : '1.5.0',
         assertJ                : '3.8.0',
-        karumi                 : '2.2.0',
+        karumi                 : '3.0.2',
         testRunner             : '1.0.2',
         espresso               : '3.0.2',
         screengrab             : '1.2.0',
         deviceAnimationsRule   : '0.0.2',
-        kotlintest             : '3.3.2',
+        kotlintest             : '3.4.2',
 ]
 
 ext.libraries = [
