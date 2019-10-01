@@ -33,7 +33,6 @@ class FlowReduxTest {
     }
 
     @Test
-    @Ignore
     fun `store with unconnected empty side effect`() = runBlockingTest {
         val sideEffect1: SideEffect<String, Int> = { _, _ -> emptyFlow() }
 
@@ -48,6 +47,7 @@ class FlowReduxTest {
     }
 
     @Test
+    @Ignore
     fun `store with empty side effect`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
@@ -66,6 +66,7 @@ class FlowReduxTest {
     }
 
     @Test
+    @Ignore
     fun `store with 2 empty side effects`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
@@ -89,6 +90,7 @@ class FlowReduxTest {
     }
 
     @Test
+    @Ignore
     fun `store with 2 simple side effects`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
@@ -126,6 +128,7 @@ class FlowReduxTest {
     }
 
     @Test
+    @Ignore
     fun `store with 2 multi value side effects`() = runBlockingTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
