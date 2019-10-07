@@ -16,7 +16,7 @@ ext.versions = [
         rxKotlin               : '2.4.0',
         rxRelay                : '2.1.1',
         rxReplayingShare       : '2.2.0',
-        okhttp                 : '4.2.0',
+        okhttp                 : '4.2.2',
 
         retrofit               : '2.6.2',
         moshi                  : '1.8.0',
