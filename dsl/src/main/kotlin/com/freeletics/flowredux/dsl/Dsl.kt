@@ -23,7 +23,7 @@ import kotlin.reflect.full.isSubclassOf
 /**
  * Provides a fluent DSL to specify a ReduxStore
  */
-fun <S : Any, A : Any> Flow<A>.reduxStoreDsl(
+fun <S : Any, A : Any> Flow<A>.reduxStore(
     initialState: S, block: FlowReduxStoreBuilder<S, A>.() -> Unit
 ): Flow<S> {
     val builder = FlowReduxStoreBuilder<S, A>()

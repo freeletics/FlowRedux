@@ -1,16 +1,11 @@
 package com.freeletics.flowredux.dsl
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 sealed class State {
@@ -34,7 +29,7 @@ sealed class MyAction {
 val sm = flow<MyAction> {
     emit(MyAction.Action1)
     emit(MyAction.Action2)
-}.reduxStoreDsl<State, MyAction>(State.S1) {
+}.reduxStore<State, MyAction>(State.S1) {
 
     /*
     observe(timer()) { value, getState, setState ->

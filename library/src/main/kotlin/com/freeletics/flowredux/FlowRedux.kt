@@ -23,15 +23,15 @@ fun <A, S> Flow<A>.reduxStore(
     val loopback: BroadcastChannel<A> = BroadcastChannel(1)
 
     // Emit the initial state
-    println("Emitting initial state")
+    // println("Emitting initial state")
     emit(currentState)
 
     suspend fun callReducer(origin: String, action: A) {
-        println("$origin: action $action received")
+        // println("$origin: action $action received")
 
         // Change state
         val newState: S = reducer(currentState, action)
-        println("$origin: reducing $currentState with $action -> $newState")
+       // println("$origin: reducing $currentState with $action -> $newState")
         currentState = newState
         emit(newState)
 
