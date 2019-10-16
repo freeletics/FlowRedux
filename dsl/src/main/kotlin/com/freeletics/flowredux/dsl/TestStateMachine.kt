@@ -32,19 +32,10 @@ val sm = flow<MyAction> {
     emit(MyAction.Action2)
 }.reduxStore<State, MyAction>(State.S1) {
 
-    /*
-    observe(timer()) { value, getState, setState ->
-        setState {
-            State.S2(value.toInt())
-        }
-    }
-    */
-
     inState<State.S1> {
 
         on<MyAction.Action1> { getState, setState, action: MyAction.Action1 ->
 
-            println("TRIGGERING TRACKING")
             setState {
                 State.S2(value = 1)
             }
@@ -53,10 +44,10 @@ val sm = flow<MyAction> {
 
 
     inState<State.S2> {
-        // TODO implement an example
+
         on<MyAction.Action2>(block = ::onAction2)
 
-        observe(timer()) { value, getState, setState ->
+        observe(interval()) { value, getState, setState ->
             setState {
                 when (val state = getState()) {
                     is State.S2 -> State.S2(state.value + 1)
@@ -75,7 +66,7 @@ suspend fun onAction2(
     action: MyAction.Action2
 ) {
 
-    delay(100) // Could be an http request ... but you could also lunch a new flow here
+    //delay(3000) // Could be an http request ... but you could also lunch a new flow here
     val value = Random.nextInt()
 
     setState {
@@ -91,11 +82,15 @@ fun main() = runBlocking {
     //}
 }
 
-private fun timer() = flow<Long> {
+private fun interval(initialDelay: Long = 0) = flow<Long> {
 
     var counter = 0L
 
     coroutineScope {
+        if (initialDelay > 0) {
+            delay(initialDelay)
+        }
+
         while (isActive) {
             counter++
             delay(1000)
