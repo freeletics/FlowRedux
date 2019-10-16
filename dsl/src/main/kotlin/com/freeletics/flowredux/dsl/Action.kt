@@ -5,9 +5,9 @@ internal data class SelfReducableAction<S, A>(val reduce: (S) -> S) : Action<S, 
 internal data class ExternalWrappedAction<S, A>(val action: A) : Action<S, A>()
 internal class InitialStateAction<S, A> : Action<S, A>()
 
-// TODO we may need an internal action to propagate state changes. This is useful to trigger things
-//  like observe a database in a certain state only. We need such a state to propagate the initial
-//  State and to dispose database flows once a new stat has been reached
+// TODO maybe we need something like an internal State that also holds the information if we have
+//  to propagate a state change to the outside of id a ExternalWrappedAction caused emitting the
+//  same state again. For now we solve this with an distinctUntilChanged() backed in
 
 internal fun <S : Any, A> reducer(state: S, action: Action<S, A>): S =
     when (action) {

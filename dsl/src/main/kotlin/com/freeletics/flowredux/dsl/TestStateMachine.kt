@@ -1,5 +1,6 @@
 package com.freeletics.flowredux.dsl
 
+import com.freeletics.flowredux.StateAccessor
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -57,7 +58,10 @@ val sm = flow<MyAction> {
 
         observe(timer()) { value, getState, setState ->
             setState {
-                State.S2(value.toInt())
+                when (val state = getState()) {
+                    is State.S2 -> State.S2(state.value + 1)
+                    else -> state
+                }
             }
         }
 

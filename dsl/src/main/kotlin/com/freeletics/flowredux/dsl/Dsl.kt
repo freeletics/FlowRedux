@@ -38,10 +38,7 @@ fun <S : Any, A : Any> Flow<A>.reduxStore(
             reducer = ::reducer,
             sideEffects = builder.generateSideEffects()
         )
-        .drop(1) // Drop / Skip the first 1 emission (initial state) as it is re-emitting because of InitialStateAction
-
-    // TODO we may neeed a loop back to propagate internally state changes.
-    //  See TODO in Action.kt
+        .distinctUntilChanged { old, new -> old === new } // distinct until not the same object refrence.
 }
 
 class FlowReduxStoreBuilder<S : Any, A : Any> {

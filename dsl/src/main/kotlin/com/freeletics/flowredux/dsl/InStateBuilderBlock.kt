@@ -153,7 +153,6 @@ class InStateBuilderBlock<S : Any, SubState : S, A : Any>(
             onAction.onActionBlock.invoke(
                 stateAccessor,
                 {
-                    println("would like to set state because $action to ${it(stateAccessor())}")
                     emit(SelfReducableAction<S, A>(it))
                 },
                 action
