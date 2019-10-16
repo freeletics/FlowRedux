@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.flow
  *
  * A typical use case would be something like observing a database.
  */
-class StoreWideObserveBuilderBlock<T, S, A>(
+internal class StoreWideObserveBuilderBlock<T, S, A>(
     private val flow: Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
     private val block: StoreWideObserverBlock<T, S>

@@ -2,10 +2,13 @@ package com.freeletics.flowredux.dsl
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.random.Random
@@ -33,11 +36,13 @@ val sm = flow<MyAction> {
     emit(MyAction.Action2)
 }.reduxStoreDsl<State, MyAction>(State.S1) {
 
-    observe(flowOf(10, 20, 30)) { value, getState, setState ->
+    /*
+    observe(timer()) { value, getState, setState ->
         setState {
-            State.S2(value)
+            State.S2(value.toInt())
         }
     }
+    */
 
     inState<State.S1> {
 
@@ -54,6 +59,12 @@ val sm = flow<MyAction> {
     inState<State.S2> {
         // TODO implement an example
         on<MyAction.Action2>(block = ::onAction2)
+
+        observe(timer()) { value, getState, setState ->
+            setState {
+                State.S2(value.toInt())
+            }
+        }
 
     }
 
@@ -74,9 +85,23 @@ suspend fun onAction2(
 }
 
 fun main() = runBlocking {
-    withContext(Dispatchers.IO) {
-        sm.collect {
-            println(it)
+    // withContext(Dispatchers.IO) {
+    sm.collect {
+        println(it)
+    }
+    //}
+}
+
+private fun timer() = flow<Long> {
+
+    var counter = 0L
+
+    coroutineScope {
+        while (isActive) {
+            counter++
+            delay(1000)
+            emit(counter)
         }
+
     }
 }

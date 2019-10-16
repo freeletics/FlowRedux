@@ -5,12 +5,16 @@ import com.freeletics.flowredux.StateAccessor
 import com.freeletics.flowredux.reduxStore
 import kotlinx.coroutines.flow.DEFAULT_CONCURRENCY
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.skip
 import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.cast
@@ -25,12 +29,16 @@ fun <S : Any, A : Any> Flow<A>.reduxStoreDsl(
     val builder = FlowReduxStoreBuilder<S, A>()
     block(builder)
 
-    return this.map { ExternalWrappedAction<S, A>(it) }
+    return this.map { ExternalWrappedAction<S, A>(it) as Action<S, A> }
+        .onStart {
+            emit(InitialStateAction<S, A>())
+        }
         .reduxStore<Action<S, A>, S>(
             initialStateSupplier = { initialState },
             reducer = ::reducer,
             sideEffects = builder.generateSideEffects()
         )
+        .drop(1) // Drop / Skip the first 1 emission (initial state) as it is re-emitting because of InitialStateAction
 
     // TODO we may neeed a loop back to propagate internally state changes.
     //  See TODO in Action.kt
@@ -61,7 +69,7 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
     //  in the block directly and folks can collect a particular flow directly
     fun <T> observe(
         flow: Flow<T>,
-        flatMapPolicy: FlatMapPolicy = FlatMapPolicy.LATEST,
+        flatMapPolicy: FlatMapPolicy = FlatMapPolicy.CONCAT,
         block: StoreWideObserverBlock<T, S>
     ) {
         val builder = StoreWideObserveBuilderBlock<T, S, A>(
