@@ -48,10 +48,10 @@ val sm = flow<MyAction> {
         on<MyAction.Action2>(block = ::onAction2)
 
         observe(interval()) { value, getState, setState ->
-            setState {
-                when (val state = getState()) {
-                    is State.S2 -> State.S2(state.value + 1)
-                    else -> state
+            setState { currentState ->
+                when (currentState) {
+                    is State.S2 -> State.S2(currentState.value + 1)
+                    else -> currentState
                 }
             }
         }
@@ -75,11 +75,20 @@ suspend fun onAction2(
 }
 
 fun main() = runBlocking {
-    // withContext(Dispatchers.IO) {
+
+    /*
     sm.collect {
         println(it)
     }
-    //}
+
+     */
+
+   val sm = FooStateMachine()
+    sm.dispatch(MyAction.Action1)
+
+    sm.state.collect {
+        println(it)
+    }
 }
 
 private fun interval(initialDelay: Long = 0) = flow<Long> {
@@ -99,3 +108,33 @@ private fun interval(initialDelay: Long = 0) = flow<Long> {
 
     }
 }
+
+class FooStateMachine : FlowReduxStateMachine<State, MyAction>(State.S1, {
+
+    inState<State.S1> {
+
+        on<MyAction.Action1> { getState, setState, action ->
+
+            setState {
+                State.S2(value = 1)
+            }
+        }
+    }
+
+
+    inState<State.S2> {
+
+        on<MyAction.Action2>(block = ::onAction2)
+
+        observe(interval()) { value, getState, setState ->
+            setState { currentState ->
+                when (currentState) {
+                    is State.S2 -> State.S2(currentState.value + 1)
+                    else -> currentState
+                }
+            }
+        }
+
+    }
+
+})

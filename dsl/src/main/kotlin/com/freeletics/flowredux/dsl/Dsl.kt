@@ -24,7 +24,7 @@ import kotlin.reflect.full.isSubclassOf
  * Provides a fluent DSL to specify a ReduxStore
  */
 fun <S : Any, A : Any> Flow<A>.reduxStore(
-    initialState: S, block: FlowReduxStoreBuilder<S, A>.() -> Unit
+    initialStateSupplier: () -> S, block: FlowReduxStoreBuilder<S, A>.() -> Unit
 ): Flow<S> {
     val builder = FlowReduxStoreBuilder<S, A>()
     block(builder)
@@ -34,12 +34,20 @@ fun <S : Any, A : Any> Flow<A>.reduxStore(
             emit(InitialStateAction<S, A>())
         }
         .reduxStore<Action<S, A>, S>(
-            initialStateSupplier = { initialState },
+            initialStateSupplier = initialStateSupplier,
             reducer = ::reducer,
             sideEffects = builder.generateSideEffects()
         )
-        .distinctUntilChanged { old, new -> old === new } // distinct until not the same object refrence.
+        .distinctUntilChanged { old, new -> old === new } // distinct until not the same object reference.
 }
+
+/**
+ * Provides a fluent DSL to specify a ReduxStore
+ */
+fun <S : Any, A : Any> Flow<A>.reduxStore(
+    initialState: S,
+    block: FlowReduxStoreBuilder<S, A>.() -> Unit
+): Flow<S> = this.reduxStore(initialStateSupplier = { initialState }, block = block)
 
 class FlowReduxStoreBuilder<S : Any, A : Any> {
 
