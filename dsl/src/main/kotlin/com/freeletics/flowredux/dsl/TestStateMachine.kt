@@ -1,12 +1,12 @@
 package com.freeletics.flowredux.dsl
 
-import com.freeletics.flowredux.StateAccessor
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
+import java.awt.MediaTracker.LOADING
 import kotlin.random.Random
 
 sealed class State {
@@ -15,6 +15,10 @@ sealed class State {
     }
 
     data class S2(val value: Int) : State()
+
+    object S3 : State() {
+        override fun toString(): String = "S3"
+    }
 }
 
 sealed class MyAction {
@@ -34,12 +38,33 @@ val sm = flow<MyAction> {
 
     inState<State.S1> {
 
-        on<MyAction.Action1> { getState, setState, action: MyAction.Action1 ->
+     /*   on<MyAction.Action1> and S1 { getState, setState, action: MyAction.Action1 ->
 
-            setState {
+            /*
+            inState<INITIAL> {
+                setState { LOAODING }
+                http()
+                setState<LOADING> {
+                    RESULT
+                }
+            }
+
+
+            // MvRx setState? some special checks?
+            setState { // can it be S1? instead of State?
                 State.S2(value = 1)
             }
+
+            val res = http()
+
+            setState {
+
+            }
+            *
+             */
         }
+
+      */
     }
 
 
@@ -75,23 +100,12 @@ suspend fun onAction2(
 }
 
 fun main() = runBlocking {
-
-    /*
     sm.collect {
-        println(it)
-    }
-
-     */
-
-   val sm = FooStateMachine()
-    sm.dispatch(MyAction.Action1)
-
-    sm.state.collect {
         println(it)
     }
 }
 
-private fun interval(initialDelay: Long = 0) = flow<Long> {
+fun interval(initialDelay: Long = 0) = flow<Long> {
 
     var counter = 0L
 
@@ -105,36 +119,5 @@ private fun interval(initialDelay: Long = 0) = flow<Long> {
             delay(1000)
             emit(counter)
         }
-
     }
 }
-
-class FooStateMachine : FlowReduxStateMachine<State, MyAction>(State.S1, {
-
-    inState<State.S1> {
-
-        on<MyAction.Action1> { getState, setState, action ->
-
-            setState {
-                State.S2(value = 1)
-            }
-        }
-    }
-
-
-    inState<State.S2> {
-
-        on<MyAction.Action2>(block = ::onAction2)
-
-        observe(interval()) { value, getState, setState ->
-            setState { currentState ->
-                when (currentState) {
-                    is State.S2 -> State.S2(currentState.value + 1)
-                    else -> currentState
-                }
-            }
-        }
-
-    }
-
-})

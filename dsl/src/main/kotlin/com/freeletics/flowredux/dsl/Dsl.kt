@@ -88,7 +88,5 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
     internal fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> =
         builderBlocks.flatMap { builder ->
             builder.generateSideEffects()
-        }.also {
-            println("Generated ${it.size} sideeffects")
         }
 }
