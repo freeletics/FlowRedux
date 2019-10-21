@@ -1,14 +1,16 @@
 package com.freeletics.flowredux.dsl
 
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.lang.IllegalArgumentException
 
 sealed class FState {
 
     data class StartCountDownState(val timeLeft: Int) : FState()
-    class WorkoutInProfress() : FState()
+    class WorkoutInProgress() : FState()
 }
 
 sealed class FAction {
@@ -28,7 +30,7 @@ class WorkoutStateMachine : FlowReduxStateMachine<FState, FAction>(FState.StartC
                         if (timeLeft > 0)
                             FState.StartCountDownState(timeLeft)
                         else
-                            FState.WorkoutInProfress()
+                            FState.WorkoutInProgress()
                     }
                     else -> state
                 }
@@ -38,7 +40,7 @@ class WorkoutStateMachine : FlowReduxStateMachine<FState, FAction>(FState.StartC
 
     }
 
-    inState<FState.WorkoutInProfress> {
+    inState<FState.WorkoutInProgress> {
         on<FAction.ClickOnScreenAction> { _, _, setState ->
 
             setState {
@@ -49,16 +51,49 @@ class WorkoutStateMachine : FlowReduxStateMachine<FState, FAction>(FState.StartC
     }
 })
 
+
+
+
+
+
+
 fun main() = runBlocking {
 
     val sm = WorkoutStateMachine()
 
-    launch {
-        delay(8000)
-        sm.dispatch(FAction.ClickOnScreenAction)
-        delay(8000)
-        sm.dispatch(FAction.ClickOnScreenAction)
+    launch(Dispatchers.IO) {
+        while (isActive) {
+           readCommandLineAndDispatchActions(sm)
+        }
     }
 
     sm.state.collect { println(it) }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+suspend fun readCommandLineAndDispatchActions(sm : WorkoutStateMachine){
+    val input = readLine()
+    try {
+
+        val action: FAction = when (input) {
+            "c" -> FAction.ClickOnScreenAction
+            else -> {
+                println("unknown command")
+                throw IllegalArgumentException()
+            }
+
+        }
+        sm.dispatch(action)
+    } catch (t: IllegalArgumentException) {
+    }
 }
