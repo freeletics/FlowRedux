@@ -67,10 +67,10 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
     }
 
     /**
-     * Define some global observer to be able to set the state directly from a flow that you observe.
-     * A common use case would be to observe a database
+     * Define some global observer to be able to set the state directly from a flow that you observeWhileInState.
+     * A common use case would be to observeWhileInState a database
      */
-    // TODO not sure if we actually need an observe or can have some kind of `setState` accessible
+    // TODO not sure if we actually need an observeWhileInState or can have some kind of `setState` accessible
     //  in the block directly and folks can collect a particular flow directly
     fun <T> observe(
         flow: Flow<T>,

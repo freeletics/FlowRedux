@@ -42,10 +42,10 @@ class InStateBuilderBlock<S : Any, SubState : S, A : Any>(
         _inStateSideEffectBuilders.add(builder)
     }
 
-    fun <T> observe(
+    fun <T> observeWhileInState(
         flow: Flow<T>,
         flatMapPolicy: FlatMapPolicy = FlatMapPolicy.CONCAT,
-        block: StoreWideObserverBlock<T, S>
+        block: InStateObserverBlock<T, S>
     ) {
         _inStateSideEffectBuilders.add(
             ObserveInStateBuilder(
@@ -111,11 +111,11 @@ class OnActionSideEffectBuilder<S : Any, A : Any, SubState : S>(
     ): Flow<Action<S, A>> =
         flow {
             onActionBlock.invoke(
+                action,
                 stateAccessor,
                 {
                     emit(SelfReducableAction<S, A>(it))
-                },
-                action
+                }
             )
         }
 
@@ -171,7 +171,7 @@ class OnActionSideEffectBuilder<S : Any, A : Any, SubState : S>(
 }
 
 
-typealias OnActionBlock<S, A> = suspend (getState: StateAccessor<S>, setState: SetState<S>, action: A) -> Unit
+typealias OnActionBlock<S, A> = suspend (action: A, getState: StateAccessor<S>, setState: SetState<S>) -> Unit
 
 /**
  * A builder to create a [SideEffect] that observes a Flow<T> as long as the redux store is in

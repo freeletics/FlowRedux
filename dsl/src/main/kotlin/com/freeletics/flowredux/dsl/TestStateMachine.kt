@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
-import java.awt.MediaTracker.LOADING
 import kotlin.random.Random
 
 sealed class State {
@@ -38,33 +37,33 @@ val sm = flow<MyAction> {
 
     inState<State.S1> {
 
-     /*   on<MyAction.Action1> and S1 { getState, setState, action: MyAction.Action1 ->
+        /*   on<MyAction.Action1> and S1 { getState, setState, action: MyAction.Action1 ->
 
-            /*
-            inState<INITIAL> {
-                setState { LOAODING }
-                http()
-                setState<LOADING> {
-                    RESULT
-                }
-            }
+               /*
+               inState<INITIAL> {
+                   setState { LOAODING }
+                   http()
+                   setState<LOADING> {
+                       RESULT
+                   }
+               }
 
 
-            // MvRx setState? some special checks?
-            setState { // can it be S1? instead of State?
-                State.S2(value = 1)
-            }
+               // MvRx setState? some special checks?
+               setState { // can it be S1? instead of State?
+                   State.S2(value = 1)
+               }
 
-            val res = http()
+               val res = http()
 
-            setState {
+               setState {
 
-            }
-            *
-             */
-        }
+               }
+               *
+                */
+           }
 
-      */
+         */
     }
 
 
@@ -72,7 +71,7 @@ val sm = flow<MyAction> {
 
         on<MyAction.Action2>(block = ::onAction2)
 
-        observe(interval()) { value, getState, setState ->
+        observeWhileInState(interval()) { value, getState, setState ->
             setState { currentState ->
                 when (currentState) {
                     is State.S2 -> State.S2(currentState.value + 1)
@@ -86,9 +85,9 @@ val sm = flow<MyAction> {
 }
 
 suspend fun onAction2(
+    action: MyAction.Action2,
     getState: () -> State,
-    setState: SetState<State>,
-    action: MyAction.Action2
+    setState: SetState<State>
 ) {
 
     //delay(3000) // Could be an http request ... but you could also lunch a new flow here
