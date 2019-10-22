@@ -17,6 +17,13 @@ sealed class FAction {
     object ClickOnScreenAction : FAction()
 }
 
+
+
+
+
+
+
+
 class WorkoutStateMachine : FlowReduxStateMachine<FState, FAction>(FState.StartCountDownState(5), {
 
     inState<FState.StartCountDownState> {
