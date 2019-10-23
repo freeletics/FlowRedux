@@ -2,6 +2,22 @@ apply plugin: 'java-library'
 apply plugin: 'kotlin'
 apply plugin: 'org.jetbrains.dokka'
 
+gradle.ext.isCiServer = System.getenv().containsKey("CI")
+logger.warn("Running on CI: ${gradle.ext.isCiServer}")
+
+if (gradle.ext.isCiServer) {
+    apply plugin: "com.vanniktech.maven.publish"
+    mavenPublish {
+        targets {
+            uploadArchives {
+                releaseRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                snapshotRepositoryUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            }
+        }
+    }
+}
+
+
 dependencies {
     implementation project(':library')
     implementation libraries.kotlinReflect
