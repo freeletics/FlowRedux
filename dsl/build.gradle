@@ -1,0 +1,23 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+apply plugin: 'org.jetbrains.dokka'
+
+dependencies {
+    implementation project(':library')
+    implementation libraries.kotlinReflect
+    implementation libraries.kotlinStdlib
+}
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        freeCompilerArgs += ["-Xuse-experimental=kotlin.Experimental"]
+    }
+}
+
+dokka {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/javadoc"
+}
