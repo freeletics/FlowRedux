@@ -45,5 +45,5 @@ allprojects {
 ```
 
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux:0.0.1-SNAPSHOT'
+implementation 'com.freeletics.flowredux:flowredux:0.1.1-SNAPSHOT'
 ```
