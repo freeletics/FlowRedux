@@ -20,6 +20,13 @@ This project is an experimental port of [RxRedux](https://github.com/freeletics/
 
 This project is in a very early stage.
 
+
+```groovy
+implementation 'com.freeletics.flowredux:flowredux:0.1.0'
+implementation 'com.freeletics.flowredux:flowredux-dsl:0.1.0'
+```
+
+
 #### Snapshot
 Latest snapshot (directly published from master branch from Travis CI):
 
