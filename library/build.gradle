@@ -24,14 +24,16 @@ dependencies {
     testImplementation testLibraries.junit
     testImplementation testLibraries.kotlintest
     testImplementation testLibraries.coroutinesTest
+    testImplementation testLibraries.flowRecorder
+    testImplementation 'com.freeletics.flow.test:test:0.0.2-SNAPSHOT'
 }
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    kotlinOptions { 
-        freeCompilerArgs += ["-Xuse-experimental=kotlin.Experimental"]    
+    kotlinOptions {
+        freeCompilerArgs += ["-Xuse-experimental=kotlin.Experimental"]
     }
 }
 

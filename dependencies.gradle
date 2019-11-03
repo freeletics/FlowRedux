@@ -34,6 +34,7 @@ ext.versions = [
         screengrab             : '1.2.0',
         deviceAnimationsRule   : '0.0.2',
         kotlintest             : '3.4.2',
+        flowRecorder           : '0.2.0',
 ]
 
 ext.libraries = [
@@ -81,7 +82,8 @@ ext.testLibraries = [
         screengrab          : "tools.fastlane:screengrab:$versions.screengrab",
         deviceAnimationsRule: "com.github.VictorAlbertos:DeviceAnimationTestRule:$versions.deviceAnimationsRule",
         coroutinesTest      : "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutines",
-        kotlintest          : "io.kotlintest:kotlintest-runner-junit5:$versions.kotlintest"
+        kotlintest          : "io.kotlintest:kotlintest-runner-junit5:$versions.kotlintest",
+        flowRecorder        : "com.freeletics.flow.test:recorder:$versions.flowRecorder"
 ]
 
 ext.gradlePlugins = [
