@@ -9,7 +9,7 @@ ext.versions = [
         coroutines             : '1.3.2',
         dagger                 : '2.24',
         kotlin                 : '1.3.50',
-        rxJava                 : '2.2.12',
+        rxJava                 : '2.2.14',
         rxAndroid              : '2.1.1',
         rxBinding              : '2.2.0',
         rxKotlin               : '2.4.0',
