@@ -114,7 +114,12 @@ class OnActionSideEffectBuilder<S : Any, A : Any, SubState : S>(
                 action,
                 stateAccessor,
                 {
-                    emit(SelfReducableAction<S, A>(it))
+                    emit(
+                        SelfReducableAction<S, A>(
+                            loggingInfo = "Caused by on<$action>",
+                            reduce = it
+                        )
+                    )
                 }
             )
         }
@@ -221,7 +226,7 @@ internal class ObserveInStateBuilder<T, S : Any, A : Any>(
                             when (stateSubscription) {
                                 FilterState.StateChanged.SUBSCRIBE ->
                                     flow.flatMapMerge {
-                                        setStateFlow(value = it, stateAccessor = state)
+                                        setStateFlow( value = it, stateAccessor = state)
                                     }
                                 FilterState.StateChanged.UNSUBSCRIBE -> flow { }
                             }
@@ -235,7 +240,12 @@ internal class ObserveInStateBuilder<T, S : Any, A : Any>(
         stateAccessor: StateAccessor<S>
     ): Flow<Action<S, A>> = flow {
         block(value, stateAccessor) {
-            emit(SelfReducableAction<S, A>(it))
+            emit(
+                SelfReducableAction<S, A>(
+                    loggingInfo = "observeWhileInState<${subStateClass.simpleName}>",
+                    reduce = it
+                )
+            )
         }
     }
 

@@ -1,6 +1,7 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flow.testovertime.record
+import com.freeletics.flowredux.FlowReduxLogger
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
@@ -137,12 +138,20 @@ private sealed class State {
 private class StateMachine(
     builderBlock: FlowReduxStoreBuilder<State, Action>.() -> Unit
 ) : FlowReduxStateMachine<State, Action>(
-    State.Initial, builderBlock
+    CommandLineLogger,
+    State.Initial,
+    builderBlock
 )
 
 private fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.dispatchAsync(action: A) {
     val sm = this
     GlobalScope.launch {
         sm.dispatch(action)
+    }
+}
+
+private object CommandLineLogger : FlowReduxLogger {
+    override fun log(message: String) {
+        println(message)
     }
 }

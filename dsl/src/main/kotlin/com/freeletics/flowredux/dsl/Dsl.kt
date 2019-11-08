@@ -1,5 +1,6 @@
 package com.freeletics.flowredux.dsl
 
+import com.freeletics.flowredux.FlowReduxLogger
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.StateAccessor
 import com.freeletics.flowredux.reduxStore
@@ -24,7 +25,9 @@ import kotlin.reflect.full.isSubclassOf
  * Provides a fluent DSL to specify a ReduxStore
  */
 fun <S : Any, A : Any> Flow<A>.reduxStore(
-    initialStateSupplier: () -> S, block: FlowReduxStoreBuilder<S, A>.() -> Unit
+    logger: FlowReduxLogger? = null,
+    initialStateSupplier: () -> S,
+    block: FlowReduxStoreBuilder<S, A>.() -> Unit
 ): Flow<S> {
     val builder = FlowReduxStoreBuilder<S, A>()
     block(builder)
@@ -34,6 +37,7 @@ fun <S : Any, A : Any> Flow<A>.reduxStore(
             emit(InitialStateAction<S, A>())
         }
         .reduxStore<Action<S, A>, S>(
+            logger = logger,
             initialStateSupplier = initialStateSupplier,
             reducer = ::reducer,
             sideEffects = builder.generateSideEffects()
@@ -45,9 +49,11 @@ fun <S : Any, A : Any> Flow<A>.reduxStore(
  * Provides a fluent DSL to specify a ReduxStore
  */
 fun <S : Any, A : Any> Flow<A>.reduxStore(
+    logger: FlowReduxLogger? = null,
     initialState: S,
     block: FlowReduxStoreBuilder<S, A>.() -> Unit
-): Flow<S> = this.reduxStore(initialStateSupplier = { initialState }, block = block)
+): Flow<S> =
+    this.reduxStore(initialStateSupplier = { initialState }, logger = logger, block = block)
 
 class FlowReduxStoreBuilder<S : Any, A : Any> {
 

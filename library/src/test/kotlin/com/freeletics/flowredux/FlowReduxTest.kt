@@ -1,6 +1,5 @@
 package com.freeletics.flowredux
 
-import com.freeletics.flow.testovertime.record
 import io.kotlintest.matchers.collections.shouldContainExactly
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -19,16 +18,14 @@ import java.util.concurrent.atomic.AtomicInteger
 @UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class FlowReduxTest {
 
-    private val counter = AtomicInteger()
-
     @Test
     fun `store without side effects`() {
         val store = flow {
-            emit(counter.incrementAndGet())
-            emit(counter.incrementAndGet())
+            emit(1)
+            emit(2)
         }.reduxStore({ "" }, listOf()) { state, action ->
             state + action
-        }.record()
+        }.testOverTime()
 
         store.shouldEmitNext("", "1", "12")
     }
@@ -38,11 +35,11 @@ class FlowReduxTest {
         val sideEffect1: SideEffect<String, Int> = { _, _ -> emptyFlow() }
 
         val store = flow {
-            emit(counter.incrementAndGet())
-            emit(counter.incrementAndGet())
+            emit(1)
+            emit(2)
         }.reduxStore({ "" }, listOf(sideEffect1)) { state, action ->
             state + action
-        }.record()
+        }.testOverTime()
 
         store.shouldEmitNext("", "1", "12")
     }
@@ -50,6 +47,9 @@ class FlowReduxTest {
     @Test
     @Ignore
     fun `store with empty side effect`() {
+
+        val counter = AtomicInteger()
+
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
             actions.flatMapConcat {
@@ -65,7 +65,7 @@ class FlowReduxTest {
         }.reduxStore({ "" }, listOf(sideEffect1)) { state, action ->
             println("Reducer $state $action")
             state + action
-        }.record()
+        }.testOverTime()
 
         store.shouldEmitNext("", "1", "12")
         Thread.sleep(2000)
@@ -74,6 +74,9 @@ class FlowReduxTest {
 
     @Test
     fun `store with 2 empty side effects`() = runBlockingTest {
+
+        val counter = AtomicInteger()
+
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
             actions.flatMapConcat { sideEffect1Actions.add(it); emptyFlow<Int>() }
@@ -88,16 +91,18 @@ class FlowReduxTest {
             emit(counter.incrementAndGet())
         }.reduxStore({ "" }, listOf(sideEffect1, sideEffect2)) { state, action ->
             state + action
-        }
+        }.testOverTime()
 
-        store.toList() shouldContainExactly listOf("", "1", "12")
+        store.shouldEmitNext("", "1", "12")
         sideEffect1Actions shouldContainExactly listOf(1, 2)
         sideEffect2Actions shouldContainExactly listOf(1, 2)
     }
 
     @Test
-    @Ignore
-    fun `store with 2 simple side effects`() = runBlockingTest {
+    fun `store with 2 simple side effects`() {
+
+        val counter = AtomicInteger()
+
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
             actions.flatMapConcat {
@@ -124,18 +129,20 @@ class FlowReduxTest {
         val store = flow {
             emit(counter.incrementAndGet())
             emit(counter.incrementAndGet())
-        }.reduxStore({ "" }, listOf(sideEffect1, sideEffect2)) { state, action ->
+        }.reduxStore({ "" }, listOf(sideEffect1, sideEffect2), CommandLineLogger) { state, action ->
             state + action
-        }
+        }.testOverTime()
 
-        store.toList() shouldContainExactly listOf("", "1", "16", "167", "1672", "16726", "167267")
-        sideEffect1Actions shouldContainExactly listOf(1, 6, 7, 2, 6, 7)
-        sideEffect2Actions shouldContainExactly listOf(1, 6, 7, 2, 6, 7)
+        store.shouldEmitNext("", "1", "12", "126", "1266", "12667", "126677")
+        sideEffect1Actions shouldContainExactly listOf(1, 2, 6, 6, 7, 7)
+        sideEffect2Actions shouldContainExactly listOf(1, 2, 6, 6, 7, 7)
     }
 
     @Test
     @Ignore
     fun `store with 2 multi value side effects`() = runBlockingTest {
+        val counter = AtomicInteger()
+
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
             actions.flatMapConcat {
@@ -186,6 +193,9 @@ class FlowReduxTest {
     @Test
     @Ignore("select is biased which will cause the first sideeffect to be prioritized, order: 1687926879")
     fun `store with 2 side effects which react to side effect actions`() = runBlockingTest {
+
+        val counter = AtomicInteger()
+
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
             actions.flatMapConcat {
@@ -241,5 +251,12 @@ class FlowReduxTest {
 
     private suspend fun <T> Flow<T>.toList() = withTimeout(1000L) {
         toCollection(mutableListOf())
+    }
+}
+
+private object CommandLineLogger : FlowReduxLogger{
+
+    override fun log(message: String) {
+        println(message)
     }
 }

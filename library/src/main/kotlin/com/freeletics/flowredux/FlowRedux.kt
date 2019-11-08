@@ -15,6 +15,7 @@ import kotlinx.coroutines.selects.select
 fun <A, S> Flow<A>.reduxStore(
     initialStateSupplier: () -> S,
     sideEffects: Iterable<SideEffect<S, A>>,
+    logger : FlowReduxLogger? = null,
     reducer: Reducer<S, A>
 ): Flow<S> = flow {
 
@@ -27,11 +28,11 @@ fun <A, S> Flow<A>.reduxStore(
     emit(currentState)
 
     suspend fun callReducer(origin: String, action: A) {
-        // println("$origin: action $action received")
+        logger?.log("$origin: action $action received")
 
         // Change state
         val newState: S = reducer(currentState, action)
-       // println("$origin: reducing $currentState with $action -> $newState")
+        logger?.log("$origin: reducing $currentState with $action -> $newState")
         currentState = newState
         emit(newState)
 
