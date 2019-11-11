@@ -89,11 +89,11 @@ class OnActionSideEffectBuilder<S : Any, A : Any, SubState : S>(
         actions
             .filter { action ->
                 // TODO use .isInstance() instead of isSubclassOf() as it should work in kotlin native
-                val conditionHolds = subStateClass.isSubclassOf(state()::class) &&
+                val conditionHolds = subStateClass.isInstance(state()) &&
                     action is ExternalWrappedAction &&
-                    subActionClass.isSubclassOf(action.action::class)
+                    subActionClass.isInstance(action.action)
 
-                // println("filter $action $conditionHolds")
+                println("filter $action $conditionHolds")
 
                 conditionHolds
 
