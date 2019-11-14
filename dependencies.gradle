@@ -31,7 +31,7 @@ ext.versions = [
         karumi                 : '3.0.2',
         testRunner             : '1.0.2',
         espresso               : '3.0.2',
-        screengrab             : '1.2.0',
+        screengrab             : '2.0.0',
         deviceAnimationsRule   : '0.0.2',
         kotlintest             : '3.4.2',
         flowRecorder           : '0.2.0',
