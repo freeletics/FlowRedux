@@ -126,7 +126,9 @@ class DslTest {
 
 private sealed class Action {
     object A1 : Action()
-    object A2 : Action()
+    object A2 : Action(){
+        fun foo(){}
+    }
 }
 
 private sealed class State {

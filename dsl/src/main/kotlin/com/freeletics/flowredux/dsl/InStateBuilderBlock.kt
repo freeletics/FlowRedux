@@ -15,8 +15,6 @@ import kotlinx.coroutines.sync.withLock
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import kotlin.reflect.KClass
-import kotlin.reflect.full.cast
-import kotlin.reflect.full.isSubclassOf
 
 // TODO @DslMarker
 
@@ -99,7 +97,7 @@ class OnActionSideEffectBuilder<S : Any, A : Any, SubState : S>(
 
             }.map {
                 when (it) {
-                    is ExternalWrappedAction<*, *> -> subActionClass.cast(it.action) // TODO kotlin native supported?
+                    is ExternalWrappedAction<*, *> -> it.action as A // TODO kotlin native supported?
                     is SelfReducableAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
                     is InitialStateAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
                 }

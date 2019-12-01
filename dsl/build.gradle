@@ -20,7 +20,6 @@ if (gradle.ext.isCiServer) {
 
 dependencies {
     implementation project(':library')
-    implementation libraries.kotlinReflect
     implementation libraries.kotlinStdlib
 
 

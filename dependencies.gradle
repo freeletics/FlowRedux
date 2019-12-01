@@ -41,7 +41,6 @@ ext.libraries = [
         dagger                : "com.google.dagger:dagger:$versions.dagger",
         daggerCompiler        : "com.google.dagger:dagger-compiler:$versions.dagger",
         kotlinStdlib          : "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin",
-        kotlinReflect         : "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin",
         moshi                 : "com.squareup.moshi:moshi:$versions.moshi",
         moshiKotlin           : "com.squareup.moshi:moshi-kotlin:$versions.moshi",
         moshiCodeGen          : "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi",
