@@ -1,8 +1,10 @@
 package com.freeletics.flowredux
 
+import com.freeletics.flow.testovertime.record
 import io.kotlintest.matchers.collections.shouldContainExactly
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapConcat
@@ -16,7 +18,7 @@ import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
 
 @UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
-class FlowReduxTest {
+class FlowReduxTestRecorder {
 
     @Test
     fun `store without side effects`() {
@@ -25,7 +27,7 @@ class FlowReduxTest {
             emit(2)
         }.reduxStore({ "" }, listOf()) { state, action ->
             state + action
-        }.testOverTime()
+        }.record()
 
         store.shouldEmitNext("", "1", "12")
     }
@@ -39,7 +41,7 @@ class FlowReduxTest {
             emit(2)
         }.reduxStore({ "" }, listOf(sideEffect1)) { state, action ->
             state + action
-        }.testOverTime()
+        }.record()
 
         store.shouldEmitNext("", "1", "12")
     }
@@ -65,7 +67,7 @@ class FlowReduxTest {
         }.reduxStore({ "" }, listOf(sideEffect1)) { state, action ->
             println("Reducer $state $action")
             state + action
-        }.testOverTime()
+        }.record()
 
         store.shouldEmitNext("", "1", "12")
         Thread.sleep(2000)
@@ -73,7 +75,7 @@ class FlowReduxTest {
     }
 
     @Test
-    fun `store with 2 empty side effects`() = runBlockingTest {
+    fun `store with 2 empty side effects`() {
 
         val counter = AtomicInteger()
 
@@ -89,9 +91,10 @@ class FlowReduxTest {
         val store = flow {
             emit(counter.incrementAndGet())
             emit(counter.incrementAndGet())
+            delay(2000) // Need some extra delay, otherwise .record() completes before side effects get the action dispatched
         }.reduxStore({ "" }, listOf(sideEffect1, sideEffect2)) { state, action ->
             state + action
-        }.testOverTime()
+        }.record()
 
         store.shouldEmitNext("", "1", "12")
         sideEffect1Actions shouldContainExactly listOf(1, 2)
@@ -129,9 +132,10 @@ class FlowReduxTest {
         val store = flow {
             emit(counter.incrementAndGet())
             emit(counter.incrementAndGet())
+            delay(1000)
         }.reduxStore({ "" }, listOf(sideEffect1, sideEffect2), CommandLineLogger) { state, action ->
             state + action
-        }.testOverTime()
+        }.record()
 
         store.shouldEmitNext("", "1", "12", "126", "1266", "12667", "126677")
         sideEffect1Actions shouldContainExactly listOf(1, 2, 6, 6, 7, 7)
