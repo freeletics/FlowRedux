@@ -1,0 +1,90 @@
+// apply plugin: 'com.android.library'
+apply plugin: 'kotlin-multiplatform'
+apply plugin: 'org.jetbrains.kotlin.native.cocoapods'
+// apply plugin: 'co.touchlab.kotlinxcodesync'
+
+
+/*
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+}
+*/
+
+kotlin {
+    targets {
+        jvm()
+        final def iOSTarget = System.getenv('SDK_NAME')?.startsWith("iphoneos") \
+                              ? presets.iosArm64 : presets.iosX64
+
+        fromPreset(iOSTarget, 'iOS') {
+            binaries {
+                framework('common')
+            }
+        }
+
+//        fromPreset(presets.android, 'android')
+
+    }
+
+    js {
+        compileKotlinJs {
+            kotlinOptions.metaInfo = true
+            kotlinOptions.sourceMap = true
+            kotlinOptions.moduleKind = "commonjs"
+            kotlinOptions.main = "call"
+        }
+    }
+
+
+    cocoapods {
+        // Configure fields required by CocoaPods.
+        summary = "Some description for a Kotlin/Native module"
+        homepage = "Link to a Kotlin/Native module homepage"
+    }
+
+
+    sourceSets {
+        commonMain.dependencies {
+            // Kotlin
+            implementation libraries.kotlinStdlibCommon
+
+        }
+/*
+        androidMain.dependencies {
+            // Kotlin
+            implementation libraries.kotlinStdlib
+        }
+*/
+        iOSMain.dependencies {
+        }
+
+        jvmMain.dependencies {
+            // Kotlin
+            implementation libraries.kotlinStdlib
+        }
+
+        jsMain.dependencies {
+            api libraries.kotlinStdlibJs
+        }
+
+    }
+}
+
+// workaround for https://youtrack.jetbrains.com/issue/KT-27170
+configurations {
+    compileClasspath
+}
+
+/*
+xcode {
+    projectPath = "../ios/GalwayBusApp/GalwayBusApp.xcodeproj"
+    target = "GalwayBusApp"
+}
+ */

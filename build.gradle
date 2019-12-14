@@ -12,9 +12,9 @@ buildscript {
     dependencies {
         classpath gradlePlugins.android
         classpath gradlePlugins.kotlin
-        classpath gradlePlugins.karumi
         classpath gradlePlugins.mavenPublish
         classpath gradlePlugins.dokka
+        classpath gradlePlugins.kotlinxcodesync
     }
 }
 
