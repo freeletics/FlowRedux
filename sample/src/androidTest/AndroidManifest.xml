@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.freeletics.rxredux.tests"
+    package="com.freeletics.flowredux.tests"
     android:sharedUserId="com.freeletics.rxredux.uid">
 
     <uses-permission android:name="android.permission.INTERNET" />

@@ -1,4 +1,4 @@
-package com.freeletics.rxredux.businesslogic.github
+package com.freeletics.flowredux.businesslogic.github
 
 import io.reactivex.Single
 import retrofit2.http.GET

@@ -1,4 +1,4 @@
-package com.freeletics.rxredux.businesslogic.github
+package com.freeletics.flowredux.businesslogic.github
 
 import com.squareup.moshi.JsonClass
 

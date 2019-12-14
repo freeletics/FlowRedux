@@ -1,4 +1,4 @@
-package com.freeletics.rxredux.businesslogic.github
+package com.freeletics.flowredux.businesslogic.github
 
 import javax.inject.Inject
 
