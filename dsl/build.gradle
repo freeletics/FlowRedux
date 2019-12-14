@@ -48,14 +48,17 @@ kotlin {
             }
         }
 
-        /*
         jvmMain {
             dependsOn commonMain
             dependencies {
                 implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+                implementation testLibraries.junit
+                implementation testLibraries.kotlintest
+                implementation testLibraries.coroutinesTest
+                implementation testLibraries.flowRecorder
+                implementation 'com.freeletics.flow.test:test:0.0.2-SNAPSHOT'
             }
         }
-         */
     }
 }
 
