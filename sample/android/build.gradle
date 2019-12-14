@@ -59,6 +59,8 @@ dependencies {
     implementation libraries.moshiKotlin
     implementation libraries.moshi
 
+    implementation project(':sample:shared_code')
+
     kapt libraries.moshiCodeGen
     implementation libraries.moshi
     implementation libraries.dagger
