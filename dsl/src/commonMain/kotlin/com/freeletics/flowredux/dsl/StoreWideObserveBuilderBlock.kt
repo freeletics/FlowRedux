@@ -22,26 +22,26 @@ internal class StoreWideObserveBuilderBlock<T, S, A>(
 ) : StoreWideBuilderBlock<S, A>() {
 
     override fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {
-        return listOf(
-            object : SideEffect<S, Action<S, A>> {
-                override fun invoke(
-                    actions: Flow<Action<S, A>>,
-                    state: StateAccessor<S>
-                ): Flow<Action<S, A>> = when (flatMapPolicy) {
-                    FlatMapPolicy.LATEST -> flow.flatMapLatest {
-                        setStateFlow(value = it, stateAccessor = state)
-                    }
-                    FlatMapPolicy.CONCAT -> flow.flatMapConcat {
-                        setStateFlow(value = it, stateAccessor = state)
 
-                    }
-                    FlatMapPolicy.MERGE -> flow.flatMapMerge {
-                        setStateFlow(value = it, stateAccessor = state)
+        val sideEffect: SideEffect<S, Action<S, A>> = { actions: Flow<Action<S, A>>,
+            state: StateAccessor<S> ->
 
-                    }
+            when (flatMapPolicy) {
+                FlatMapPolicy.LATEST -> flow.flatMapLatest {
+                    setStateFlow(value = it, stateAccessor = state)
+                }
+                FlatMapPolicy.CONCAT -> flow.flatMapConcat {
+                    setStateFlow(value = it, stateAccessor = state)
+
+                }
+                FlatMapPolicy.MERGE -> flow.flatMapMerge {
+                    setStateFlow(value = it, stateAccessor = state)
+
                 }
             }
-        )
+        }
+
+        return listOf(sideEffect)
     }
 
     private suspend fun setStateFlow(

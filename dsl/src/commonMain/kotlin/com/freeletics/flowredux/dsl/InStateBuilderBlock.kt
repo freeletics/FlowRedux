@@ -12,11 +12,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
 import kotlin.reflect.KClass
-import kotlin.reflect.full.cast
-import kotlin.reflect.full.isSubclassOf
 
 // TODO @DslMarker
 
@@ -99,7 +95,7 @@ class OnActionSideEffectBuilder<S : Any, A : Any, SubState : S>(
 
             }.map {
                 when (it) {
-                    is ExternalWrappedAction<*, *> -> subActionClass.cast(it.action) // TODO kotlin native supported?
+                    is ExternalWrappedAction<*, *> -> it.action as A // subActionClass.cast(it.action) // TODO kotlin native supported?
                     is SelfReducableAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
                     is InitialStateAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
                 }
@@ -125,51 +121,47 @@ class OnActionSideEffectBuilder<S : Any, A : Any, SubState : S>(
         }
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
-        return object : SideEffect<S, Action<S, A>> {
-            override fun invoke(
-                actions: Flow<Action<S, A>>,
-                state: StateAccessor<S>
-            ): Flow<Action<S, A>> {
-                return when (flatMapPolicy) {
-                    FlatMapPolicy.LATEST ->
-                        actionsFilterFactory(
-                            actions,
-                            state,
-                            subStateClass
-                        )
-                            .flatMapLatest { action ->
-                                onActionSideEffectFactory(
-                                    action = action,
-                                    stateAccessor = state
-                                )
-                            }
+        return { actions: Flow<Action<S, A>>, state: StateAccessor<S> ->
 
-                    FlatMapPolicy.MERGE ->
-                        actionsFilterFactory(
-                            actions,
-                            state,
-                            subStateClass
-                        )
-                            .flatMapMerge { action ->
-                                onActionSideEffectFactory(
-                                    action = action,
-                                    stateAccessor = state
-                                )
-                            }
+            when (flatMapPolicy) {
+                FlatMapPolicy.LATEST ->
+                    actionsFilterFactory(
+                        actions,
+                        state,
+                        subStateClass
+                    )
+                        .flatMapLatest { action ->
+                            onActionSideEffectFactory(
+                                action = action,
+                                stateAccessor = state
+                            )
+                        }
 
-                    FlatMapPolicy.CONCAT ->
-                        actionsFilterFactory(
-                            actions,
-                            state,
-                            subStateClass
-                        )
-                            .flatMapConcat { action ->
-                                onActionSideEffectFactory(
-                                    action = action,
-                                    stateAccessor = state
-                                )
-                            }
-                }
+                FlatMapPolicy.MERGE ->
+                    actionsFilterFactory(
+                        actions,
+                        state,
+                        subStateClass
+                    )
+                        .flatMapMerge { action ->
+                            onActionSideEffectFactory(
+                                action = action,
+                                stateAccessor = state
+                            )
+                        }
+
+                FlatMapPolicy.CONCAT ->
+                    actionsFilterFactory(
+                        actions,
+                        state,
+                        subStateClass
+                    )
+                        .flatMapConcat { action ->
+                            onActionSideEffectFactory(
+                                action = action,
+                                stateAccessor = state
+                            )
+                        }
             }
         }
     }
@@ -191,47 +183,43 @@ internal class ObserveInStateBuilder<T, S : Any, A : Any>(
 ) : InStateSideEffectBuilder<S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
-        return object : SideEffect<S, Action<S, A>> {
-            override fun invoke(
-                actions: Flow<Action<S, A>>,
-                state: StateAccessor<S>
-            ): Flow<Action<S, A>> =
-                when (flatMapPolicy) {
-                    FlatMapPolicy.LATEST ->
-                        actions
-                            .filterState(state)
-                            .flatMapLatest { stateSubscription ->
-                                when (stateSubscription) {
-                                    FilterState.StateChanged.SUBSCRIBE ->
-                                        flow.flatMapLatest {
-                                            setStateFlow(value = it, stateAccessor = state)
-                                        }
-                                    FilterState.StateChanged.UNSUBSCRIBE -> flow { }
-                                }
-                            }
-                    FlatMapPolicy.CONCAT -> actions
+        return { actions: Flow<Action<S, A>>, state: StateAccessor<S> ->
+            when (flatMapPolicy) {
+                FlatMapPolicy.LATEST ->
+                    actions
                         .filterState(state)
                         .flatMapLatest { stateSubscription ->
                             when (stateSubscription) {
                                 FilterState.StateChanged.SUBSCRIBE ->
-                                    flow.flatMapConcat {
+                                    flow.flatMapLatest {
                                         setStateFlow(value = it, stateAccessor = state)
                                     }
                                 FilterState.StateChanged.UNSUBSCRIBE -> flow { }
                             }
                         }
-                    FlatMapPolicy.MERGE -> actions
-                        .filterState(state)
-                        .flatMapLatest { stateSubscription ->
-                            when (stateSubscription) {
-                                FilterState.StateChanged.SUBSCRIBE ->
-                                    flow.flatMapMerge {
-                                        setStateFlow( value = it, stateAccessor = state)
-                                    }
-                                FilterState.StateChanged.UNSUBSCRIBE -> flow { }
-                            }
+                FlatMapPolicy.CONCAT -> actions
+                    .filterState(state)
+                    .flatMapLatest { stateSubscription ->
+                        when (stateSubscription) {
+                            FilterState.StateChanged.SUBSCRIBE ->
+                                flow.flatMapConcat {
+                                    setStateFlow(value = it, stateAccessor = state)
+                                }
+                            FilterState.StateChanged.UNSUBSCRIBE -> flow { }
                         }
-                }
+                    }
+                FlatMapPolicy.MERGE -> actions
+                    .filterState(state)
+                    .flatMapLatest { stateSubscription ->
+                        when (stateSubscription) {
+                            FilterState.StateChanged.SUBSCRIBE ->
+                                flow.flatMapMerge {
+                                    setStateFlow(value = it, stateAccessor = state)
+                                }
+                            FilterState.StateChanged.UNSUBSCRIBE -> flow { }
+                        }
+                    }
+            }
         }
     }
 
