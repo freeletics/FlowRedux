@@ -1,5 +1,5 @@
 Pod::Spec.new do |spec|
-    spec.name                     = 'SharedCode'
+    spec.name                     = 'shared_code'
     spec.version                  = '1.0'
     spec.homepage                 = 'Link to a Kotlin/Native module homepage'
     spec.source                   = { :git => "Not Published", :tag => "Cocoapods/#{spec.name}/#{spec.version}" }
@@ -28,7 +28,7 @@ Pod::Spec.new do |spec|
             :script => <<-SCRIPT
                 set -ev
                 REPO_ROOT="$PODS_TARGET_SRCROOT"
-                "$REPO_ROOT/../gradlew" -p "$REPO_ROOT" :SharedCode:syncFramework \
+                "$REPO_ROOT/../../gradlew" -p "$REPO_ROOT" :sample:shared_code:syncFramework \
                     -Pkotlin.native.cocoapods.target=$KOTLIN_TARGET \
                     -Pkotlin.native.cocoapods.configuration=$CONFIGURATION \
                     -Pkotlin.native.cocoapods.cflags="$OTHER_CFLAGS" \

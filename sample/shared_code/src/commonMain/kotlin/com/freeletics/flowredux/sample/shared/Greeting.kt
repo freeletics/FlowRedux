@@ -1,6 +1,6 @@
 package com.freeletics.flowredux.sample.shared
 
-object Greeting {
+class Greeting {
 
-    fun hello() = "Hello World!"
+    fun hello() = "Hello Multiplatform World!"
 }

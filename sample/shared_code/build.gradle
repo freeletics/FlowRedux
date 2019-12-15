@@ -1,7 +1,7 @@
 // apply plugin: 'com.android.library'
 apply plugin: 'kotlin-multiplatform'
 apply plugin: 'org.jetbrains.kotlin.native.cocoapods'
-// apply plugin: 'co.touchlab.kotlinxcodesync'
+apply plugin: 'co.touchlab.kotlinxcodesync'
 
 
 /*
@@ -25,7 +25,7 @@ kotlin {
 
         fromPreset(iOSTarget, 'iOS') {
             binaries {
-                framework('common')
+                framework('shared_code')
             }
         }
 
@@ -78,13 +78,13 @@ kotlin {
 }
 
 // workaround for https://youtrack.jetbrains.com/issue/KT-27170
+/*
 configurations {
     compileClasspath
 }
-
-/*
-xcode {
-    projectPath = "../ios/GalwayBusApp/GalwayBusApp.xcodeproj"
-    target = "GalwayBusApp"
-}
  */
+
+xcode {
+    projectPath = "../ios/ios.xcodeproj"
+    target = "ios"
+}
