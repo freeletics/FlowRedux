@@ -38,6 +38,20 @@ android {
     lintOptions {
        abortOnError false
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.md'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/library.kotlin_module'
+        exclude 'META-INF/LICENSE-notice.md'
+    }
 }
 
 dependencies {
@@ -45,8 +59,9 @@ dependencies {
     implementation supportLibraries.appCompat
     implementation supportLibraries.recyclerView
     implementation supportLibraries.constraintLayout
-    implementation supportLibraries.design
     implementation supportLibraries.viewModel
+    implementation supportLibraries.viewModelKtx
+    implementation supportLibraries.fragmentKtx
     implementation libraries.retrofit
     implementation libraries.retrofitRxJava
     implementation libraries.retrofitMoshi
@@ -69,7 +84,7 @@ dependencies {
     implementation testLibraries.okhttpTls
 
     testImplementation testLibraries.junit
-    testImplementation testLibraries.androidArchTesting
+   // testImplementation testLibraries.androidArchTesting
     testImplementation testLibraries.mockWebServer
     testImplementation libraries.moshiKotlin
     testImplementation libraries.moshi

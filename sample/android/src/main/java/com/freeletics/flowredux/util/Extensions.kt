@@ -1,9 +1,9 @@
 package com.freeletics.flowredux.util
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
-import android.support.v4.app.FragmentActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 
-inline fun <reified T : ViewModel> FragmentActivity.viewModel(factory: ViewModelProvider.Factory)
-    = ViewModelProviders.of(this, factory)[T::class.java]
+inline fun <reified T : ViewModel> AppCompatActivity.viewModel(factory: ViewModelProvider.Factory) =
+    ViewModelProviders.of(this, factory)[T::class.java]

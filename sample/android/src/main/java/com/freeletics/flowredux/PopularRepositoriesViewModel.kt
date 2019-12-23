@@ -1,14 +1,27 @@
 package com.freeletics.flowredux
 
-import android.arch.lifecycle.ViewModel
-import javax.inject.Inject
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.freeletics.flowredux.sample.shared.Action
+import com.freeletics.flowredux.sample.shared.PaginationStateMachine
+import com.freeletics.flowredux.sample.shared.PaginationState
 
-class PopularRepositoriesViewModel @Inject constructor(
+    class PopularRepositoriesViewModel : ViewModel() {
 
-) : ViewModel() {
+    val liveData = MutableLiveData<PaginationState>()
 
+    private val stateMachine = PaginationStateMachine(
+        AndroidFlowReduxLogger,
+        viewModelScope,
+        this::onStateChanged
+    )
 
-    override fun onCleared() {
-        super.onCleared()
+    private fun onStateChanged(state: PaginationState) {
+        liveData.value = state
+    }
+
+    fun dispatch(action: Action) {
+        stateMachine.dispatch(action)
     }
 }

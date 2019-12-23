@@ -54,6 +54,7 @@ kotlin {
         commonMain.dependencies {
             // Kotlin
             implementation libraries.kotlinStdlibCommon
+            api project(':dsl')
 
         }
 /*
