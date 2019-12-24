@@ -21,14 +21,19 @@ struct ContentView: View {
             stateChangeListener: { (paginationState: PaginationState) -> Void in
                 NSLog("Received \(paginationState) to render")
                 self.state = paginationState
-        }
-        )
+        } )
     }
     
     
     
     var body: some View {
-        Text("hi")
+        VStack {
+        if state is LoadingPaginationState {
+            LoadingFirstPageView()
+        } else {
+            Text("Default")
+        }
+        }
     }
 }
 

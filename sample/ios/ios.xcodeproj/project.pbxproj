@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7A07762055956F6BFDC87A68 /* Pods_ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9117FB535FC223FB180CEC8C /* Pods_ios.framework */; };
+		D10566BB23B2188400647884 /* LoadingFirstPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10566BA23B2188400647884 /* LoadingFirstPageView.swift */; };
 		D1D799FD23A53A03009C5D8D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D799FC23A53A03009C5D8D /* AppDelegate.swift */; };
 		D1D799FF23A53A03009C5D8D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D799FE23A53A03009C5D8D /* SceneDelegate.swift */; };
 		D1D79A0123A53A03009C5D8D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D79A0023A53A03009C5D8D /* ContentView.swift */; };
@@ -30,6 +31,7 @@
 /* Begin PBXFileReference section */
 		55170E6CA5B2B55A9917C493 /* Pods-ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios.release.xcconfig"; path = "Target Support Files/Pods-ios/Pods-ios.release.xcconfig"; sourceTree = "<group>"; };
 		9117FB535FC223FB180CEC8C /* Pods_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D10566BA23B2188400647884 /* LoadingFirstPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingFirstPageView.swift; sourceTree = "<group>"; };
 		D1D799F923A53A03009C5D8D /* ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1D799FC23A53A03009C5D8D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D1D799FE23A53A03009C5D8D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 				D1D79A0723A53A05009C5D8D /* LaunchScreen.storyboard */,
 				D1D79A0A23A53A05009C5D8D /* Info.plist */,
 				D1D79A0423A53A05009C5D8D /* Preview Content */,
+				D10566BA23B2188400647884 /* LoadingFirstPageView.swift */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -279,6 +282,7 @@
 				D1D799FD23A53A03009C5D8D /* AppDelegate.swift in Sources */,
 				D1D799FF23A53A03009C5D8D /* SceneDelegate.swift in Sources */,
 				D1D79A0123A53A03009C5D8D /* ContentView.swift in Sources */,
+				D10566BB23B2188400647884 /* LoadingFirstPageView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
