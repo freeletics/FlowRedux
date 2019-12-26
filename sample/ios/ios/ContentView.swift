@@ -12,7 +12,7 @@ import shared_code
 import os.log
 
 struct ContentView: View {
-    @State var state : PaginationState = LoadingPaginationState()
+    @State private var state : PaginationState = LoadingPaginationState()
     
     func start(){
         let _ = PaginationStateMachine(
@@ -23,7 +23,6 @@ struct ContentView: View {
                 self.state = paginationState
         } )
     }
-    
     
     
     var body: some View {

@@ -15,7 +15,10 @@ object FooAction : Action()
 
 internal class InternalPaginationStateMachine(logger: FlowReduxLogger) :
     FlowReduxStateMachine<PaginationState, Action>(logger, LoadingPaginationState, {
+
     })
+
+
 
 class PaginationStateMachine(
     logger: FlowReduxLogger,

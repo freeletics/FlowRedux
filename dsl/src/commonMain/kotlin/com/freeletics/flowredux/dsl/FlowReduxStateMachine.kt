@@ -5,32 +5,27 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
 
-open class FlowReduxStateMachine<S : Any, A : Any>(
+abstract class FlowReduxStateMachine<S : Any, A : Any>(
     logger: FlowReduxLogger?,
-    initialStateSupplier: () -> S,
-    builderBlock: FlowReduxStoreBuilder<S, A>.() -> Unit
+    initialStateSupplier: () -> S
 ) {
 
     // TODO remove constructor overloads
     constructor(
-        initialStateSupplier: () -> S,
-        builderBlock: FlowReduxStoreBuilder<S, A>.() -> Unit
+        initialStateSupplier: () -> S
     ) : this(
         logger = null,
-        initialStateSupplier = initialStateSupplier,
-        builderBlock = builderBlock
+        initialStateSupplier = initialStateSupplier
     )
 
-    constructor(
-        initialState: S,
-        builderBlock: FlowReduxStoreBuilder<S, A>.() -> Unit
-    ) : this(logger = null, initialState = initialState, builderBlock = builderBlock)
+    constructor(initialState: S) : this(logger = null, initialState = initialState)
 
     constructor(
         logger: FlowReduxLogger?,
-        initialState: S,
-        builderBlock: FlowReduxStoreBuilder<S, A>.() -> Unit
-    ) : this(logger, { initialState }, builderBlock)
+        initialState: S
+    ) : this(logger, { initialState })
+
+    protected abstract val spec: FlowReduxStoreBuilder<S, A>.() -> Unit
 
     private val inputActionChannel = Channel<A>(Channel.UNLIMITED)
 
@@ -40,5 +35,6 @@ open class FlowReduxStateMachine<S : Any, A : Any>(
 
     val state: Flow<S> = inputActionChannel
         .consumeAsFlow()
-        .reduxStore<S, A>(logger, initialStateSupplier, builderBlock)
+        .reduxStore<S, A>(logger, initialStateSupplier, spec)
 }
+

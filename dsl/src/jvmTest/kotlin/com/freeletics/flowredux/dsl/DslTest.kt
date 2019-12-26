@@ -139,9 +139,10 @@ private class StateMachine(
     builderBlock: FlowReduxStoreBuilder<State, Action>.() -> Unit
 ) : FlowReduxStateMachine<State, Action>(
     CommandLineLogger,
-    State.Initial,
-    builderBlock
-)
+    State.Initial
+){
+    override val spec: FlowReduxStoreBuilder<State, Action>.() -> Unit = builderBlock
+}
 
 private fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.dispatchAsync(action: A) {
     val sm = this
