@@ -2,7 +2,9 @@ package com.freeletics.flowredux.sample.shared
 
 import com.freeletics.flowredux.FlowReduxLogger
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
+import com.freeletics.flowredux.dsl.FlowReduxStoreBuilder
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -14,9 +16,14 @@ object LoadingPaginationState : PaginationState()
 object FooAction : Action()
 
 internal class InternalPaginationStateMachine(logger: FlowReduxLogger) :
-    FlowReduxStateMachine<PaginationState, Action>(logger, LoadingPaginationState, {
+    FlowReduxStateMachine<PaginationState, Action>(logger, LoadingPaginationState) {
 
-    })
+    override val spec: FlowReduxStoreBuilder<PaginationState, Action>.() -> Unit = {
+        inState<LoadingPaginationState> {
+
+        }
+    }
+}
 
 
 

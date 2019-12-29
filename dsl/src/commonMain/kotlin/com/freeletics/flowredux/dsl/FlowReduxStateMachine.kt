@@ -33,8 +33,10 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
         inputActionChannel.send(action)
     }
 
-    val state: Flow<S> = inputActionChannel
-        .consumeAsFlow()
-        .reduxStore<S, A>(logger, initialStateSupplier, spec)
+    val state: Flow<S> by lazy(LazyThreadSafetyMode.NONE) {
+        inputActionChannel
+            .consumeAsFlow()
+            .reduxStore<S, A>(logger, initialStateSupplier, spec)
+    }
 }
 
