@@ -25,7 +25,19 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
         initialState: S
     ) : this(logger, { initialState })
 
-    protected abstract val spec: FlowReduxStoreBuilder<S, A>.() -> Unit
+    private var specBlockSet = false
+    private var specBlock: (FlowReduxStoreBuilder<S, A>.() -> Unit)? = null
+
+    protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
+        if (specBlockSet) {
+            throw IllegalStateException(
+                "State machine spec has already been set. " +
+                    "It's only allowed to call spec {...} once."
+            )
+        }
+        this.specBlock = specBlock
+        this.specBlockSet = true
+    }
 
     private val inputActionChannel = Channel<A>(Channel.UNLIMITED)
 
@@ -34,9 +46,34 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
     }
 
     val state: Flow<S> by lazy(LazyThreadSafetyMode.NONE) {
+        val spec = specBlock
+        println("Spec is $spec")
+           if (spec == null) {
+               throw IllegalStateException(
+                   """
+                        No state machine specs are defined. Did you call spec { ... } in init {...}?
+                        Example usage:
+                        
+                        class MyStateMachine : FlowReduxStateMachine<State, Action>(InitialState) {
+                            
+                            init{
+                                spec {
+                                    inState<FooState> {
+                                        on<BarAction> { ... }
+                                    }
+                                    ...
+                                }
+                            }
+                        }
+                    """.trimIndent()
+               )
+           }
         inputActionChannel
             .consumeAsFlow()
             .reduxStore<S, A>(logger, initialStateSupplier, spec)
+            .also {
+                specBlock = null // Free up memory
+            }
     }
 }
 

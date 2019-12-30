@@ -136,16 +136,15 @@ private sealed class State {
 }
 
 private class StateMachine(
-    private val builderBlock: FlowReduxStoreBuilder<State, Action>.() -> Unit
+    builderBlock: FlowReduxStoreBuilder<State, Action>.() -> Unit
 ) : FlowReduxStateMachine<State, Action>(
     CommandLineLogger,
     State.Initial
 ) {
-    override val spec: FlowReduxStoreBuilder<State, Action>.() -> Unit
-        get() {
-            println("returing $builderBlock")
-            return builderBlock
-        }
+
+    init {
+        spec(builderBlock)
+    }
 }
 
 private fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.dispatchAsync(action: A) {
