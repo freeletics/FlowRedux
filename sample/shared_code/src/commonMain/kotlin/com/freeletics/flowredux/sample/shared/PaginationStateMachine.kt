@@ -18,9 +18,10 @@ object FooAction : Action()
 internal class InternalPaginationStateMachine(logger: FlowReduxLogger) :
     FlowReduxStateMachine<PaginationState, Action>(logger, LoadingPaginationState) {
 
-    override val spec: FlowReduxStoreBuilder<PaginationState, Action>.() -> Unit = {
-        inState<LoadingPaginationState> {
-
+    init {
+        spec {
+            inState<LoadingPaginationState> {
+            }
         }
     }
 }

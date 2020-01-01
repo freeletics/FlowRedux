@@ -2,7 +2,7 @@
 apply plugin: 'kotlin-multiplatform'
 apply plugin: 'org.jetbrains.kotlin.native.cocoapods'
 apply plugin: 'co.touchlab.kotlinxcodesync'
-
+apply plugin: 'kotlinx-serialization'
 
 /*
 android {
@@ -20,8 +20,8 @@ android {
 kotlin {
     targets {
         jvm()
-        final def iOSTarget = System.getenv('SDK_NAME')?.startsWith("iphoneos") \
-                              ? presets.iosArm64 : presets.iosX64
+        final def iOSTarget = System.getenv('SDK_NAME')?.startsWith("iphoneos")   \
+                                ? presets.iosArm64 : presets.iosX64
 
         fromPreset(iOSTarget, 'iOS') {
             binaries {
@@ -56,20 +56,41 @@ kotlin {
             implementation libraries.kotlinStdlibCommon
             api project(':dsl')
 
+
+            // Ktor
+            api libraries.ktorClientCore
+            implementation libraries.ktorClientJson
+            implementation libraries.ktorClientLogging
+            implementation libraries.ktorClientSerialization
+            implementation libraries.ktorClientSerializationJvm
+
+            // Serialize
+            implementation libraries.kotlinxSerialization
+            implementation libraries.kotlinxSerializationJvm
+
         }
-/*
+
         androidMain.dependencies {
             // Kotlin
             implementation libraries.kotlinStdlib
+            implementation libraries.ktorClientCoreAndroid
+            implementation libraries.ktorClientCoreJvm
+            implementation libraries.ktorClientJsonJvm
+            implementation libraries.ktorClientLoggingJvm
+            implementation libraries.ktorClientSerializationJvm
+            implementation libraries.kotlinxSerializationJvm
         }
-*/
+
+
         iOSMain.dependencies {
         }
 
+        /*
         jvmMain.dependencies {
             // Kotlin
             implementation libraries.kotlinStdlib
         }
+         */
 
         jsMain.dependencies {
             api libraries.kotlinStdlibJs
