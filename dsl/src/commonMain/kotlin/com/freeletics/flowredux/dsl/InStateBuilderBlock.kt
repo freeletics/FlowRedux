@@ -187,36 +187,36 @@ internal class ObserveInStateBuilder<T, S : Any, A : Any>(
             when (flatMapPolicy) {
                 FlatMapPolicy.LATEST ->
                     actions
-                        .filterState(state)
-                        .flatMapLatest { stateSubscription ->
-                            when (stateSubscription) {
-                                FilterState.StateChanged.SUBSCRIBE ->
+                        .mapStateChanges(state)
+                        .flatMapLatest { stateChange ->
+                            when (stateChange) {
+                                MapStateChange.StateChanged.ENTERED ->
                                     flow.flatMapLatest {
                                         setStateFlow(value = it, stateAccessor = state)
                                     }
-                                FilterState.StateChanged.UNSUBSCRIBE -> flow { }
+                                MapStateChange.StateChanged.LEFT -> flow { }
                             }
                         }
                 FlatMapPolicy.CONCAT -> actions
-                    .filterState(state)
-                    .flatMapLatest { stateSubscription ->
-                        when (stateSubscription) {
-                            FilterState.StateChanged.SUBSCRIBE ->
+                    .mapStateChanges(state)
+                    .flatMapLatest { stateChanged ->
+                        when (stateChanged) {
+                            MapStateChange.StateChanged.ENTERED ->
                                 flow.flatMapConcat {
                                     setStateFlow(value = it, stateAccessor = state)
                                 }
-                            FilterState.StateChanged.UNSUBSCRIBE -> flow { }
+                            MapStateChange.StateChanged.LEFT -> flow { }
                         }
                     }
                 FlatMapPolicy.MERGE -> actions
-                    .filterState(state)
-                    .flatMapLatest { stateSubscription ->
-                        when (stateSubscription) {
-                            FilterState.StateChanged.SUBSCRIBE ->
+                    .mapStateChanges(state)
+                    .flatMapLatest { stateChange ->
+                        when (stateChange) {
+                            MapStateChange.StateChanged.ENTERED ->
                                 flow.flatMapMerge {
                                     setStateFlow(value = it, stateAccessor = state)
                                 }
-                            FilterState.StateChanged.UNSUBSCRIBE -> flow { }
+                            MapStateChange.StateChanged.LEFT -> flow { }
                         }
                     }
             }
@@ -238,22 +238,31 @@ internal class ObserveInStateBuilder<T, S : Any, A : Any>(
     }
 
     /**
-     * Internal implementation of an operator that keeps track if you have to subscribe
-     * or unsubscribe of a certain Flow.
-     *
+     * Internal implementation of an operator that keeps track if you a certain state has been
+     * entered or left.
      */
-    private class FilterState<S : Any, A : Any>(
+    private class MapStateChange<S : Any, A : Any>(
         actions: Flow<Action<S, A>>,
         state: StateAccessor<S>,
         subStateClass: KClass<out S>
     ) {
 
         private enum class InternalStateChangedSubscription {
-            SUBSCRIBE, UNSUBSCRIBE, DO_NOTHING
+            ENTERED, LEFT, NOT_CHANGED
         }
 
+        /**
+         * Information about whether a state machine entered or did left a certain state
+         */
         internal enum class StateChanged {
-            SUBSCRIBE, UNSUBSCRIBE
+            /**
+             * Entered the specified state
+             */
+            ENTERED,
+            /**
+             * Left the specified state
+             */
+            LEFT
         }
 
         private val mutex = Mutex()
@@ -273,16 +282,16 @@ internal class ObserveInStateBuilder<T, S : Any, A : Any>(
 
                 if (previousState == null) {
                     if (isInExpectedState) {
-                        InternalStateChangedSubscription.SUBSCRIBE
+                        InternalStateChangedSubscription.ENTERED
                     } else {
-                        InternalStateChangedSubscription.DO_NOTHING
+                        InternalStateChangedSubscription.NOT_CHANGED
                     }
                 } else {
                     when {
-                        isInExpectedState && previousStateInExpectedState -> InternalStateChangedSubscription.DO_NOTHING
-                        isInExpectedState && !previousStateInExpectedState -> InternalStateChangedSubscription.SUBSCRIBE
-                        !isInExpectedState && previousStateInExpectedState -> InternalStateChangedSubscription.UNSUBSCRIBE
-                        !isInExpectedState && !previousStateInExpectedState -> InternalStateChangedSubscription.DO_NOTHING
+                        isInExpectedState && previousStateInExpectedState -> InternalStateChangedSubscription.NOT_CHANGED
+                        isInExpectedState && !previousStateInExpectedState -> InternalStateChangedSubscription.ENTERED
+                        !isInExpectedState && previousStateInExpectedState -> InternalStateChangedSubscription.LEFT
+                        !isInExpectedState && !previousStateInExpectedState -> InternalStateChangedSubscription.NOT_CHANGED
                         else -> throw IllegalStateException(
                             "An internal error occurred: " +
                                 "isInExpectedState: $isInExpectedState" +
@@ -297,22 +306,22 @@ internal class ObserveInStateBuilder<T, S : Any, A : Any>(
 
             }
         }
-            .filter { it != InternalStateChangedSubscription.DO_NOTHING }
+            .filter { it != InternalStateChangedSubscription.NOT_CHANGED }
             .distinctUntilChanged()
             .map {
                 when (it) {
-                    InternalStateChangedSubscription.SUBSCRIBE -> StateChanged.SUBSCRIBE
-                    InternalStateChangedSubscription.UNSUBSCRIBE -> StateChanged.UNSUBSCRIBE
-                    InternalStateChangedSubscription.DO_NOTHING -> throw IllegalStateException(
+                    InternalStateChangedSubscription.ENTERED -> StateChanged.ENTERED
+                    InternalStateChangedSubscription.LEFT -> StateChanged.LEFT
+                    InternalStateChangedSubscription.NOT_CHANGED -> throw IllegalStateException(
                         "Internal Error occurred. File an issue on Github."
                     )
                 }
             }
     }
 
-    private fun Flow<Action<S, A>>.filterState(
+    private fun Flow<Action<S, A>>.mapStateChanges(
         state: StateAccessor<S>
-    ): Flow<FilterState.StateChanged> = FilterState<S, A>(
+    ): Flow<MapStateChange.StateChanged> = MapStateChange<S, A>(
         actions = this,
         subStateClass = subStateClass,
         state = state
