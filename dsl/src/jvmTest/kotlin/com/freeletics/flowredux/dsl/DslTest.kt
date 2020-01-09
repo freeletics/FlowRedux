@@ -159,3 +159,26 @@ private object CommandLineLogger : FlowReduxLogger {
         println(message)
     }
 }
+
+fun main() {
+    val sm = StateMachine {
+        inState<State.Initial> {
+            observeWhileInState(flowOf(1)) { _, _, setState ->
+                setState { State.S1 }
+            }
+        }
+
+        inState<State.S1> {
+            on<Action.A1> { _, _, setState ->
+                setState { State.S2 }
+            }
+        }
+
+        inState<State.S2> {
+            on<Action.A2> { _, _, setState ->
+                setState { State.S1 }
+
+            }
+        }
+    }
+}
