@@ -5,15 +5,7 @@ gradle.ext.isCiServer = System.getenv().containsKey("CI")
 logger.warn("Running on CI: ${gradle.ext.isCiServer}")
 
 if (gradle.ext.isCiServer) {
-    apply plugin: "com.vanniktech.maven.publish"
-    mavenPublish {
-        targets {
-            uploadArchives {
-                releaseRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                snapshotRepositoryUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-            }
-        }
-    }
+
 }
 
 kotlin {
@@ -62,39 +54,6 @@ kotlin {
     }
 }
 
-
-gradle.ext.isCiServer = System.getenv().containsKey("CI")
-logger.warn("Running on CI: ${gradle.ext.isCiServer}")
-
-if (gradle.ext.isCiServer) {
-    apply plugin: "com.vanniktech.maven.publish"
-    mavenPublish {
-        targets {
-            uploadArchives {
-                releaseRepositoryUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                snapshotRepositoryUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-            }
-        }
-    }
-}
-
-/*
-dependencies {
-    api libraries.kotlinStdlib
-    api libraries.coroutines
-
-    testImplementation testLibraries.junit
-    testImplementation testLibraries.kotlintest
-    testImplementation testLibraries.coroutinesTest
-    testImplementation testLibraries.flowRecorder
-    testImplementation 'com.freeletics.flow.test:test:0.0.2-SNAPSHOT'
-}
-
-sourceCompatibility = "1.7"
-targetCompatibility = "1.7"
-
-
-*/
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
