@@ -9,9 +9,15 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import org.junit.Assert
 import org.junit.Test
+import java.util.concurrent.TimeUnit
 
 // TODO fix FlowRecorder and migrate tast from .testOverTime() to .record()
 class DslTest {
+
+    private val timeout20Milliseconds = TimeoutConfig(
+        timeout = 20,
+        timeoutTimeUnit = TimeUnit.MILLISECONDS
+    )
 
     @Test
     fun `empty statemachine just emits initial state`() {
@@ -164,6 +170,29 @@ class DslTest {
         state.shouldNotHaveEmittedSinceLastCheck(TimeoutConfig.default())
 
         Assert.assertEquals(listOf(0, 2, 1, 3, 4), order)
+    }
+
+    fun `on entering the same state doesnt tringer onEnter again`() {
+        var s1Entered = 0
+        val sm = StateMachine {
+            inState<State.Initial> {
+                onEnter { _, setState -> setState { State.S1 } }
+            }
+
+            inState<State.S1> {
+                onEnter { _, _ -> s1Entered++ }
+                on<Action.A1> { _, _, setState -> setState { State.S1 } }
+            }
+        }
+
+        val state = sm.state.testOverTime()
+        state.shouldEmitNext(State.Initial, State.S1)
+
+        repeat(2) {
+            sm.dispatchAsync(Action.A1) // Causes state transition to S1 again which is already current
+            state.shouldNotHaveEmittedSinceLastCheck(timeout20Milliseconds)
+            Assert.assertEquals(1, s1Entered)
+        }
     }
 }
 
