@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
  * A builder that generates a [SideEffect] that triggers every time the state machine enters
  * a certain state.
  */
-class OnEnterInStateBuilder<S : Any, A : Any>(
+class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
     private val subStateClass: KClass<out S>,
     private val flatMapPolicy: FlatMapPolicy,
     private val block: InStateOnEnterBlock<S>

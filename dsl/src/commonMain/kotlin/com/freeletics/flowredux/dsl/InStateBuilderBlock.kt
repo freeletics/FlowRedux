@@ -60,7 +60,7 @@ class InStateBuilderBlock<S : Any, SubState : S, A : Any>(
         block: InStateOnEnterBlock<S>
     ) {
         _inStateSideEffectBuilders.add(
-            OnEnterInStateBuilder(
+            OnEnterInStateSideEffectBuilder(
                 subStateClass = _subStateClass,
                 flatMapPolicy = flatMapPolicy,
                 block = block
