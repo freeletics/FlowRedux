@@ -122,6 +122,49 @@ class DslTest {
         sm.dispatchAsync(Action.A2)
         state shouldEmitNext State.S1
     }
+
+    @Test
+    fun `onEnter in a state triggers but doesnt stop execution on leaving state`() {
+        val order = ArrayList<Int>()
+        val sm = StateMachine {
+            inState<State.Initial> {
+                onEnter { _, setState ->
+                    order.add(0)
+                    setState { State.S1 }
+                    delay(50)
+                    order.add(1)
+                }
+            }
+
+            inState<State.S1> {
+                onEnter { _, setState ->
+                    order.add(2)
+                    delay(100)
+                    setState { State.S2 }
+                    order.add(3)
+                }
+            }
+
+            inState<State.S2> {
+                onEnter { _, _ ->
+                    order.add(4)
+                }
+
+                on<Action.A1> { _, _, setState ->
+                    setState { State.S2 }
+                }
+            }
+        }
+
+        val state = sm.state.testOverTime()
+
+        state.shouldEmitNext(State.Initial, State.S1, State.S2)
+
+        sm.dispatchAsync(Action.A1)
+        state.shouldNotHaveEmittedSinceLastCheck(TimeoutConfig.default())
+
+        Assert.assertEquals(listOf(0, 2, 1, 3, 4), order)
+    }
 }
 
 private sealed class Action {
@@ -157,28 +200,5 @@ private fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.dispatchAsync(action:
 private object CommandLineLogger : FlowReduxLogger {
     override fun log(message: String) {
         println(message)
-    }
-}
-
-fun main() {
-    val sm = StateMachine {
-        inState<State.Initial> {
-            observeWhileInState(flowOf(1)) { _, _, setState ->
-                setState { State.S1 }
-            }
-        }
-
-        inState<State.S1> {
-            on<Action.A1> { _, _, setState ->
-                setState { State.S2 }
-            }
-        }
-
-        inState<State.S2> {
-            on<Action.A2> { _, _, setState ->
-                setState { State.S1 }
-
-            }
-        }
     }
 }

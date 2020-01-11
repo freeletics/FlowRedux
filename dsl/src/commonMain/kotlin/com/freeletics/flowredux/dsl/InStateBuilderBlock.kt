@@ -50,6 +50,26 @@ class InStateBuilderBlock<S : Any, SubState : S, A : Any>(
         )
     }
 
+    /**
+     * Triggers every time the state machine enters this state.
+     *
+     * This does not cancel any ongoing block when the state changes.
+     *
+     * TODO add a sample
+     */
+    fun onEnter(
+        flatMapPolicy: FlatMapPolicy = FlatMapPolicy.LATEST,
+        block: InStateOnEnterBlock<S>
+    ) {
+        _inStateSideEffectBuilders.add(
+            OnEnterInStateBuilder(
+                subStateClass = _subStateClass,
+                flatMapPolicy = flatMapPolicy,
+                block = block
+            )
+        )
+    }
+
     override fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {
         return _inStateSideEffectBuilders.map { it.generateSideEffect() }
     }
