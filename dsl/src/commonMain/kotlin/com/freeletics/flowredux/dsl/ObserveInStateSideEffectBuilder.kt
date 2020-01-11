@@ -76,4 +76,6 @@ internal class ObserveInStateSideEffectBuilder<T, S : Any, A : Any>(
                 )
             }
         }
-}typealias InStateObserverBlock<T, S> = suspend (value: T, getState: StateAccessor<S>, setState: SetState<S>) -> Unit
+}
+
+typealias InStateObserverBlock<T, S> = suspend (value: T, getState: StateAccessor<S>, setState: SetState<S>) -> Unit

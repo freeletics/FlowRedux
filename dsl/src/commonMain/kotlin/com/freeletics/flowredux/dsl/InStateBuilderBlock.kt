@@ -67,12 +67,3 @@ class InStateBuilderBlock<S : Any, SubState : S, A : Any>(
         return _inStateSideEffectBuilders.map { it.generateSideEffect() }
     }
 }
-
-/**
- * It's just not an Interface to not expose internal class `Action` to the public.
- * Thus it's an internal abstract class but you can think of it as an internal interface.
- */
-abstract class InStateSideEffectBuilder<S, A> internal constructor() {
-    internal abstract fun generateSideEffect(): SideEffect<S, Action<S, A>>
-}
-
