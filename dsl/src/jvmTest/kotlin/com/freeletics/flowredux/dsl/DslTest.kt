@@ -167,7 +167,7 @@ class DslTest {
         state.shouldEmitNext(State.Initial, State.S1, State.S2)
 
         sm.dispatchAsync(Action.A1)
-        state.shouldNotHaveEmittedSinceLastCheck(TimeoutConfig.default())
+        state.shouldNotHaveEmittedSinceLastCheck(timeout20Milliseconds)
 
         Assert.assertEquals(listOf(0, 2, 1, 3, 4), order)
     }

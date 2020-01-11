@@ -94,15 +94,13 @@ class OnActionSideEffectBuilder<S : Any, A : Any, SubState : S>(
      * Creates a Flow that filters for a given (sub)state and (sub)action and returns a
      * Flow of (sub)action
      */
-    private fun actionsFilterFactory(
-        actions: Flow<Action<S, out A>>,
-        state: StateAccessor<S>,
+    private fun Flow<Action<S, out A>>.filterStateAndUnwrapExternalAction(
+        stateAccessor: StateAccessor<S>,
         subStateClass: KClass<out S>
     ): Flow<A> =
-        actions
+        this
             .filter { action ->
-                // TODO use .isInstance() instead of isSubclassOf() as it should work in kotlin native
-                val conditionHolds = subStateClass.isInstance(state()) &&
+                val conditionHolds = subStateClass.isInstance(stateAccessor()) &&
                     action is ExternalWrappedAction &&
                     subActionClass.isInstance(action.action)
 
@@ -140,46 +138,17 @@ class OnActionSideEffectBuilder<S : Any, A : Any, SubState : S>(
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, state: StateAccessor<S> ->
 
-            when (flatMapPolicy) {
-                FlatMapPolicy.LATEST ->
-                    actionsFilterFactory(
-                        actions,
-                        state,
-                        subStateClass
+            actions
+                .filterStateAndUnwrapExternalAction(
+                    stateAccessor = state,
+                    subStateClass = subStateClass
+                )
+                .flatMapWithPolicy(flatMapPolicy) { action ->
+                    onActionSideEffectFactory(
+                        action = action,
+                        stateAccessor = state
                     )
-                        .flatMapLatest { action ->
-                            onActionSideEffectFactory(
-                                action = action,
-                                stateAccessor = state
-                            )
-                        }
-
-                FlatMapPolicy.MERGE ->
-                    actionsFilterFactory(
-                        actions,
-                        state,
-                        subStateClass
-                    )
-                        .flatMapMerge { action ->
-                            onActionSideEffectFactory(
-                                action = action,
-                                stateAccessor = state
-                            )
-                        }
-
-                FlatMapPolicy.CONCAT ->
-                    actionsFilterFactory(
-                        actions,
-                        state,
-                        subStateClass
-                    )
-                        .flatMapConcat { action ->
-                            onActionSideEffectFactory(
-                                action = action,
-                                stateAccessor = state
-                            )
-                        }
-            }
+                }
         }
     }
 }
