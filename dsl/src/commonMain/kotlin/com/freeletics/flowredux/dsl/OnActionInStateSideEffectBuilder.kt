@@ -77,3 +77,5 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any, SubState : S>(
             )
         }
 }
+
+typealias OnActionBlock<S, A> = suspend (action: A, getState: StateAccessor<S>, setState: SetState<S>) -> Unit

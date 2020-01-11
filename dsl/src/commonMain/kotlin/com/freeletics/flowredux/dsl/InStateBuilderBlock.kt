@@ -81,9 +81,6 @@ abstract class InStateSideEffectBuilder<S, A> internal constructor() {
     internal abstract fun generateSideEffect(): SideEffect<S, Action<S, A>>
 }
 
-
-typealias OnActionBlock<S, A> = suspend (action: A, getState: StateAccessor<S>, setState: SetState<S>) -> Unit
-
 /**
  * A builder to create a [SideEffect] that observes a Flow<T> as long as the redux store is in
  * the given state. We use is instance of check to check if a new state has been reached and Flow<T>
