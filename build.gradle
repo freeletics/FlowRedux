@@ -12,9 +12,10 @@ buildscript {
     dependencies {
         classpath gradlePlugins.android
         classpath gradlePlugins.kotlin
-        classpath gradlePlugins.karumi
         classpath gradlePlugins.mavenPublish
         classpath gradlePlugins.dokka
+        classpath gradlePlugins.kotlinxcodesync
+        classpath gradlePlugins.kotlinSerialization
     }
 }
 
@@ -25,6 +26,8 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://kotlin.bintray.com/kotlinx" }
+        maven { url "https://dl.bintray.com/jetbrains/kotlin-native-dependencies" }
     }
 }
 

@@ -5,32 +5,39 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
 
-open class FlowReduxStateMachine<S : Any, A : Any>(
+abstract class FlowReduxStateMachine<S : Any, A : Any>(
     logger: FlowReduxLogger?,
-    initialStateSupplier: () -> S,
-    builderBlock: FlowReduxStoreBuilder<S, A>.() -> Unit
+    initialStateSupplier: () -> S
 ) {
 
     // TODO remove constructor overloads
     constructor(
-        initialStateSupplier: () -> S,
-        builderBlock: FlowReduxStoreBuilder<S, A>.() -> Unit
+        initialStateSupplier: () -> S
     ) : this(
         logger = null,
-        initialStateSupplier = initialStateSupplier,
-        builderBlock = builderBlock
+        initialStateSupplier = initialStateSupplier
     )
 
-    constructor(
-        initialState: S,
-        builderBlock: FlowReduxStoreBuilder<S, A>.() -> Unit
-    ) : this(logger = null, initialState = initialState, builderBlock = builderBlock)
+    constructor(initialState: S) : this(logger = null, initialState = initialState)
 
     constructor(
         logger: FlowReduxLogger?,
-        initialState: S,
-        builderBlock: FlowReduxStoreBuilder<S, A>.() -> Unit
-    ) : this(logger, { initialState }, builderBlock)
+        initialState: S
+    ) : this(logger, { initialState })
+
+    private var specBlockSet = false
+    private var specBlock: (FlowReduxStoreBuilder<S, A>.() -> Unit)? = null
+
+    protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
+        if (specBlockSet) {
+            throw IllegalStateException(
+                "State machine spec has already been set. " +
+                    "It's only allowed to call spec {...} once."
+            )
+        }
+        this.specBlock = specBlock
+        this.specBlockSet = true
+    }
 
     private val inputActionChannel = Channel<A>(Channel.UNLIMITED)
 
@@ -38,7 +45,35 @@ open class FlowReduxStateMachine<S : Any, A : Any>(
         inputActionChannel.send(action)
     }
 
-    val state: Flow<S> = inputActionChannel
-        .consumeAsFlow()
-        .reduxStore<S, A>(logger, initialStateSupplier, builderBlock)
+    val state: Flow<S> by lazy(LazyThreadSafetyMode.NONE) {
+        val spec = specBlock
+        println("Spec is $spec")
+           if (spec == null) {
+               throw IllegalStateException(
+                   """
+                        No state machine specs are defined. Did you call spec { ... } in init {...}?
+                        Example usage:
+                        
+                        class MyStateMachine : FlowReduxStateMachine<State, Action>(InitialState) {
+                            
+                            init{
+                                spec {
+                                    inState<FooState> {
+                                        on<BarAction> { ... }
+                                    }
+                                    ...
+                                }
+                            }
+                        }
+                    """.trimIndent()
+               )
+           }
+        inputActionChannel
+            .consumeAsFlow()
+            .reduxStore<S, A>(logger, initialStateSupplier, spec)
+            .also {
+                specBlock = null // Free up memory
+            }
+    }
 }
+

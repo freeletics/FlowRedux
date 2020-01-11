@@ -1,2 +1,2 @@
-include ':library' , ':dsl'
+include ':library' , ':dsl', ':sample:android', ':sample:shared_code'
 enableFeaturePreview('GRADLE_METADATA')
