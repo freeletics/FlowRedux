@@ -26,18 +26,8 @@ internal class StoreWideObserveBuilderBlock<T, S, A>(
         val sideEffect: SideEffect<S, Action<S, A>> = { actions: Flow<Action<S, A>>,
             state: StateAccessor<S> ->
 
-            when (flatMapPolicy) {
-                FlatMapPolicy.LATEST -> flow.flatMapLatest {
-                    setStateFlow(value = it, stateAccessor = state)
-                }
-                FlatMapPolicy.CONCAT -> flow.flatMapConcat {
-                    setStateFlow(value = it, stateAccessor = state)
-
-                }
-                FlatMapPolicy.MERGE -> flow.flatMapMerge {
-                    setStateFlow(value = it, stateAccessor = state)
-
-                }
+            flow.flatMapWithPolicy(flatMapPolicy) {
+                setStateFlow(value = it, stateAccessor = state)
             }
         }
 
