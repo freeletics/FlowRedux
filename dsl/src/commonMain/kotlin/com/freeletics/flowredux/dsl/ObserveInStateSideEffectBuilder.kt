@@ -14,6 +14,7 @@ import kotlin.reflect.KClass
  * the given state. We use is instance of check to check if a new state has been reached and Flow<T>
  * is closed.
  */
+// TODO rename Observe to Collect to match with flow api naming conventions
 internal class ObserveInStateSideEffectBuilder<T, S : Any, A : Any>(
     private val subStateClass: KClass<out S>,
     private val flow: Flow<T>,
