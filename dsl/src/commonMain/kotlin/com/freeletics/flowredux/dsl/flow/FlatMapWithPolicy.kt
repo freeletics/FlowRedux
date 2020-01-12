@@ -1,5 +1,6 @@
-package com.freeletics.flowredux.dsl
+package com.freeletics.flowredux.dsl.flow
 
+import com.freeletics.flowredux.dsl.FlatMapPolicy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
@@ -13,9 +14,7 @@ internal fun <T, R> Flow<T>.flatMapWithPolicy(
     transform: suspend (value: T) -> Flow<R>
 ): Flow<R> =
     when (flatMapPolicy) {
-        FlatMapPolicy.LATEST ->
-            this.flatMapLatest(transform)
-        FlatMapPolicy.CONCAT ->
-            this.flatMapConcat(transform)
+        FlatMapPolicy.LATEST -> this.flatMapLatest(transform)
+        FlatMapPolicy.CONCAT -> this.flatMapConcat(transform)
         FlatMapPolicy.MERGE -> this.flatMapMerge(transform = transform)
     }
