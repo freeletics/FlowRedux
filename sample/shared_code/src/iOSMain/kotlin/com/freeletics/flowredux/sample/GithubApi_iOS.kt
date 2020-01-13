@@ -12,7 +12,7 @@ import io.ktor.client.features.logging.Logging
 import kotlinx.serialization.json.Json
 
 val githubApi_iOS = GithubApi(
-    httpClient = HttpClient(Ios)  {
+    httpClient = HttpClient(Ios) {
 
         install(Logging) {
             logger = Logger.DEFAULT
@@ -20,8 +20,7 @@ val githubApi_iOS = GithubApi(
         }
 
         install(JsonFeature) {
-            serializer = KotlinxSerializer  (Json.nonstrict)
+            serializer = KotlinxSerializer(Json.nonstrict)
         }
-
     }
 )
