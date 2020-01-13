@@ -83,6 +83,11 @@ kotlin {
 
 
         iOSMain.dependencies {
+            implementation libraries.ktorClientCoreiOS
+            implementation libraries.ktorClientJsoniOS
+            implementation libraries.ktorClientLoggingiOS
+            implementation libraries.ktorClientSerializationiOS
+            implementation libraries.kotlinxSerializationiOS
         }
 
         /*

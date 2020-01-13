@@ -64,7 +64,11 @@ ext.libraries = [
         ktorClientLoggingJvm      : "io.ktor:ktor-client-logging-jvm:$versions.ktor",
         ktorClientSerializationJvm: "io.ktor:ktor-client-serialization-jvm:$versions.ktor",
         kotlinxSerializationJvm   : "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$versions.kotlinSerialization",
-
+        ktorClientCoreiOS         : "io.ktor:ktor-client-ios:$versions.ktor",
+        ktorClientJsoniOS         : "io.ktor:ktor-client-json-native:$versions.ktor",
+        ktorClientLoggingiOS      : "io.ktor:ktor-client-logging-native:$versions.ktor",
+        ktorClientSerializationiOS: "io.ktor:ktor-client-serialization-native:$versions.ktor",
+        kotlinxSerializationiOS   : "org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:$versions.kotlinSerialization",
 
         coroutines                : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines",
         rxJava                    : "io.reactivex.rxjava2:rxjava:$versions.rxJava",

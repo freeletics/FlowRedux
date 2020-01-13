@@ -12,11 +12,12 @@ import shared_code
 import os.log
 
 struct ContentView: View {
-    @State private var state : PaginationState = LoadingPaginationState()
+    @State private var state : PaginationState = LoadFirstPagePaginationState()
     
     func start(){
         let _ = PaginationStateMachine(
             logger: Logger(),
+            githubApi: GithubApi_iOSKt.githubApi_iOS,
             scope: NsQueueCoroutineScope(),
             stateChangeListener: { (paginationState: PaginationState) -> Void in
                 NSLog("Received \(paginationState) to render")
@@ -27,7 +28,7 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-        if state is LoadingPaginationState {
+        if state is LoadFirstPagePaginationState {
             LoadingFirstPageView()
         } else {
             Text("Default")
