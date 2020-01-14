@@ -20,7 +20,7 @@ struct ContentView: View {
             githubApi: GithubApi_iOSKt.githubApi_iOS,
             scope: NsQueueCoroutineScope(),
             stateChangeListener: { (paginationState: PaginationState) -> Void in
-                NSLog("Received \(paginationState) to render")
+                NSLog("Swift UI \(paginationState) to render")
                 self.state = paginationState
         } )
     }
@@ -30,22 +30,22 @@ struct ContentView: View {
         VStack {
         if state is LoadFirstPagePaginationState {
             LoadingFirstPageView()
-        } else {
+        } else if state is ShowContentPaginationState {
             Text("Default")
         }
-        }
     }
+}
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+      ContentView()
     }
 }
 
 class Logger : LibraryFlowReduxLogger{
     
     func log(message: String) {
-        NSLog(message)
+        // NSLog(message)
     }
 }

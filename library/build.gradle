@@ -4,10 +4,6 @@ apply plugin: 'org.jetbrains.kotlin.multiplatform'
 gradle.ext.isCiServer = System.getenv().containsKey("CI")
 logger.warn("Running on CI: ${gradle.ext.isCiServer}")
 
-if (gradle.ext.isCiServer) {
-
-}
-
 kotlin {
 //    macosX64("nativeCommon")
     jvm()
@@ -64,3 +60,7 @@ dokka {
     outputDirectory = "$buildDir/javadoc"
 }
  */
+
+if (gradle.ext.isCiServer) {
+    apply from: "$rootDir/gradle-mvn-mpp-push.gradle"
+}
