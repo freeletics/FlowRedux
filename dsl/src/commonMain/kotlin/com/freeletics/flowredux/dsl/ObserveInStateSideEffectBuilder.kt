@@ -2,6 +2,7 @@ package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.StateAccessor
+import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
@@ -24,42 +25,17 @@ internal class ObserveInStateSideEffectBuilder<T, S : Any, A : Any>(
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, state: StateAccessor<S> ->
-            when (flatMapPolicy) {
-                FlatMapPolicy.LATEST ->
-                    actions
-                        .mapStateChanges(stateAccessor = state, stateToObserve = subStateClass)
-                        .flatMapLatest { stateChange ->
-                            when (stateChange) {
-                                MapStateChange.StateChanged.ENTERED ->
-                                    flow.flatMapLatest {
-                                        setStateFlow(value = it, stateAccessor = state)
-                                    }
-                                MapStateChange.StateChanged.LEFT -> flow { }
+            actions
+                .mapStateChanges(stateAccessor = state, stateToObserve = subStateClass)
+                .flatMapWithPolicy(flatMapPolicy) { stateChange ->
+                    when (stateChange) {
+                        MapStateChange.StateChanged.ENTERED ->
+                            flow.flatMapLatest {// TODO is it actually always flatMapLatest or also flatMapWithPolicy
+                                setStateFlow(value = it, stateAccessor = state)
                             }
-                        }
-                FlatMapPolicy.CONCAT -> actions
-                    .mapStateChanges(stateAccessor = state, stateToObserve = subStateClass)
-                    .flatMapLatest { stateChanged ->
-                        when (stateChanged) {
-                            MapStateChange.StateChanged.ENTERED ->
-                                flow.flatMapConcat {
-                                    setStateFlow(value = it, stateAccessor = state)
-                                }
-                            MapStateChange.StateChanged.LEFT -> flow { }
-                        }
+                        MapStateChange.StateChanged.LEFT -> flow { }
                     }
-                FlatMapPolicy.MERGE -> actions
-                    .mapStateChanges(stateAccessor = state, stateToObserve = subStateClass)
-                    .flatMapLatest { stateChange ->
-                        when (stateChange) {
-                            MapStateChange.StateChanged.ENTERED ->
-                                flow.flatMapMerge {
-                                    setStateFlow(value = it, stateAccessor = state)
-                                }
-                            MapStateChange.StateChanged.LEFT -> flow { }
-                        }
-                    }
-            }
+                }
         }
     }
 
