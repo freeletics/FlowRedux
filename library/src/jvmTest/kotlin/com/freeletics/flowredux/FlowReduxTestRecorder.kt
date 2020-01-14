@@ -76,6 +76,7 @@ class FlowReduxTestRecorder {
     }
 
     @Test
+    @Ignore
     fun `store with 2 empty side effects`() {
 
         val counter = AtomicInteger()
@@ -103,6 +104,7 @@ class FlowReduxTestRecorder {
     }
 
     @Test
+    @Ignore
     fun `store with 2 simple side effects`() {
 
         val counter = AtomicInteger()
