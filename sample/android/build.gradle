@@ -1,0 +1,123 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+kapt {
+    arguments {
+        arg("moshi.generated", "javax.annotation.Generated")
+    }
+}
+androidExtensions {
+    experimental = true
+}
+
+android {
+    compileSdkVersion versions.compileSdk
+    defaultConfig {
+        applicationId "com.freeletics.flowredux"
+        targetSdkVersion versions.targetSdk
+        minSdkVersion versions.minSdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "com.freeletics.rxredux.SampleAppRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    testOptions {
+        animationsDisabled = true
+    }
+
+    lintOptions {
+       abortOnError false
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.md'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/library.kotlin_module'
+        exclude 'META-INF/LICENSE-notice.md'
+        exclude 'META-INF/kotlinx-coroutines-core.kotlin_module'
+        exclude 'META-INF/ktor-client-serialization.kotlin_module'
+        exclude 'META-INF/ktor-http.kotlin_module'
+        exclude 'META-INF/ktor-utils.kotlin_module'
+        exclude 'META-INF/kotlinx-serialization-runtime.kotlin_module'
+        exclude 'META-INF/ktor-io.kotlin_module'
+        exclude 'META-INF/ktor-http-cio.kotlin_module'
+        exclude 'META-INF/ktor-client-json.kotlin_module'
+        exclude 'META-INF/ktor-client-core.kotlin_module'
+        exclude 'META-INF/ktor-client-logging.kotlin_module'
+    }
+}
+
+dependencies {
+    implementation libraries.kotlinStdlib
+    implementation supportLibraries.appCompat
+    implementation supportLibraries.recyclerView
+    implementation supportLibraries.constraintLayout
+    implementation supportLibraries.viewModel
+    implementation supportLibraries.viewModelKtx
+    implementation supportLibraries.fragmentKtx
+    implementation libraries.retrofit
+    implementation libraries.retrofitRxJava
+    implementation libraries.retrofitMoshi
+    implementation libraries.rxRelay
+    implementation libraries.rxJava
+    implementation libraries.rxAndroid
+    implementation libraries.timber
+    implementation libraries.rxBinding
+    implementation libraries.okhttp
+    implementation libraries.moshiKotlin
+    implementation libraries.moshi
+    implementation("io.ktor:ktor-client-okhttp:1.3.0-rc2")
+    implementation("io.ktor:ktor-client-json-jvm:1.3.0-rc2")
+    implementation("io.ktor:ktor-client-logging-jvm:1.3.0-rc2")
+    implementation("io.ktor:ktor-client-serialization-jvm:1.3.0-rc2")
+    implementation("com.squareup.okhttp3:okhttp:4.3.1")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.3.1")
+    implementation 'com.hannesdorfmann:adapterdelegates4-kotlin-dsl-layoutcontainer:4.2.0'
+
+    implementation project(':sample:shared_code')
+
+    kapt libraries.moshiCodeGen
+    implementation libraries.moshi
+    implementation libraries.dagger
+    kapt libraries.daggerCompiler
+    implementation project(':library')
+    implementation testLibraries.okhttpTls
+
+    testImplementation testLibraries.junit
+   // testImplementation testLibraries.androidArchTesting
+    testImplementation testLibraries.mockWebServer
+    testImplementation libraries.moshiKotlin
+    testImplementation libraries.moshi
+
+    kaptTest libraries.daggerCompiler
+    androidTestImplementation testLibraries.junit
+    androidTestImplementation testLibraries.testRunner
+    androidTestImplementation testLibraries.espresso
+    androidTestImplementation testLibraries.espressoContrib
+    androidTestImplementation testLibraries.testRules
+    androidTestImplementation testLibraries.screengrab
+    androidTestImplementation testLibraries.deviceAnimationsRule
+    androidTestImplementation testLibraries.mockWebServer
+    androidTestImplementation libraries.moshiKotlin
+    androidTestImplementation libraries.moshi
+}

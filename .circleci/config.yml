@@ -35,10 +35,10 @@ jobs:
       - *restore_gradle_cache
       - run:
           name: Build library
-          command: ./gradlew :library:build :dsl:build
+          command: ./gradlew :library:build :dsl:build --stacktrace
       - run:
           name: Run library tests
-          command: ./gradlew :library:test :dsl:test
+          command: ./gradlew :library:check :dsl:check --stacktrace
      # - run:
      #     name: Build sample
      #     command: ./gradlew :sample:assembleDebug
@@ -60,6 +60,7 @@ workflows:
       - gradle-publish/publish_artifacts:
           executor: gradle-publish/circleci-android
           context: "android-maven-publish"
+          deploy_task: "publish"
           requires:
             - build_and_test
 

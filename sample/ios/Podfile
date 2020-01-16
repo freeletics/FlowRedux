@@ -1,0 +1,8 @@
+use_frameworks!
+
+platform :ios, '12.2'
+
+target 'ios' do
+    pod 'shared_code', :path => '../shared_code'
+    pod 'AFNetworking', '~> 2.6'
+end

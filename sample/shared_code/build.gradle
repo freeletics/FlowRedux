@@ -1,0 +1,117 @@
+// apply plugin: 'com.android.library'
+apply plugin: 'kotlin-multiplatform'
+apply plugin: 'org.jetbrains.kotlin.native.cocoapods'
+apply plugin: 'co.touchlab.kotlinxcodesync'
+apply plugin: 'kotlinx-serialization'
+
+/*
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+}
+*/
+
+kotlin {
+    targets {
+        jvm()
+        final def iOSTarget = System.getenv('SDK_NAME')?.startsWith("iphoneos")   \
+                                ? presets.iosArm64 : presets.iosX64
+
+        fromPreset(iOSTarget, 'iOS') {
+            binaries {
+                framework('shared_code')
+            }
+        }
+
+//        fromPreset(presets.android, 'android')
+
+    }
+
+    js {
+        compileKotlinJs {
+            kotlinOptions.metaInfo = true
+            kotlinOptions.sourceMap = true
+            kotlinOptions.moduleKind = "commonjs"
+            kotlinOptions.main = "call"
+        }
+    }
+
+
+    cocoapods {
+        // Configure fields required by CocoaPods.
+        summary = "Some description for a Kotlin/Native module"
+        homepage = "Link to a Kotlin/Native module homepage"
+    }
+
+
+    sourceSets {
+        commonMain.dependencies {
+            // Kotlin
+            implementation libraries.kotlinStdlibCommon
+            api project(':dsl')
+
+
+            // Ktor
+            api libraries.ktorClientCore
+            implementation libraries.ktorClientJson
+            implementation libraries.ktorClientLogging
+            implementation libraries.ktorClientSerialization
+            implementation libraries.ktorClientSerializationJvm
+
+            // Serialize
+            implementation libraries.kotlinxSerialization
+            implementation libraries.kotlinxSerializationJvm
+
+        }
+
+        androidMain.dependencies {
+            // Kotlin
+            implementation libraries.kotlinStdlib
+            implementation libraries.ktorClientCoreAndroid
+            implementation libraries.ktorClientCoreJvm
+            implementation libraries.ktorClientJsonJvm
+            implementation libraries.ktorClientLoggingJvm
+            implementation libraries.ktorClientSerializationJvm
+            implementation libraries.kotlinxSerializationJvm
+        }
+
+
+        iOSMain.dependencies {
+            implementation libraries.ktorClientCoreiOS
+            implementation libraries.ktorClientJsoniOS
+            implementation libraries.ktorClientLoggingiOS
+            implementation libraries.ktorClientSerializationiOS
+            implementation libraries.kotlinxSerializationiOS
+        }
+
+        /*
+        jvmMain.dependencies {
+            // Kotlin
+            implementation libraries.kotlinStdlib
+        }
+         */
+
+        jsMain.dependencies {
+            api libraries.kotlinStdlibJs
+        }
+
+    }
+}
+
+// workaround for https://youtrack.jetbrains.com/issue/KT-27170
+/*
+configurations {
+    compileClasspath
+}
+ */
+
+xcode {
+    projectPath = "../ios/ios.xcodeproj"
+    target = "ios"
+}
