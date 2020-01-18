@@ -137,17 +137,18 @@ publishing {
     }
 
     repositories {
-        /*
         maven {
             url isReleaseBuild() ? getReleaseRepositoryUrl() : getSnapshotRepositoryUrl()
             credentials {
                 username getRepositoryUsername()
                 password getRepositoryPassword()
             }
-        } */
+        }
+        /*
         maven {
             name 'test'
             url "file://${rootProject.buildDir}/localMaven"
         }
+         */
     }
 }
