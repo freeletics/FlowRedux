@@ -18,7 +18,7 @@ dokka {
             }
              */
         }
-        /*
+
         jvm {
             sourceRoot {
                 // assuming there is only a single source dir...
@@ -37,7 +37,7 @@ dokka {
                 path = kotlin.sourceSets.nativeMain.kotlin.srcDirs[0]
             }
         }
-         */
+
     }
 }
 
