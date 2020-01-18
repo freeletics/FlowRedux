@@ -6,7 +6,7 @@ ext.versions = [
 
         mavenPublish           : '0.8.0',
         dokka                  : '0.10.0',
-        coroutines             : '1.3.2',
+        coroutines             : '1.3.3',
         dagger                 : '2.24',
         kotlin                 : '1.3.61',
         rxJava                 : '2.2.12',
