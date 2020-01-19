@@ -100,7 +100,7 @@ dependencies {
     implementation libraries.moshi
     implementation libraries.dagger
     kapt libraries.daggerCompiler
-    implementation project(':library')
+    implementation project(':flowredux')
     implementation testLibraries.okhttpTls
 
     testImplementation testLibraries.junit
