@@ -27,7 +27,3 @@ struct GithubReposList_Previews: PreviewProvider {
         .previewLayout(.fixed(width: 300, height: 70))
     }
 }
-
-extension GithubRepository : Hashable {
-    
-}

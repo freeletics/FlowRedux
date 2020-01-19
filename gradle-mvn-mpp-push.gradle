@@ -119,6 +119,7 @@ publishing {
     // Use default artifact name for the JVM target
     publications {
         version = VERSION_NAME
+        group = GROUP
         kotlinMultiplatform {
             artifactId = POM_ARTIFACT_ID + "-multiplatform"
           //  version = VERSION_NAME
@@ -144,11 +145,13 @@ publishing {
                 password getRepositoryPassword()
             }
         }
-        /*
+
+/*
         maven {
             name 'test'
             url "file://${rootProject.buildDir}/localMaven"
         }
-         */
+       */
+
     }
 }
