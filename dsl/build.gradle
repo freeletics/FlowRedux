@@ -29,7 +29,7 @@ kotlin {
             dependencies {
                 api 'org.jetbrains.kotlin:kotlin-stdlib-common'
                 // api "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.3.2"
-                api 'org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.2-native-mt-1'
+                api 'org.jetbrains.kotlinx:kotlinx-coroutines-core-native:1.3.3-native-mt'
                 api project(":flowredux")
             }
         }
