@@ -34,7 +34,7 @@ class InStateBuilderBlock<S : Any, SubState : S, A : Any>(
         block: InStateObserverBlock<T, S>
     ) {
         _inStateSideEffectBuilders.add(
-            ObserveInStateSideEffectBuilder(
+            Working_ObserveInStateBuilder(
                 subStateClass = _subStateClass,
                 flow = flow,
                 flatMapPolicy = flatMapPolicy,
