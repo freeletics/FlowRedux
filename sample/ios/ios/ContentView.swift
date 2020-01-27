@@ -13,33 +13,43 @@ import os.log
 
 struct ContentView: View {
     @State private var state : PaginationState = LoadFirstPagePaginationState()
+    private let stateMachine : PaginationStateMachine = PaginationStateMachine(
+        logger: Logger(),
+        githubApi: GithubApi_iOSKt.githubApi_iOS,
+        scope: NsQueueCoroutineScope())
     
     var body: some View {
 
         NSLog("rendering \(state)")
         
         return VStack {
-        if state is LoadFirstPagePaginationState {
-            LoadingIndicatorView()
-        } else if state is ShowContentPaginationState {
-            GithubReposList(repositories: (state as! ShowContentPaginationState).items)
-        }
-        }.onAppear(perform: start)
+            if state is LoadFirstPagePaginationState {
+                LoadingIndicatorView()
+            } else if state is ShowContentPaginationState {
+                GithubReposList(repositories: (state as! ShowContentPaginationState).items,
+                                endOfListReached: triggerLoadNextPage,
+                                showLoadMoreIndicator: false
+                )
+            } else if (state is ShowContentAndLoadingNextPagePaginationState) {
+                GithubReposList(repositories: (state as! ShowContentAndLoadingNextPagePaginationState).items,
+                                endOfListReached: triggerLoadNextPage,
+                                showLoadMoreIndicator: true
+                               )
+            }
+        }.onAppear(perform: startStateMachine)
         
     }
     
-    private func start(){
-           // This instantiates and actually starts the async jobs inside the statemachine.
-           // updates follow via stateChangeListener
-           PaginationStateMachine(
-               logger: Logger(),
-               githubApi: GithubApi_iOSKt.githubApi_iOS,
-               scope: NsQueueCoroutineScope(),
-               stateChangeListener: { (paginationState: PaginationState) -> Void in
-                   NSLog("Swift UI \(paginationState) to render")
-                   self.state = paginationState
-           } )
-       }
+    private func triggerLoadNextPage(){
+        self.stateMachine.dispatch(action: LoadNextPage())
+    }
+    
+    private func startStateMachine(){
+        self.stateMachine.start(stateChangeListener: { (paginationState: PaginationState) -> Void in
+                NSLog("Swift UI \(paginationState) to render")
+                self.state = paginationState
+        })
+    }
        
 }
 

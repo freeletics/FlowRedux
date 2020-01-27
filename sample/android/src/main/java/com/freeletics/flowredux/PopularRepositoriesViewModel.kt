@@ -44,9 +44,10 @@ class PopularRepositoriesViewModel : ViewModel() {
     private val stateMachine = PaginationStateMachine(
         logger = AndroidFlowReduxLogger,
         githubApi = GithubApi(httpClient = httpClient),
-        scope = viewModelScope,
-        stateChangeListener = ::onStateChanged
-    )
+        scope = viewModelScope
+    ).also {
+        it.start(::onStateChanged)
+    }
 
     private fun onStateChanged(state: PaginationState) {
         liveData.value = state

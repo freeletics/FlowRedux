@@ -5,12 +5,12 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 
 class GithubApi(
-    private val baseUrl: String = "https://api.github.com/orgs/square/repos",
+    private val baseUrl: String = "https://api.github.com/organizations/82592/repos",
     private val httpClient: HttpClient
 ) {
 
     suspend fun loadPage(page: Int): PageResult =
-        httpClient.get<List<GithubRepository>>(baseUrl).run {
+        httpClient.get<List<GithubRepository>>("$baseUrl?page=$page").run {
             // TODO rewrite this to use header Link
             if (isEmpty()) {
                 PageResult.NoNextPage
