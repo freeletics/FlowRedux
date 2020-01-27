@@ -20,9 +20,9 @@ struct ContentView: View {
         
         return VStack {
         if state is LoadFirstPagePaginationState {
-            LoadingFirstPageView()
+            LoadingIndicatorView()
         } else if state is ShowContentPaginationState {
-            Text("Default")
+            GithubReposList(repositories: (state as! ShowContentPaginationState).items)
         }
         }.onAppear(perform: start)
         
@@ -55,3 +55,5 @@ class Logger : FlowreduxFlowReduxLogger{
         // NSLog(message)
     }
 }
+
+extension String: Error {}

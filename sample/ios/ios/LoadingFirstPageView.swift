@@ -8,15 +8,25 @@
 
 import SwiftUI
 
-struct LoadingFirstPageView: View {
-   @State private var spinCircle = false
+enum IndicatorStyle : CGFloat{
+    case big = 100
+    case small = 25
+}
+
+struct LoadingIndicatorView: View {
+    @State private var spinCircle = false
+    private var style: IndicatorStyle
+    
+    init(style: IndicatorStyle = .big) {
+        self.style = style
+    }
 
    var body: some View {
        ZStack {
            Circle()
                .trim(from: 0.5, to: 1)
                .stroke(Color.blue, lineWidth:4)
-               .frame(width:100)
+            .frame(width: self.style.rawValue)
                .rotationEffect(.degrees(spinCircle ? 0 : -360), anchor: .center)
                .animation(Animation.linear(duration: 1).repeatForever(autoreverses: false))
        }
@@ -26,8 +36,8 @@ struct LoadingFirstPageView: View {
    }
 }
 
-struct LoadingFirstPageView_Previews: PreviewProvider {
+struct LoadingIndicatorView_Previews: PreviewProvider {
     static var previews: some View {
-        LoadingFirstPageView()
+        LoadingIndicatorView()
     }
 }

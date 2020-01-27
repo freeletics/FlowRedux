@@ -32,7 +32,7 @@ object LoadFirstPagePaginationState : PaginationState()
  * State that represents displaying a list of  [GithubRepository] items
  */
 data class ShowContentPaginationState(
-    val items: List<Item>,
+    val items: List<GithubRepository>,
     private val currentPage: Int,
     private val canLoadNextPage: Boolean
 ) : PaginationState()

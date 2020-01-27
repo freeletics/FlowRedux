@@ -10,20 +10,20 @@ import SwiftUI
 import shared_code
 
 struct GithubReposList: View {
-    //var reposiitories : [GithubRepository]
+    var repositories : [GithubRepository]
     var body: some View {
-   /*     List(reposiitories, id: \.id) { repo in
-
-            
+        List(repositories) { repo in
+            Text("\(repo.name)")
         }
- */
-        Text("repo.name")
     }
 }
 
 struct GithubReposList_Previews: PreviewProvider {
     static var previews: some View {
-        GithubReposList()
+        GithubReposList(repositories: [GithubRepository(id: "1", name: "Repop name", stargazersCount: 123)])
         .previewLayout(.fixed(width: 300, height: 70))
     }
+}
+
+extension GithubRepository : Identifiable {
 }
