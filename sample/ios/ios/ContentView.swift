@@ -14,27 +14,33 @@ import os.log
 struct ContentView: View {
     @State private var state : PaginationState = LoadFirstPagePaginationState()
     
-    func start(){
-        let _ = PaginationStateMachine(
-            logger: Logger(),
-            githubApi: GithubApi_iOSKt.githubApi_iOS,
-            scope: NsQueueCoroutineScope(),
-            stateChangeListener: { (paginationState: PaginationState) -> Void in
-                NSLog("Swift UI \(paginationState) to render")
-                self.state = paginationState
-        } )
-    }
-    
-    
     var body: some View {
-        VStack {
+
+        NSLog("rendering \(state)")
+        
+        return VStack {
         if state is LoadFirstPagePaginationState {
             LoadingFirstPageView()
         } else if state is ShowContentPaginationState {
             Text("Default")
         }
+        }.onAppear(perform: start)
+        
     }
-}
+    
+    private func start(){
+           // This instantiates and actually starts the async jobs inside the statemachine.
+           // updates follow via stateChangeListener
+           PaginationStateMachine(
+               logger: Logger(),
+               githubApi: GithubApi_iOSKt.githubApi_iOS,
+               scope: NsQueueCoroutineScope(),
+               stateChangeListener: { (paginationState: PaginationState) -> Void in
+                   NSLog("Swift UI \(paginationState) to render")
+                   self.state = paginationState
+           } )
+       }
+       
 }
 
 struct ContentView_Previews: PreviewProvider {
@@ -43,7 +49,7 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-class Logger : LibraryFlowReduxLogger{
+class Logger : FlowreduxFlowReduxLogger{
     
     func log(message: String) {
         // NSLog(message)
