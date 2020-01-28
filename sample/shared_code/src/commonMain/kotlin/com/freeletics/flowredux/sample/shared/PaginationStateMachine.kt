@@ -5,6 +5,7 @@ import com.freeletics.flowredux.StateAccessor
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.SetState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -34,6 +35,11 @@ sealed class PaginationState
  */
 object LoadFirstPagePaginationState : PaginationState()
 
+/**
+ * An error has occurred while loading the first page
+ */
+data class LoadingFirstPageError(val cause: Throwable) : PaginationState()
+
 sealed class ContainsContentPaginationState : PaginationState() {
     abstract val items: List<GithubRepository>
     internal abstract val currentPage: Int
@@ -46,7 +52,7 @@ sealed class ContainsContentPaginationState : PaginationState() {
 data class ShowContentPaginationState(
     override val items: List<GithubRepository>,
     internal override val currentPage: Int,
-    internal override  val canLoadNextPage: Boolean
+    internal override val canLoadNextPage: Boolean
 ) : ContainsContentPaginationState()
 
 /**
@@ -56,7 +62,7 @@ data class ShowContentPaginationState(
 data class ShowContentAndLoadingNextPagePaginationState(
     override val items: List<GithubRepository>,
     internal override val currentPage: Int,
-    internal override  val canLoadNextPage: Boolean
+    internal override val canLoadNextPage: Boolean
 ) : ContainsContentPaginationState()
 
 /**
@@ -65,13 +71,8 @@ data class ShowContentAndLoadingNextPagePaginationState(
 data class ShowContentAndLoadingNextPageErrorPaginationState(
     override val items: List<GithubRepository>,
     internal override val currentPage: Int,
-    internal override  val canLoadNextPage: Boolean
+    internal override val canLoadNextPage: Boolean
 ) : ContainsContentPaginationState()
-
-/**
- * An error has occurred while loading the first page
- */
-data class LoadingFirstPageError(val cause: Throwable) : PaginationState()
 
 internal class InternalPaginationStateMachine(
     logger: FlowReduxLogger,
@@ -99,7 +100,7 @@ internal class InternalPaginationStateMachine(
             }
 
             inState<ShowContentAndLoadingNextPageErrorPaginationState> {
-
+                onEnter(block = ::moveToContentStateAfter3Seconds)
             }
         }
     }
@@ -197,6 +198,22 @@ internal class InternalPaginationStateMachine(
         }
 
         setState { nextState }
+    }
+
+    private suspend fun moveToContentStateAfter3Seconds(
+        getState: StateAccessor<PaginationState>,
+        setState: SetState<PaginationState>
+    ) {
+        delay(3000)
+        setState {
+            if (it is ShowContentAndLoadingNextPageErrorPaginationState)
+                ShowContentPaginationState(
+                    items = it.items,
+                    currentPage = it.currentPage,
+                    canLoadNextPage = it.canLoadNextPage
+                )
+            else it
+        }
     }
 }
 

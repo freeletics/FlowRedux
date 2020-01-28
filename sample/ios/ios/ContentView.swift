@@ -22,13 +22,20 @@ struct ContentView: View {
 
         NSLog("rendering \(state)")
         
-        return VStack {
+        return ZStack {
             if state is LoadFirstPagePaginationState {
                 LoadingIndicatorView()
             } else if state is ContainsContentPaginationState {
+                
                 GithubReposList(contentState: $state,
                                 endOfListReached: triggerLoadNextPage
                 )
+                
+            } else if state is LoadingFirstPageError {
+                // TODO extract standalone widget?
+                Button(action: triggerReloadFirstPage) {
+                    Text("An error has occured.\nClick here to retry.")
+                }
             }
         }.onAppear(perform: startStateMachine)
         
@@ -36,6 +43,10 @@ struct ContentView: View {
     
     private func triggerLoadNextPage(){
         self.stateMachine.dispatch(action: LoadNextPage())
+    }
+    
+    private func triggerReloadFirstPage(){
+        self.stateMachine.dispatch(action: RetryLoadingFirstPage())
     }
     
     private func startStateMachine(){

@@ -22,12 +22,18 @@ struct GithubReposList: View {
             
             if (contentState is ShowContentAndLoadingNextPagePaginationState){
                 LoadingIndicatorView(style: .small)
-            }
+            } else if (contentState is ShowContentAndLoadingNextPageErrorPaginationState){
+                Text("An error has occurred")
+                    .background(Color.black)
+                    .foregroundColor(Color.white)
+                    .padding(10)
+            } else {
             
             // Work around to get notified when we have reached the end of the list by showing an invisible rect
             Rectangle()
                 .size(width: 0, height: 0)
                 .onAppear(perform: endOfListReached)
+            }
         }
     }
 }
