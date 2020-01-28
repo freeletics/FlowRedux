@@ -34,30 +34,39 @@ sealed class PaginationState
  */
 object LoadFirstPagePaginationState : PaginationState()
 
+sealed class ContainsContentPaginationState : PaginationState() {
+    abstract val items: List<GithubRepository>
+    internal abstract val currentPage: Int
+    internal abstract val canLoadNextPage: Boolean
+}
+
 /**
  * State that represents displaying a list of  [GithubRepository] items
  */
 data class ShowContentPaginationState(
-    val items: List<GithubRepository>,
-    internal val currentPage: Int,
-    internal val canLoadNextPage: Boolean
-) : PaginationState()
+    override val items: List<GithubRepository>,
+    internal override val currentPage: Int,
+    internal override  val canLoadNextPage: Boolean
+) : ContainsContentPaginationState()
 
 /**
  * Indicates that the next page is loading
  * while still displaying the current items
  */
 data class ShowContentAndLoadingNextPagePaginationState(
-    val items: List<GithubRepository>,
-    internal val currentPage: Int,
-    internal val canLoadNextPage: Boolean
-) : PaginationState()
+    override val items: List<GithubRepository>,
+    internal override val currentPage: Int,
+    internal override  val canLoadNextPage: Boolean
+) : ContainsContentPaginationState()
 
+/**
+ * Shows an Error while loading next page while still showing content
+ */
 data class ShowContentAndLoadingNextPageErrorPaginationState(
-    val items: List<GithubRepository>,
-    internal val currentPage: Int,
-    internal val canLoadNextPage: Boolean
-) : PaginationState()
+    override val items: List<GithubRepository>,
+    internal override val currentPage: Int,
+    internal override  val canLoadNextPage: Boolean
+) : ContainsContentPaginationState()
 
 /**
  * An error has occurred while loading the first page

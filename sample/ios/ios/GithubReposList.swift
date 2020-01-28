@@ -10,17 +10,17 @@ import SwiftUI
 import shared_code
 
 struct GithubReposList: View {
-    var repositories : [GithubRepository]
+    // TODO Not idiomatic Swift UI, maybe use @BindableObject instead or find a better way?
+    @Binding var contentState : PaginationState
     var endOfListReached: () -> Void
-    var showLoadMoreIndicator : Bool
     
     var body: some View {
         List {
-            ForEach(repositories) { repo in
+            ForEach((contentState as! ContainsContentPaginationState).items) { repo in
                 Text("\(repo.name)")
             }
             
-            if (showLoadMoreIndicator){
+            if (contentState is ShowContentAndLoadingNextPagePaginationState){
                 LoadingIndicatorView(style: .small)
             }
             
@@ -32,12 +32,14 @@ struct GithubReposList: View {
     }
 }
 
+/*
 struct GithubReposList_Previews: PreviewProvider {
     static var previews: some View {
-        GithubReposList(repositories: [GithubRepository(id: "1", name: "Repop name", stargazersCount: 123)], endOfListReached: { }, showLoadMoreIndicator: true)
+        GithubReposList(contentState: [GithubRepository(id: "1", name: "Repop name", stargazersCount: 123)], endOfListReached: { }, showLoadMoreIndicator: true)
         .previewLayout(.fixed(width: 300, height: 70))
     }
 }
 
+*/
 extension GithubRepository : Identifiable {
 }

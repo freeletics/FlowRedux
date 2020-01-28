@@ -25,16 +25,10 @@ struct ContentView: View {
         return VStack {
             if state is LoadFirstPagePaginationState {
                 LoadingIndicatorView()
-            } else if state is ShowContentPaginationState {
-                GithubReposList(repositories: (state as! ShowContentPaginationState).items,
-                                endOfListReached: triggerLoadNextPage,
-                                showLoadMoreIndicator: false
+            } else if state is ContainsContentPaginationState {
+                GithubReposList(contentState: $state,
+                                endOfListReached: triggerLoadNextPage
                 )
-            } else if (state is ShowContentAndLoadingNextPagePaginationState) {
-                GithubReposList(repositories: (state as! ShowContentAndLoadingNextPagePaginationState).items,
-                                endOfListReached: triggerLoadNextPage,
-                                showLoadMoreIndicator: true
-                               )
             }
         }.onAppear(perform: startStateMachine)
         
