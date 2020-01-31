@@ -10,14 +10,18 @@ import androidx.lifecycle.Observer
 import com.freeletics.flowredux.sample.shared.LoadFirstPagePaginationState
 import com.freeletics.flowredux.sample.shared.LoadingFirstPageError
 import com.freeletics.flowredux.sample.shared.PaginationState
+import com.freeletics.flowredux.sample.shared.ShowContentAndLoadingNextPageErrorPaginationState
+import com.freeletics.flowredux.sample.shared.ShowContentAndLoadingNextPagePaginationState
 import com.freeletics.flowredux.sample.shared.ShowContentPaginationState
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_repositories.*
 import timber.log.Timber
 
 class PopularRepositoriesFragment : Fragment() {
 
-    val viewModel by viewModels<PopularRepositoriesViewModel>()
-    lateinit var adapter: PopularRepositoriesAdapter
+    private val viewModel by viewModels<PopularRepositoriesViewModel>()
+    private var adapter: PopularRepositoriesAdapter? = null
+    private var snackbar : Snackbar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,16 +45,36 @@ class PopularRepositoriesFragment : Fragment() {
             loading.visible
         }
         is ShowContentPaginationState -> {
-            adapter.items = state.items
+            adapter!!.items = state.items
             error.gone
             recyclerView.visible
             loading.gone
+        }
+        is ShowContentAndLoadingNextPagePaginationState -> {
+            adapter!!.items = listOf(state.items, LoadingItem)
+            error.gone
+            recyclerView.visible
+            loading.gone
+        }
+        is ShowContentAndLoadingNextPageErrorPaginationState -> {
+            adapter!!.items = state.items
+            error.gone
+            recyclerView.visible
+            loading.gone
+            snackbar = Snackbar.make(view!!, "An error occurred", Snackbar.LENGTH_LONG)
+            snackbar!!.show()
         }
         is LoadingFirstPageError -> {
             error.visible
             recyclerView.gone
             loading.gone
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        adapter = null
+        snackbar = null
     }
 }
 

@@ -1,0 +1,4 @@
+$dokka.format:gfm
+$dokka.linkExtension:md
+$dokka.location:com.freeletics.flowredux$reduxStore(kotlinx.coroutines.flow.Flow((com.freeletics.flowredux.reduxStore.A)), kotlin.Function0((com.freeletics.flowredux.reduxStore.S)), kotlin.collections.Iterable((kotlin.Function2((kotlinx.coroutines.flow.Flow((com.freeletics.flowredux.reduxStore.A)), kotlin.Function0((com.freeletics.flowredux.reduxStore.S)), )))), com.freeletics.flowredux.FlowReduxLogger, kotlin.Function2((com.freeletics.flowredux.reduxStore.S, com.freeletics.flowredux.reduxStore.A, )))com.freeletics.flowredux/kotlinx.coroutines.flow.-flow/redux-store.md
+com.freeletics.flowredux
