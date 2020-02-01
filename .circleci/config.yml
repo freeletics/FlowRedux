@@ -35,16 +35,10 @@ jobs:
       - *restore_gradle_cache
       - run:
           name: Build library
-          command: ./gradlew :library:build :dsl:build --stacktrace
+          command: ./gradlew :flowredux:build :dsl:build --stacktrace
       - run:
           name: Run library tests
-          command: ./gradlew :library:check :dsl:check --stacktrace
-     # - run:
-     #     name: Build sample
-     #     command: ./gradlew :sample:assembleDebug
-     # - run:
-     #     name: Run sample tests
-     #     command: ./gradlew :sample:testDebug
+          command: ./gradlew :flowredux:check :dsl:check --stacktrace
       - *save_gradle_cache
 
 workflows:
