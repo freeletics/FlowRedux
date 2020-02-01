@@ -7,9 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.RecyclerView
 import com.freeletics.flowredux.sample.shared.LoadFirstPagePaginationState
+import com.freeletics.flowredux.sample.shared.LoadNextPage
 import com.freeletics.flowredux.sample.shared.LoadingFirstPageError
 import com.freeletics.flowredux.sample.shared.PaginationState
+import com.freeletics.flowredux.sample.shared.RetryLoadingFirstPage
 import com.freeletics.flowredux.sample.shared.ShowContentAndLoadingNextPageErrorPaginationState
 import com.freeletics.flowredux.sample.shared.ShowContentAndLoadingNextPagePaginationState
 import com.freeletics.flowredux.sample.shared.ShowContentPaginationState
@@ -21,7 +24,7 @@ class PopularRepositoriesFragment : Fragment() {
 
     private val viewModel by viewModels<PopularRepositoriesViewModel>()
     private var adapter: PopularRepositoriesAdapter? = null
-    private var snackbar : Snackbar? = null
+    private var snackbar: Snackbar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,6 +39,21 @@ class PopularRepositoriesFragment : Fragment() {
             Timber.d("render $it")
             render(it)
         })
+        error.setOnClickListener { viewModel.dispatch(RetryLoadingFirstPage) }
+
+        val endOfListReached = object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                val endReached = !recyclerView!!.canScrollVertically(1)
+                Timber.d("Scroll changed: $endReached")
+                if (endReached) {
+                    viewModel.dispatch(LoadNextPage)
+                }
+            }
+        }
+
+        recyclerView.addOnScrollListener(endOfListReached)
     }
 
     private fun render(state: PaginationState) = when (state) {
