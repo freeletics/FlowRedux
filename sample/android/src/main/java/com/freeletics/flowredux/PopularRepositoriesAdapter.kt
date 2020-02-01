@@ -1,6 +1,8 @@
 package com.freeletics.flowredux
 
+import androidx.recyclerview.widget.DiffUtil
 import com.freeletics.flowredux.sample.shared.GithubRepository
+import com.hannesdorfmann.adapterdelegates4.AsyncListDifferDelegationAdapter
 import com.hannesdorfmann.adapterdelegates4.ListDelegationAdapter
 import com.hannesdorfmann.adapterdelegates4.dsl.adapterDelegateLayoutContainer
 import kotlinx.android.synthetic.main.item_repository.*
@@ -10,7 +12,13 @@ import kotlinx.android.synthetic.main.item_repository.*
  */
 object LoadingItem
 
-class PopularRepositoriesAdapter : ListDelegationAdapter<List<Any>>(
+class PopularRepositoriesAdapter : AsyncListDifferDelegationAdapter<Any>(
+    object : DiffUtil.ItemCallback<Any>() {
+        override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean =
+            newItem == oldItem
+
+        override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean = false
+    },
     githubAdapterDelegate(),
     loadingAdapterDelegate()
 )

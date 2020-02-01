@@ -69,7 +69,8 @@ class PopularRepositoriesFragment : Fragment() {
             loading.gone
         }
         is ShowContentAndLoadingNextPagePaginationState -> {
-            adapter!!.items = listOf(state.items, LoadingItem)
+            adapter!!.items = state.items + LoadingItem
+            recyclerView.smoothScrollToPosition(adapter!!.itemCount)
             error.gone
             recyclerView.visible
             loading.gone
