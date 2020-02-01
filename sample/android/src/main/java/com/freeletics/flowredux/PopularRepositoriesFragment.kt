@@ -61,11 +61,13 @@ class PopularRepositoriesFragment : Fragment() {
             error.gone
             recyclerView.gone
             loading.visible
+            snackbar?.dismiss()
         }
         is ShowContentPaginationState -> {
             adapter!!.items = state.items
             error.gone
             recyclerView.visible
+            snackbar?.dismiss()
             loading.gone
         }
         is ShowContentAndLoadingNextPagePaginationState -> {
@@ -74,6 +76,7 @@ class PopularRepositoriesFragment : Fragment() {
             error.gone
             recyclerView.visible
             loading.gone
+            snackbar?.dismiss()
         }
         is ShowContentAndLoadingNextPageErrorPaginationState -> {
             adapter!!.items = state.items
@@ -87,6 +90,7 @@ class PopularRepositoriesFragment : Fragment() {
             error.visible
             recyclerView.gone
             loading.gone
+            snackbar?.dismiss()
         }
     }
 
