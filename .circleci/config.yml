@@ -28,7 +28,7 @@ executors:
       TERM: dumb
   mkdocs:
     docker:
-      - squidfunk/mkdocs-material:4.6.0
+      - image: squidfunk/mkdocs-material:4.6.0
     working_directory: ~/repo
 
 jobs:
