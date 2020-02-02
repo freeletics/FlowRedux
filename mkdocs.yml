@@ -1,0 +1,44 @@
+site_name: FlowRedux
+site_url: https://freeletics.github.com/flowredux/
+repo_name: FlowRedux
+repo_url: https://github.com/freeletics/FlowRedux
+site_description: "Kotlin Multiplatform library to create state machines"
+site_author: Freeletics
+remote_branch: gh-pages
+
+copyright: 'Copyright &copy; 2020 Freeletics.'
+
+theme:
+  name: 'material'
+  favicon: images/icon-freeletics.png
+  logo: images/logo-freeletics.png
+  palette:
+    primary: 'black'
+    accent: 'white'
+
+extra_css:
+  - 'css/app.css'
+
+markdown_extensions:
+  - smarty
+  - codehilite:
+      guess_lang: false
+  - footnotes
+  - meta
+  - toc:
+      permalink: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tilde
+  - tables
+
+nav:
+  - 'Overview': index.md
+  - 'DSL': dsl.md
+  - 'Multiplatform': multiplatform.md
+  - 'Contributing': contributing.md

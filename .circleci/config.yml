@@ -40,6 +40,19 @@ jobs:
           name: Run library tests
           command: ./gradlew :flowredux:check :dsl:check --stacktrace
       - *save_gradle_cache
+  deploy_website:
+    executor: android
+    steps:
+      - checkout
+      - *restore_gradle_cache
+      - run:
+          name: Create index.md
+          command: cp README.md docs/index.md
+      - run:
+          name: mkdocs
+          command: mkdocs gh-deploy
+
+
 
 workflows:
   version: 2
@@ -47,6 +60,13 @@ workflows:
   master-pipeline:
     jobs:
       - build_and_test:
+          filters:
+            branches:
+              only:
+                - master
+      - deploy_website:
+          requires:
+            - build_and_test
           filters:
             branches:
               only:
