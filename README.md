@@ -7,8 +7,6 @@ Building kotlin multiplatform StateMachine made easy with DSL and coroutines.
 
 ## Usage
 
-To be done.
-
 ```kotlin
 sealed class State
 
@@ -40,7 +38,10 @@ class MyStateMachine : FlowReduxStateMachine<State, Action>(LoadingState){
 }
 ```
 
-## Dependency
+## Dependencies
+There are two artifacts that you can include as dependency::
+1. `flowredux`: this is the core library. Usually you dont want to use the core library directly but rather use the `dsl`.
+2. `dsl` which provides a convenient DSL on top of the core library. Usually this is what you want.
 
 ```groovy
 implementation 'com.freeletics.flowredux:flowredux-multiplatform:0.2.1'
@@ -49,6 +50,7 @@ implementation 'com.freeletics.flowredux:dsl-multiplatform:0.2.1'
 
 ### JVM only
 ```groovy
+implementation 'com.freeletics.flowredux:flowredux:0.2.1'
 implementation 'com.freeletics.flowredux:dsl:0.2.1'
 ```
 
@@ -93,8 +95,7 @@ allprojects {
 }
 ```
 
-JVM
+Then just use `-SNAPSHOT`suffix as version like
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux:0.2.2-SNAPSHOT'
-implementation 'com.freeletics.flowredux:flowredux-dsl:0.2.2-SNAPSHOT'
+implementation 'com.freeletics.flowredux:dsl:0.2.2-SNAPSHOT'
 ```
