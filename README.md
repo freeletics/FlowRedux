@@ -9,6 +9,37 @@ Building kotlin multiplatform StateMachine made easy with DSL and coroutines.
 
 To be done.
 
+```kotlin
+sealed class State
+
+object LoadingState : State()
+data class ContentState(val items : List<Item>) : State()
+data class ErrorState(val error : Throwable) : State()
+
+
+sealed class Action
+object RetryLoadingAction : Action()
+
+
+class MyStateMachine : FlowReduxStateMachine<State, Action>(LoadingState){
+    init {
+        spec {
+            inState<LoadingState> {
+                onEnter  { getState, setState ->
+                    // executes this block whenever we enter LoadingState
+                    try {
+                        val items = loadItems() // suspending function / coroutine to load items
+                        setState { ContentState(items) } // Transition to ContentState
+                    } catch (t : Throwable) {
+
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
 ## Dependency
 
 ```groovy
