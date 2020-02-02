@@ -26,6 +26,10 @@ executors:
       JAVA_TOOL_OPTIONS: "-Xmx1536m"
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.incremental=false"
       TERM: dumb
+  python:
+    docker:
+      - image: circleci/python:3.7.6
+    working_directory: ~/repo
 
 jobs:
   build_and_test:
@@ -41,15 +45,20 @@ jobs:
           command: ./gradlew :flowredux:check :dsl:check --stacktrace
       - *save_gradle_cache
   deploy_website:
-    executor: android
+    executor: python
     steps:
       - checkout
-      - *restore_gradle_cache
       - run:
           name: Create index.md
           command: cp README.md docs/index.md
       - run:
-          name: mkdocs
+          name: install mkdocs
+          command: pip install mkdocs
+      - run:
+          name: install material theme
+          command: pip install mkdocs-material
+      - run:
+          name: mkdocs deploy
           command: mkdocs gh-deploy
 
 
