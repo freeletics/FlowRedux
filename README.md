@@ -29,8 +29,24 @@ class MyStateMachine : FlowReduxStateMachine<State, Action>(LoadingState){
                         val items = loadItems() // suspending function / coroutine to load items
                         setState { ContentState(items) } // Transition to ContentState
                     } catch (t : Throwable) {
-
+                        setState { ErrorState(t) } // Transition to ErrorState
                     }
+                }
+            }
+
+            inState<ErrorState> {
+                on<RetryLoadingAction> { action, getState, setState ->
+                    // executes this block whenever
+                    // ErrorState is current state and RetryLoadingAction is emitted
+                    setState { LoadingState } // Transition to LoadingState which loads list again
+                 }
+            }
+
+            inState<ContentState> {
+                observeWhileInState( flowOf(1,2,3) ) { getState, setState ->
+                    // observes the database flow as long as state is ContentState.
+                    // Once state is changed to another state the flow will automatically
+                    // stop emitting.
                 }
             }
         }
