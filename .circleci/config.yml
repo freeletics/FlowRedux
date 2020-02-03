@@ -102,3 +102,4 @@ workflows:
             branches:
               ignore:
                 - master
+                - gh-pages
