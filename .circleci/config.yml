@@ -28,7 +28,7 @@ executors:
       TERM: dumb
   mkdocs:
     docker:
-      - image: squidfunk/mkdocs-material:4.6.0
+      - image: circleci/python:3.7.6
     working_directory: ~/repo
 
 jobs:
@@ -48,6 +48,11 @@ jobs:
     executor: mkdocs
     steps:
       - checkout
+      - run:
+          name: Setup mkdocs and material theme
+          command: |
+            pip install mkdocs
+            pip install mkdocs-material
       - run:
           name: Set Git config
           command: |
