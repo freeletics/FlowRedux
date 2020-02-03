@@ -49,6 +49,16 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Set Git config
+          command: |
+            git config --global user.email "$GIT_AUTHOR_EMAIL"
+            git config --global user.name "$GIT_AUTHOR_NAME"
+            git config --global user.signingkey "$GIT_SIGNING_KEY"
+            git config --global commit.gpgsign true
+            export PRIVATE_KEY_FILE=`mktemp`
+            echo $GPG_PRIVATE_KEY | base64 -d > $PRIVATE_KEY_FILE
+            gpg --import $PRIVATE_KEY_FILE
+      - run:
           name: Create index.md
           command: cp README.md docs/index.md
       - run:
@@ -66,6 +76,7 @@ workflows:
               only:
                 - master
       - deploy_website:
+          context: "Commit Signing"
           requires:
             - build_and_test
           filters:
