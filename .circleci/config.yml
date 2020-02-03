@@ -47,7 +47,6 @@ jobs:
   deploy_website:
     executor: mkdocs
     steps:
-      - checkout
       - run:
           name: Setup mkdocs and material theme
           command: |
@@ -63,6 +62,7 @@ jobs:
             export PRIVATE_KEY_FILE=`mktemp`
             echo $GPG_PRIVATE_KEY | base64 -d > $PRIVATE_KEY_FILE
             gpg --import $PRIVATE_KEY_FILE
+      - checkout
       - run:
           name: Create index.md
           command: cp README.md docs/index.md
