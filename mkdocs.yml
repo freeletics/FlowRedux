@@ -11,7 +11,7 @@ copyright: 'Copyright &copy; 2020 Freeletics.'
 theme:
   name: 'material'
   favicon: images/icon-freeletics.png
-  logo: images/logo-freeletics.png
+  logo: images/icon-freeletics.png
   palette:
     primary: 'black'
     accent: 'white'
@@ -37,8 +37,8 @@ markdown_extensions:
   - pymdownx.tilde
   - tables
 
-nav:
-  - 'Overview': index.md
-  - 'DSL': dsl.md
-  - 'Multiplatform': multiplatform.md
-  - 'Contributing': contributing.md
+# nav:
+#   - 'Overview': index.md
+#   - 'DSL': dsl.md
+#   - 'Multiplatform': multiplatform.md
+#   - 'Contributing': contributing.md
