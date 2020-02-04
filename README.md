@@ -70,6 +70,28 @@ launch { // Launch a coroutine
 }
 ```
 
+In an Android Application you would use it with AndroidX `ViewModel` like that:
+
+```kotlin
+class MyViewModel @Inject constructor(private val stateMachine : StateMachine) : ViewModel() {
+    val state : LiveData<State> = MutableLiveData<State>()
+
+    init {
+        viewModelScope.launch { // automatically canceled once ViewModel lifecycle reached destroyed.
+            stateMachine.state.collect { newState ->
+                state.value = newState
+            }
+        }
+    }
+
+    fun dispatch(action : Action) {
+        viewModelScope.launch {
+            stateMachine.dispatch(action)
+        }
+    }
+}
+```
+
 ## Dependencies
 There are two artifacts that you can include as dependency::
 1. `flowredux`: this is the core library. Usually you dont want to use the core library directly but rather use the `dsl`.
