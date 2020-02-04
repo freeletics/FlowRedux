@@ -64,11 +64,8 @@ jobs:
             gpg --import $PRIVATE_KEY_FILE
       - checkout
       - run:
-          name: Create index.md
-          command: cp README.md docs/index.md
-      - run:
-          name: mkdocs deploy
-          command: mkdocs gh-deploy
+          name: Deploy Website
+          command: ./deply_website.sh
 
 workflows:
   version: 2
