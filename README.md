@@ -44,13 +44,29 @@ class MyStateMachine : FlowReduxStateMachine<State, Action>(LoadingState){
 
             inState<ContentState> {
                 observeWhileInState( flowOf(1,2,3) ) { getState, setState ->
-                    // observes the database flow as long as state is ContentState.
+                    // observes the given flow as long as state is ContentState.
                     // Once state is changed to another state the flow will automatically
                     // stop emitting.
                 }
             }
         }
     }
+}
+```
+
+```kotlin
+val statemachine = MyStateMachine()
+
+launch {  // Launch a coroutine
+    statemachine.state.collect { state ->
+      // do something with new state like update UI
+      renderUI(state)
+    }
+}
+
+// emit an Action
+launch { // Launch a coroutine
+    statemachine.dispatch(Action)
 }
 ```
 

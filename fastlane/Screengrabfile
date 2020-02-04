@@ -1,5 +1,0 @@
-locales ["en-US", "fr-FR", "ja-JP"]
-clear_previous_screenshots true
-app_apk_path "sample/build/outputs/apk/debug/sample-debug.apk"
-tests_apk_path "sample/build/outputs/apk/androidTest/debug/sample-debug-androidTest.apk"
-test_instrumentation_runner "com.freeletics.rxredux.SampleAppRunner"
