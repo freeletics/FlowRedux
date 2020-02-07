@@ -3,6 +3,7 @@ package com.freeletics.flowredux.dsl
 internal sealed class Action<S, A>
 internal data class SelfReducableAction<S, A>(
     private val loggingInfo: String,
+    internal val runReduceOnlyIf: (S) -> Boolean,
     val reduce: (S) -> S
 ) : Action<S, A>() {
     override fun toString(): String {
@@ -28,7 +29,10 @@ internal class InitialStateAction<S, A> : Action<S, A>() {
 
 internal fun <S : Any, A> reducer(state: S, action: Action<S, A>): S =
     when (action) {
-        is SelfReducableAction<S, A> -> action.reduce.invoke(state)
+        is SelfReducableAction<S, A> ->
+            if (action.runReduceOnlyIf.invoke(state))
+                action.reduce.invoke(state)
+            else state
         is ExternalWrappedAction<S, A> -> state
         is InitialStateAction<S, A> -> state
     }

@@ -36,7 +36,8 @@ class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
             emit(
                 SelfReducableAction<S, A>(
                     loggingInfo = "onEnter<${subStateClass.simpleName}>",
-                    reduce = it
+                    reduce = it,
+                    runReduceOnlyIf = { state -> subStateClass.isInstance(state) }
                 )
             )
         }

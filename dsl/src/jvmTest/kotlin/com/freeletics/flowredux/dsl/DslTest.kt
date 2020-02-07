@@ -172,6 +172,7 @@ class DslTest {
         Assert.assertEquals(listOf(0, 2, 1, 3, 4), order)
     }
 
+    @Test
     fun `on entering the same state doesnt tringer onEnter again`() {
         var s1Entered = 0
         val sm = StateMachine {
@@ -194,19 +195,65 @@ class DslTest {
             Assert.assertEquals(1, s1Entered)
         }
     }
+
+    /*
+    @Test
+    fun `on Action triggers in state setState executes while being in same state`() {
+        var setStateCalled = 0
+        val sm = StateMachine {
+            inState<State.Initial> {
+                on<Action.A1> { _, _, setState ->
+                    setState { setStateCalled++; it }
+                    setState { setStateCalled++; it }
+                }
+            }
+        }
+
+        val state = sm.state.testOverTime()
+        sm.dispatchAsync(Action.A1)
+        state shouldEmitNext State.Initial
+
+        Assert.assertEquals(2, setStateCalled)
+    }
+     */
+
+    @Test
+    fun `on Action changes state than second setState doesn't trigger anymore`() {
+        var setStateCalled = 0
+        val sm = StateMachine {
+            inState<State.Initial> {
+                on<Action.A1> { _, _, setState ->
+                    setState { setStateCalled++; State.S1 }
+                    setState { setStateCalled++; State.S2 }
+                }
+            }
+            inState<State.S1> {
+                onEnter { _, setState ->
+                    delay(100)
+                    setState { State.S3 }
+                }
+            }
+        }
+
+        val state = sm.state.testOverTime()
+        sm.dispatchAsync(Action.A1)
+        state shouldEmitNext State.Initial
+        state shouldEmitNext State.S1
+        state.shouldEmitNext(State.S3)
+        Assert.assertEquals(1, setStateCalled)
+    }
 }
 
 private sealed class Action {
     object A1 : Action()
-    object A2 : Action(){
-        fun foo(){}
-    }
+    object A2 : Action()
 }
 
 private sealed class State {
     object Initial : State()
     object S1 : State()
     object S2 : State()
+    object S3 : State()
 }
 
 private class StateMachine(

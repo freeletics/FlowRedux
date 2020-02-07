@@ -36,8 +36,13 @@ internal class StoreWideObserveBuilderBlock<T, S, A>(
         value: T,
         stateAccessor: StateAccessor<S>
     ): Flow<Action<S, A>> = flow {
+
         block(value, stateAccessor) {
-            emit(SelfReducableAction<S, A>(loggingInfo = "observe<Flow>", reduce = it))
+            emit(SelfReducableAction<S, A>(
+                loggingInfo = "observe<Flow>",
+                reduce = it,
+                runReduceOnlyIf =  { true }
+            ))
         }
     }
 }

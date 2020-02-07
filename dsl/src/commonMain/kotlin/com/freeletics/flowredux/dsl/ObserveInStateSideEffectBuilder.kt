@@ -30,7 +30,8 @@ internal class ObserveInStateSideEffectBuilder<T, S : Any, A : Any>(
                 .flatMapWithPolicy(flatMapPolicy) { stateChange ->
                     when (stateChange) {
                         MapStateChange.StateChanged.ENTERED ->
-                            flow.flatMapLatest {// TODO is it actually always flatMapLatest or also flatMapWithPolicy
+                            flow.flatMapLatest {
+                                // TODO is it actually always flatMapLatest or also flatMapWithPolicy
                                 setStateFlow(value = it, stateAccessor = state)
                             }
                         MapStateChange.StateChanged.LEFT -> flow { }
@@ -48,7 +49,8 @@ internal class ObserveInStateSideEffectBuilder<T, S : Any, A : Any>(
                 emit(
                     SelfReducableAction<S, A>(
                         loggingInfo = "observeWhileInState<${subStateClass.simpleName}>",
-                        reduce = it
+                        reduce = it,
+                        runReduceOnlyIf = { state -> subStateClass.isInstance(state) }
                     )
                 )
             }

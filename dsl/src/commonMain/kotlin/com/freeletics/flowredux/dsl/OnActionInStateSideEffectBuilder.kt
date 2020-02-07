@@ -46,14 +46,10 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any, SubState : S>(
                 val conditionHolds = subStateClass.isInstance(stateAccessor()) &&
                     action is ExternalWrappedAction &&
                     subActionClass.isInstance(action.action)
-
-                println("filter $action $conditionHolds")
-
                 conditionHolds
-
             }.map {
                 when (it) {
-                    is ExternalWrappedAction<*, *> -> it.action as A // subActionClass.cast(it.action) // TODO kotlin native supported?
+                    is ExternalWrappedAction<*, *> -> it.action as A
                     is SelfReducableAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
                     is InitialStateAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
                 }
@@ -71,7 +67,8 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any, SubState : S>(
                     emit(
                         SelfReducableAction<S, A>(
                             loggingInfo = "Caused by on<$action>",
-                            reduce = it
+                            reduce = it,
+                            runReduceOnlyIf = { state -> subStateClass.isInstance(state) }
                         )
                     )
                 }

@@ -82,7 +82,8 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
             emit(
                 SelfReducableAction<S, A>(
                     loggingInfo = "observeWhileInState<${subStateClass.simpleName}>",
-                    reduce = it
+                    reduce = it,
+                    runReduceOnlyIf = { state -> subStateClass.isInstance(state) }
                 )
             )
         }
