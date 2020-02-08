@@ -1,52 +1,137 @@
-# Diros late cepisse ora postquam parenti seque
+# DSL
 
-## Manuum Ulixes
+FlowRedux provides a convenient DSL to describe your state machine.
+This page introduces you the DSL that you can use.
 
-Lorem markdownum telas quaerit; Laestrygonis **parte** placetque labique
-sterilis. Voce in duraeque monte forte matri quam: lente augebat demittitur
-volet vulneribus nimbos manum duobus. Suo purpureum derexit
-[secum](http://prohibemur-et.net/pietas-falsa) habentem sequitur furta lacrimas
-es luce erroris iurasse verbaque.
+To do that we will stick with a simple example of loading a list of items from a web service.
+As you read this section and more concepts of the DSL will be introduced we will extend this sample.
 
-    supplyGigaflops -= megapixelPpc.server_pci(affiliateUnitSpyware(dvi +
-            active_access_metadata, saas_module_gopher), -1, sip_webcam_menu +
-            zettabyte);
-    linuxProcess -= name.wiPrompt.gpu(bluAccessAnalog) + wins_hdmi_keywords;
-    driver_rt(headerPetabyte + smishing + phishing_core);
+For now to get started, let's define the `States` our state machine has.
+As said before we loads a list of items from a web service
+and display that list.
+While loading the list we show a loading indicator on the screen and
+if an error occurs we show an error message on the screen with a retry button.
 
-Nervosque cingitur vidit *contrahitur* maius, huius, usque dei inminet. Audito
-mentis adhuc dummodo dei parabat nec Iove [caluere](http://iura.com/)? Illis
-duobus deos primum **nomen successit teneras** ad sibi esse Telethusa pectoris
-Chimaera se latus, dum manu deferri mortale? Avidae Lemnos vertice *volitare
-nebulas* ultor exempla sceleris celeberrima aura egrediturque aures, movet.
-Radii aut in pro onus comitum quoque; tegmine mota, ad quid trunco domum, tamen.
+This gives us the following states:
 
-## Tum atri abstulerat flamma
+```kotlin
+sealed class State {
 
-Et fide vicisse, oculisque transfert urebat relinquit femina Cerbere. Latona est
-finierat, illam! Addit citius iussere nepotum. Rex visa tumidarum vestigia
-vulgi; sed alto umbrae alumnus. Nec Iovis inposuit arma silex orbata in dummodo
-retexit nostra.
+    // Shows a loading indicator on screen
+    object LoadingState : State()
 
-Et volentem sacrorum egregius grana. Armis scelus damus geminos: rursus quid.
-Mihi sua; solet vitae fons, non eras poteras,
-[singula](http://www.taedissimul.com/aera).
+    // List of items loaded successfully, show it on screen
+    data class ShowContentState(val items : List<Item>) : State()
 
-1. Socer repelli hanc ira quicumque et iam
-2. Grande caelo frequentant silet
-3. Undis moneo nubes abdidit fugae ad erravit
-4. Acrisioneas paret
-5. Utinam atque toto tempora
-6. Sumpsitque nivea inpatiens deus circumfluus mater functaque
+    // Error while loading happened
+    data class ErrorState(val cause : Throwable) : State()
+}
+```
 
-Minor suis non scitatur vidisset magis cantibus: et, tibi. Adit alis fatentur
-illi ostendens iugum iecur esse celer vaga, irae, audiat, tristi? Nulla esse,
-tota, et in et cessataque scit pavens. Venias **maris splendidaque somno**
-iuncosaque aequor.
+If we reached `ErrorState` we display an error message but also a button a user can click to retry loading the items.
+This gives us the following `Actions`:
 
-**Faciem frigus** est [nepotem simul Laertaque](http://www.quantum.org/)
-trepidantem ancora et cinximus iubet conclamat cetera et alterno rarissima
-errabat. Et versat subigebant herbis potius robora miserrima aequora generumque
-petis; ergo venter, nec parari Iovem carpant illis. Hominis gravis hoc illuc!
-Tali sed luserat moenia pedes, aliena vacantem Minyae [ab
-aquis](http://mora.org/).
+```kotlin
+sealed class Action {
+    object RetryLoadingAction : Action()
+}
+```
+
+## Initial State
+Every `FlowReduxStateMachine` needs an initial state.
+This is in which state the state machine starts.
+In our example we start with the `LoadingState`.
+
+```kotlin
+class MyStateMachine(
+    private val httpClient: HttpClient
+) : FlowReduxStateMachine<State, Action>(initialState = LoadingState) {
+
+    init {
+        spec {
+            // will be filled in next section
+            ...
+        }
+    }
+}
+```
+
+Please note the constructor parameter of `FlowReduxStateMachine(initialState = ...)`.
+This is how you define the initial state of your state machine.
+Next, we already see that we need an `init {...}` block containing a `spec { ... }` block inside.
+The `spec { ... }` block is actually where we write our DSL inside.
+
+## inState
+The first concept we learn is `inState`
+
+```kotlin
+class MyStateMachine(
+    private val httpClient: HttpClient
+) : FlowReduxStateMachine<State, Action>(initialState = LoadingState) {
+
+    init {
+        spec {
+            inState<LoadingState> {
+                ...
+            }
+        }
+    }
+}
+```
+
+Please note that `inState` itself doesn't do anything.
+All we did so far with `inState<LoadingState>` is set an entry point.
+Next let's discuss what an `inState` can contain as triggers to actually "do something":
+
+1. `onEnter`: Triggers whenever we enter that state
+2. `on<Action>`: Triggers whenever we are in this state and the specified action is triggered from the outside by calling `FlowReduxStateMachine.dispatch(action)`.
+3. `observeWhileInState( flow )`: You can subscribe to any arbitarry `Flow` while your state machine is in that state.
+
+Let's try to go through them as we build our state machine:
+
+### onEnter
+What do we want to do when we enter the `LoadingState`?
+We want to do the http request, right?
+Let's do that by extending our example:
+
+```kotlin
+class MyStateMachine(
+    private val httpClient: HttpClient
+) : FlowReduxStateMachine<State, Action>(initialState = LoadingState) {
+
+    init {
+        spec {
+            inState<LoadingState> {
+                onEnter { getState, setState ->
+                    // we entered the LoadingState, so let's do the http request
+                    try {
+                        val items = httpClient.loadItems()
+                        setState { ShowContentState(items) }
+                    } catch (t : Throwable) {
+                        setState { ErrorState(t) }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+There are a some new things like  `onEnter`, `getState` and `setState`.
+Let's first talk a bit about `onEnter`:
+
+- **`onEnter { ... }` is running asynchronously in a coroutine**.
+That means whatever you do inside the `onEnter` block is not blocking anything else.
+You can totally run here long running and expensive calls (like doing an http request).
+- **`onEnter { ... }` doesn't get canceled** when the original state got left. Example
+ ```kotlin
+ inState<LoadingState> {
+    onEnter { getState, setState ->
+        setState { ErrorState(Exception("Fake Exception") }
+        doA()
+        doSomethingLongRunning()
+    }
+ }
+ ```
+ `doA()` and `doSomethingLongRunning()` are still executed even if `setState { ... }` which got executed before causes our state machine to move to the next state.
+ The takeaway is: the full `onEnter { ... }` block will be executed once a state has been entered (there is an exception, we will talk about that in `FlatMapPolicy` section).
+

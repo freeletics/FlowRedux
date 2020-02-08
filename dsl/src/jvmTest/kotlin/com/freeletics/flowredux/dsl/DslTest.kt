@@ -255,7 +255,7 @@ class DslTest {
                 }
 
                 on<Action.A2> { _, _, setState ->
-                    delay(50) // ensure that A1 setState{ } would have time be executed
+                    delay(100) // ensure that A1 setState{ } would have time be executed
                     setState { State.S2 }
                 }
             }
