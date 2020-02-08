@@ -80,7 +80,7 @@ workflows:
       - deploy_website:
           context: "Commit Signing"
           requires:
-            - build_and_test
+            - gradle-publish/publish_artifacts
           filters:
             branches:
               only:
