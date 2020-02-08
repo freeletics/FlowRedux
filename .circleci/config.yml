@@ -86,7 +86,7 @@ workflows:
               only:
                 - master
       - gradle-publish/publish_artifacts:
-          executor: gradle-publish/circleci-macos
+          executor: gradle-publish/circleci-android
           context: "android-maven-publish"
           deploy_task: "publish"
           requires:
