@@ -32,15 +32,20 @@ class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
     private suspend fun setStateFlow(
         stateAccessor: StateAccessor<S>
     ): Flow<Action<S, A>> = flow {
-        block(stateAccessor) {
-            emit(
-                SelfReducableAction<S, A>(
-                    loggingInfo = "onEnter<${subStateClass.simpleName}>",
-                    reduce = it,
-                    runReduceOnlyIf = { state -> subStateClass.isInstance(state) }
+
+        val setState = SetStateImpl<S>(
+            defaultRunIf = { state -> subStateClass.isInstance(state) },
+            invokeCallback = { runIf, reduce ->
+                emit(
+                    SelfReducableAction<S, A>(
+                        loggingInfo = "onEnter<${subStateClass.simpleName}>",
+                        reduce = reduce,
+                        runReduceOnlyIf = runIf
+                    )
                 )
-            )
-        }
+            }
+        )
+        block(stateAccessor, setState)
     }
 }
 

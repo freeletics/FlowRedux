@@ -60,18 +60,23 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any, SubState : S>(
         stateAccessor: StateAccessor<S>
     ): Flow<Action<S, A>> =
         flow {
-            onActionBlock.invoke(
-                action,
-                stateAccessor,
-                {
+            val setState = SetStateImpl<S>(
+                defaultRunIf = { state -> subStateClass.isInstance(state) },
+                invokeCallback = { runIf, reduce ->
                     emit(
                         SelfReducableAction<S, A>(
                             loggingInfo = "Caused by on<$action>",
-                            reduce = it,
-                            runReduceOnlyIf = { state -> subStateClass.isInstance(state) }
+                            reduce = reduce,
+                            runReduceOnlyIf = runIf
                         )
                     )
                 }
+            )
+
+            onActionBlock.invoke(
+                action,
+                stateAccessor,
+                setState
             )
         }
 }

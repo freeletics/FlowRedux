@@ -45,15 +45,19 @@ internal class ObserveInStateSideEffectBuilder<T, S : Any, A : Any>(
         stateAccessor: StateAccessor<S>
     ): Flow<Action<S, A>> =
         flow {
-            block(value, stateAccessor) {
-                emit(
-                    SelfReducableAction<S, A>(
-                        loggingInfo = "observeWhileInState<${subStateClass.simpleName}>",
-                        reduce = it,
-                        runReduceOnlyIf = { state -> subStateClass.isInstance(state) }
+            val setState = SetStateImpl<S>(
+                defaultRunIf = { state -> subStateClass.isInstance(state) },
+                invokeCallback = { runIf, reduce ->
+                    emit(
+                        SelfReducableAction<S, A>(
+                            loggingInfo = "observeWhileInState<${subStateClass.simpleName}>",
+                            reduce = reduce,
+                            runReduceOnlyIf = runIf
+                        )
                     )
-                )
-            }
+                }
+            )
+            block(value, stateAccessor, setState)
         }
 }
 

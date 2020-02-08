@@ -242,6 +242,35 @@ class DslTest {
         state.shouldEmitNext(State.S3)
         Assert.assertEquals(1, setStateCalled)
     }
+
+    @Test
+    fun `setState with runIf returning false doesnt change state`() {
+        var setS1Called = false
+        var a1Dispatched = false
+        val sm = StateMachine {
+            inState<State.Initial> {
+                on<Action.A1> { _, _, setState ->
+                    a1Dispatched = true
+                    setState(runIf = { false }) { setS1Called = true; State.S1 }
+                }
+
+                on<Action.A2> { _, _, setState ->
+                    delay(50) // ensure that A1 setState{ } would have time be executed
+                    setState { State.S2 }
+                }
+            }
+        }
+
+        val state = sm.state.testOverTime()
+        state shouldEmitNext State.Initial
+
+        sm.dispatchAsync(Action.A1)
+        sm.dispatchAsync(Action.A2)
+
+        state shouldEmitNext State.S2
+        Assert.assertFalse(setS1Called)
+        Assert.assertFalse(a1Dispatched)
+    }
 }
 
 private sealed class Action {

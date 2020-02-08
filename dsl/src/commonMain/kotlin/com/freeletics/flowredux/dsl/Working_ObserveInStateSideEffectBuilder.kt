@@ -78,15 +78,19 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
         value: T,
         stateAccessor: StateAccessor<S>
     ): Flow<Action<S, A>> = flow {
-        block(value, stateAccessor) {
-            emit(
-                SelfReducableAction<S, A>(
-                    loggingInfo = "observeWhileInState<${subStateClass.simpleName}>",
-                    reduce = it,
-                    runReduceOnlyIf = { state -> subStateClass.isInstance(state) }
+        val setState = SetStateImpl<S>(
+            defaultRunIf = { state -> subStateClass.isInstance(state) },
+            invokeCallback = { runOnlyIf, reduce ->
+                emit(
+                    SelfReducableAction<S, A>(
+                        loggingInfo = "observeWhileInState<${subStateClass.simpleName}>",
+                        reduce = reduce,
+                        runReduceOnlyIf = runOnlyIf
+                    )
                 )
-            )
-        }
+            }
+        )
+        block(value, stateAccessor, setState)
     }
 
     /**
