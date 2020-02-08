@@ -28,7 +28,14 @@ abstract class SetState<S>(
     private val defaultRunIf: (S) -> Boolean
 ) {
     abstract suspend operator fun invoke(
+        /**
+         * If this lambda return true only then reduce block will be executed
+         */
         runIf: (S) -> Boolean = defaultRunIf,
+        /**
+         * This lambda gets the current state of the state machine as input and returns
+         * the new state the state machine should transition to as return value.
+         */
         reduce: (currentState: S) -> S
     )
 }
