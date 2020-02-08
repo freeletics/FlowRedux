@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  gradle-publish: freeletics/gradle-publish@1.0.4
+  gradle-publish: freeletics/gradle-publish@1.1.0
 
 # Common anchors
 # PR cache anchors
@@ -86,7 +86,7 @@ workflows:
               only:
                 - master
       - gradle-publish/publish_artifacts:
-          executor: gradle-publish/circleci-android
+          executor: gradle-publish/circleci-macos
           context: "android-maven-publish"
           deploy_task: "publish"
           requires:
