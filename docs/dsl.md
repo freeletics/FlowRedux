@@ -116,8 +116,9 @@ class MyStateMachine(
     }
 }
 ```
-There are a some new things like  `onEnter`, `getState` and `setState`.
-Let's first talk a bit about `onEnter`:
+There are a some new things like  `onEnter`, `getState` and `setState`. We will cover `getState` and `setState` in dedicated sections. 
+All you have to know about `setState` for now is that this is the way to set the next state in your state machine.
+Let's talk about `onEnter`:
 
 - **`onEnter { ... }` is running asynchronously in a coroutine**.
 That means whatever you do inside the `onEnter` block is not blocking anything else.
@@ -134,6 +135,51 @@ You can totally run here long running and expensive calls (like doing an http re
  ```
  `doA()` and `doSomethingLongRunning()` are still executed even if `setState { ... }` which got executed before causes our state machine to move to the next state.
  The takeaway is: the full `onEnter { ... }` block will be executed once a state has been entered (there is an exception, we will talk about that in `FlatMapPolicy` section).
+
+### on`<Action>`
+How do we deal with external user input like clicks in FlowRedux? 
+This is what Actions are for. 
+In FlowRedux DSL you can react on Actions by using a `on<MyAction>{ ... }` block.
+
+In our example we want to retry loading if we are in `ErrorState` and the user clicks on a retry button. 
+Clicking on that button dispatches a `RetryLoadingAction` to our state machine.
+Let's extend our FlowReduxStateMachine to react on such an action if the current state is `ErrorState`:
+
+```kotlin
+class MyStateMachine(
+    private val httpClient: HttpClient
+) : FlowReduxStateMachine<State, Action>(initialState = LoadingState) {
+
+    init {
+        spec {
+            inState<LoadingState> {
+                onEnter { getState, setState ->
+                    // we entered the LoadingState, so let's do the http request
+                    try {
+                        val items = httpClient.loadItems()
+                        setState { ShowContentState(items) }
+                    } catch (t : Throwable) {
+                        setState { ErrorState(t) }
+                    }
+                }
+            }
+            
+            // let's add a new inState{...} with an on{...} block 
+            inState<ErrorState> {
+               on<RetryLoadingAction> { action, getState, setState ->
+                  // This block triggers if we are in ErrorState 
+                  // RetryLoadingAction has been dispatched to this state machine.
+                  // In that case we transition to LoadingState which then starts the http
+                  // request to load items.
+                  
+                  setState { LoadingState }
+               }
+            }
+        }
+    }
+}
+```
+ 
 
 ## SetState
 
