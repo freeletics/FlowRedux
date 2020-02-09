@@ -122,7 +122,7 @@ Let's first talk a bit about `onEnter`:
 - **`onEnter { ... }` is running asynchronously in a coroutine**.
 That means whatever you do inside the `onEnter` block is not blocking anything else.
 You can totally run here long running and expensive calls (like doing an http request).
-- **`onEnter { ... }` doesn't get canceled** when the original state got left. Example
+- **`onEnter { ... }` doesn't get canceled** when the state machine transitioned to another state original state. Example:
  ```kotlin
  inState<LoadingState> {
     onEnter { getState, setState ->
@@ -135,3 +135,8 @@ You can totally run here long running and expensive calls (like doing an http re
  `doA()` and `doSomethingLongRunning()` are still executed even if `setState { ... }` which got executed before causes our state machine to move to the next state.
  The takeaway is: the full `onEnter { ... }` block will be executed once a state has been entered (there is an exception, we will talk about that in `FlatMapPolicy` section).
 
+## SetState
+
+## GetState
+
+## FlatMapPolicy
