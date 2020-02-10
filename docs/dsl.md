@@ -285,6 +285,51 @@ On zero we call `setState { LoadingState }` to do the state transition.
 
 In contrast to `onEnter` and `on<Action>` block `observeWhileInState()` block stops the execution once the state machine is not in the original `inState<State>` anymore.
 
+## observe
+If for whatever reason you want to trigger a state change out of  `inState<>`, `onEnter { ... }`, `on<Action>` or `observeWhileInState { ... }` by observing a `Flow` then `observe` is what you are looking for:
+
+```kotlin
+class MyStateMachine(
+    private val httpClient: HttpClient
+) : FlowReduxStateMachine<State, Action>(initialState = LoadingState) {
+
+    init {
+        spec {
+            inState<LoadingState> {
+                onEnter { getState, setState ->
+                  ...
+                }
+            }
+
+            inState<ErrorState> {
+               on<RetryLoadingAction> { action, getState, setState ->
+                  ...
+               }
+
+               observeWhileInState(timer) { value, getState, setState ->
+                  ...
+               }
+            }
+
+            val aFlow : Flow<Int> = flowOf(1,2,3,4)
+            observe( aFlow ) { value, getState, setState ->
+                // Will trigger anytime flow emits a value
+                ...
+            }
+
+            observe( anotherFlow ) { value, getState, setState ->
+                // Will trigger anytime flow emits a value
+               ...
+            }
+        }
+    }
+}
+```
+
+`observe()` is like `observeWhileInState()` just that it is not bound to the current state like `observeWhileInState()` is.
+`observe()` will stop collecting the passed in Flow only if the CoroutineScope of the whole FlowReduxStateMachine gets canceled.
+
+
 ## SetState
 As you probably have already noticed from the sections above `setState` is a way to make you state machine transition to another state.
 You can think of `SetState` as a function that gets the current state as input parameter and returns
