@@ -45,20 +45,17 @@ sealed class Action{
     object Action1 : MyAction()
     object Action2 : MyAction()
 }
+```
 
-//
-// Example
-//
-
+```kotlin
 val actionFlow : Flow<Action> = flowOf {
-// Let's assume
     emit(Action1)
     delay(2000)
     emit(Action2)
 }
 
 val stateFlow : Flow<State> = actionFlow // actionFlow is the input actions to the state machine
-    .reduxStore<Action, State> {
+    .reduxStore<Action, State>(IntialState) {
         // Your DSL goes inside this spec block.
         // Example:
         inState<State1> {
