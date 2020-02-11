@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import org.junit.Assert
+import org.junit.Ignore
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 
@@ -244,6 +245,7 @@ class DslTest {
     }
 
     @Test
+    @Ignore("Seems to be flaky on CI")
     fun `setState with runIf returning false doesnt change state`() {
         var setS1Called = false
         var a1Dispatched = false
