@@ -245,7 +245,6 @@ class DslTest {
     }
 
     @Test
-    @Ignore("Seems to be flaky on CI")
     fun `setState with runIf returning false doesnt change state`() {
         var setS1Called = false
         var a1Dispatched = false
@@ -271,7 +270,7 @@ class DslTest {
 
         state shouldEmitNext State.S2
         Assert.assertFalse(setS1Called)
-        Assert.assertFalse(a1Dispatched)
+        Assert.assertTrue(a1Dispatched)
     }
 }
 
