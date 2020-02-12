@@ -421,3 +421,139 @@ All execution blocks can specify a `FlatMapPolicy`:
  - `onEnter(flatMapPolicy = FlatMapPolicy.LATEST) { ... }`
  - `observeWhileInState(flatMapPolicy = FlatMapPolicy.LATEST) { ... }`
 
+## Best Practice
+One very important aspect of the DSL is to provide a readable and maintainable way to reason about your state machine.
+Let' take a look at our example state machine:
+
+```kotlin
+class MyStateMachine(
+    private val httpClient: HttpClient
+) : FlowReduxStateMachine<State, Action>(initialState = LoadingState) {
+
+    init {
+        spec {
+            inState<LoadingState> {
+                onEnter { getState, setState ->
+                    // we entered the LoadingState, so let's do the http request
+                    try {
+                        val items = httpClient.loadItems()
+                        setState { ShowContentState(items) }
+                    } catch (t : Throwable) {
+                        setState { ErrorState(cause = t, countdown = 3) } // Countdown starts with 3 seconds
+                    }
+                }
+            }
+
+            inState<ErrorState> {
+               on<RetryLoadingAction> { action, getState, setState ->
+                  setState { LoadingState }
+               }
+
+               val timer : Flow<Int> = timerThatEmitsEverySecond()
+               observeWhileInState(timer) { value, getState, setState ->
+                    // This block triggers every time the timer emits
+                    // which happens every second
+                    val state = getState()
+                    if (state is ErrorState) {
+                        val countdownTimeLeft = state.countdown
+                        if (countdownTimeLeft > 0)
+                            setState { state.copy(countdown = countdownTimeLeft - 1) } //  decrease the countdown by 1 second
+                        else
+                            setState { LoadingState } // transition to the LoadingState
+                    }
+               }
+            }
+        }
+    }
+
+    private fun timerThatEmitsEverySecond() : Flow<Int> {
+        var timeElapsed = 0
+        while (isActive) {  // is Flow still active?
+            delay(1000)     // wait 1 second
+            timeElapsed++
+            emit(timeElapsed) // Flow Emits value
+        }
+    }
+}
+```
+
+Do you notice something?
+With more blocks we add the state machine itself gets harder to read, understand and maintain.
+What we are aiming for with the DSL is an overview about what the state machine is supposed to do on a high level that reads like as specification.
+If you take a look at the example from above, however, you will notice that it isn't easy to read and get bloated with implementation details.
+
+### The recommended way
+We recommend to keep the DSL really short, expressive, readable and maintainable.
+Therefore instead of having implementation details in your DSL we recommend to use function references instead.
+Let's refactor the example above to reflect this idea:
+
+```kotlin
+class MyStateMachine(
+    private val httpClient: HttpClient
+) : FlowReduxStateMachine<State, Action>(initialState = LoadingState) {
+
+    //
+    // This is the specification of your state machine. Less implementation details, better readability.
+    //
+    init {
+        spec {
+            inState<LoadingState> {
+                onEnter(::loadItemsAndMoveToContentOrErrorState)
+            }
+
+            inState<ErrorState> {
+               on<RetryLoadingAction> { _, _, setState ->
+                  // For a single line statement it's fine to keep it as a block instead of moving to a function reference
+                  setState { LoadingState }
+               }
+
+               observeWhileInState(
+                    timerThatEmitsEverySecond(),
+                    ::onSecondElapsedMoveToLoadingStateOrMoveToDecrementCountdown
+               )
+            }
+        }
+    }
+
+
+    //
+    // All the implementation details are in the functions below.
+    //
+
+    private fun loadItemsAndMoveToContentOrErrorState(getState : StateAccessor<State>, setState : SetState<State>){
+        try {
+            val items = httpClient.loadItems()
+            setState { ShowContentState(items) }
+        } catch (t : Throwable) {
+            setState { ErrorState(cause = t, countdown = 3) } // Countdown starts with 3 seconds
+        }
+    }
+
+    private fun onSecondElapsedMoveToLoadingStateOrMoveToDecrementCountdown(
+        value : Int,
+        getState : StateAccessor<State>,
+        setState : SetState<State>
+    ){
+        val state = getState()
+        if (state is ErrorState) {
+            val countdownTimeLeft = state.countdown
+            if (countdownTimeLeft > 0)
+                setState { state.copy(countdown = countdownTimeLeft - 1) } //  decrease the countdown by 1 second
+            else
+                setState { LoadingState } // transition to the LoadingState
+        }
+    }
+
+    private fun timerThatEmitsEverySecond() : Flow<Int> {
+        var timeElapsed = 0
+        while (isActive) {  // is Flow still active?
+            delay(1000)     // wait 1 second
+            timeElapsed++
+            emit(timeElapsed) // Flow Emits value
+        }
+    }
+}
+```
+
+By using function references you can read the DSL better and can zoom in into implementation
+details anytime you want to by looking into a function body.
