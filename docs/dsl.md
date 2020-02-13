@@ -503,7 +503,7 @@ class MyStateMachine(
 
             inState<ErrorState> {
                on<RetryLoadingAction> { _, _, setState ->
-                  // For a single line statement it's fine to keep it as a block instead of moving to a function reference
+                  // For a single line statement it's ok to keep the block instead of moving to a function reference
                   setState { LoadingState }
                }
 
