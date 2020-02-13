@@ -61,7 +61,7 @@ This is how you define the initial state of your state machine.
 Next, we already see that we need an `init {...}` block containing a `spec { ... }` block inside.
 The `spec { ... }` block is actually where we write our DSL inside.
 
-## inState
+## inState`<State>`
 The first concept we learn is `inState`
 
 ```kotlin
@@ -284,6 +284,88 @@ On zero we call `setState { LoadingState }` to do the state transition.
 `value` is the value emitted by the flow, [getState](#getstate) to get the current state and [setState](#setState) to do a state transition.
 
 In contrast to `onEnter` and `on<Action>` block `observeWhileInState()` block stops the execution once the state machine is not in the original `inState<State>` anymore.
+
+## Custom condition for inState
+We already covered `inState<State>` that builds upon the recommended best practice that every State
+in your state machine is expressed us it's own type in Kotlin.
+Again, this is a best practice and the recommended way.
+
+Sometimes, however, you need a bit more flexibility then just relaying on type.
+For that use case you can use `inState(isInState: (State) -> Boolean)`.
+
+Example: One could have also modeled the state for our example above as the following:
+
+```kotlin
+// TO MODEL YOUR STATE LIKE THIS IS NOT BEST PRACTICE! Use sealed class instead.
+data class State (
+    val loading : Boolean, // true means loading, false means not loading
+    val items : List<Items>, // empty list if no items loaded yet
+    val error : Throwable?, // if not null we are in error state
+    val errorCountDown : Int? // the seconds for the error countdown
+)
+```
+
+**AGAIN, the example shown above is not the recommended way.
+We strongly recommend to use sealed classes instead to model state as shown at the beginning of this document.**
+
+We just do this for demo purpose to demonstrate a way how to customize `inState`.
+Given the state from above, what we can do now with our DSL is the following:
+
+```kotlin
+class MyStateMachine(
+    private val httpClient: HttpClient
+) : FlowReduxStateMachine<State, Action>(initialState = State(loading = true, items = emptyList(), error = null, errorCountDown = null)) {
+
+    init {
+        spec {
+            inState( isInState = {state -> state.loading == true} ) {
+                onEnter { getState, setState ->
+                    // we entered the LoadingState, so let's do the http request
+                    try {
+                        val items = httpClient.loadItems()
+                        setState {
+                            State(loading = false, items = items, error = null, errorCountdown = null)
+                        }
+                    } catch (t : Throwable) {
+                        setState {
+                            State(loading = false, items = emptyList(), error = t, errorCountdown = 3)
+                        } // Countdown starts with 3 seconds
+                    }
+                }
+            }
+
+            inState( isInState = {state -> state.error != null } ) {
+               on<RetryLoadingAction> { action, getState, setState ->
+                  setState {
+                     State(loading = true, items = emptyList(), error = null, errorCountdown = null)
+                  }
+               }
+
+               val timer : Flow<Int> = timerThatEmitsEverySecond()
+               observeWhileInState(timer) { value, getState, setState ->
+                    // This block triggers every time the timer emits
+                    // which happens every second
+                    val state = getState()
+                    val countdownTimeLeft = state.errorCountdown!!
+                    if (countdownTimeLeft > 0)
+                        setState { state.copy(errorCountdown = countdownTimeLeft - 1) } //  decrease the countdown by 1 second
+                    else
+                        setState {
+                          State(loading = true, items = emptyList(), error = null, errorCountdown = null) // transition to the LoadingState
+                        }
+                    }
+               }
+            }
+        }
+    }
+}
+```
+
+Instead of `inState<State> { ... }` we can use another version of `inState` name that instead of
+generics take a lambda as parameter that looks like `(State) -> Boolean` so that.
+If that lambda returns `true` it means we are in that state, otherwise not (returning false).
+The rest still remains the same.
+You can use `onEnter`, `on<Action>` and `observeWhileInState` the exact way as you already know.
 
 ## observe
 If for whatever reason you want to trigger a state change out of  `inState<>`, `onEnter { ... }`, `on<Action>` or `observeWhileInState { ... }` by observing a `Flow` then `observe` is what you are looking for:
