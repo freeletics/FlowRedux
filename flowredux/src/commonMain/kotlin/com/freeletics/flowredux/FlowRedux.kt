@@ -20,7 +20,7 @@ fun <A, S> Flow<A>.reduxStore(
 ): Flow<S> = flow {
 
     var currentState: S = initialStateSupplier()
-    val stateAccessor: StateAccessor<S> = { currentState }
+    val getState: GetState<S> = { currentState }
     val loopback: BroadcastChannel<A> = BroadcastChannel(1)
 
     // Emit the initial state
@@ -43,7 +43,7 @@ fun <A, S> Flow<A>.reduxStore(
     coroutineScope {
         val upstreamChannel = produceIn(this)
         val loopbackFlow = loopback.asFlow()
-        val sideEffectChannels = sideEffects.map { it(loopbackFlow, stateAccessor).produceIn(this) }
+        val sideEffectChannels = sideEffects.map { it(loopbackFlow, getState).produceIn(this) }
 
         while (!upstreamChannel.isClosedForReceive || sideEffectChannels.any { !it.isClosedForReceive }) {
             select<Unit> {

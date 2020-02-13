@@ -1,6 +1,5 @@
 package com.freeletics.flowredux
 
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -9,14 +8,13 @@ import kotlinx.coroutines.flow.Flow
  *
  * @param actions Input action. Every SideEffect should be responsible to handle a single Action
  * (i.e using filter or ofType operator)
- * @param state [StateAccessor] to get the latest state of the state machine
+ * @param state [GetState] to get the latest state of the state machine
  */
 // TODO find better name?
-typealias SideEffect<S, A> = (actions: Flow<A>, state: StateAccessor<S>) -> Flow<A>
+typealias SideEffect<S, A> = (actions: Flow<A>, getState: GetState<S>) -> Flow<A>
 
 /**
- * The StateAccessor is basically just a deferred way to get a state of a [reduxStore] at any given point in time.
+ * The GetState is basically just a deferred way to get a state of a [reduxStore] at any given point in time.
  * So you have to call this method to get the state.
  */
-// TODO find better name
-typealias StateAccessor<S> = () -> S
+typealias GetState<S> = () -> S

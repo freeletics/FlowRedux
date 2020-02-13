@@ -1,14 +1,11 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
-import com.freeletics.flowredux.StateAccessor
+import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
-import kotlin.reflect.KClass
 
 /**
  * A builder to create a [SideEffect] that observes a Flow<T> as long as the redux store is in
@@ -24,15 +21,15 @@ internal class ObserveInStateSideEffectBuilder<T, S : Any, A : Any>(
 ) : InStateSideEffectBuilder<S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
-        return { actions: Flow<Action<S, A>>, state: StateAccessor<S> ->
+        return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             actions
-                .mapStateChanges(stateAccessor = state, isInState = isInState)
+                .mapStateChanges(getState = getState, isInState = isInState)
                 .flatMapWithPolicy(flatMapPolicy) { stateChange ->
                     when (stateChange) {
                         MapStateChange.StateChanged.ENTERED ->
                             flow.flatMapLatest {
                                 // TODO is it actually always flatMapLatest or also flatMapWithPolicy
-                                setStateFlow(value = it, stateAccessor = state)
+                                setStateFlow(value = it, getState = getState)
                             }
                         MapStateChange.StateChanged.LEFT -> flow { }
                     }
@@ -42,7 +39,7 @@ internal class ObserveInStateSideEffectBuilder<T, S : Any, A : Any>(
 
     private suspend fun setStateFlow(
         value: T,
-        stateAccessor: StateAccessor<S>
+        getState: GetState<S>
     ): Flow<Action<S, A>> =
         flow {
             val setState = SetStateImpl<S>(
@@ -57,8 +54,8 @@ internal class ObserveInStateSideEffectBuilder<T, S : Any, A : Any>(
                     )
                 }
             )
-            block(value, stateAccessor, setState)
+            block(value, getState, setState)
         }
 }
 
-typealias InStateObserverBlock<T, S> = suspend (value: T, getState: StateAccessor<S>, setState: SetState<S>) -> Unit
+typealias InStateObserverBlock<T, S> = suspend (value: T, getState: GetState<S>, setState: SetState<S>) -> Unit

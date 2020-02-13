@@ -1,7 +1,7 @@
 package com.freeletics.flowredux.sample.shared
 
 import com.freeletics.flowredux.FlowReduxLogger
-import com.freeletics.flowredux.StateAccessor
+import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.SetState
 import kotlinx.coroutines.CoroutineScope
@@ -107,7 +107,7 @@ internal class InternalPaginationStateMachine(
 
     private suspend fun moveToLoadNextPageStateIfCanLoadNextPage(
         action: LoadNextPage,
-        getState: StateAccessor<PaginationState>,
+        getState: GetState<PaginationState>,
         setState: SetState<PaginationState>
     ) {
         setState { state ->
@@ -131,7 +131,7 @@ internal class InternalPaginationStateMachine(
      * Loads the first page
      */
     private suspend fun loadFirstPage(
-        getState: StateAccessor<PaginationState>,
+        getState: GetState<PaginationState>,
         setState: SetState<PaginationState>
     ) {
         val nextState = try {
@@ -164,7 +164,7 @@ internal class InternalPaginationStateMachine(
      * [ShowContentAndLoadingNextPageErrorPaginationState]
      */
     private suspend fun loadNextPage(
-        getState: StateAccessor<PaginationState>,
+        getState: GetState<PaginationState>,
         setState: SetState<PaginationState>
     ) {
         val state = getState()
@@ -201,7 +201,7 @@ internal class InternalPaginationStateMachine(
     }
 
     private suspend fun moveToContentStateAfter3Seconds(
-        getState: StateAccessor<PaginationState>,
+        getState: GetState<PaginationState>,
         setState: SetState<PaginationState>
     ) {
         delay(3000)

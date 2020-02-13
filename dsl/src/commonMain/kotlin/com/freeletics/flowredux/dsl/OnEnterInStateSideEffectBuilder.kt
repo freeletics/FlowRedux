@@ -1,12 +1,11 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
-import com.freeletics.flowredux.StateAccessor
+import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
-import kotlin.reflect.KClass
 
 /**
  * A builder that generates a [SideEffect] that triggers every time the state machine enters
@@ -19,18 +18,18 @@ class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
 ) : InStateSideEffectBuilder<S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
-        return { actions: Flow<Action<S, A>>, state: StateAccessor<S> ->
+        return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             actions
-                .mapStateChanges(isInState = isInState, stateAccessor = state)
+                .mapStateChanges(isInState = isInState, getState = getState)
                 .filter { it == MapStateChange.StateChanged.ENTERED }
                 .flatMapWithPolicy(flatMapPolicy) {
-                    setStateFlow(state)
+                    setStateFlow(getState)
                 }
         }
     }
 
     private suspend fun setStateFlow(
-        stateAccessor: StateAccessor<S>
+        getState: GetState<S>
     ): Flow<Action<S, A>> = flow {
 
         val setState = SetStateImpl<S>(
@@ -45,9 +44,9 @@ class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
                 )
             }
         )
-        block(stateAccessor, setState)
+        block(getState, setState)
     }
 }
 
-typealias InStateOnEnterBlock<S> = suspend (getState: StateAccessor<S>, setState: SetState<S>) -> Unit
+typealias InStateOnEnterBlock<S> = suspend (getState: GetState<S>, setState: SetState<S>) -> Unit
 

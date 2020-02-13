@@ -1,13 +1,12 @@
 package com.freeletics.flowredux.dsl
 
-import com.freeletics.flowredux.StateAccessor
+import com.freeletics.flowredux.GetState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlin.reflect.KClass
 
 /**
  * Internal implementation of an operator that keeps track if you a certain state has been
@@ -15,7 +14,7 @@ import kotlin.reflect.KClass
  */
 internal class MapStateChange<S : Any, A : Any>(
     actions: Flow<Action<S, A>>,
-    state: StateAccessor<S>,
+    getState: GetState<S>,
     isInState: (S) -> Boolean
 ) {
 
@@ -44,7 +43,7 @@ internal class MapStateChange<S : Any, A : Any>(
         println("action $it")
         mutex.withLock {
 
-            val state = state()
+            val state = getState()
             val previousState = lastState
             val isInExpectedState = isInState(state)
             val previousStateInExpectedState = if (previousState == null) {
@@ -93,10 +92,10 @@ internal class MapStateChange<S : Any, A : Any>(
 }
 
 internal fun <S: Any, A : Any> Flow<Action<S, A>>.mapStateChanges(
-    stateAccessor: StateAccessor<S>,
+    getState: GetState<S>,
     isInState : (S) -> Boolean
 ): Flow<MapStateChange.StateChanged> = MapStateChange<S, A>(
     actions = this,
     isInState = isInState,
-    state = stateAccessor
+    getState = getState
 ).flow

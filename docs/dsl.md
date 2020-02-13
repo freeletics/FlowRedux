@@ -602,7 +602,7 @@ class MyStateMachine(
     // All the implementation details are in the functions below.
     //
 
-    private fun loadItemsAndMoveToContentOrErrorState(getState : StateAccessor<State>, setState : SetState<State>){
+    private fun loadItemsAndMoveToContentOrErrorState(getState : GetState<State>, setState : SetState<State>){
         try {
             val items = httpClient.loadItems()
             setState { ShowContentState(items) }
@@ -613,7 +613,7 @@ class MyStateMachine(
 
     private fun onSecondElapsedMoveToLoadingStateOrMoveToDecrementCountdown(
         value : Int,
-        getState : StateAccessor<State>,
+        getState : GetState<State>,
         setState : SetState<State>
     ){
         val state = getState()

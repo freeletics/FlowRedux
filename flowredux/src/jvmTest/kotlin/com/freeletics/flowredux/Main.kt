@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 
+// TODO remove this file
+
+
 @UseExperimental(ExperimentalCoroutinesApi::class, FlowPreview::class)
 fun main() = runBlocking {
     val sideEffect1: SideEffect<String, Int> = { actions, stateAccessor ->

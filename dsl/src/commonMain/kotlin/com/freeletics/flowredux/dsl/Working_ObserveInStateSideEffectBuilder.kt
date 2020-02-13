@@ -1,7 +1,7 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
-import com.freeletics.flowredux.StateAccessor
+import com.freeletics.flowredux.GetState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlin.reflect.KClass
 
 /**
  * A builder to create a [SideEffect] that observes a Flow<T> as long as the redux store is in
@@ -33,38 +32,38 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
 ) : InStateSideEffectBuilder<S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
-        return { actions: Flow<Action<S, A>>, state: StateAccessor<S> ->
+        return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             when (flatMapPolicy) {
                 FlatMapPolicy.LATEST ->
                     actions
-                        .filterState(state = state, isInState = isInState)
+                        .filterState(getState = getState, isInState = isInState)
                         .flatMapLatest { stateSubscription ->
                             when (stateSubscription) {
                                 FilterState.StateChanged.SUBSCRIBE ->
                                     flow.flatMapLatest {
-                                        setStateFlow(value = it, stateAccessor = state)
+                                        setStateFlow(value = it, getState = getState)
                                     }
                                 FilterState.StateChanged.UNSUBSCRIBE -> flow { }
                             }
                         }
                 FlatMapPolicy.CONCAT -> actions
-                    .filterState(state = state, isInState = isInState)
+                    .filterState(getState = getState, isInState = isInState)
                     .flatMapLatest { stateSubscription ->
                         when (stateSubscription) {
                             FilterState.StateChanged.SUBSCRIBE ->
                                 flow.flatMapConcat {
-                                    setStateFlow(value = it, stateAccessor = state)
+                                    setStateFlow(value = it, getState = getState)
                                 }
                             FilterState.StateChanged.UNSUBSCRIBE -> flow { }
                         }
                     }
                 FlatMapPolicy.MERGE -> actions
-                    .filterState(state = state, isInState = isInState)
+                    .filterState(getState = getState, isInState = isInState)
                     .flatMapLatest { stateSubscription ->
                         when (stateSubscription) {
                             FilterState.StateChanged.SUBSCRIBE ->
                                 flow.flatMapMerge {
-                                    setStateFlow(value = it, stateAccessor = state)
+                                    setStateFlow(value = it, getState = getState)
                                 }
                             FilterState.StateChanged.UNSUBSCRIBE -> flow { }
                         }
@@ -76,7 +75,7 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
 
     private suspend fun setStateFlow(
         value: T,
-        stateAccessor: StateAccessor<S>
+        getState: GetState<S>
     ): Flow<Action<S, A>> = flow {
         val setState = SetStateImpl<S>(
             defaultRunIf = { state -> isInState(state) },
@@ -90,7 +89,7 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
                 )
             }
         )
-        block(value, stateAccessor, setState)
+        block(value, getState, setState)
     }
 
     /**
@@ -100,7 +99,7 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
      */
     private class FilterState<S : Any, A : Any>(
         actions: Flow<Action<S, A>>,
-        state: StateAccessor<S>,
+        getState: GetState<S>,
         private val isInState : (S) -> Boolean
     ) {
 
@@ -118,7 +117,7 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
         internal val flow: Flow<StateChanged> = actions.map {
             mutex.withLock {
 
-                val state = state()
+                val state = getState()
                 val previousState = lastState
                 val isInExpectedState = isInState(state)
                 val previousStateInExpectedState = if (previousState == null) {
@@ -167,11 +166,11 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
     }
 
     private fun Flow<Action<S, A>>.filterState(
-        state: StateAccessor<S>,
+        getState: GetState<S>,
         isInState : (S) -> Boolean
     ): Flow<FilterState.StateChanged> = FilterState<S, A>(
         actions = this,
         isInState = isInState,
-        state = state
+        getState = getState
     ).flow
 }

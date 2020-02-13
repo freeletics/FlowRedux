@@ -1,7 +1,7 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
-import com.freeletics.flowredux.StateAccessor
+import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -17,16 +17,16 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any>(
 ) : InStateSideEffectBuilder<S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
-        return { actions: Flow<Action<S, A>>, state: StateAccessor<S> ->
+        return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
 
             actions
                 .filterStateAndUnwrapExternalAction(
-                    stateAccessor = state
+                    getState = getState
                 )
                 .flatMapWithPolicy(flatMapPolicy) { action ->
                     onActionSideEffectFactory(
                         action = action,
-                        stateAccessor = state
+                        getState = getState
                     )
                 }
         }
@@ -37,11 +37,11 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any>(
      * Flow of (sub)action
      */
     private fun Flow<Action<S, out A>>.filterStateAndUnwrapExternalAction(
-        stateAccessor: StateAccessor<S>
+        getState: GetState<S>
     ): Flow<A> =
         this
             .filter { action ->
-                val conditionHolds = isInState(stateAccessor()) &&
+                val conditionHolds = isInState(getState()) &&
                     action is ExternalWrappedAction &&
                     subActionClass.isInstance(action.action)
                 conditionHolds
@@ -55,7 +55,7 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any>(
 
     private fun onActionSideEffectFactory(
         action: A,
-        stateAccessor: StateAccessor<S>
+        getState: GetState<S>
     ): Flow<Action<S, A>> =
         flow {
             val setState = SetStateImpl<S>(
@@ -73,10 +73,10 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any>(
 
             onActionBlock.invoke(
                 action,
-                stateAccessor,
+                getState,
                 setState
             )
         }
 }
 
-typealias OnActionBlock<S, A> = suspend (action: A, getState: StateAccessor<S>, setState: SetState<S>) -> Unit
+typealias OnActionBlock<S, A> = suspend (action: A, getState: GetState<S>, setState: SetState<S>) -> Unit

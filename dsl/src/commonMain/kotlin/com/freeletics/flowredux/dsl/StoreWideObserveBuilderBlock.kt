@@ -1,7 +1,7 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
-import com.freeletics.flowredux.StateAccessor
+import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -22,10 +22,10 @@ internal class StoreWideObserveBuilderBlock<T, S, A>(
     override fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {
 
         val sideEffect: SideEffect<S, Action<S, A>> = { actions: Flow<Action<S, A>>,
-            state: StateAccessor<S> ->
+            getState: GetState<S> ->
 
             flow.flatMapWithPolicy(flatMapPolicy) {
-                setStateFlow(value = it, stateAccessor = state)
+                setStateFlow(value = it, getState = getState)
             }
         }
 
@@ -34,7 +34,7 @@ internal class StoreWideObserveBuilderBlock<T, S, A>(
 
     private suspend fun setStateFlow(
         value: T,
-        stateAccessor: StateAccessor<S>
+        getState: GetState<S>
     ): Flow<Action<S, A>> = flow {
 
         val setState = SetStateImpl<S>(
@@ -49,8 +49,8 @@ internal class StoreWideObserveBuilderBlock<T, S, A>(
                 )
             }
         )
-        block(value, stateAccessor, setState)
+        block(value, getState, setState)
     }
 }
 
-typealias StoreWideObserverBlock<T, S> = suspend (value: T, getState: StateAccessor<S>, setState: SetState<S>) -> Unit
+typealias StoreWideObserverBlock<T, S> = suspend (value: T, getState: GetState<S>, setState: SetState<S>) -> Unit
