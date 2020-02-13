@@ -1,4 +1,4 @@
-# DSL
+# DSL Guide
 
 FlowRedux provides a convenient DSL to describe your state machine.
 This page introduces you the DSL that you can use.
@@ -367,8 +367,8 @@ If that lambda returns `true` it means we are in that state, otherwise not (retu
 The rest still remains the same.
 You can use `onEnter`, `on<Action>` and `collectWhileInState` the exact way as you already know.
 
-## observe
-If for whatever reason you want to trigger a state change out of  `inState<>`, `onEnter { ... }`, `on<Action>` or `collectWhileInState { ... }` by observing a `Flow` then `observe` is what you are looking for:
+## collectWhileInAnyState()
+If for whatever reason you want to trigger a state change out of  `inState<>`, `onEnter { ... }`, `on<Action>` or `collectWhileInState { ... }` by observing a `Flow` then `collectWhileInAnyState` is what you are looking for:
 
 ```kotlin
 class MyStateMachine(
@@ -394,12 +394,12 @@ class MyStateMachine(
             }
 
             val aFlow : Flow<Int> = flowOf(1,2,3,4)
-            observe( aFlow ) { value, getState, setState ->
+            collectWhileInAnyState( aFlow ) { value, getState, setState ->
                 // Will trigger anytime flow emits a value
                 ...
             }
 
-            observe( anotherFlow ) { value, getState, setState ->
+            collectWhileInAnyState( anotherFlow ) { value, getState, setState ->
                 // Will trigger anytime flow emits a value
                ...
             }
@@ -408,8 +408,8 @@ class MyStateMachine(
 }
 ```
 
-`observe()` is like `collectWhileInState()` just that it is not bound to the current state like `collectWhileInState()` is.
-`observe()` will stop collecting the passed in Flow only if the CoroutineScope of the whole FlowReduxStateMachine gets canceled.
+`collectWhileInAnyState()` is like `collectWhileInState()` just that it is not bound to the current state like `collectWhileInState()` is.
+`collectWhileInAnyState()` will stop collecting the passed in Flow only if the CoroutineScope of the whole FlowReduxStateMachine gets canceled.
 
 
 ## SetState

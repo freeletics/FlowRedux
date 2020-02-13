@@ -57,7 +57,7 @@ class DslTest {
     }
 
     @Test
-    fun `observe while in state stops after having moved to next state`() {
+    fun `collectWhileInState stops after having moved to next state`() {
 
         val recordedValues = mutableListOf<Int>()
         val sm = StateMachine {

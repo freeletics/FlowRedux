@@ -80,13 +80,12 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
      */
     // TODO not sure if we actually need an observe or can have some kind of `setState` accessible
     //  in the block directly and folks can collect a particular flow directly
-    // TODO rename observe to collect
-    fun <T> observe(
+    fun <T> collectWhileInAnyState(
         flow: Flow<T>,
-        flatMapPolicy: FlatMapPolicy = FlatMapPolicy.CONCAT,
-        block: StoreWideObserverBlock<T, S>
+        flatMapPolicy: FlatMapPolicy = FlatMapPolicy.CONCAT, // TODO should be latest?
+        block: StoreWideCollectorBlock<T, S>
     ) {
-        val builder = StoreWideObserveBuilderBlock<T, S, A>(
+        val builder = StoreWideCollectBuilderBlock<T, S, A>(
             flow = flow,
             flatMapPolicy = flatMapPolicy,
             block = block

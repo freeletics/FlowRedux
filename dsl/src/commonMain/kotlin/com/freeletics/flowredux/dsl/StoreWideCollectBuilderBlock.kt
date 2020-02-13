@@ -13,10 +13,10 @@ import kotlinx.coroutines.flow.flow
  *
  * A typical use case would be something like observing a database.
  */
-internal class StoreWideObserveBuilderBlock<T, S, A>(
+internal class StoreWideCollectBuilderBlock<T, S, A>(
     private val flow: Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
-    private val block: StoreWideObserverBlock<T, S>
+    private val block: StoreWideCollectorBlock<T, S>
 ) : StoreWideBuilderBlock<S, A>() {
 
     override fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {
@@ -53,4 +53,4 @@ internal class StoreWideObserveBuilderBlock<T, S, A>(
     }
 }
 
-typealias StoreWideObserverBlock<T, S> = suspend (value: T, getState: GetState<S>, setState: SetState<S>) -> Unit
+typealias StoreWideCollectorBlock<T, S> = suspend (value: T, getState: GetState<S>, setState: SetState<S>) -> Unit
