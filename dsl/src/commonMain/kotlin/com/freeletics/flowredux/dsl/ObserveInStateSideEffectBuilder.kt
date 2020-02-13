@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
  */
 // TODO rename Observe to Collect to match with flow api naming conventions
 internal class ObserveInStateSideEffectBuilder<T, S : Any, A : Any>(
-    private val subStateClass: KClass<out S>,
+    private val isInState : (S) -> Boolean,
     private val flow: Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
     private val block: InStateObserverBlock<T, S>
@@ -26,7 +26,7 @@ internal class ObserveInStateSideEffectBuilder<T, S : Any, A : Any>(
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, state: StateAccessor<S> ->
             actions
-                .mapStateChanges(stateAccessor = state, stateToObserve = subStateClass)
+                .mapStateChanges(stateAccessor = state, isInState = isInState)
                 .flatMapWithPolicy(flatMapPolicy) { stateChange ->
                     when (stateChange) {
                         MapStateChange.StateChanged.ENTERED ->
@@ -46,11 +46,11 @@ internal class ObserveInStateSideEffectBuilder<T, S : Any, A : Any>(
     ): Flow<Action<S, A>> =
         flow {
             val setState = SetStateImpl<S>(
-                defaultRunIf = { state -> subStateClass.isInstance(state) },
+                defaultRunIf = { state -> isInState(state) },
                 invokeCallback = { runIf, reduce ->
                     emit(
                         SelfReducableAction<S, A>(
-                            loggingInfo = "observeWhileInState<${subStateClass.simpleName}>",
+                            loggingInfo = "observeWhileInState<>", // TODO logging
                             reduce = reduce,
                             runReduceOnlyIf = runIf
                         )

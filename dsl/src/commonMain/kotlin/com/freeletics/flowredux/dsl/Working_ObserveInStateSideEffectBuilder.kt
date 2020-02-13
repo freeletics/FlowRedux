@@ -26,7 +26,7 @@ import kotlin.reflect.KClass
  */
 // TODO make [ObserveInStateSideEffectBuilder] work and remove this class.
 internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
-    private val subStateClass: KClass<out S>,
+    private val isInState: (S) -> Boolean,
     private val flow: Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
     private val block: InStateObserverBlock<T, S>
@@ -37,7 +37,7 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
             when (flatMapPolicy) {
                 FlatMapPolicy.LATEST ->
                     actions
-                        .filterState(state)
+                        .filterState(state = state, isInState = isInState)
                         .flatMapLatest { stateSubscription ->
                             when (stateSubscription) {
                                 FilterState.StateChanged.SUBSCRIBE ->
@@ -48,7 +48,7 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
                             }
                         }
                 FlatMapPolicy.CONCAT -> actions
-                    .filterState(state)
+                    .filterState(state = state, isInState = isInState)
                     .flatMapLatest { stateSubscription ->
                         when (stateSubscription) {
                             FilterState.StateChanged.SUBSCRIBE ->
@@ -59,7 +59,7 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
                         }
                     }
                 FlatMapPolicy.MERGE -> actions
-                    .filterState(state)
+                    .filterState(state = state, isInState = isInState)
                     .flatMapLatest { stateSubscription ->
                         when (stateSubscription) {
                             FilterState.StateChanged.SUBSCRIBE ->
@@ -79,11 +79,11 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
         stateAccessor: StateAccessor<S>
     ): Flow<Action<S, A>> = flow {
         val setState = SetStateImpl<S>(
-            defaultRunIf = { state -> subStateClass.isInstance(state) },
+            defaultRunIf = { state -> isInState(state) },
             invokeCallback = { runOnlyIf, reduce ->
                 emit(
                     SelfReducableAction<S, A>(
-                        loggingInfo = "observeWhileInState<${subStateClass.simpleName}>",
+                        loggingInfo = "observeWhileInState<>", // TODO better logging
                         reduce = reduce,
                         runReduceOnlyIf = runOnlyIf
                     )
@@ -101,7 +101,7 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
     private class FilterState<S : Any, A : Any>(
         actions: Flow<Action<S, A>>,
         state: StateAccessor<S>,
-        subStateClass: KClass<out S>
+        private val isInState : (S) -> Boolean
     ) {
 
         private enum class InternalStateChangedSubscription {
@@ -120,11 +120,11 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
 
                 val state = state()
                 val previousState = lastState
-                val isInExpectedState = subStateClass.isInstance(state)
+                val isInExpectedState = isInState(state)
                 val previousStateInExpectedState = if (previousState == null) {
                     false
                 } else {
-                    subStateClass.isInstance(previousState)
+                    isInState(previousState)
                 }
 
                 if (previousState == null) {
@@ -167,10 +167,11 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
     }
 
     private fun Flow<Action<S, A>>.filterState(
-        state: StateAccessor<S>
+        state: StateAccessor<S>,
+        isInState : (S) -> Boolean
     ): Flow<FilterState.StateChanged> = FilterState<S, A>(
         actions = this,
-        subStateClass = subStateClass,
+        isInState = isInState,
         state = state
     ).flow
 }

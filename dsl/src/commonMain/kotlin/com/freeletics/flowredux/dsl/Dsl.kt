@@ -51,10 +51,12 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
      * Define what happens if the store is in a certain state.
      */
     inline fun <reified SubState : S> inState(
-        block: InStateBuilderBlock<S, SubState, A>.() -> Unit
+        block: InStateBuilderBlock<S, A>.() -> Unit
     ) {
         // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
-        val builder = InStateBuilderBlock<S, SubState, A>(SubState::class)
+        val builder = InStateBuilderBlock<S, A>(_isInState = { state ->
+            SubState::class.isInstance(state)
+        })
         block(builder)
         builderBlocks.add(builder)
     }

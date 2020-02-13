@@ -13,7 +13,7 @@ import kotlin.reflect.KClass
  * a certain state.
  */
 class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
-    private val subStateClass: KClass<out S>,
+    private val isInState: (S) -> Boolean,
     private val flatMapPolicy: FlatMapPolicy,
     private val block: InStateOnEnterBlock<S>
 ) : InStateSideEffectBuilder<S, A>() {
@@ -21,7 +21,7 @@ class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, state: StateAccessor<S> ->
             actions
-                .mapStateChanges(stateToObserve = subStateClass, stateAccessor = state)
+                .mapStateChanges(isInState = isInState, stateAccessor = state)
                 .filter { it == MapStateChange.StateChanged.ENTERED }
                 .flatMapWithPolicy(flatMapPolicy) {
                     setStateFlow(state)
@@ -34,11 +34,11 @@ class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
     ): Flow<Action<S, A>> = flow {
 
         val setState = SetStateImpl<S>(
-            defaultRunIf = { state -> subStateClass.isInstance(state) },
+            defaultRunIf = { state -> isInState(state) },
             invokeCallback = { runIf, reduce ->
                 emit(
                     SelfReducableAction<S, A>(
-                        loggingInfo = "onEnter<${subStateClass.simpleName}>",
+                        loggingInfo = "onEnter<>", // TODO logging
                         reduce = reduce,
                         runReduceOnlyIf = runIf
                     )

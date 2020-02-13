@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
 internal class MapStateChange<S : Any, A : Any>(
     actions: Flow<Action<S, A>>,
     state: StateAccessor<S>,
-    subStateClass: KClass<out S>
+    isInState: (S) -> Boolean
 ) {
 
     private enum class InternalStateChangedSubscription {
@@ -46,14 +46,12 @@ internal class MapStateChange<S : Any, A : Any>(
 
             val state = state()
             val previousState = lastState
-            val isInExpectedState = subStateClass.isInstance(state)
+            val isInExpectedState = isInState(state)
             val previousStateInExpectedState = if (previousState == null) {
                 false
             } else {
-                subStateClass.isInstance(previousState)
+                isInState(previousState)
             }
-
-            println("$previousStateInExpectedState $subStateClass $state $previousState")
 
             if (previousState == null) {
                 if (isInExpectedState) {
@@ -96,9 +94,9 @@ internal class MapStateChange<S : Any, A : Any>(
 
 internal fun <S: Any, A : Any> Flow<Action<S, A>>.mapStateChanges(
     stateAccessor: StateAccessor<S>,
-    stateToObserve : KClass<out S>
+    isInState : (S) -> Boolean
 ): Flow<MapStateChange.StateChanged> = MapStateChange<S, A>(
     actions = this,
-    subStateClass = stateToObserve,
+    isInState = isInState,
     state = stateAccessor
 ).flow

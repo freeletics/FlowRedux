@@ -2,12 +2,13 @@ package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
 import kotlinx.coroutines.flow.Flow
-import kotlin.reflect.KClass
 
 // TODO @DslMarker
-
-class InStateBuilderBlock<S : Any, SubState : S, A : Any>(
-    val _subStateClass: KClass<SubState>
+class InStateBuilderBlock<S : Any, A : Any>(
+    /**
+     * For private usage only
+     */
+    val _isInState: (S) -> Boolean
 ) : StoreWideBuilderBlock<S, A>() {
 
     val _inStateSideEffectBuilders = ArrayList<InStateSideEffectBuilder<S, A>>()
@@ -18,10 +19,10 @@ class InStateBuilderBlock<S : Any, SubState : S, A : Any>(
     ) {
 
         @Suppress("UNCHECKED_CAST")
-        val builder = OnActionInStateSideEffectBuilder<S, A, SubState>(
+        val builder = OnActionInStateSideEffectBuilder<S, A>(
             flatMapPolicy = flatMapPolicy,
             subActionClass = SubAction::class,
-            subStateClass = _subStateClass,
+            isInState = _isInState,
             onActionBlock = block as OnActionBlock<S, A>
         )
 
@@ -35,7 +36,7 @@ class InStateBuilderBlock<S : Any, SubState : S, A : Any>(
     ) {
         _inStateSideEffectBuilders.add(
             Working_ObserveInStateBuilder(
-                subStateClass = _subStateClass,
+                isInState = _isInState,
                 flow = flow,
                 flatMapPolicy = flatMapPolicy,
                 block = block
@@ -56,7 +57,7 @@ class InStateBuilderBlock<S : Any, SubState : S, A : Any>(
     ) {
         _inStateSideEffectBuilders.add(
             OnEnterInStateSideEffectBuilder(
-                subStateClass = _subStateClass,
+                isInState = _isInState,
                 flatMapPolicy = flatMapPolicy,
                 block = block
             )

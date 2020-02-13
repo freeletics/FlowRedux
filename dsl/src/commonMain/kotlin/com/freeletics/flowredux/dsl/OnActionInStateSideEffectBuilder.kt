@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlin.reflect.KClass
 
-class OnActionInStateSideEffectBuilder<S : Any, A : Any, SubState : S>(
-    private val subStateClass: KClass<SubState>,
+class OnActionInStateSideEffectBuilder<S : Any, A : Any>(
+    private val isInState: (S) -> Boolean,
     internal val subActionClass: KClass<out A>,
     internal val flatMapPolicy: FlatMapPolicy,
     internal val onActionBlock: OnActionBlock<S, A>
@@ -21,8 +21,7 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any, SubState : S>(
 
             actions
                 .filterStateAndUnwrapExternalAction(
-                    stateAccessor = state,
-                    subStateClass = subStateClass
+                    stateAccessor = state
                 )
                 .flatMapWithPolicy(flatMapPolicy) { action ->
                     onActionSideEffectFactory(
@@ -38,12 +37,11 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any, SubState : S>(
      * Flow of (sub)action
      */
     private fun Flow<Action<S, out A>>.filterStateAndUnwrapExternalAction(
-        stateAccessor: StateAccessor<S>,
-        subStateClass: KClass<out S>
+        stateAccessor: StateAccessor<S>
     ): Flow<A> =
         this
             .filter { action ->
-                val conditionHolds = subStateClass.isInstance(stateAccessor()) &&
+                val conditionHolds = isInState(stateAccessor()) &&
                     action is ExternalWrappedAction &&
                     subActionClass.isInstance(action.action)
                 conditionHolds
@@ -61,7 +59,7 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any, SubState : S>(
     ): Flow<Action<S, A>> =
         flow {
             val setState = SetStateImpl<S>(
-                defaultRunIf = { state -> subStateClass.isInstance(state) },
+                defaultRunIf = { state -> isInState(state) },
                 invokeCallback = { runIf, reduce ->
                     emit(
                         SelfReducableAction<S, A>(
