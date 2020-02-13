@@ -62,7 +62,7 @@ class DslTest {
         val recordedValues = mutableListOf<Int>()
         val sm = StateMachine {
             inState<State.Initial> {
-                observeWhileInState(flow {
+                collectWhileInState(flow {
                     emit(1)
                     delay(10)
                     emit(2)
@@ -87,11 +87,11 @@ class DslTest {
     }
 
     @Test
-    fun `move from observeWhileInState to next state with action`() {
+    fun `move from collectWhileInState to next state with action`() {
 
         val sm = StateMachine {
             inState<State.Initial> {
-                observeWhileInState(flowOf(1)) { _, _, setState ->
+                collectWhileInState(flowOf(1)) { _, _, setState ->
                     setState { State.S1 }
                 }
             }

@@ -47,7 +47,7 @@ internal class ObserveInStateSideEffectBuilder<T, S : Any, A : Any>(
                 invokeCallback = { runIf, reduce ->
                     emit(
                         SelfReducableAction<S, A>(
-                            loggingInfo = "observeWhileInState<>", // TODO logging
+                            loggingInfo = "collectWhileInState<>", // TODO logging
                             reduce = reduce,
                             runReduceOnlyIf = runIf
                         )

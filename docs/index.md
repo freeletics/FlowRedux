@@ -43,7 +43,7 @@ class MyStateMachine : FlowReduxStateMachine<State, Action>(LoadingState){
             }
 
             inState<ContentState> {
-                observeWhileInState( flowOf(1,2,3) ) { getState, setState ->
+                collectWhileInState( flowOf(1,2,3) ) { getState, setState ->
                     // observes the given flow as long as state is ContentState.
                     // Once state is changed to another state the flow will automatically
                     // stop emitting.

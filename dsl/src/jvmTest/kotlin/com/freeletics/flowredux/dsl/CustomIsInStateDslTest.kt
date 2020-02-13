@@ -52,7 +52,7 @@ class CustomIsInStateDslTest {
     }
 
     @Test
-    fun `observeWhileInState stops when leaving custom state`() {
+    fun `collectWhileInState stops when leaving custom state`() {
         val gs1 = State.GenericState("asd", 1)
         val gs2 = State.GenericState("2", 2)
         var reached = false
@@ -64,7 +64,7 @@ class CustomIsInStateDslTest {
                 }
             }
             inState(isInState = { it is State.GenericState && it.anInt == 1 }) {
-                observeWhileInState(flow {
+                collectWhileInState(flow {
                     emit(2)
                     delay(20)
                     reached = true
@@ -77,7 +77,7 @@ class CustomIsInStateDslTest {
 
             inState(isInState = { it is State.GenericState && it.anInt == 2 }){
                 onEnter { _, setState ->
-                    delay(50) // Wait until observeWhileInState succeeded
+                    delay(50) // Wait until collectWhileInState succeeded
                     setState { State.S1}
                 }
             }

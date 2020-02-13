@@ -85,7 +85,7 @@ Next let's discuss what an `inState` can contain as triggers to actually "do som
 
 1. `onEnter`: Triggers whenever we enter that state
 2. `on<Action>`: Triggers whenever we are in this state and the specified action is triggered from the outside by calling `FlowReduxStateMachine.dispatch(action)`.
-3. `observeWhileInState( flow )`: You can subscribe to any arbitarry `Flow` while your state machine is in that state.
+3. `collectWhileInState( flow )`: You can subscribe to any arbitrary `Flow` while your state machine is in that state.
 
 Let's try to go through them as we build our state machine:
 
@@ -191,7 +191,7 @@ You can totally run here long running and expensive calls (like doing an http re
 - **`on<MyAction> { ... }` doesn't get canceled** when the state machine transitioned to another state original state.
 See [onEnter](#onenter) section for more details.
 
-### observeWhileInState()
+### collectWhileInState()
 This one is useful if you want to collect a `Flow` only while being exactly in that state.
 To give a concrete example how this is useful let's extend our example from above.
 Let's say whenever our state machine is in `ErrorState` we want to retry loading the items after
@@ -207,7 +207,7 @@ data class ErrorState(
 ) : State()
 ```
 
-Now let's add some countdown capabilities to our state machine by using `observeWhileInState()`:
+Now let's add some countdown capabilities to our state machine by using `collectWhileInState()`:
 
 ```kotlin
 class MyStateMachine(
@@ -234,7 +234,7 @@ class MyStateMachine(
                }
 
                val timer : Flow<Int> = timerThatEmitsEverySecond()
-               observeWhileInState(timer) { value, getState, setState ->
+               collectWhileInState(timer) { value, getState, setState ->
                     // This block triggers every time the timer emits
                     // which happens every second
                     val state = getState()
@@ -267,11 +267,11 @@ Whenever we are in `LoadingState` and an error occurs while loading the items we
 What is new is that `ErrorState` contains an additional field  `countdown` which we set on
 transitioning from `LoadingState` to `ErrorState(countdown = 3)` (means 3 seconds left).
 
-We extend ` inState<ErrorState> { ... }` block and add a `observeWhileInState(timer)`.
+We extend ` inState<ErrorState> { ... }` block and add a `collectWhileInState(timer)`.
 `timer` is a `Flow<Int>` that emits a new (incremented) number every second.
-`observeWhileInState(timer)` calls `.collect {...}` on the timer flow and executes the block with the
+`collectWhileInState(timer)` calls `.collect {...}` on the timer flow and executes the block with the
 parameters `value`, `getState` and `setState` every time `timer` emits a new value.
-In other words: instead of calling `timer.collect { ... }` you call `observeWhileInState(timer) { ... }` to collect the Flow's values as long as the state machine is in that state.
+In other words: instead of calling `timer.collect { ... }` you call `collectWhileInState(timer) { ... }` to collect the Flow's values as long as the state machine is in that state.
 
 But here is the deal: it automatically cancels the timer once the state machine transitioned away from
 `ErrorState` into another state.
@@ -280,10 +280,10 @@ or when 3 seconds have elapsed.
 To keep track how many seconds are left we decrease `ErrorState.countdown` field after every second until we reached zero.
 On zero we call `setState { LoadingState }` to do the state transition.
 
-`observeWhileInState(anyFlow) { value, getState, setState -> ... }` has 3 parameters:
+`collectWhileInState(anyFlow) { value, getState, setState -> ... }` has 3 parameters:
 `value` is the value emitted by the flow, [getState](#getstate) to get the current state and [setState](#setState) to do a state transition.
 
-In contrast to `onEnter` and `on<Action>` block `observeWhileInState()` block stops the execution once the state machine is not in the original `inState<State>` anymore.
+In contrast to `onEnter` and `on<Action>` block `collectWhileInState()` block stops the execution once the state machine is not in the original `inState<State>` anymore.
 
 ## Custom condition for inState
 We already covered `inState<State>` that builds upon the recommended best practice that every State
@@ -342,7 +342,7 @@ class MyStateMachine(
                }
 
                val timer : Flow<Int> = timerThatEmitsEverySecond()
-               observeWhileInState(timer) { value, getState, setState ->
+               collectWhileInState(timer) { value, getState, setState ->
                     // This block triggers every time the timer emits
                     // which happens every second
                     val state = getState()
@@ -365,10 +365,10 @@ Instead of `inState<State> { ... }` we can use another version of `inState` name
 generics take a lambda as parameter that looks like `(State) -> Boolean` so that.
 If that lambda returns `true` it means we are in that state, otherwise not (returning false).
 The rest still remains the same.
-You can use `onEnter`, `on<Action>` and `observeWhileInState` the exact way as you already know.
+You can use `onEnter`, `on<Action>` and `collectWhileInState` the exact way as you already know.
 
 ## observe
-If for whatever reason you want to trigger a state change out of  `inState<>`, `onEnter { ... }`, `on<Action>` or `observeWhileInState { ... }` by observing a `Flow` then `observe` is what you are looking for:
+If for whatever reason you want to trigger a state change out of  `inState<>`, `onEnter { ... }`, `on<Action>` or `collectWhileInState { ... }` by observing a `Flow` then `observe` is what you are looking for:
 
 ```kotlin
 class MyStateMachine(
@@ -388,7 +388,7 @@ class MyStateMachine(
                   ...
                }
 
-               observeWhileInState(timer) { value, getState, setState ->
+               collectWhileInState(timer) { value, getState, setState ->
                   ...
                }
             }
@@ -408,7 +408,7 @@ class MyStateMachine(
 }
 ```
 
-`observe()` is like `observeWhileInState()` just that it is not bound to the current state like `observeWhileInState()` is.
+`observe()` is like `collectWhileInState()` just that it is not bound to the current state like `collectWhileInState()` is.
 `observe()` will stop collecting the passed in Flow only if the CoroutineScope of the whole FlowReduxStateMachine gets canceled.
 
 
@@ -501,7 +501,7 @@ All execution blocks can specify a `FlatMapPolicy`:
 
  - `on<Action>(flatMapPolicy = FlatMapPolicy.LATEST){... }`
  - `onEnter(flatMapPolicy = FlatMapPolicy.LATEST) { ... }`
- - `observeWhileInState(flatMapPolicy = FlatMapPolicy.LATEST) { ... }`
+ - `collectWhileInState(flatMapPolicy = FlatMapPolicy.LATEST) { ... }`
 
 ## Best Practice
 One very important aspect of the DSL is to provide a readable and maintainable way to reason about your state machine.
@@ -532,7 +532,7 @@ class MyStateMachine(
                }
 
                val timer : Flow<Int> = timerThatEmitsEverySecond()
-               observeWhileInState(timer) { value, getState, setState ->
+               collectWhileInState(timer) { value, getState, setState ->
                     // This block triggers every time the timer emits
                     // which happens every second
                     val state = getState()
@@ -589,7 +589,7 @@ class MyStateMachine(
                   setState { LoadingState }
                }
 
-               observeWhileInState(
+               collectWhileInState(
                     timerThatEmitsEverySecond(),
                     ::onSecondElapsedMoveToLoadingStateOrMoveToDecrementCountdown
                )

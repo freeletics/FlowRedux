@@ -24,7 +24,7 @@ import kotlinx.coroutines.sync.withLock
  * is closed.
  */
 // TODO make [ObserveInStateSideEffectBuilder] work and remove this class.
-internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
+internal class Working_CollectInStateBuilder<T, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     private val flow: Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
@@ -82,7 +82,7 @@ internal class Working_ObserveInStateBuilder<T, S : Any, A : Any>(
             invokeCallback = { runOnlyIf, reduce ->
                 emit(
                     SelfReducableAction<S, A>(
-                        loggingInfo = "observeWhileInState<>", // TODO better logging
+                        loggingInfo = "collectWhileInState<>", // TODO better logging
                         reduce = reduce,
                         runReduceOnlyIf = runOnlyIf
                     )

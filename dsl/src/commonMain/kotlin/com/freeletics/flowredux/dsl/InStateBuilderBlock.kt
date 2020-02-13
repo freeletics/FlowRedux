@@ -29,13 +29,13 @@ class InStateBuilderBlock<S : Any, A : Any>(
         _inStateSideEffectBuilders.add(builder)
     }
 
-    fun <T> observeWhileInState(
+    fun <T> collectWhileInState(
         flow: Flow<T>,
         flatMapPolicy: FlatMapPolicy = FlatMapPolicy.CONCAT,
         block: InStateObserverBlock<T, S>
     ) {
         _inStateSideEffectBuilders.add(
-            Working_ObserveInStateBuilder(
+            Working_CollectInStateBuilder(
                 isInState = _isInState,
                 flow = flow,
                 flatMapPolicy = flatMapPolicy,
