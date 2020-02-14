@@ -1,9 +1,8 @@
 # FlowRedux
 
-[![CircleCI](https://circleci.com/gh/freeletics/FlowRedux.svg?style=svg)](https://circleci.com/gh/freeletics/FlowFedux)
 [![Download](https://maven-badges.herokuapp.com/maven-central/com.freeletics.flowredux/flowredux/badge.svg) ](https://maven-badges.herokuapp.com/maven-central/com.freeletics.flowredux/flowredux)
 
-Building kotlin multiplatform StateMachine made easy with DSL and coroutines.
+Building async. running Kotlin Multiplatform state machine made easy with a DSL and coroutines.
 
 ## Usage
 
@@ -98,35 +97,35 @@ There are two artifacts that you can include as dependency::
 2. `dsl` which provides a convenient DSL on top of the core library. Usually this is what you want.
 
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux-multiplatform:0.2.1'
-implementation 'com.freeletics.flowredux:dsl-multiplatform:0.2.1'
+implementation 'com.freeletics.flowredux:flowredux-multiplatform:0.3.0'
+implementation 'com.freeletics.flowredux:dsl-multiplatform:0.3.0'
 ```
 
 ### JVM only
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux:0.2.1'
-implementation 'com.freeletics.flowredux:dsl:0.2.1'
+implementation 'com.freeletics.flowredux:flowredux:0.3.0'
+implementation 'com.freeletics.flowredux:dsl:0.3.0'
 ```
 
 ### Native binaries
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux-iosx64:0.2.1'
-implementation 'com.freeletics.flowredux:flowredux-iosarm64:0.2.1'
-implementation 'com.freeletics.flowredux:flowredux-iosarm32:0.2.1'
-implementation 'com.freeletics.flowredux:flowredux-watchosx86:0.2.1'
-implementation 'com.freeletics.flowredux:flowredux-watchosarm64:0.2.1'
-implementation 'com.freeletics.flowredux:flowredux-watchosarm32:0.2.1'
-implementation 'com.freeletics.flowredux:flowredux-tvosx64:0.2.1'
-implementation 'com.freeletics.flowredux:flowredux-tvosxarm64:0.2.1'
+implementation 'com.freeletics.flowredux:flowredux-iosx64:0.3.0'
+implementation 'com.freeletics.flowredux:flowredux-iosarm64:0.3.0'
+implementation 'com.freeletics.flowredux:flowredux-iosarm32:0.3.0'
+implementation 'com.freeletics.flowredux:flowredux-watchosx86:0.3.0'
+implementation 'com.freeletics.flowredux:flowredux-watchosarm64:0.3.0'
+implementation 'com.freeletics.flowredux:flowredux-watchosarm32:0.3.0'
+implementation 'com.freeletics.flowredux:flowredux-tvosx64:0.3.0'
+implementation 'com.freeletics.flowredux:flowredux-tvosxarm64:0.3.0'
 
-implementation 'com.freeletics.flowredux:dsl-iosx64:0.2.1'
-implementation 'com.freeletics.flowredux:dsl-iosarm64:0.2.1'
-implementation 'com.freeletics.flowredux:dsl-iosarm32:0.2.1'
-implementation 'com.freeletics.flowredux:dsl-watchosx86:0.2.1'
-implementation 'com.freeletics.flowredux:dsl-watchosarm64:0.2.1'
-implementation 'com.freeletics.flowredux:dsl-watchosarm32:0.2.1'
-implementation 'com.freeletics.flowredux:dsl-tvosx64:0.2.1'
-implementation 'com.freeletics.flowredux:dsl-tvosxarm64:0.2.1'
+implementation 'com.freeletics.flowredux:dsl-iosx64:0.3.0'
+implementation 'com.freeletics.flowredux:dsl-iosarm64:0.3.0'
+implementation 'com.freeletics.flowredux:dsl-iosarm32:0.3.0'
+implementation 'com.freeletics.flowredux:dsl-watchosx86:0.3.0'
+implementation 'com.freeletics.flowredux:dsl-watchosarm64:0.3.0'
+implementation 'com.freeletics.flowredux:dsl-watchosarm32:0.3.0'
+implementation 'com.freeletics.flowredux:dsl-tvosx64:0.3.0'
+implementation 'com.freeletics.flowredux:dsl-tvosxarm64:0.3.0'
 ```
 
 ### JavaScript
@@ -151,5 +150,5 @@ allprojects {
 
 Then just use `-SNAPSHOT`suffix as version like
 ```groovy
-implementation 'com.freeletics.flowredux:dsl:0.2.2-SNAPSHOT'
+implementation 'com.freeletics.flowredux:dsl:0.3.1-SNAPSHOT'
 ```
