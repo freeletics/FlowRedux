@@ -90,7 +90,7 @@ ext.supportLibraries = [
         constraintLayout: "androidx.constraintlayout:constraintlayout:$versions.supportConstraintLayout",
         viewModel       : "androidx.lifecycle:lifecycle-extensions:$versions.androidArch",
         viewModelKtx    : "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0-rc03",
-        fragmentKtx     : "androidx.fragment:fragment-ktx:1.1.0"
+        fragmentKtx     : "androidx.fragment:fragment-ktx:1.2.1"
 ]
 
 ext.testLibraries = [
