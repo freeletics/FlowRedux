@@ -82,7 +82,7 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
     //  in the block directly and folks can collect a particular flow directly
     fun <T> collectWhileInAnyState(
         flow: Flow<T>,
-        flatMapPolicy: FlatMapPolicy = FlatMapPolicy.CONCAT, // TODO should be latest?
+        flatMapPolicy: FlatMapPolicy = FlatMapPolicy.LATEST,
         block: StoreWideCollectorBlock<T, S>
     ) {
         val builder = StoreWideCollectBuilderBlock<T, S, A>(
