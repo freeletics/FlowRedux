@@ -89,7 +89,7 @@ ext.supportLibraries = [
         recyclerView    : "androidx.recyclerview:recyclerview:$versions.recyclerView",
         constraintLayout: "androidx.constraintlayout:constraintlayout:$versions.supportConstraintLayout",
         viewModel       : "androidx.lifecycle:lifecycle-extensions:$versions.androidArch",
-        viewModelKtx    : "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0-rc03",
+        viewModelKtx    : "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0-alpha01",
         fragmentKtx     : "androidx.fragment:fragment-ktx:1.2.1"
 ]
 
