@@ -115,6 +115,6 @@ ext.gradlePlugins = [
         karumi             : "com.karumi:shot:$versions.karumi",
         mavenPublish       : "com.vanniktech:gradle-maven-publish-plugin:$versions.mavenPublish",
         dokka              : "org.jetbrains.dokka:dokka-gradle-plugin:$versions.dokka",
-        kotlinxcodesync    : "co.touchlab:kotlinxcodesync:0.1.5",
+        kotlinxcodesync    : "co.touchlab:kotlinxcodesync:0.2",
         kotlinSerialization: "org.jetbrains.kotlin:kotlin-serialization:$versions.kotlin"
 ]
