@@ -4,7 +4,7 @@ ext.versions = [
         targetSdk              : 28,
         minSdk                 : 21,
 
-        mavenPublish           : '0.8.0',
+        mavenPublish           : '0.10.0',
         dokka                  : '0.10.1',
         coroutines             : '1.3.4',
         dagger                 : '2.24',
