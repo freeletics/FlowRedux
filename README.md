@@ -76,7 +76,7 @@ In an Android Application you would use it with AndroidX `ViewModel` like that:
 
 ```kotlin
 class MyViewModel @Inject constructor(private val stateMachine : StateMachine) : ViewModel() {
-    val state : LiveData<State> = MutableLiveData<State>()
+    val state = MutableLiveData<State>()
 
     init {
         viewModelScope.launch { // automatically canceled once ViewModel lifecycle reached destroyed.
