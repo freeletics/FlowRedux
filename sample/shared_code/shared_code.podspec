@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'shared_code'
-    spec.version                  = '1.0'
+    spec.version                  = 'unspecified'
     spec.homepage                 = 'Link to a Kotlin/Native module homepage'
     spec.source                   = { :git => "Not Published", :tag => "Cocoapods/#{spec.name}/#{spec.version}" }
     spec.authors                  = ''
@@ -8,21 +8,27 @@ Pod::Spec.new do |spec|
     spec.summary                  = 'Some description for a Kotlin/Native module'
 
     spec.static_framework         = true
-    spec.vendored_frameworks      = "build/cocoapods/framework/#{spec.name}.framework"
+    spec.vendored_frameworks      = "build/cocoapods/framework/shared_code.framework"
     spec.libraries                = "c++"
     spec.module_name              = "#{spec.name}_umbrella"
 
+                
 
+                
 
     spec.pod_target_xcconfig = {
         'KOTLIN_TARGET[sdk=iphonesimulator*]' => 'ios_x64',
         'KOTLIN_TARGET[sdk=iphoneos*]' => 'ios_arm',
+        'KOTLIN_TARGET[sdk=watchsimulator*]' => 'watchos_x86',
+        'KOTLIN_TARGET[sdk=watchos*]' => 'watchos_arm',
+        'KOTLIN_TARGET[sdk=appletvsimulator*]' => 'tvos_x64',
+        'KOTLIN_TARGET[sdk=appletvos*]' => 'tvos_arm64',
         'KOTLIN_TARGET[sdk=macosx*]' => 'macos_x64'
     }
 
     spec.script_phases = [
         {
-            :name => 'Build SharedCode',
+            :name => 'Build shared_code',
             :execution_position => :before_compile,
             :shell_path => '/bin/sh',
             :script => <<-SCRIPT

@@ -1,14 +1,14 @@
 ext.versions = [
-        agp                    : '3.5.2',
+        agp                    : '4.0.1',
         compileSdk             : 28,
         targetSdk              : 28,
         minSdk                 : 21,
 
         mavenPublish           : '0.8.0',
         dokka                  : '0.10.1',
-        coroutines             : '1.3.4',
+        coroutines             : '1.3.9',
         dagger                 : '2.24',
-        kotlin                 : '1.3.61',
+        kotlin                 : '1.4.0',
         rxJava                 : '2.2.12',
         rxAndroid              : '2.1.1',
         rxBinding              : '2.2.0',
@@ -28,7 +28,7 @@ ext.versions = [
 
         junit                  : '4.12',
         kotlinMockito          : '1.5.0',
-        ktor                   : '1.3.1',
+        ktor                   : '1.4.0',
         kotlinSerialization    : '0.14.0',
 
         assertJ                : '3.8.0',
@@ -71,6 +71,7 @@ ext.libraries = [
         kotlinxSerializationiOS   : "org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:$versions.kotlinSerialization",
 
         coroutines                : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines",
+        coroutinesNative          : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}-native-mt",
         rxJava                    : "io.reactivex.rxjava2:rxjava:$versions.rxJava",
         rxAndroid                 : "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid",
         rxBinding                 : "com.jakewharton.rxbinding2:rxbinding-kotlin:$versions.rxBinding",
