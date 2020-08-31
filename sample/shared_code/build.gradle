@@ -62,11 +62,9 @@ kotlin {
             implementation libraries.ktorClientJson
             implementation libraries.ktorClientLogging
             implementation libraries.ktorClientSerialization
-            implementation libraries.ktorClientSerializationJvm
 
             // Serialize
             implementation libraries.kotlinxSerialization
-            implementation libraries.kotlinxSerializationJvm
 
         }
 
@@ -74,20 +72,11 @@ kotlin {
             // Kotlin
             implementation libraries.kotlinStdlib
             implementation libraries.ktorClientCoreAndroid
-            implementation libraries.ktorClientCoreJvm
-            implementation libraries.ktorClientJsonJvm
-            implementation libraries.ktorClientLoggingJvm
-            implementation libraries.ktorClientSerializationJvm
-            implementation libraries.kotlinxSerializationJvm
         }
 
 
         iOSMain.dependencies {
             implementation libraries.ktorClientCoreiOS
-            implementation libraries.ktorClientJsoniOS
-            implementation libraries.ktorClientLoggingiOS
-            implementation libraries.ktorClientSerializationiOS
-            implementation libraries.kotlinxSerializationiOS
         }
 
         /*

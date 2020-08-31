@@ -29,7 +29,7 @@ ext.versions = [
         junit                  : '4.12',
         kotlinMockito          : '1.5.0',
         ktor                   : '1.4.0',
-        kotlinSerialization    : '0.14.0',
+        kotlinSerialization    : '1.0.0-RC',
 
         assertJ                : '3.8.0',
         karumi                 : '3.0.2',
@@ -56,7 +56,7 @@ ext.libraries = [
         ktorClientJson            : "io.ktor:ktor-client-json:$versions.ktor",
         ktorClientLogging         : "io.ktor:ktor-client-logging:$versions.ktor",
         ktorClientSerialization   : "io.ktor:ktor-client-serialization:$versions.ktor",
-        kotlinxSerialization      : "org.jetbrains.kotlinx:kotlinx-serialization-runtime-common:$versions.kotlinSerialization",
+        kotlinxSerialization      : "org.jetbrains.kotlinx:kotlinx-serialization-core:$versions.kotlinSerialization",
 
         ktorClientCoreAndroid     : "io.ktor:ktor-client-android:$versions.ktor",
         ktorClientCoreJvm         : "io.ktor:ktor-client-core-jvm:$versions.ktor",
@@ -65,7 +65,7 @@ ext.libraries = [
         ktorClientSerializationJvm: "io.ktor:ktor-client-serialization-jvm:$versions.ktor",
         kotlinxSerializationJvm   : "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$versions.kotlinSerialization",
         ktorClientCoreiOS         : "io.ktor:ktor-client-ios:$versions.ktor",
-        ktorClientJsoniOS         : "io.ktor:ktor-client-json-native:$versions.ktor",
+        ktorClientJsoniOS         : "io.ktor:ktor-client-serialization-native:$versions.ktor",
         ktorClientLoggingiOS      : "io.ktor:ktor-client-logging-native:$versions.ktor",
         ktorClientSerializationiOS: "io.ktor:ktor-client-serialization-native:$versions.ktor",
         kotlinxSerializationiOS   : "org.jetbrains.kotlinx:kotlinx-serialization-runtime-native:$versions.kotlinSerialization",

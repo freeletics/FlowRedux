@@ -23,27 +23,10 @@ import okhttp3.logging.HttpLoggingInterceptor
 class PopularRepositoriesViewModel : ViewModel() {
 
     val liveData = MutableLiveData<PaginationState>()
-    private val httpClient = HttpClient(OkHttp) {
-
-        install(Logging) {
-            logger = Logger.DEFAULT
-            level = LogLevel.ALL
-        }
-
-        engine {
-            val loggingInterceptor = HttpLoggingInterceptor()
-            loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-            addInterceptor(loggingInterceptor)
-        }
-
-        install(JsonFeature) {
-            serializer = KotlinxSerializer(Json.nonstrict)
-        }
-    }
 
     private val stateMachine = PaginationStateMachine(
         logger = AndroidFlowReduxLogger,
-        githubApi = GithubApi(httpClient = httpClient),
+        githubApi = GithubApi(),
         scope = viewModelScope
     ).also {
         it.start(::onStateChanged)
