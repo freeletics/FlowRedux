@@ -18,7 +18,7 @@ kotlin {
 //        fromPreset(presets.android, 'android')
 
     }
-
+/*
     js {
         compileKotlinJs {
             kotlinOptions.metaInfo = true
@@ -27,7 +27,7 @@ kotlin {
             kotlinOptions.main = "call"
         }
     }
-
+*/
 
     cocoapods {
         // Configure fields required by CocoaPods.
@@ -57,12 +57,12 @@ kotlin {
             // Kotlin
             implementation libraries.kotlinStdlib
         }
-         */
 
         jsMain.dependencies {
             api libraries.kotlinStdlibJs
         }
 
+         */
     }
 }
 
