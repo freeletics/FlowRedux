@@ -2,20 +2,6 @@
 apply plugin: 'kotlin-multiplatform'
 apply plugin: 'org.jetbrains.kotlin.native.cocoapods'
 apply plugin: 'co.touchlab.kotlinxcodesync'
-apply plugin: 'kotlinx-serialization'
-
-/*
-android {
-    compileSdkVersion 28
-
-    defaultConfig {
-        minSdkVersion 21
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-}
-*/
 
 kotlin {
     targets {
@@ -55,28 +41,15 @@ kotlin {
             // Kotlin
             implementation libraries.kotlinStdlibCommon
             api project(':dsl')
-
-
-            // Ktor
-            api libraries.ktorClientCore
-            implementation libraries.ktorClientJson
-            implementation libraries.ktorClientLogging
-            implementation libraries.ktorClientSerialization
-
-            // Serialize
-            implementation libraries.kotlinxSerialization
-
         }
 
         androidMain.dependencies {
             // Kotlin
             implementation libraries.kotlinStdlib
-            implementation libraries.ktorClientCoreAndroid
         }
 
 
         iOSMain.dependencies {
-            implementation libraries.ktorClientCoreiOS
         }
 
         /*
@@ -93,14 +66,8 @@ kotlin {
     }
 }
 
-// workaround for https://youtrack.jetbrains.com/issue/KT-27170
-/*
-configurations {
-    compileClasspath
-}
- */
 
-xcode {
+xcodeSync {
     projectPath = "../ios/ios.xcodeproj"
-    target = "ios"
+    target = "iosApp"
 }
