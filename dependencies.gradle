@@ -18,7 +18,7 @@ ext.versions = [
         okhttp                 : '4.2.0',
 
         retrofit               : '2.6.2',
-        moshi                  : '1.8.0',
+        moshi                  : '1.10.0',
         timber                 : '4.7.1',
 
         support                : '1.1.0',
