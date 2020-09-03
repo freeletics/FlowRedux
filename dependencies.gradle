@@ -49,7 +49,6 @@ ext.libraries = [
         moshiKotlin           : "com.squareup.moshi:moshi-kotlin:$versions.moshi",
         moshiCodeGen          : "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi",
         timber                : "com.jakewharton.timber:timber:$versions.timber",
-        turbine               : "app.cash.turbine:turbine:${versions.turbine}",
         coroutines            : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines",
         coroutinesNative      : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}-native-mt",
         rxJava                : "io.reactivex.rxjava2:rxjava:$versions.rxJava",
@@ -87,7 +86,9 @@ ext.testLibraries = [
         deviceAnimationsRule: "com.github.VictorAlbertos:DeviceAnimationTestRule:$versions.deviceAnimationsRule",
         coroutinesTest      : "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutines",
         kotlintest          : "io.kotlintest:kotlintest-runner-junit5:$versions.kotlintest",
-        flowRecorder        : "com.freeletics.flow.test:recorder:$versions.flowRecorder"
+        flowRecorder        : "com.freeletics.flow.test:recorder:$versions.flowRecorder",
+        turbine               : "app.cash.turbine:turbine:${versions.turbine}",
+
 ]
 
 ext.gradlePlugins = [
