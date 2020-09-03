@@ -7,7 +7,7 @@ import kotlin.test.*
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
-class FlowReduxTest2 {
+class FlowReduxTest {
 
     @Test
     fun `initial state is emitted even without actions as input`() {
