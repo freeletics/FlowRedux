@@ -35,7 +35,7 @@ kotlin {
         commonTest {
             dependencies {
                 implementation 'org.jetbrains.kotlin:kotlin-test-multiplatform'
-                implementation 'app.cash.turbine:turbine:0.2.1'
+                implementation testLibraries.turbine
             }
         }
 
@@ -44,9 +44,6 @@ kotlin {
             dependencies {
                 implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
                 implementation testLibraries.junit
-                implementation testLibraries.kotlintest
-                implementation testLibraries.coroutinesTest
-                implementation testLibraries.flowRecorder
             }
         }
 

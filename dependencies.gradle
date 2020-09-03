@@ -35,34 +35,34 @@ ext.versions = [
         espresso               : '3.0.2',
         screengrab             : '1.2.0',
         deviceAnimationsRule   : '0.0.2',
-        kotlintest             : '3.4.2',
-        flowRecorder           : '0.2.0',
+        turbine                : '0.2.1'
 ]
 
 ext.libraries = [
-        dagger                    : "com.google.dagger:dagger:$versions.dagger",
-        daggerCompiler            : "com.google.dagger:dagger-compiler:$versions.dagger",
-        kotlinStdlib              : "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin",
-        kotlinStdlibCommon        : "org.jetbrains.kotlin:kotlin-stdlib-common:$versions.kotlin",
-        kotlinStdlibJs            : "org.jetbrains.kotlin:kotlin-stdlib-js:$versions.kotlin",
-        kotlinReflect             : "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin",
-        moshi                     : "com.squareup.moshi:moshi:$versions.moshi",
-        moshiKotlin               : "com.squareup.moshi:moshi-kotlin:$versions.moshi",
-        moshiCodeGen              : "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi",
-        timber                    : "com.jakewharton.timber:timber:$versions.timber",
-        coroutines                : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines",
-        coroutinesNative          : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}-native-mt",
-        rxJava                    : "io.reactivex.rxjava2:rxjava:$versions.rxJava",
-        rxAndroid                 : "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid",
-        rxBinding                 : "com.jakewharton.rxbinding2:rxbinding-kotlin:$versions.rxBinding",
-        rxKotlin                  : "io.reactivex.rxjava2:rxkotlin:$versions.rxKotlin",
-        rxRelay                   : "com.jakewharton.rxrelay2:rxrelay:$versions.rxRelay",
-        rxReplayingShareKotlin    : "com.jakewharton.rx2:replaying-share-kotlin:$versions.rxReplayingShare",
-        koptionalRxJava2          : "com.gojuno.koptional:koptional-rxjava2-extensions:$versions.koptional",
-        retrofit                  : "com.squareup.retrofit2:retrofit:$versions.retrofit",
-        retrofitMoshi             : "com.squareup.retrofit2:converter-moshi:$versions.retrofit",
-        retrofitRxJava            : "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit",
-        okhttp                    : "com.squareup.okhttp3:okhttp:$versions.okhttp"
+        dagger                : "com.google.dagger:dagger:$versions.dagger",
+        daggerCompiler        : "com.google.dagger:dagger-compiler:$versions.dagger",
+        kotlinStdlib          : "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin",
+        kotlinStdlibCommon    : "org.jetbrains.kotlin:kotlin-stdlib-common:$versions.kotlin",
+        kotlinStdlibJs        : "org.jetbrains.kotlin:kotlin-stdlib-js:$versions.kotlin",
+        kotlinReflect         : "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin",
+        moshi                 : "com.squareup.moshi:moshi:$versions.moshi",
+        moshiKotlin           : "com.squareup.moshi:moshi-kotlin:$versions.moshi",
+        moshiCodeGen          : "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi",
+        timber                : "com.jakewharton.timber:timber:$versions.timber",
+        turbine               : "app.cash.turbine:turbine:${versions.turbine}",
+        coroutines            : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines",
+        coroutinesNative      : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}-native-mt",
+        rxJava                : "io.reactivex.rxjava2:rxjava:$versions.rxJava",
+        rxAndroid             : "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid",
+        rxBinding             : "com.jakewharton.rxbinding2:rxbinding-kotlin:$versions.rxBinding",
+        rxKotlin              : "io.reactivex.rxjava2:rxkotlin:$versions.rxKotlin",
+        rxRelay               : "com.jakewharton.rxrelay2:rxrelay:$versions.rxRelay",
+        rxReplayingShareKotlin: "com.jakewharton.rx2:replaying-share-kotlin:$versions.rxReplayingShare",
+        koptionalRxJava2      : "com.gojuno.koptional:koptional-rxjava2-extensions:$versions.koptional",
+        retrofit              : "com.squareup.retrofit2:retrofit:$versions.retrofit",
+        retrofitMoshi         : "com.squareup.retrofit2:converter-moshi:$versions.retrofit",
+        retrofitRxJava        : "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit",
+        okhttp                : "com.squareup.okhttp3:okhttp:$versions.okhttp"
 ]
 
 ext.supportLibraries = [
@@ -91,10 +91,10 @@ ext.testLibraries = [
 ]
 
 ext.gradlePlugins = [
-        android            : "com.android.tools.build:gradle:$versions.agp",
-        kotlin             : "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin",
-        karumi             : "com.karumi:shot:$versions.karumi",
-        mavenPublish       : "com.vanniktech:gradle-maven-publish-plugin:$versions.mavenPublish",
-        dokka              : "org.jetbrains.dokka:dokka-gradle-plugin:$versions.dokka",
-        kotlinxcodesync    : "co.touchlab:kotlinxcodesync:0.2",
+        android        : "com.android.tools.build:gradle:$versions.agp",
+        kotlin         : "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin",
+        karumi         : "com.karumi:shot:$versions.karumi",
+        mavenPublish   : "com.vanniktech:gradle-maven-publish-plugin:$versions.mavenPublish",
+        dokka          : "org.jetbrains.dokka:dokka-gradle-plugin:$versions.dokka",
+        kotlinxcodesync: "co.touchlab:kotlinxcodesync:0.2",
 ]

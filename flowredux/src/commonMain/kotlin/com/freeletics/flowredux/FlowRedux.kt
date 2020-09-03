@@ -10,13 +10,37 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 
+/**
+ * Creates a Redux store with an initial state. If your initial state is an expensive computation
+ * consider using [reduxStore]  which has an initialStateSupplier as parameter that produces the
+ * first state lazily once the flow starts.
+
 @ExperimentalCoroutinesApi
 @FlowPreview
 fun <A, S> Flow<A>.reduxStore(
-    initialStateSupplier: () -> S,
-    sideEffects: Iterable<SideEffect<S, A>>,
-    logger : FlowReduxLogger? = null,
-    reducer: Reducer<S, A>
+        initialState: S,
+        sideEffects: Iterable<SideEffect<S, A>>,
+        logger: FlowReduxLogger? = null,
+        reducer: Reducer<S, A>
+): Flow<S> = reduxStore(
+        initialStateSupplier = { initialState },
+        sideEffects = sideEffects,
+        logger = logger,
+        reducer = reducer
+)
+ */
+
+/**
+ * Creates a Redux store with a [initialStateSupplier] that produces the first state lazily once
+ * the flow starts.
+ */
+@ExperimentalCoroutinesApi
+@FlowPreview
+fun <A, S> Flow<A>.reduxStore(
+        initialStateSupplier: () -> S,
+        sideEffects: Iterable<SideEffect<S, A>>,
+        logger: FlowReduxLogger? = null,
+        reducer: Reducer<S, A>
 ): Flow<S> = flow {
 
     var currentState: S = initialStateSupplier()
