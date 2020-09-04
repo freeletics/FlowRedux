@@ -1,9 +1,10 @@
 package com.freeletics.flowredux.dsl
 
-import org.junit.Assert
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.fail
 
-class FlowReduxTest {
+class FlowReduxDslSpecTest {
 
     @Test
     fun callingSpecTwiceThrowsException() {
@@ -21,11 +22,11 @@ class FlowReduxTest {
 
         try {
             sm.specAgain()
-            Assert.fail("Exception expected to be thrown")
+            fail("Exception expected to be thrown")
         } catch (e: IllegalStateException) {
             val expected =
                 "State machine spec has already been set. It's only allowed to call spec {...} once."
-            Assert.assertEquals(expected, e.message)
+            assertEquals(expected, e.message)
         }
     }
 
@@ -36,7 +37,7 @@ class FlowReduxTest {
 
         try {
             sm.state
-            Assert.fail("Exception expected to be thrown")
+            fail("Exception expected to be thrown")
         } catch (e: IllegalStateException) {
             val expected =
                 "No state machine specs are defined. Did you call spec { ... } in init {...}?\n" +
@@ -53,7 +54,7 @@ class FlowReduxTest {
                     "        }\n" +
                     "    }\n" +
                     "}"
-            Assert.assertEquals(expected, e.message)
+            assertEquals(expected, e.message)
         }
     }
 }
