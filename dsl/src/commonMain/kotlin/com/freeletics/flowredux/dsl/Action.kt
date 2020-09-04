@@ -1,6 +1,7 @@
 package com.freeletics.flowredux.dsl
 
 internal sealed class Action<S, A>
+
 internal data class SelfReducableAction<S, A>(
     private val loggingInfo: String,
     internal val runReduceOnlyIf: (S) -> Boolean,
