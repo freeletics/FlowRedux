@@ -54,6 +54,28 @@ kotlin {
                 implementation 'com.freeletics.flow.test:test:0.0.2-SNAPSHOT'
             }
         }
+
+        nativeMain {
+        }
+        nativeTest {
+        }
+
+        configure([
+                targets.iosArm32,
+                targets.iosArm64,
+                targets.iosX64,
+                targets.linuxX64,
+                targets.macosX64,
+                targets.mingwX64,
+                targets.tvosArm64,
+                targets.tvosX64,
+                targets.watchosArm32,
+                targets.watchosArm64,
+                targets.watchosX86,
+        ]) {
+            compilations.main.source(sourceSets.nativeMain)
+            compilations.test.source(sourceSets.nativeTest)
+        }
     }
 }
 
