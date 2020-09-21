@@ -1,6 +1,7 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -45,9 +46,9 @@ class DslTest {
             }
             sm.state.test {
                 assertEquals(State.Initial, expectItem())
-                sm.dispatchAsync(Action.A1)
+                dispatchAsync(sm, Action.A1)
                 assertEquals(State.S1, expectItem())
-                sm.dispatchAsync(Action.A2)
+                dispatchAsync(sm, Action.A2)
                 assertEquals(State.S2, expectItem())
             }
         }
@@ -116,16 +117,16 @@ class DslTest {
                 assertEquals(State.Initial, expectItem())
                 assertEquals(State.S1, expectItem())
 
-                sm.dispatchAsync(Action.A1)
+                dispatchAsync(sm, Action.A1)
                 assertEquals(State.S2, expectItem())
 
-                sm.dispatchAsync(Action.A2)
+                dispatchAsync(sm, Action.A2)
                 assertEquals(State.S1, expectItem())
 
-                sm.dispatchAsync(Action.A1)
+                dispatchAsync(sm, Action.A1)
                 assertEquals(State.S2, expectItem())
 
-                sm.dispatchAsync(Action.A2)
+                dispatchAsync(sm, Action.A2)
                 assertEquals(State.S1, expectItem())
             }
         }
@@ -170,7 +171,7 @@ class DslTest {
                     assertEquals(State.Initial, expectItem())
                     assertEquals(State.S1, expectItem())
                     assertEquals(State.S2, expectItem())
-                    sm.dispatchAsync(Action.A1)
+                    dispatchAsync(sm, Action.A1)
                     delay(20) // wait for 20 ms before checking that no events
                     expectNoEvents()
                 }
@@ -199,7 +200,7 @@ class DslTest {
                     assertEquals(State.Initial, expectItem())
                     assertEquals(State.S1, expectItem())
                     repeat(2) {
-                        sm.dispatchAsync(Action.A1) // Causes state transition to S1 again which is already current
+                        dispatchAsync(sm, Action.A1) // Causes state transition to S1 again which is already current
                         expectNoEvents()
                         assertEquals(1, s1Entered)
                     }
@@ -251,7 +252,7 @@ class DslTest {
 
             launch {
                 val state = sm.state.test {
-                    sm.dispatchAsync(Action.A1)
+                    dispatchAsync(sm, Action.A1)
                     assertEquals(State.Initial, expectItem())
                     assertEquals(State.S1, expectItem())
                     assertEquals(State.S3, expectItem())
@@ -287,8 +288,8 @@ class DslTest {
                 sm.state.test {
                     assertEquals(State.Initial, expectItem())
 
-                    sm.dispatchAsync(Action.A1)
-                    sm.dispatchAsync(Action.A2)
+                    dispatchAsync(sm, Action.A1)
+                    dispatchAsync(sm, Action.A2)
 
                     assertEquals(State.S2, expectItem())
                 }
@@ -296,5 +297,11 @@ class DslTest {
         }
         assertFalse(setS1Called)
         assertTrue(a1Dispatched)
+    }
+
+    private fun dispatchAsync(sm: FlowReduxStateMachine<State, Action>, action: Action) {
+        GlobalScope.launch {
+            sm.dispatch(action)
+        }
     }
 }
