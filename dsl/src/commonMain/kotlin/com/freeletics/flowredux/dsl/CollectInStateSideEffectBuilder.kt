@@ -45,7 +45,7 @@ internal class CollectInStateSideEffectBuilder<T, S : Any, A : Any>(
                 defaultRunIf = { state -> isInState(state) },
                 invokeCallback = { runIf, reduce ->
                     emit(
-                        SelfReducableAction<S, A>(
+                        SetStateAction<S, A>(
                             loggingInfo = "collectWhileInState<>", // TODO logging
                             reduce = reduce,
                             runReduceOnlyIf = runIf

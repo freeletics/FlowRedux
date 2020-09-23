@@ -41,7 +41,7 @@ internal class StoreWideCollectBuilderBlock<T, S, A>(
             defaultRunIf = { true },
             invokeCallback = { runIf, reduce ->
                 emit(
-                    SelfReducableAction<S, A>(
+                    SetStateAction<S, A>(
                         loggingInfo = "observe<Flow>",
                         reduce = reduce,
                         runReduceOnlyIf = runIf

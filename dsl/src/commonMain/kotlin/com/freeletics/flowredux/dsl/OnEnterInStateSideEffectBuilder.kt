@@ -36,7 +36,7 @@ class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
             defaultRunIf = { state -> isInState(state) },
             invokeCallback = { runIf, reduce ->
                 emit(
-                    SelfReducableAction<S, A>(
+                    SetStateAction<S, A>(
                         loggingInfo = "onEnter<>", // TODO logging
                         reduce = reduce,
                         runReduceOnlyIf = runIf

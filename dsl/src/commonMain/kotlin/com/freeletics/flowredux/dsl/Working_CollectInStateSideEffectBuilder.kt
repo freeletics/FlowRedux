@@ -81,7 +81,7 @@ internal class Working_CollectInStateBuilder<T, S : Any, A : Any>(
             defaultRunIf = { state -> isInState(state) },
             invokeCallback = { runOnlyIf, reduce ->
                 emit(
-                    SelfReducableAction<S, A>(
+                    SetStateAction<S, A>(
                         loggingInfo = "collectWhileInState<>", // TODO better logging
                         reduce = reduce,
                         runReduceOnlyIf = runOnlyIf

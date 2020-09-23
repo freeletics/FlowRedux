@@ -48,7 +48,7 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any>(
             }.map {
                 when (it) {
                     is ExternalWrappedAction<*, *> -> it.action as A
-                    is SelfReducableAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
+                    is SetStateAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
                     is InitialStateAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
                 }
             }
@@ -62,7 +62,7 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any>(
                 defaultRunIf = { state -> isInState(state) },
                 invokeCallback = { runIf, reduce ->
                     emit(
-                        SelfReducableAction<S, A>(
+                        SetStateAction<S, A>(
                             loggingInfo = "Caused by on<$action>",
                             reduce = reduce,
                             runReduceOnlyIf = runIf
