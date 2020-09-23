@@ -1,11 +1,11 @@
 package com.freeletics.flowredux.dsl
 
 fun StateMachine(
-        builderBlock: FlowReduxStoreBuilder<State, Action>.() -> Unit
-): FlowReduxStateMachine<State, Action> {
-    val sm: FlowReduxStateMachine<State, Action> = object : FlowReduxStateMachine<State, Action>(
+        builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit
+): FlowReduxStateMachine<TestState, TestAction> {
+    val sm: FlowReduxStateMachine<TestState, TestAction> = object : FlowReduxStateMachine<TestState, TestAction>(
             CommandLineLogger,
-            State.Initial){
+            TestState.Initial){
 
         init {
             spec(builderBlock)

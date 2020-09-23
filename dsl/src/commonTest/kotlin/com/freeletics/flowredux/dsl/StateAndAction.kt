@@ -1,15 +1,15 @@
 package com.freeletics.flowredux.dsl
 
-sealed class Action {
-    object A1 : Action()
-    object A2 : Action()
+sealed class TestAction {
+    object A1 : TestAction()
+    object A2 : TestAction()
 }
 
-sealed class State {
-    object Initial : State()
-    object S1 : State()
-    object S2 : State()
-    object S3 : State()
+sealed class TestState {
+    object Initial : TestState()
+    object S1 : TestState()
+    object S2 : TestState()
+    object S3 : TestState()
 
-    data class GenericState(val aString : String, val anInt : Int) : State()
+    data class GenericState(val aString : String, val anInt : Int) : TestState()
 }

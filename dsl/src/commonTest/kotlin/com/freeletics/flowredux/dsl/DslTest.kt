@@ -20,7 +20,7 @@ class DslTest {
         val sm = StateMachine { }
         launch {
             sm.state.test {
-                assertEquals(State.Initial, expectItem())
+                assertEquals(TestState.Initial, expectItem())
             }
         }
     }
@@ -30,26 +30,26 @@ class DslTest {
 
         launch {
             val sm = StateMachine {
-                inState<State.Initial> {
-                    on<Action.A1> { _, _, setState ->
-                        setState { State.S1 }
+                inState<TestState.Initial> {
+                    on<TestAction.A1> { _, _, setState ->
+                        setState { TestState.S1 }
                     }
                 }
 
-                inState<State.S1> {
-                    on<Action.A2> { _, _, setState ->
-                        setState { State.S2 }
+                inState<TestState.S1> {
+                    on<TestAction.A2> { _, _, setState ->
+                        setState { TestState.S2 }
                     }
 
                 }
 
             }
             sm.state.test {
-                assertEquals(State.Initial, expectItem())
-                dispatchAsync(sm, Action.A1)
-                assertEquals(State.S1, expectItem())
-                dispatchAsync(sm, Action.A2)
-                assertEquals(State.S2, expectItem())
+                assertEquals(TestState.Initial, expectItem())
+                dispatchAsync(sm, TestAction.A1)
+                assertEquals(TestState.S1, expectItem())
+                dispatchAsync(sm, TestAction.A2)
+                assertEquals(TestState.S2, expectItem())
             }
         }
     }
@@ -63,7 +63,7 @@ class DslTest {
 
 
             val sm = StateMachine {
-                inState<State.Initial> {
+                inState<TestState.Initial> {
                     collectWhileInState(flow {
                         emit(1)
                         delay(10)
@@ -73,15 +73,15 @@ class DslTest {
                     }) { v, _, setState ->
                         recordedValues.add(v)
                         if (v == 2)
-                            setState { State.S1 }
+                            setState { TestState.S1 }
                     }
                 }
             }
 
             launch {
                 sm.state.test {
-                    assertEquals(State.Initial, expectItem())
-                    assertEquals(State.S1, expectItem())
+                    assertEquals(TestState.Initial, expectItem())
+                    assertEquals(TestState.S1, expectItem())
                 }
             }
         }
@@ -92,21 +92,21 @@ class DslTest {
     fun `move from collectWhileInState to next state with action`() = suspendTest {
 
         val sm = StateMachine {
-            inState<State.Initial> {
+            inState<TestState.Initial> {
                 collectWhileInState(flowOf(1)) { _, _, setState ->
-                    setState { State.S1 }
+                    setState { TestState.S1 }
                 }
             }
 
-            inState<State.S1> {
-                on<Action.A1> { _, _, setState ->
-                    setState { State.S2 }
+            inState<TestState.S1> {
+                on<TestAction.A1> { _, _, setState ->
+                    setState { TestState.S2 }
                 }
             }
 
-            inState<State.S2> {
-                on<Action.A2> { _, _, setState ->
-                    setState { State.S1 }
+            inState<TestState.S2> {
+                on<TestAction.A2> { _, _, setState ->
+                    setState { TestState.S1 }
 
                 }
             }
@@ -114,20 +114,20 @@ class DslTest {
 
         launch {
             sm.state.test {
-                assertEquals(State.Initial, expectItem())
-                assertEquals(State.S1, expectItem())
+                assertEquals(TestState.Initial, expectItem())
+                assertEquals(TestState.S1, expectItem())
 
-                dispatchAsync(sm, Action.A1)
-                assertEquals(State.S2, expectItem())
+                dispatchAsync(sm, TestAction.A1)
+                assertEquals(TestState.S2, expectItem())
 
-                dispatchAsync(sm, Action.A2)
-                assertEquals(State.S1, expectItem())
+                dispatchAsync(sm, TestAction.A2)
+                assertEquals(TestState.S1, expectItem())
 
-                dispatchAsync(sm, Action.A1)
-                assertEquals(State.S2, expectItem())
+                dispatchAsync(sm, TestAction.A1)
+                assertEquals(TestState.S2, expectItem())
 
-                dispatchAsync(sm, Action.A2)
-                assertEquals(State.S1, expectItem())
+                dispatchAsync(sm, TestAction.A2)
+                assertEquals(TestState.S1, expectItem())
             }
         }
     }
@@ -137,41 +137,41 @@ class DslTest {
         val order = ArrayList<Int>()
         suspendTest {
             val sm = StateMachine {
-                inState<State.Initial> {
+                inState<TestState.Initial> {
                     onEnter { _, setState ->
                         order.add(0)
-                        setState { State.S1 }
+                        setState { TestState.S1 }
                         delay(50)
                         order.add(1)
                     }
                 }
 
-                inState<State.S1> {
+                inState<TestState.S1> {
                     onEnter { _, setState ->
                         order.add(2)
                         delay(100)
-                        setState { State.S2 }
+                        setState { TestState.S2 }
                         order.add(3)
                     }
                 }
 
-                inState<State.S2> {
+                inState<TestState.S2> {
                     onEnter { _, _ ->
                         order.add(4)
                     }
 
-                    on<Action.A1> { _, _, setState ->
-                        setState { State.S2 }
+                    on<TestAction.A1> { _, _, setState ->
+                        setState { TestState.S2 }
                     }
                 }
             }
 
             launch {
                 sm.state.test {
-                    assertEquals(State.Initial, expectItem())
-                    assertEquals(State.S1, expectItem())
-                    assertEquals(State.S2, expectItem())
-                    dispatchAsync(sm, Action.A1)
+                    assertEquals(TestState.Initial, expectItem())
+                    assertEquals(TestState.S1, expectItem())
+                    assertEquals(TestState.S2, expectItem())
+                    dispatchAsync(sm, TestAction.A1)
                     delay(20) // wait for 20 ms before checking that no events
                     expectNoEvents()
                 }
@@ -185,22 +185,22 @@ class DslTest {
         suspendTest {
             var s1Entered = 0
             val sm = StateMachine {
-                inState<State.Initial> {
-                    onEnter { _, setState -> setState { State.S1 } }
+                inState<TestState.Initial> {
+                    onEnter { _, setState -> setState { TestState.S1 } }
                 }
 
-                inState<State.S1> {
+                inState<TestState.S1> {
                     onEnter { _, _ -> s1Entered++ }
-                    on<Action.A1> { _, _, setState -> setState { State.S1 } }
+                    on<TestAction.A1> { _, _, setState -> setState { TestState.S1 } }
                 }
             }
 
             launch {
                 sm.state.test {
-                    assertEquals(State.Initial, expectItem())
-                    assertEquals(State.S1, expectItem())
+                    assertEquals(TestState.Initial, expectItem())
+                    assertEquals(TestState.S1, expectItem())
                     repeat(2) {
-                        dispatchAsync(sm, Action.A1) // Causes state transition to S1 again which is already current
+                        dispatchAsync(sm, TestAction.A1) // Causes state transition to S1 again which is already current
                         expectNoEvents()
                         assertEquals(1, s1Entered)
                     }
@@ -211,11 +211,11 @@ class DslTest {
 
     /*
     @Test
-    fun `on Action triggers in state setState executes while being in same state`() {
+    fun `on TestAction triggers in state setState executes while being in same state`() {
         var setStateCalled = 0
         val sm = StateMachine {
-            inState<State.Initial> {
-                on<Action.A1> { _, _, setState ->
+            inState<TestState.Initial> {
+                on<TestAction.A1> { _, _, setState ->
                     setState { setStateCalled++; it }
                     setState { setStateCalled++; it }
                 }
@@ -223,8 +223,8 @@ class DslTest {
         }
 
         val state = sm.state.testOverTime()
-        sm.dispatchAsync(Action.A1)
-        state shouldEmitNext State.Initial
+        sm.dispatchAsync(TestAction.A1)
+        state shouldEmitNext TestState.Initial
 
         Assert.assertEquals(2, setStateCalled)
     }
@@ -236,26 +236,26 @@ class DslTest {
 
         suspendTest {
             val sm = StateMachine {
-                inState<State.Initial> {
-                    on<Action.A1> { _, _, setState ->
-                        setState { setStateCalled++; State.S1 }
-                        setState { setStateCalled++; State.S2 }
+                inState<TestState.Initial> {
+                    on<TestAction.A1> { _, _, setState ->
+                        setState { setStateCalled++; TestState.S1 }
+                        setState { setStateCalled++; TestState.S2 }
                     }
                 }
-                inState<State.S1> {
+                inState<TestState.S1> {
                     onEnter { _, setState ->
                         delay(100)
-                        setState { State.S3 }
+                        setState { TestState.S3 }
                     }
                 }
             }
 
             launch {
                 val state = sm.state.test {
-                    dispatchAsync(sm, Action.A1)
-                    assertEquals(State.Initial, expectItem())
-                    assertEquals(State.S1, expectItem())
-                    assertEquals(State.S3, expectItem())
+                    dispatchAsync(sm, TestAction.A1)
+                    assertEquals(TestState.Initial, expectItem())
+                    assertEquals(TestState.S1, expectItem())
+                    assertEquals(TestState.S3, expectItem())
                 }
             }
 
@@ -271,27 +271,27 @@ class DslTest {
 
         suspendTest {
             val sm = StateMachine {
-                inState<State.Initial> {
-                    on<Action.A1> { _, _, setState ->
+                inState<TestState.Initial> {
+                    on<TestAction.A1> { _, _, setState ->
                         a1Dispatched = true
-                        setState(runIf = { false }) { setS1Called = true; State.S1 }
+                        setState(runIf = { false }) { setS1Called = true; TestState.S1 }
                     }
 
-                    on<Action.A2> { _, _, setState ->
+                    on<TestAction.A2> { _, _, setState ->
                         delay(100) // ensure that A1 setState{ } would have time be executed
-                        setState { State.S2 }
+                        setState { TestState.S2 }
                     }
                 }
             }
 
             launch {
                 sm.state.test {
-                    assertEquals(State.Initial, expectItem())
+                    assertEquals(TestState.Initial, expectItem())
 
-                    dispatchAsync(sm, Action.A1)
-                    dispatchAsync(sm, Action.A2)
+                    dispatchAsync(sm, TestAction.A1)
+                    dispatchAsync(sm, TestAction.A2)
 
-                    assertEquals(State.S2, expectItem())
+                    assertEquals(TestState.S2, expectItem())
                 }
             }
         }
@@ -299,7 +299,7 @@ class DslTest {
         assertTrue(a1Dispatched)
     }
 
-    private fun dispatchAsync(sm: FlowReduxStateMachine<State, Action>, action: Action) {
+    private fun dispatchAsync(sm: FlowReduxStateMachine<TestState, TestAction>, action: TestAction) {
         GlobalScope.launch {
             sm.dispatch(action)
         }

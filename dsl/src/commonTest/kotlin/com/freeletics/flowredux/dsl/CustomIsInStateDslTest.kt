@@ -21,40 +21,40 @@ class CustomIsInStateDslTest {
         var counter2 = 0
 
         suspendTest {
-            val gs1 = State.GenericState("asd", 1)
-            val gs2 = State.GenericState("foo", 2)
+            val gs1 = TestState.GenericState("asd", 1)
+            val gs2 = TestState.GenericState("foo", 2)
 
             val sm = StateMachine {
-                inState<State.Initial> {
-                    on<Action.A1> { _, _, setState ->
+                inState<TestState.Initial> {
+                    on<TestAction.A1> { _, _, setState ->
                         setState { gs1 }
                     }
                 }
-                inState(isInState = { it is State.GenericState && it.anInt == 1 }) {
-                    on<Action.A1> { _, _, setState ->
+                inState(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
+                    on<TestAction.A1> { _, _, setState ->
                         counter1++
                         setState { gs2 }
                     }
                 }
 
-                inState(isInState = { it is State.GenericState && it.anInt == 2 }) {
-                    on<Action.A1> { _, _, setState ->
+                inState(isInState = { it is TestState.GenericState && it.anInt == 2 }) {
+                    on<TestAction.A1> { _, _, setState ->
                         delay(20) // wait for some time to see if not other state above triggers
                         counter2++
-                        setState { State.S1 }
+                        setState { TestState.S1 }
                     }
                 }
             }
 
             launch {
                 sm.state.test {
-                    assertEquals(State.Initial, expectItem())
-                    dispatchAsync(sm, Action.A1)
+                    assertEquals(TestState.Initial, expectItem())
+                    dispatchAsync(sm, TestAction.A1)
                     assertEquals(gs1, expectItem())
-                    dispatchAsync(sm, Action.A1)
+                    dispatchAsync(sm, TestAction.A1)
                     assertEquals(gs2, expectItem())
-                    dispatchAsync(sm, Action.A1)
-                    assertEquals(State.S1, expectItem())
+                    dispatchAsync(sm, TestAction.A1)
+                    assertEquals(TestState.S1, expectItem())
                 }
             }
 
@@ -71,16 +71,16 @@ class CustomIsInStateDslTest {
         var reached = false
 
         suspendTest {
-            val gs1 = State.GenericState("asd", 1)
-            val gs2 = State.GenericState("2", 2)
+            val gs1 = TestState.GenericState("asd", 1)
+            val gs2 = TestState.GenericState("2", 2)
 
             val sm = StateMachine {
-                inState<State.Initial> {
-                    on<Action.A1> { _, _, setState ->
+                inState<TestState.Initial> {
+                    on<TestAction.A1> { _, _, setState ->
                         setState { gs1 }
                     }
                 }
-                inState(isInState = { it is State.GenericState && it.anInt == 1 }) {
+                inState(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
                     collectWhileInState(flow {
                         emit(2)
                         delay(20)
@@ -88,25 +88,25 @@ class CustomIsInStateDslTest {
                         fail("This should never be reached")
                         emit(9999)
                     }) { value, _, setState ->
-                        setState { State.GenericState(value.toString(), value) }
+                        setState { TestState.GenericState(value.toString(), value) }
                     }
                 }
 
-                inState(isInState = { it is State.GenericState && it.anInt == 2 }) {
+                inState(isInState = { it is TestState.GenericState && it.anInt == 2 }) {
                     onEnter { _, setState ->
                         delay(50) // Wait until collectWhileInState succeeded
-                        setState { State.S1 }
+                        setState { TestState.S1 }
                     }
                 }
             }
 
             launch {
                 sm.state.test {
-                    assertEquals(State.Initial, expectItem())
-                    dispatchAsync(sm, Action.A1)
+                    assertEquals(TestState.Initial, expectItem())
+                    dispatchAsync(sm, TestAction.A1)
                     assertEquals(gs1, expectItem())
                     assertEquals(gs2, expectItem())
-                    assertEquals(State.S1, expectItem())
+                    assertEquals(TestState.S1, expectItem())
                 }
 
             }
@@ -115,7 +115,7 @@ class CustomIsInStateDslTest {
         assertFalse(reached)
     }
 
-    private fun dispatchAsync(sm: FlowReduxStateMachine<State, Action>, action: Action) {
+    private fun dispatchAsync(sm: FlowReduxStateMachine<TestState, TestAction>, action: TestAction) {
         GlobalScope.launch {
             sm.dispatch(action)
         }
