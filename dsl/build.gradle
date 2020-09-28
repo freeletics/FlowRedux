@@ -1,4 +1,4 @@
-// apply plugin: 'org.jetbrains.dokka'
+apply plugin: 'org.jetbrains.dokka'
 apply plugin: 'org.jetbrains.kotlin.multiplatform'
 
 gradle.ext.isCiServer = true // System.getenv().containsKey("CI")
@@ -93,5 +93,6 @@ dokka {
  */
 
 if (gradle.ext.isCiServer) {
-    apply from: "$rootDir/gradle-mvn-mpp-push.gradle"
+    // apply from: "$rootDir/gradle-mvn-mpp-push.gradle"
+    apply plugin: "com.vanniktech.maven.publish"
 }

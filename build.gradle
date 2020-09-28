@@ -15,6 +15,7 @@ buildscript {
         classpath gradlePlugins.mavenPublish
         classpath gradlePlugins.dokka
         classpath gradlePlugins.kotlinxcodesync
+        classpath gradlePlugins.gradleMavenPublish
     }
 }
 
