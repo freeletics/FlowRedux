@@ -47,7 +47,7 @@ jobs:
       - *restore_gradle_cache
       - run:
           name: Build library
-          command: ./gradlew :flowredux:build :dsl:build :sample:android:assembleDebug --stacktrace
+          command: ./gradlew :flowredux:build :dsl:build --stacktrace
       - *save_gradle_cache
   deploy_website:
     executor: mkdocs
