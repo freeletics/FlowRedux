@@ -100,7 +100,6 @@ workflows:
               only:
                 - master
       - deploy_oss_sonatype:
-          executor: macos
           context: "android-maven-publish"
           requires:
             - build_and_test
