@@ -70,7 +70,7 @@ jobs:
       - checkout
       - run:
           name: Deploy Website
-          command: ./deply_website.sh
+          command: ./depoly_website.sh
 
 workflows:
   version: 2
