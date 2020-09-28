@@ -46,7 +46,7 @@ jobs:
       - checkout
       - *restore_gradle_cache
       - run:
-          name: Build library
+          name: Build and test library and dsl
           command: ./gradlew :flowredux:build :dsl:build --stacktrace
       - *save_gradle_cache
   deploy_website:
