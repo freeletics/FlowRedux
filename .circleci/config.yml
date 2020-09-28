@@ -36,7 +36,7 @@ executors:
       xcode: 11.7.0
   mkdocs:
     docker:
-      - image: circleci/python:3.7.6
+      - image: rappdw/docker-java-python:zulu1.8.0_262-python3.7.9
     working_directory: ~/repo
 
 jobs:
@@ -56,7 +56,7 @@ jobs:
       - *restore_gradle_cache
       - run:
           name: Depoloy to OSS Sonatype
-          command: ./gradlew uploadArchives --stacktrace
+          command: ./gradlew uploadArchives --no-daemon --no-parallel --stacktrace
       - *save_gradle_cache
   deploy_website:
     executor: mkdocs
@@ -93,8 +93,8 @@ workflows:
                 - master
       - deploy_website:
           context: "Commit Signing"
-          requires:
-            - deploy_oss_sonatype
+#          requires:
+#            - deploy_oss_sonatype
           filters:
             branches:
               only:
