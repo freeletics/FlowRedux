@@ -49,6 +49,15 @@ jobs:
           name: Build and test library and dsl
           command: ./gradlew :flowredux:build :dsl:build --stacktrace
       - *save_gradle_cache
+  deploy_oss_sonatype:
+    executor: macos
+    steps:
+      - checkout
+      - *restore_gradle_cache
+      - run:
+          name: Depoloy to OSS Sonatype
+          command: ./gradlew uploadArchives --stacktrace
+      - *save_gradle_cache
   deploy_website:
     executor: mkdocs
     steps:
@@ -90,12 +99,15 @@ workflows:
             branches:
               only:
                 - master
-      - gradle-publish/publish_artifacts:
-          executor: gradle-publish/circleci-macos
+      - deploy_oss_sonatype:
+          executor: macos
           context: "android-maven-publish"
-          deploy_task: "publish"
           requires:
             - build_and_test
+          filters:
+            branches:
+              only:
+                - master
 
   check-pr:
     jobs:
