@@ -26,6 +26,14 @@ executors:
       JAVA_TOOL_OPTIONS: "-Xmx1536m"
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dkotlin.incremental=false"
       TERM: dumb
+
+  macos:
+    parameters:
+      resource_class:
+        type: string
+        default: medium
+    macos:
+      xcode: 11.7.0
   mkdocs:
     docker:
       - image: circleci/python:3.7.6
@@ -33,7 +41,7 @@ executors:
 
 jobs:
   build_and_test:
-    executor: android
+    executor: macos
     steps:
       - checkout
       - *restore_gradle_cache
