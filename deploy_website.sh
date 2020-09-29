@@ -3,6 +3,7 @@ cp README.md docs/index.md
 rm -rf docs/Javadoc
 ./gradlew dokka
 mkdocs build
+git reset --hard
 git checkout gh-pages
 find . -mindepth 1 ! -regex '^./site' -delete
 cp -R site/ .
