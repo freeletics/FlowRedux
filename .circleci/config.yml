@@ -1,8 +1,5 @@
 version: 2.1
 
-orbs:
-  gradle-publish: freeletics/gradle-publish@1.1.1
-
 # Common anchors
 # PR cache anchors
 gradle_cache_key: &gradle_cache_key
