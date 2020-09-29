@@ -5,7 +5,7 @@ rm -rf docs/Javadoc
 mkdocs build -d ../site
 git reset --hard
 git checkout gh-pages
-find . -mindepth 1 ! -regex '^./.git' -delete
+ls | grep -v .git | xargs rm -rf
 cp -R ../site/ .
 git add .
 git commit -am "Releasing new version of docs"
