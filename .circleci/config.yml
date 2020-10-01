@@ -88,14 +88,14 @@ workflows:
             branches:
               only:
                 - master
-      - deploy_website:
-          context: "Commit Signing"
+#      - deploy_website:
+#          context: "Commit Signing"
 #          requires:
 #            - deploy_oss_sonatype
-          filters:
-            branches:
-              only:
-                - master
+#          filters:
+#            branches:
+#              only:
+#                - master
       - deploy_oss_sonatype:
           context: "android-maven-publish"
           requires:
