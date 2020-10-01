@@ -99,36 +99,37 @@ There are two artifacts that you can include as dependency::
 1. `flowredux`: this is the core library. Usually you dont want to use the core library directly but rather use the `dsl`.
 2. `dsl` which provides a convenient DSL on top of the core library. Usually this is what you want.
 
+### Multiplatform
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux-multiplatform:0.3.0'
-implementation 'com.freeletics.flowredux:dsl-multiplatform:0.3.0'
+implementation 'com.freeletics.flowredux:flowredux:0.4.0'
+implementation 'com.freeletics.flowredux:dsl:0.4.0'
 ```
 
 ### JVM only
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux:0.3.0'
-implementation 'com.freeletics.flowredux:dsl:0.3.0'
+implementation 'com.freeletics.flowredux:flowredux-jvm:0.4.0'
+implementation 'com.freeletics.flowredux:dsl-jvm:0.4.0'
 ```
 
 ### Native binaries
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux-iosx64:0.3.0'
-implementation 'com.freeletics.flowredux:flowredux-iosarm64:0.3.0'
-implementation 'com.freeletics.flowredux:flowredux-iosarm32:0.3.0'
-implementation 'com.freeletics.flowredux:flowredux-watchosx86:0.3.0'
-implementation 'com.freeletics.flowredux:flowredux-watchosarm64:0.3.0'
-implementation 'com.freeletics.flowredux:flowredux-watchosarm32:0.3.0'
-implementation 'com.freeletics.flowredux:flowredux-tvosx64:0.3.0'
-implementation 'com.freeletics.flowredux:flowredux-tvosxarm64:0.3.0'
+implementation 'com.freeletics.flowredux:flowredux-iosx64:0.4.0'
+implementation 'com.freeletics.flowredux:flowredux-iosarm64:0.4.0'
+implementation 'com.freeletics.flowredux:flowredux-iosarm32:0.4.0'
+implementation 'com.freeletics.flowredux:flowredux-watchosx86:0.4.0'
+implementation 'com.freeletics.flowredux:flowredux-watchosarm64:0.4.0'
+implementation 'com.freeletics.flowredux:flowredux-watchosarm32:0.4.0'
+implementation 'com.freeletics.flowredux:flowredux-tvosx64:0.4.0'
+implementation 'com.freeletics.flowredux:flowredux-tvosxarm64:0.4.0'
 
-implementation 'com.freeletics.flowredux:dsl-iosx64:0.3.0'
-implementation 'com.freeletics.flowredux:dsl-iosarm64:0.3.0'
-implementation 'com.freeletics.flowredux:dsl-iosarm32:0.3.0'
-implementation 'com.freeletics.flowredux:dsl-watchosx86:0.3.0'
-implementation 'com.freeletics.flowredux:dsl-watchosarm64:0.3.0'
-implementation 'com.freeletics.flowredux:dsl-watchosarm32:0.3.0'
-implementation 'com.freeletics.flowredux:dsl-tvosx64:0.3.0'
-implementation 'com.freeletics.flowredux:dsl-tvosxarm64:0.3.0'
+implementation 'com.freeletics.flowredux:dsl-iosx64:0.4.0'
+implementation 'com.freeletics.flowredux:dsl-iosarm64:0.4.0'
+implementation 'com.freeletics.flowredux:dsl-iosarm32:0.4.0'
+implementation 'com.freeletics.flowredux:dsl-watchosx86:0.4.0'
+implementation 'com.freeletics.flowredux:dsl-watchosarm64:0.4.0'
+implementation 'com.freeletics.flowredux:dsl-watchosarm32:0.4.0'
+implementation 'com.freeletics.flowredux:dsl-tvosx64:0.4.0'
+implementation 'com.freeletics.flowredux:dsl-tvosxarm64:0.4.0'
 ```
 
 ### JavaScript
