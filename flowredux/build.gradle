@@ -87,4 +87,9 @@ dokka {
 if (gradle.ext.isCiServer) {
     // apply from: "$rootDir/gradle-mvn-mpp-push.gradle"
     apply plugin: "com.vanniktech.maven.publish"
+    signing {
+        if (hasProperty('SIGNING_PRIVATE_KEY')) {
+            useInMemoryPgpKeys(SIGNING_PRIVATE_KEY, "")
+        }
+    }
 }
