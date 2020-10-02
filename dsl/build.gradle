@@ -97,9 +97,9 @@ if (gradle.ext.isCiServer) {
     apply plugin: "com.vanniktech.maven.publish"
 
     signing {
-        if (hasProperty('SIGNING_PRIVATE_KEY')) {
-            logger.warn("SIGNING_PRIVATE_KEY found")
-            useInMemoryPgpKeys(SIGNING_PRIVATE_KEY, "")
+        if (project.hasProperty('SIGNING_PRIVATE_KEY')) {
+            logger.warn("SIGNING_PRIVATE_KEY found ")
+            useInMemoryPgpKeys(project.findProperty('SIGNING_PRIVATE_KEY'), project.findProperty("PGP_PASSWORD")
         }
     }
     
