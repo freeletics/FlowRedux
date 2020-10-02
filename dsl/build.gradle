@@ -98,7 +98,9 @@ if (gradle.ext.isCiServer) {
 
     signing {
         if (hasProperty('SIGNING_PRIVATE_KEY')) {
+            logger.warn("SIGNING_PRIVATE_KEY found")
             useInMemoryPgpKeys(SIGNING_PRIVATE_KEY, "")
         }
     }
+    
 }
