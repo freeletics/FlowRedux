@@ -31,7 +31,7 @@ class InStateBuilderBlock<S : Any, A : Any>(
 
     fun <T> collectWhileInState(
         flow: Flow<T>,
-        flatMapPolicy: FlatMapPolicy = FlatMapPolicy.CONCAT,
+        flatMapPolicy: FlatMapPolicy = FlatMapPolicy.LATEST,
         block: InStateObserverBlock<T, S>
     ) {
         _inStateSideEffectBuilders.add(
