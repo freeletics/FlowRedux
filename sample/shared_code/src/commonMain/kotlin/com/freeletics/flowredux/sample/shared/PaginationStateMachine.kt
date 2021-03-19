@@ -3,7 +3,6 @@ package com.freeletics.flowredux.sample.shared
 import com.freeletics.flowredux.FlowReduxLogger
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
-import com.freeletics.flowredux.dsl.SetState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -51,9 +50,9 @@ sealed class ContainsContentPaginationState : PaginationState() {
  * State that represents displaying a list of  [GithubRepository] items
  */
 data class ShowContentPaginationState(
-        override val items: List<GithubRepository>,
-        internal override val currentPage: Int,
-        internal override val canLoadNextPage: Boolean
+    override val items: List<GithubRepository>,
+    internal override val currentPage: Int,
+    internal override val canLoadNextPage: Boolean
 ) : ContainsContentPaginationState()
 
 /**
@@ -61,23 +60,23 @@ data class ShowContentPaginationState(
  * while still displaying the current items
  */
 data class ShowContentAndLoadingNextPagePaginationState(
-        override val items: List<GithubRepository>,
-        internal override val currentPage: Int,
-        internal override val canLoadNextPage: Boolean
+    override val items: List<GithubRepository>,
+    internal override val currentPage: Int,
+    internal override val canLoadNextPage: Boolean
 ) : ContainsContentPaginationState()
 
 /**
  * Shows an Error while loading next page while still showing content
  */
 data class ShowContentAndLoadingNextPageErrorPaginationState(
-        override val items: List<GithubRepository>,
-        internal override val currentPage: Int,
-        internal override val canLoadNextPage: Boolean
+    override val items: List<GithubRepository>,
+    internal override val currentPage: Int,
+    internal override val canLoadNextPage: Boolean
 ) : ContainsContentPaginationState()
 
 internal class InternalPaginationStateMachine(
-        logger: FlowReduxLogger,
-        private val githubApi: GithubApi
+    logger: FlowReduxLogger,
+    private val githubApi: GithubApi
 ) : FlowReduxStateMachine<PaginationState, Action>(logger, LoadFirstPagePaginationState) {
     init {
         spec {
@@ -87,8 +86,8 @@ internal class InternalPaginationStateMachine(
             }
 
             inState<LoadingFirstPageError> {
-                on<RetryLoadingFirstPage> { _, _, setState ->
-                    setState { LoadFirstPagePaginationState }
+                on<RetryLoadingFirstPage> { _, _ ->
+                    { LoadFirstPagePaginationState }
                 }
             }
 
@@ -107,20 +106,19 @@ internal class InternalPaginationStateMachine(
     }
 
     private suspend fun moveToLoadNextPageStateIfCanLoadNextPage(
-            action: LoadNextPage,
-            getState: GetState<PaginationState>,
-            setState: SetState<PaginationState>
-    ) {
-        setState { state ->
+        action: LoadNextPage,
+        getState: GetState<PaginationState>
+    ): (PaginationState) -> PaginationState {
+        return { state ->
             when (state) {
                 is ShowContentPaginationState -> {
                     if (!state.canLoadNextPage)
                         state
                     else
                         ShowContentAndLoadingNextPagePaginationState(
-                                items = state.items,
-                                currentPage = state.currentPage + 1, // load next page
-                                canLoadNextPage = true
+                            items = state.items,
+                            currentPage = state.currentPage + 1, // load next page
+                            canLoadNextPage = true
                         )
                 }
                 else -> state
@@ -132,24 +130,22 @@ internal class InternalPaginationStateMachine(
      * Loads the first page
      */
     private suspend fun loadFirstPage(
-            getState: GetState<PaginationState>,
-            setState: SetState<PaginationState>
-    ) {
+        getState: GetState<PaginationState>
+    ): (PaginationState) -> PaginationState {
         val nextState = try {
-            val pageResult: PageResult = githubApi.loadPage(page = 0)
-            when (pageResult) {
+            when (val pageResult: PageResult = githubApi.loadPage(page = 0)) {
                 PageResult.NoNextPage -> {
                     ShowContentPaginationState(
-                            items = emptyList(),
-                            canLoadNextPage = false,
-                            currentPage = 1
+                        items = emptyList(),
+                        canLoadNextPage = false,
+                        currentPage = 1
                     )
                 }
                 is PageResult.Page -> {
                     ShowContentPaginationState(
-                            items = pageResult.items,
-                            canLoadNextPage = true,
-                            currentPage = pageResult.page
+                        items = pageResult.items,
+                        canLoadNextPage = true,
+                        currentPage = pageResult.page
                     )
                 }
             }
@@ -157,7 +153,7 @@ internal class InternalPaginationStateMachine(
             LoadingFirstPageError(t)
         }
 
-        setState { nextState }
+        return { nextState }
     }
 
     /**
@@ -165,53 +161,51 @@ internal class InternalPaginationStateMachine(
      * [ShowContentAndLoadingNextPageErrorPaginationState]
      */
     private suspend fun loadNextPage(
-            getState: GetState<PaginationState>,
-            setState: SetState<PaginationState>
-    ) {
+        getState: GetState<PaginationState>
+    ): (PaginationState) -> PaginationState {
         val state = getState()
         if (state !is ShowContentAndLoadingNextPagePaginationState)
-            return // TODO should this throw an exception instead?
+            return { state }
 
         val nextState = try {
             when (val pageResult = githubApi.loadPage(page = state.currentPage)) {
                 PageResult.NoNextPage -> {
                     ShowContentPaginationState(
-                            items = state.items,
-                            canLoadNextPage = false,
-                            currentPage = state.currentPage
+                        items = state.items,
+                        canLoadNextPage = false,
+                        currentPage = state.currentPage
                     )
                 }
                 is PageResult.Page -> {
                     ShowContentPaginationState(
-                            items = state.items + pageResult.items,
-                            canLoadNextPage = true,
-                            currentPage = state.currentPage
+                        items = state.items + pageResult.items,
+                        canLoadNextPage = true,
+                        currentPage = state.currentPage
                     )
                 }
             }
         } catch (t: Throwable) {
             t.printStackTrace()
             ShowContentAndLoadingNextPageErrorPaginationState(
-                    items = state.items,
-                    canLoadNextPage = state.canLoadNextPage,
-                    currentPage = max(0, state.currentPage - 1)
+                items = state.items,
+                canLoadNextPage = state.canLoadNextPage,
+                currentPage = max(0, state.currentPage - 1)
             )
         }
 
-        setState { nextState }
+        return { nextState }
     }
 
     private suspend fun moveToContentStateAfter3Seconds(
-            getState: GetState<PaginationState>,
-            setState: SetState<PaginationState>
-    ) {
+        getState: GetState<PaginationState>
+    ) : (PaginationState) -> PaginationState {
         delay(3000)
-        setState {
+        return {
             if (it is ShowContentAndLoadingNextPageErrorPaginationState)
                 ShowContentPaginationState(
-                        items = it.items,
-                        currentPage = it.currentPage,
-                        canLoadNextPage = it.canLoadNextPage
+                    items = it.items,
+                    currentPage = it.currentPage,
+                    canLoadNextPage = it.canLoadNextPage
                 )
             else it
         }
@@ -219,13 +213,13 @@ internal class InternalPaginationStateMachine(
 }
 
 class PaginationStateMachine(
-        logger: FlowReduxLogger,
-        githubApi: GithubApi,
-        private val scope: CoroutineScope
+    logger: FlowReduxLogger,
+    githubApi: GithubApi,
+    private val scope: CoroutineScope
 ) {
     private val stateMachine = InternalPaginationStateMachine(
-            logger = logger,
-            githubApi = githubApi
+        logger = logger,
+        githubApi = githubApi
     )
 
     fun dispatch(action: Action) {

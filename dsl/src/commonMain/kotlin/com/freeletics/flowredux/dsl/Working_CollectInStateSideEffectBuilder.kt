@@ -77,19 +77,16 @@ internal class Working_CollectInStateBuilder<T, S : Any, A : Any>(
         value: T,
         getState: GetState<S>
     ): Flow<Action<S, A>> = flow {
-        val setState = SetStateImpl<S>(
-            defaultRunIf = { state -> isInState(state) },
-            invokeCallback = { runOnlyIf, reduce ->
-                emit(
-                    SetStateAction<S, A>(
-                        loggingInfo = "collectWhileInState<>", // TODO better logging
-                        reduce = reduce,
-                        runReduceOnlyIf = runOnlyIf
-                    )
-                )
-            }
+
+        val reduce = block(value, getState)
+
+        emit(
+            SetStateAction<S, A>(
+                loggingInfo = "collectWhileInState<>", // TODO better logging
+                reduce = reduce,
+                runReduceOnlyIf = { state -> isInState(state) }
+            )
         )
-        block(value, getState, setState)
     }
 
     /**
@@ -100,7 +97,7 @@ internal class Working_CollectInStateBuilder<T, S : Any, A : Any>(
     private class FilterState<S : Any, A : Any>(
         actions: Flow<Action<S, A>>,
         getState: GetState<S>,
-        private val isInState : (S) -> Boolean
+        private val isInState: (S) -> Boolean
     ) {
 
         private enum class InternalStateChangedSubscription {
@@ -140,9 +137,9 @@ internal class Working_CollectInStateBuilder<T, S : Any, A : Any>(
                         !isInExpectedState && !previousStateInExpectedState -> InternalStateChangedSubscription.DO_NOTHING
                         else -> throw IllegalStateException(
                             "An internal error occurred: " +
-                                "isInExpectedState: $isInExpectedState" +
-                                "and previousStateInExpectedState: $previousStateInExpectedState " +
-                                "is not possible. Please file an issue on Github."
+                                    "isInExpectedState: $isInExpectedState" +
+                                    "and previousStateInExpectedState: $previousStateInExpectedState " +
+                                    "is not possible. Please file an issue on Github."
                         )
 
                     }
@@ -167,7 +164,7 @@ internal class Working_CollectInStateBuilder<T, S : Any, A : Any>(
 
     private fun Flow<Action<S, A>>.filterState(
         getState: GetState<S>,
-        isInState : (S) -> Boolean
+        isInState: (S) -> Boolean
     ): Flow<FilterState.StateChanged> = FilterState<S, A>(
         actions = this,
         isInState = isInState,

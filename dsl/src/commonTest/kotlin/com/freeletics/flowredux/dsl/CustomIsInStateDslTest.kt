@@ -26,22 +26,22 @@ class CustomIsInStateDslTest {
 
             val sm = StateMachine {
                 inState<TestState.Initial> {
-                    on<TestAction.A1> { _, _, setState ->
-                        setState { gs1 }
+                    on<TestAction.A1> { _, _ ->
+                        { gs1 }
                     }
                 }
                 inState(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
-                    on<TestAction.A1> { _, _, setState ->
+                    on<TestAction.A1> { _, _ ->
                         counter1++
-                        setState { gs2 }
+                        { gs2 }
                     }
                 }
 
                 inState(isInState = { it is TestState.GenericState && it.anInt == 2 }) {
-                    on<TestAction.A1> { _, _, setState ->
+                    on<TestAction.A1> { _, _ ->
                         delay(20) // wait for some time to see if not other state above triggers
                         counter2++
-                        setState { TestState.S1 }
+                        { TestState.S1 }
                     }
                 }
             }
@@ -76,8 +76,8 @@ class CustomIsInStateDslTest {
 
             val sm = StateMachine {
                 inState<TestState.Initial> {
-                    on<TestAction.A1> { _, _, setState ->
-                        setState { gs1 }
+                    on<TestAction.A1> { _, _ ->
+                        { gs1 }
                     }
                 }
                 inState(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
@@ -87,15 +87,15 @@ class CustomIsInStateDslTest {
                         reached = true
                         fail("This should never be reached")
                         emit(9999)
-                    }) { value, _, setState ->
-                        setState { TestState.GenericState(value.toString(), value) }
+                    }) { value, _ ->
+                        { TestState.GenericState(value.toString(), value) }
                     }
                 }
 
                 inState(isInState = { it is TestState.GenericState && it.anInt == 2 }) {
-                    onEnter { _, setState ->
+                    onEnter {
                         delay(50) // Wait until collectWhileInState succeeded
-                        setState { TestState.S1 }
+                        return@onEnter { TestState.S1 }
                     }
                 }
             }

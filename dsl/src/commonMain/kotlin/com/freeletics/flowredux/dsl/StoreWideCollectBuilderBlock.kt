@@ -22,7 +22,7 @@ internal class StoreWideCollectBuilderBlock<T, S, A>(
     override fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {
 
         val sideEffect: SideEffect<S, Action<S, A>> = { actions: Flow<Action<S, A>>,
-            getState: GetState<S> ->
+                                                        getState: GetState<S> ->
 
             flow.flatMapWithPolicy(flatMapPolicy) {
                 setStateFlow(value = it, getState = getState)
@@ -37,20 +37,15 @@ internal class StoreWideCollectBuilderBlock<T, S, A>(
         getState: GetState<S>
     ): Flow<Action<S, A>> = flow {
 
-        val setState = SetStateImpl<S>(
-            defaultRunIf = { true },
-            invokeCallback = { runIf, reduce ->
-                emit(
-                    SetStateAction<S, A>(
-                        loggingInfo = "observe<Flow>",
-                        reduce = reduce,
-                        runReduceOnlyIf = runIf
-                    )
-                )
-            }
+        val reduce = block(value, getState)
+        emit(
+            SetStateAction<S, A>(
+                loggingInfo = "observe<Flow>",
+                reduce = reduce,
+                runReduceOnlyIf = { true }
+            )
         )
-        block(value, getState, setState)
     }
 }
 
-typealias StoreWideCollectorBlock<T, S> = suspend (value: T, getState: GetState<S>, setState: SetState<S>) -> Unit
+typealias StoreWideCollectorBlock<T, S> = suspend (value: T, getState: GetState<S>) -> ReduceFunc<S>

@@ -41,20 +41,15 @@ internal class CollectInStateSideEffectBuilder<T, S : Any, A : Any>(
         getState: GetState<S>
     ): Flow<Action<S, A>> =
         flow {
-            val setState = SetStateImpl<S>(
-                defaultRunIf = { state -> isInState(state) },
-                invokeCallback = { runIf, reduce ->
-                    emit(
-                        SetStateAction<S, A>(
-                            loggingInfo = "collectWhileInState<>", // TODO logging
-                            reduce = reduce,
-                            runReduceOnlyIf = runIf
-                        )
-                    )
-                }
+            val reduce = block(value, getState)
+            emit(
+                SetStateAction<S, A>(
+                    loggingInfo = "collectWhileInState<>", // TODO logging
+                    reduce = reduce,
+                    runReduceOnlyIf = { state -> isInState(state) }
+                )
             )
-            block(value, getState, setState)
         }
 }
 
-typealias InStateObserverBlock<T, S> = suspend (value: T, getState: GetState<S>, setState: SetState<S>) -> Unit
+typealias InStateObserverBlock<T, S> = suspend (value: T, getState: GetState<S>) -> ReduceFunc<S>

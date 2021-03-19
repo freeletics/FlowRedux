@@ -32,21 +32,17 @@ class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
         getState: GetState<S>
     ): Flow<Action<S, A>> = flow {
 
-        val setState = SetStateImpl<S>(
-            defaultRunIf = { state -> isInState(state) },
-            invokeCallback = { runIf, reduce ->
-                emit(
-                    SetStateAction<S, A>(
-                        loggingInfo = "onEnter<>", // TODO logging
-                        reduce = reduce,
-                        runReduceOnlyIf = runIf
-                    )
-                )
-            }
+        val reduce = block(getState)
+        emit(
+            SetStateAction<S, A>(
+                loggingInfo = "onEnter<>", // TODO logging
+                reduce = reduce,
+                runReduceOnlyIf = { state -> isInState(state) }
+            )
         )
-        block(getState, setState)
+
     }
 }
 
-typealias InStateOnEnterBlock<S> = suspend (getState: GetState<S>, setState: SetState<S>) -> Unit
+typealias InStateOnEnterBlock<S> = suspend (getState: GetState<S>) -> ReduceFunc<S>
 

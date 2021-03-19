@@ -2,6 +2,7 @@ package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
+import com.freeletics.flowredux.Reducer
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -42,8 +43,8 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any>(
         this
             .filter { action ->
                 val conditionHolds = isInState(getState()) &&
-                    action is ExternalWrappedAction &&
-                    subActionClass.isInstance(action.action)
+                        action is ExternalWrappedAction &&
+                        subActionClass.isInstance(action.action)
                 conditionHolds
             }.map {
                 when (it) {
@@ -58,25 +59,19 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any>(
         getState: GetState<S>
     ): Flow<Action<S, A>> =
         flow {
-            val setState = SetStateImpl<S>(
-                defaultRunIf = { state -> isInState(state) },
-                invokeCallback = { runIf, reduce ->
-                    emit(
-                        SetStateAction<S, A>(
-                            loggingInfo = "Caused by on<$action>",
-                            reduce = reduce,
-                            runReduceOnlyIf = runIf
-                        )
-                    )
-                }
+            val reduce = onActionBlock.invoke(
+                action,
+                getState
             )
 
-            onActionBlock.invoke(
-                action,
-                getState,
-                setState
+            emit(
+                SetStateAction<S, A>(
+                    loggingInfo = "Caused by on<$action>",
+                    reduce = reduce,
+                    runReduceOnlyIf = { state -> isInState(state) }
+                )
             )
         }
 }
 
-typealias OnActionBlock<S, A> = suspend (action: A, getState: GetState<S>, setState: SetState<S>) -> Unit
+typealias OnActionBlock<S, A> = suspend (action: A, getState: GetState<S>) -> ReduceFunc<S>

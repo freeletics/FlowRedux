@@ -2,10 +2,12 @@ package com.freeletics.flowredux.dsl
 
 internal sealed class Action<S, A>
 
+internal typealias ReduceFunc<S> = (S) -> S
+
 internal data class SetStateAction<S, A>(
     private val loggingInfo: String,
     internal val runReduceOnlyIf: (S) -> Boolean,
-    val reduce: (S) -> S
+    val reduce: ReduceFunc<S>
 ) : Action<S, A>() {
     override fun toString(): String {
         return "SetStateAction $loggingInfo"
