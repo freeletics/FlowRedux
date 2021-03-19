@@ -27,13 +27,13 @@ class CustomIsInStateDslTest {
             val sm = StateMachine {
                 inState<TestState.Initial> {
                     on<TestAction.A1> { _, _ ->
-                        { gs1 }
+                        SetState(gs1)
                     }
                 }
                 inState(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
                     on<TestAction.A1> { _, _ ->
                         counter1++
-                        { gs2 }
+                        SetState(gs2)
                     }
                 }
 
@@ -41,7 +41,7 @@ class CustomIsInStateDslTest {
                     on<TestAction.A1> { _, _ ->
                         delay(20) // wait for some time to see if not other state above triggers
                         counter2++
-                        { TestState.S1 }
+                        SetState(TestState.S1)
                     }
                 }
             }
@@ -77,7 +77,7 @@ class CustomIsInStateDslTest {
             val sm = StateMachine {
                 inState<TestState.Initial> {
                     on<TestAction.A1> { _, _ ->
-                        { gs1 }
+                        SetState(gs1)
                     }
                 }
                 inState(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
@@ -88,14 +88,14 @@ class CustomIsInStateDslTest {
                         fail("This should never be reached")
                         emit(9999)
                     }) { value, _ ->
-                        { TestState.GenericState(value.toString(), value) }
+                        SetState(TestState.GenericState(value.toString(), value))
                     }
                 }
 
                 inState(isInState = { it is TestState.GenericState && it.anInt == 2 }) {
                     onEnter {
                         delay(50) // Wait until collectWhileInState succeeded
-                        return@onEnter { TestState.S1 }
+                        return@onEnter SetState(TestState.S1)
                     }
                 }
             }

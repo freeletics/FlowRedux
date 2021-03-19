@@ -2,12 +2,39 @@ package com.freeletics.flowredux.dsl
 
 internal sealed class Action<S, A>
 
-internal typealias ReduceFunc<S> = (S) -> S
+/**
+ *
+ */
+sealed class ChangeState<out S>
 
-internal data class SetStateAction<S, A>(
+/**
+ * Sets a new state by directly override any previous state
+ */
+data class SetState<S>(val newState: S) : ChangeState<S>() // TODO make val internal
+
+/**
+ * If you want to change the state by copying the old state
+ */
+class CopyStateWith<S>(val reducer: S.() -> S) : ChangeState<S>() // TODO make val internal
+
+/**
+ * No change, this is semantially equivalent to use [SetState] and pass in the previous state
+ */
+object NoStateChange : ChangeState<Nothing>()
+
+fun <S> ChangeState<S>.reduce(state: S): S {
+    return when (val change = this) {
+        is SetState -> change.newState
+        is NoStateChange -> state // TODO throw exception instead?
+        is CopyStateWith -> change.reducer(state)
+    }
+}
+
+
+internal data class ChangeStateAction<S, A>(
     private val loggingInfo: String,
     internal val runReduceOnlyIf: (S) -> Boolean,
-    val reduce: ReduceFunc<S>
+    internal val changeState: ChangeState<S>
 ) : Action<S, A>() {
     override fun toString(): String {
         return "SetStateAction $loggingInfo"
@@ -32,9 +59,9 @@ internal class InitialStateAction<S, A> : Action<S, A>() {
 
 internal fun <S : Any, A> reducer(state: S, action: Action<S, A>): S =
     when (action) {
-        is SetStateAction<S, A> ->
+        is ChangeStateAction<S, A> ->
             if (action.runReduceOnlyIf.invoke(state))
-                action.reduce.invoke(state)
+                action.changeState.reduce(state)
             else state
         is ExternalWrappedAction<S, A> -> state
         is InitialStateAction<S, A> -> state

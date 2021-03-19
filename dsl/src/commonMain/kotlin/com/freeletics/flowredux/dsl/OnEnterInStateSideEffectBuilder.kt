@@ -32,11 +32,11 @@ class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
         getState: GetState<S>
     ): Flow<Action<S, A>> = flow {
 
-        val reduce = block(getState)
+        val changeState = block(getState)
         emit(
-            SetStateAction<S, A>(
+            ChangeStateAction<S, A>(
                 loggingInfo = "onEnter<>", // TODO logging
-                reduce = reduce,
+                changeState = changeState,
                 runReduceOnlyIf = { state -> isInState(state) }
             )
         )
@@ -44,5 +44,5 @@ class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
     }
 }
 
-typealias InStateOnEnterBlock<S> = suspend (getState: GetState<S>) -> ReduceFunc<S>
+typealias InStateOnEnterBlock<S> = suspend (getState: GetState<S>) -> ChangeState<S>
 

@@ -2,7 +2,6 @@ package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
-import com.freeletics.flowredux.Reducer
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -49,7 +48,7 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any>(
             }.map {
                 when (it) {
                     is ExternalWrappedAction<*, *> -> it.action as A
-                    is SetStateAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
+                    is ChangeStateAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
                     is InitialStateAction -> throw IllegalArgumentException("Internal bug. Please file an issue on Github")
                 }
             }
@@ -59,19 +58,19 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any>(
         getState: GetState<S>
     ): Flow<Action<S, A>> =
         flow {
-            val reduce = onActionBlock.invoke(
+            val changeState = onActionBlock.invoke(
                 action,
                 getState
             )
 
             emit(
-                SetStateAction<S, A>(
+                ChangeStateAction<S, A>(
                     loggingInfo = "Caused by on<$action>",
-                    reduce = reduce,
+                    changeState = changeState,
                     runReduceOnlyIf = { state -> isInState(state) }
                 )
             )
         }
 }
 
-typealias OnActionBlock<S, A> = suspend (action: A, getState: GetState<S>) -> ReduceFunc<S>
+typealias OnActionBlock<S, A> = suspend (action: A, getState: GetState<S>) -> ChangeState<S>

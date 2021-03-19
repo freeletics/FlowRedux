@@ -81,9 +81,9 @@ internal class Working_CollectInStateBuilder<T, S : Any, A : Any>(
         val reduce = block(value, getState)
 
         emit(
-            SetStateAction<S, A>(
+            ChangeStateAction<S, A>(
                 loggingInfo = "collectWhileInState<>", // TODO better logging
-                reduce = reduce,
+                changeState = reduce,
                 runReduceOnlyIf = { state -> isInState(state) }
             )
         )

@@ -43,13 +43,13 @@ internal class CollectInStateSideEffectBuilder<T, S : Any, A : Any>(
         flow {
             val reduce = block(value, getState)
             emit(
-                SetStateAction<S, A>(
+                ChangeStateAction<S, A>(
                     loggingInfo = "collectWhileInState<>", // TODO logging
-                    reduce = reduce,
+                    changeState = reduce,
                     runReduceOnlyIf = { state -> isInState(state) }
                 )
             )
         }
 }
 
-typealias InStateObserverBlock<T, S> = suspend (value: T, getState: GetState<S>) -> ReduceFunc<S>
+typealias InStateObserverBlock<T, S> = suspend (value: T, getState: GetState<S>) -> ChangeState<S>

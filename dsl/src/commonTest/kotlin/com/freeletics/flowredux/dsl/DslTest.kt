@@ -33,13 +33,13 @@ class DslTest {
             val sm = StateMachine {
                 inState<TestState.Initial> {
                     on<TestAction.A1> { _, _ ->
-                        { TestState.S1 }
+                        SetState(TestState.S1)
                     }
                 }
 
                 inState<TestState.S1> {
                     on<TestAction.A2> { _, _ ->
-                        { TestState.S2 }
+                        SetState(TestState.S2)
                     }
 
                 }
@@ -73,7 +73,7 @@ class DslTest {
                         emit(3)
                     }) { v, _ ->
                         recordedValues.add(v)
-                        return@collectWhileInState { TestState.S1 }
+                        return@collectWhileInState SetState(TestState.S1)
                     }
                 }
             }
@@ -94,19 +94,19 @@ class DslTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 collectWhileInState(flowOf(1)) { _, _ ->
-                    { TestState.S1 }
+                    SetState(TestState.S1)
                 }
             }
 
             inState<TestState.S1> {
                 on<TestAction.A1> { _, _ ->
-                    { TestState.S2 }
+                    SetState(TestState.S2)
                 }
             }
 
             inState<TestState.S2> {
                 on<TestAction.A2> { _, _ ->
-                    { TestState.S1 }
+                    SetState(TestState.S1)
                 }
             }
         }
@@ -139,16 +139,16 @@ class DslTest {
             val sm = StateMachine {
                 inState<TestState.Initial> {
                     onEnter { _ ->
-                        { TestState.S1 }
+                        SetState(TestState.S1)
                     }
                 }
 
                 inState<TestState.S1> {
                     onEnter { _ ->
                         s1Entered++
-                        { it }
+                        CopyStateWith { this }
                     }
-                    on<TestAction.A1> { _, _ -> { TestState.S1 } }
+                    on<TestAction.A1> { _, _ -> SetState(TestState.S1) }
                 }
             }
 

@@ -37,15 +37,15 @@ internal class StoreWideCollectBuilderBlock<T, S, A>(
         getState: GetState<S>
     ): Flow<Action<S, A>> = flow {
 
-        val reduce = block(value, getState)
+        val changeState = block(value, getState)
         emit(
-            SetStateAction<S, A>(
+            ChangeStateAction<S, A>(
                 loggingInfo = "observe<Flow>",
-                reduce = reduce,
+                changeState = changeState,
                 runReduceOnlyIf = { true }
             )
         )
     }
 }
 
-typealias StoreWideCollectorBlock<T, S> = suspend (value: T, getState: GetState<S>) -> ReduceFunc<S>
+typealias StoreWideCollectorBlock<T, S> = suspend (value: T, getState: GetState<S>) -> ChangeState<S>
