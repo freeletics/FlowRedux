@@ -195,15 +195,12 @@ internal class InternalPaginationStateMachine(
         s: ShowContentAndLoadingNextPageErrorPaginationState
     ): ChangeState<PaginationState> {
         delay(3000)
-        return MutateState {
-            val state = this
-            if (state is ShowContentAndLoadingNextPageErrorPaginationState)
-                ShowContentPaginationState(
-                    items = state.items,
-                    currentPage = state.currentPage,
-                    canLoadNextPage = state.canLoadNextPage
-                )
-            else state
+        return MutateState<ShowContentAndLoadingNextPageErrorPaginationState, PaginationState> {
+            ShowContentPaginationState(
+                items = items,
+                currentPage = currentPage,
+                canLoadNextPage = canLoadNextPage
+            )
         }
     }
 }

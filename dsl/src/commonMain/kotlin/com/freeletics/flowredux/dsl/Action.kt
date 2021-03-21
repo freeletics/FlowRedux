@@ -33,7 +33,7 @@ internal class InitialStateAction<S, A> : Action<S, A>() {
 internal fun <S : Any, A> reducer(state: S, action: Action<S, A>): S =
     when (action) {
         is ChangeStateAction<S, A> ->
-            if (action.runReduceOnlyIf.invoke(state))
+            if (action.runReduceOnlyIf(state))
                 action.changeState.reduce(state)
             else state
         is ExternalWrappedAction<S, A> -> state

@@ -23,7 +23,12 @@ data class SetState<S>(internal val newState: S) : ChangeState<S>()
  * Use this function if you want to "mutate" the current state by copying the old state and modify some properties in
  * the copy of the new state. A common use case is to call .copy() on your state defined as data class.
  */
-class MutateState<S>(internal val reducer: S.() -> S) : ChangeState<S>()
+class MutateState<InputState : S, S>(internal val reducer: InputState.() -> S) : ChangeState<S>(){
+    @Suppress("UNCHECKED_CAST")
+    internal fun reduceImpl(state : S) : S =
+        reducer(state as InputState)
+}
+
 
 /**
  * No change, this is semantially equivalent to use [SetState] and pass in the previous state
@@ -34,6 +39,6 @@ fun <S> ChangeState<S>.reduce(state: S): S {
     return when (val change = this) {
         is SetState -> change.newState
         is NoStateChange -> state // TODO throw exception instead?
-        is MutateState -> change.reducer(state)
+        is MutateState<*, S> -> change.reduceImpl(state)
     }
 }
