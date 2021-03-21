@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlin.reflect.KClass
 
 /**
  * Provides a fluent DSL to specify a ReduxStore
@@ -45,20 +46,21 @@ fun <S : Any, A : Any> Flow<A>.reduxStore(
 class FlowReduxStoreBuilder<S : Any, A : Any> {
 
     // TODO is there a better workaround to hide implementation details like this while keep inline fun()
-    val builderBlocks = ArrayList<StoreWideBuilderBlock<S, A>>()
+    val builderBlocks: MutableList<StoreWideBuilderBlock<S, A>> = ArrayList<StoreWideBuilderBlock<S, A>>()
 
     /**
      * Define what happens if the store is in a certain state.
      */
     inline fun <reified SubState : S> inState(
-        noinline block: InStateBuilderBlock<S, A>.() -> Unit
+        noinline block: InStateBuilderBlock<SubState, S, A>.() -> Unit
     ) {
-        inState(
-            isInState = { state ->
-                SubState::class.isInstance(state)
-            },
-            block = block
-        )
+
+        // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
+        val builder = InStateBuilderBlock<SubState, S, A>(_isInState = { state ->
+            SubState::class.isInstance(state)
+        })
+        block(builder)
+        builderBlocks.add(builder as StoreWideBuilderBlock<S, A>)
     }
 
     /**
@@ -66,10 +68,10 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
      */
     fun inState(
         isInState: (S) -> Boolean,
-        block: InStateBuilderBlock<S, A>.() -> Unit
+        block: InStateBuilderBlock<S, S, A>.() -> Unit
     ) {
         // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
-        val builder = InStateBuilderBlock<S, A>(_isInState = isInState)
+        val builder = InStateBuilderBlock<S, S, A>(_isInState = isInState)
         block(builder)
         builderBlocks.add(builder)
     }
@@ -97,4 +99,21 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
         builderBlocks.flatMap { builder ->
             builder.generateSideEffects()
         }
+}
+
+
+internal sealed class IsInState<S> {
+    internal abstract fun isInState(state: S): Boolean
+
+    internal class InferredFromGenericsFromDSL<Substate : S, S : Any>(
+        internal val substateType: KClass<Substate>
+    ) : IsInState<S>() {
+        override fun isInState(state: S): Boolean =
+            substateType.isInstance(state)
+
+    }
+
+    internal class Custom<S>(internal val condition: (S) -> Boolean) : IsInState<S>() {
+        override fun isInState(state: S): Boolean = condition(state)
+    }
 }

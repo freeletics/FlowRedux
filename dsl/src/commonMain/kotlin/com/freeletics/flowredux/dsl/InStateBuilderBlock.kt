@@ -4,7 +4,7 @@ import com.freeletics.flowredux.SideEffect
 import kotlinx.coroutines.flow.Flow
 
 // TODO @DslMarker
-class InStateBuilderBlock<S : Any, A : Any>(
+class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     /**
      * For private usage only
      */
