@@ -11,11 +11,11 @@ import kotlinx.coroutines.flow.flow
  * A builder that generates a [SideEffect] that triggers every time the state machine enters
  * a certain state.
  */
-class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
+class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     private val flatMapPolicy: FlatMapPolicy,
-    private val block: InStateOnEnterBlock<S>
-) : InStateSideEffectBuilder<S, A>() {
+    private val block: InStateOnEnterBlock<InputState, S>
+) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
@@ -32,17 +32,18 @@ class OnEnterInStateSideEffectBuilder<S : Any, A : Any>(
         getState: GetState<S>
     ): Flow<Action<S, A>> = flow {
 
-        val changeState = block(getState)
-        emit(
-            ChangeStateAction<S, A>(
-                loggingInfo = "onEnter<>", // TODO logging
-                changeState = changeState,
-                runReduceOnlyIf = { state -> isInState(state) }
+        runOnlyIfInInputState(getState, isInState) { inputState ->
+            val changeState = block(inputState)
+            emit(
+                ChangeStateAction<S, A>(
+                    loggingInfo = "onEnter<>", // TODO logging
+                    changeState = changeState,
+                    runReduceOnlyIf = { state -> isInState(state) }
+                )
             )
-        )
-
+        }
     }
 }
 
-typealias InStateOnEnterBlock<S> = suspend (getState: GetState<S>) -> ChangeState<S>
+typealias InStateOnEnterBlock<InputState, S> = suspend (state: InputState) -> ChangeState<S>
 

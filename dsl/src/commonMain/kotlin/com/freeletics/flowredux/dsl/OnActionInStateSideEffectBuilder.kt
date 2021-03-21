@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
@@ -9,12 +11,12 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlin.reflect.KClass
 
-class OnActionInStateSideEffectBuilder<S : Any, A : Any>(
+class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     internal val subActionClass: KClass<out A>,
     internal val flatMapPolicy: FlatMapPolicy,
-    internal val onActionBlock: OnActionBlock<S, A>
-) : InStateSideEffectBuilder<S, A>() {
+    internal val onActionBlock: OnActionBlock<InputState, S, A>
+) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
@@ -58,19 +60,27 @@ class OnActionInStateSideEffectBuilder<S : Any, A : Any>(
         getState: GetState<S>
     ): Flow<Action<S, A>> =
         flow {
-            val changeState = onActionBlock.invoke(
-                action,
-                getState
-            )
 
-            emit(
-                ChangeStateAction<S, A>(
-                    loggingInfo = "Caused by on<$action>",
-                    changeState = changeState,
-                    runReduceOnlyIf = { state -> isInState(state) }
+            runOnlyIfInInputState(getState, isInState) { inputState ->
+                val changeState = onActionBlock.invoke(
+                    action,
+                    inputState
                 )
-            )
+
+                emit(
+                    ChangeStateAction<S, A>(
+                        loggingInfo = "Caused by on<$action>",
+                        changeState = changeState,
+                        runReduceOnlyIf = { state -> isInState(state) }
+                    )
+                )
+
+            }
+
         }
+
 }
 
-typealias OnActionBlock<S, A> = suspend (action: A, getState: GetState<S>) -> ChangeState<S>
+
+typealias OnActionBlock<InputState, S, A> = suspend (action: A, state: InputState) -> ChangeState<S>
+

@@ -12,12 +12,12 @@ import kotlinx.coroutines.flow.flow
  * the given state. We use is instance of check to check if a new state has been reached and Flow<T>
  * is closed.
  */
-internal class CollectInStateSideEffectBuilder<T, S : Any, A : Any>(
-    private val isInState : (S) -> Boolean,
+internal class CollectInStateSideEffectBuilder<T, InputState : S, S : Any, A : Any>(
+    private val isInState: (S) -> Boolean,
     private val flow: Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
-    private val block: InStateObserverBlock<T, S>
-) : InStateSideEffectBuilder<S, A>() {
+    private val block: InStateObserverBlock<T, InputState, S>
+) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
@@ -41,15 +41,18 @@ internal class CollectInStateSideEffectBuilder<T, S : Any, A : Any>(
         getState: GetState<S>
     ): Flow<Action<S, A>> =
         flow {
-            val reduce = block(value, getState)
-            emit(
-                ChangeStateAction<S, A>(
-                    loggingInfo = "collectWhileInState<>", // TODO logging
-                    changeState = reduce,
-                    runReduceOnlyIf = { state -> isInState(state) }
+
+            runOnlyIfInInputState(getState, isInState) { inputState ->
+                val changeState = block(value, inputState)
+                emit(
+                    ChangeStateAction<S, A>(
+                        loggingInfo = "collectWhileInState<>", // TODO logging
+                        changeState = changeState,
+                        runReduceOnlyIf = { state -> isInState(state) }
+                    )
                 )
-            )
+            }
         }
 }
 
-typealias InStateObserverBlock<T, S> = suspend (value: T, getState: GetState<S>) -> ChangeState<S>
+typealias InStateObserverBlock<T, InputState, S> = suspend (value: T, state: InputState) -> ChangeState<S>

@@ -11,19 +11,19 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     val _isInState: (S) -> Boolean
 ) : StoreWideBuilderBlock<S, A>() {
 
-    val _inStateSideEffectBuilders = ArrayList<InStateSideEffectBuilder<S, A>>()
+    val _inStateSideEffectBuilders = ArrayList<InStateSideEffectBuilder<InputState, S, A>>()
 
     inline fun <reified SubAction : A> on(
         flatMapPolicy: FlatMapPolicy = FlatMapPolicy.LATEST,
-        noinline block: OnActionBlock<S, SubAction>
+        noinline block: OnActionBlock<InputState, S, SubAction>
     ) {
 
         @Suppress("UNCHECKED_CAST")
-        val builder = OnActionInStateSideEffectBuilder<S, A>(
+        val builder = OnActionInStateSideEffectBuilder<InputState, S, A>(
             flatMapPolicy = flatMapPolicy,
             subActionClass = SubAction::class,
             isInState = _isInState,
-            onActionBlock = block as OnActionBlock<S, A>
+            onActionBlock = block as OnActionBlock<InputState, S, A>
         )
 
         _inStateSideEffectBuilders.add(builder)
@@ -32,7 +32,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     fun <T> collectWhileInState(
         flow: Flow<T>,
         flatMapPolicy: FlatMapPolicy = FlatMapPolicy.CONCAT,
-        block: InStateObserverBlock<T, S>
+        block: InStateObserverBlock<T, InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
             Working_CollectInStateBuilder(
@@ -53,7 +53,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      */
     fun onEnter(
         flatMapPolicy: FlatMapPolicy = FlatMapPolicy.LATEST,
-        block: InStateOnEnterBlock<S>
+        block: InStateOnEnterBlock<InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
             OnEnterInStateSideEffectBuilder(

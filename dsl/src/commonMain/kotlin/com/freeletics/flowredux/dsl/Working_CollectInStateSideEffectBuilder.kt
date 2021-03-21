@@ -24,12 +24,12 @@ import kotlinx.coroutines.sync.withLock
  * is closed.
  */
 // TODO make [ObserveInStateSideEffectBuilder] work and remove this class.
-internal class Working_CollectInStateBuilder<T, S : Any, A : Any>(
+internal class Working_CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     private val flow: Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
-    private val block: InStateObserverBlock<T, S>
-) : InStateSideEffectBuilder<S, A>() {
+    private val block: InStateObserverBlock<T, InputState, S>
+) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
@@ -78,15 +78,16 @@ internal class Working_CollectInStateBuilder<T, S : Any, A : Any>(
         getState: GetState<S>
     ): Flow<Action<S, A>> = flow {
 
-        val reduce = block(value, getState)
-
-        emit(
-            ChangeStateAction<S, A>(
-                loggingInfo = "collectWhileInState<>", // TODO better logging
-                changeState = reduce,
-                runReduceOnlyIf = { state -> isInState(state) }
+        runOnlyIfInInputState(getState, isInState) { inputState ->
+            val changeState = block(value, inputState)
+            emit(
+                ChangeStateAction<S, A>(
+                    loggingInfo = "collectWhileInState<>", // TODO better logging
+                    changeState = changeState,
+                    runReduceOnlyIf = { state -> isInState(state) }
+                )
             )
-        )
+        }
     }
 
     /**
