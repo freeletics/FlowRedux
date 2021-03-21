@@ -3,13 +3,11 @@ package com.freeletics.flowredux.dsl
 import app.cash.turbine.test
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 
@@ -146,7 +144,7 @@ class DslTest {
                 inState<TestState.S1> {
                     onEnter { _ ->
                         s1Entered++
-                        CopyStateWith { this }
+                        MutateState { this }
                     }
                     on<TestAction.A1> { _, _ -> SetState(TestState.S1) }
                 }

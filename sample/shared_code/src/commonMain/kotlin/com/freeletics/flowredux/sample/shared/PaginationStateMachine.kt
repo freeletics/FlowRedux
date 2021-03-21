@@ -1,7 +1,6 @@
 package com.freeletics.flowredux.sample.shared
 
 import com.freeletics.flowredux.FlowReduxLogger
-import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -107,9 +106,9 @@ internal class InternalPaginationStateMachine(
 
     private suspend fun moveToLoadNextPageStateIfCanLoadNextPage(
         action: LoadNextPage,
-        getState: GetState<PaginationState>
+        state: ShowContentPaginationState
     ): ChangeState<PaginationState> {
-        return CopyStateWith {
+        return MutateState {
             when (val state = this) {
                 is ShowContentPaginationState -> {
                     if (!state.canLoadNextPage)
@@ -130,7 +129,7 @@ internal class InternalPaginationStateMachine(
      * Loads the first page
      */
     private suspend fun loadFirstPage(
-        getState: GetState<PaginationState>
+        state: LoadFirstPagePaginationState
     ): ChangeState<PaginationState> {
         val nextState = try {
             when (val pageResult: PageResult = githubApi.loadPage(page = 0)) {
@@ -161,12 +160,8 @@ internal class InternalPaginationStateMachine(
      * [ShowContentAndLoadingNextPageErrorPaginationState]
      */
     private suspend fun loadNextPage(
-        getState: GetState<PaginationState>
+        state: ShowContentAndLoadingNextPagePaginationState
     ): ChangeState<PaginationState> {
-        val state = getState()
-        if (state !is ShowContentAndLoadingNextPagePaginationState)
-            return NoStateChange
-
         val nextState = try {
             when (val pageResult = githubApi.loadPage(page = state.currentPage)) {
                 PageResult.NoNextPage -> {
@@ -176,7 +171,7 @@ internal class InternalPaginationStateMachine(
                         currentPage = state.currentPage
                     )
                 }
-                is PageResult.Page -> {
+                is PageResult.Page -> { // TODO should be MutateState
                     ShowContentPaginationState(
                         items = state.items + pageResult.items,
                         canLoadNextPage = true,
@@ -197,10 +192,10 @@ internal class InternalPaginationStateMachine(
     }
 
     private suspend fun moveToContentStateAfter3Seconds(
-        getState: GetState<PaginationState>
+        s: ShowContentAndLoadingNextPageErrorPaginationState
     ): ChangeState<PaginationState> {
         delay(3000)
-        return CopyStateWith {
+        return MutateState {
             val state = this
             if (state is ShowContentAndLoadingNextPageErrorPaginationState)
                 ShowContentPaginationState(
