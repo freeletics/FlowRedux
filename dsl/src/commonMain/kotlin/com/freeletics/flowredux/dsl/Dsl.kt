@@ -122,20 +122,3 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
             builder.generateSideEffects()
         }
 }
-
-
-internal sealed class IsInState<S> {
-    internal abstract fun isInState(state: S): Boolean
-
-    internal class InferredFromGenericsFromDSL<Substate : S, S : Any>(
-        internal val substateType: KClass<Substate>
-    ) : IsInState<S>() {
-        override fun isInState(state: S): Boolean =
-            substateType.isInstance(state)
-
-    }
-
-    internal class Custom<S>(internal val condition: (S) -> Boolean) : IsInState<S>() {
-        override fun isInState(state: S): Boolean = condition(state)
-    }
-}
