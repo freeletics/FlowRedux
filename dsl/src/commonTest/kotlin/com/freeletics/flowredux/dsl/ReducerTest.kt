@@ -15,7 +15,7 @@ class ReducerTest {
         val action =
             ChangeStateAction<TestState, Any>(
                 loggingInfo = "info",
-                changeState = SetState(TestState.B),
+                changeState = OverrideState(TestState.B),
                 runReduceOnlyIf = { true }
             )
 
@@ -33,7 +33,7 @@ class ReducerTest {
         val action =
             ChangeStateAction<TestState, Any>(
                 loggingInfo = "info",
-                changeState = SetState(TestState.B),
+                changeState = OverrideState(TestState.B),
                 runReduceOnlyIf = { false }
             )
 

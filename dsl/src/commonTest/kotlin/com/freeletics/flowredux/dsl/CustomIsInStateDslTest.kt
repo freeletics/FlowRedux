@@ -27,13 +27,13 @@ class CustomIsInStateDslTest {
             val sm = StateMachine {
                 inState<TestState.Initial> {
                     on<TestAction.A1> { _, _ ->
-                        SetState(gs1)
+                        OverrideState(gs1)
                     }
                 }
                 inState(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
                     on<TestAction.A1> { _, _ ->
                         counter1++
-                        SetState(gs2)
+                        OverrideState(gs2)
                     }
                 }
 
@@ -41,7 +41,7 @@ class CustomIsInStateDslTest {
                     on<TestAction.A1> { _, _ ->
                         delay(20) // wait for some time to see if not other state above triggers
                         counter2++
-                        SetState(TestState.S1)
+                        OverrideState(TestState.S1)
                     }
                 }
             }
@@ -77,7 +77,7 @@ class CustomIsInStateDslTest {
             val sm = StateMachine {
                 inState<TestState.Initial> {
                     on<TestAction.A1> { _, _ ->
-                        SetState(gs1)
+                        OverrideState(gs1)
                     }
                 }
                 inState(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
@@ -88,14 +88,14 @@ class CustomIsInStateDslTest {
                         fail("This should never be reached")
                         emit(9999)
                     }) { value, _ ->
-                        SetState(TestState.GenericState(value.toString(), value))
+                        OverrideState(TestState.GenericState(value.toString(), value))
                     }
                 }
 
                 inState(isInState = { it is TestState.GenericState && it.anInt == 2 }) {
                     onEnter {
                         delay(50) // Wait until collectWhileInState succeeded
-                        return@onEnter SetState(TestState.S1)
+                        return@onEnter OverrideState(TestState.S1)
                     }
                 }
             }

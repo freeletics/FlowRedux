@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -31,13 +30,13 @@ class DslTest {
             val sm = StateMachine {
                 inState<TestState.Initial> {
                     on<TestAction.A1> { _, _ ->
-                        SetState(TestState.S1)
+                        OverrideState(TestState.S1)
                     }
                 }
 
                 inState<TestState.S1> {
                     on<TestAction.A2> { _, _ ->
-                        SetState(TestState.S2)
+                        OverrideState(TestState.S2)
                     }
 
                 }
@@ -71,7 +70,7 @@ class DslTest {
                         emit(3)
                     }) { v, _ ->
                         recordedValues.add(v)
-                        return@collectWhileInState SetState(TestState.S1)
+                        return@collectWhileInState OverrideState(TestState.S1)
                     }
                 }
             }
@@ -92,19 +91,19 @@ class DslTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 collectWhileInState(flowOf(1)) { _, _ ->
-                    SetState(TestState.S1)
+                    OverrideState(TestState.S1)
                 }
             }
 
             inState<TestState.S1> {
                 on<TestAction.A1> { _, _ ->
-                    SetState(TestState.S2)
+                    OverrideState(TestState.S2)
                 }
             }
 
             inState<TestState.S2> {
                 on<TestAction.A2> { _, _ ->
-                    SetState(TestState.S1)
+                    OverrideState(TestState.S1)
                 }
             }
         }
@@ -137,7 +136,7 @@ class DslTest {
             val sm = StateMachine {
                 inState<TestState.Initial> {
                     onEnter { _ ->
-                        SetState(TestState.S1)
+                        OverrideState(TestState.S1)
                     }
                 }
 
@@ -146,7 +145,7 @@ class DslTest {
                         s1Entered++
                         MutateState { this }
                     }
-                    on<TestAction.A1> { _, _ -> SetState(TestState.S1) }
+                    on<TestAction.A1> { _, _ -> OverrideState(TestState.S1) }
                 }
             }
 

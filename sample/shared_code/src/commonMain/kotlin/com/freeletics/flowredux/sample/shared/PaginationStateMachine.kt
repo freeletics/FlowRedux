@@ -86,7 +86,7 @@ internal class InternalPaginationStateMachine(
 
             inState<LoadingFirstPageError> {
                 on<RetryLoadingFirstPage> { _, _ ->
-                    SetState(LoadFirstPagePaginationState)
+                    OverrideState(LoadFirstPagePaginationState)
                 }
             }
 
@@ -152,7 +152,7 @@ internal class InternalPaginationStateMachine(
             LoadingFirstPageError(t)
         }
 
-        return SetState(nextState)
+        return OverrideState(nextState)
     }
 
     /**
@@ -188,7 +188,7 @@ internal class InternalPaginationStateMachine(
             )
         }
 
-        return SetState(nextState)
+        return OverrideState(nextState)
     }
 
     private suspend fun moveToContentStateAfter3Seconds(
