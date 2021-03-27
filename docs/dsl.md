@@ -7,7 +7,7 @@ To do that we will stick with a simple example of loading a list of items from a
 As you read this section and more concepts of the DSL will be introduced we will extend this sample.
 
 For now to get started, let's define the `States` our state machine has.
-As said before we loads a list of items from a web service
+As said before we load a list of items from a web service
 and display that list.
 While loading the list we show a loading indicator on the screen and
 if an error occurs we show an error message on the screen with a retry button.
@@ -102,7 +102,7 @@ class MyStateMachine(
     init {
         spec {
             inState<LoadingState> {
-                onEnter { getState, setState ->
+                onEnter { state : LoadingState ->
                     // we entered the LoadingState, so let's do the http request
                     try {
                         val items = httpClient.loadItems()

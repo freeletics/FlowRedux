@@ -30,14 +30,14 @@ class CustomIsInStateDslTest {
                         OverrideState(gs1)
                     }
                 }
-                inState(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
+                inStateWithCondition(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
                     on<TestAction.A1> { _, _ ->
                         counter1++
                         OverrideState(gs2)
                     }
                 }
 
-                inState(isInState = { it is TestState.GenericState && it.anInt == 2 }) {
+                inStateWithCondition(isInState = { it is TestState.GenericState && it.anInt == 2 }) {
                     on<TestAction.A1> { _, _ ->
                         delay(20) // wait for some time to see if not other state above triggers
                         counter2++
@@ -80,7 +80,7 @@ class CustomIsInStateDslTest {
                         OverrideState(gs1)
                     }
                 }
-                inState(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
+                inStateWithCondition(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
                     collectWhileInState(flow {
                         emit(2)
                         delay(20)
@@ -92,7 +92,7 @@ class CustomIsInStateDslTest {
                     }
                 }
 
-                inState(isInState = { it is TestState.GenericState && it.anInt == 2 }) {
+                inStateWithCondition(isInState = { it is TestState.GenericState && it.anInt == 2 }) {
                     onEnter {
                         delay(50) // Wait until collectWhileInState succeeded
                         return@onEnter OverrideState(TestState.S1)

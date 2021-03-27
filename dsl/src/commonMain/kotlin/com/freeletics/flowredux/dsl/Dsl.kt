@@ -88,7 +88,7 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
      * Define what happens if the store is in a certain state.
      * @param isInState The condition under which we identify that the state machine is in a given "state".
      */
-    fun inState(
+    fun inStateWithCondition(
         isInState: (S) -> Boolean,
         block: InStateBuilderBlock<S, S, A>.() -> Unit
     ) {

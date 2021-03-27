@@ -37,7 +37,6 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
         }
         this.specBlock = specBlock
         this.specBlockSet = true
-
     }
 
     private val inputActionChannel = Channel<A>(Channel.UNLIMITED)
