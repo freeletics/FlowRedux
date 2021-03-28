@@ -61,6 +61,17 @@ This is how you define the initial state of your state machine.
 Next, we already see that we need an `init {...}` block containing a `spec { ... }` block inside.
 The `spec { ... }` block is actually where we write our DSL inside.
 
+## ChangeState
+One key concept of the FlowRedux DSL is that the return type of every function such as `onEnter`, `onAction` and `collectWhileInState` 
+(we will learn about them later) is of type `ChangeState<State>`. 
+As the name suggests `ChangeState<State>` is the way to tell the Redux store what the next state is or how to "compute" the next state(often also called reduce state).
+`ChangeState` is a sealed class. You never use `ChangeState` directly but only one of the subtypes. 
+There are 3 subtypes that cover different use cases:
+
+ - `OverrideState<S>(nextState : S)`: OverrideState is overriding the current state of your redux store to whatever you pass in as parameter. This is used if computing the next state is indipendent from current state. You literally override the state regardless of what the current state is.
+ - `MutateState<CurrentState, State>( reducer: (currentState : CurrentState) -> State )`: 
+Here is a very simple example
+
 ## inState`<State>`
 The first concept we learn is `inState`
 
@@ -106,9 +117,9 @@ class MyStateMachine(
                     // we entered the LoadingState, so let's do the http request
                     try {
                         val items = httpClient.loadItems()
-                        setState { ShowContentState(items) }
+                        OverrideState( ShowContentState(items) ) // return OverrideState
                     } catch (t : Throwable) {
-                        setState { ErrorState(t) }
+                        OverrideState( ErrorState(t) )
                     }
                 }
             }
@@ -117,25 +128,15 @@ class MyStateMachine(
 }
 ```
 
-There are a some new things like  `onEnter`, `getState` and `setState`. We will cover [getState](#getstate) and [setState](#setstate) in dedicated sections.
+There are a some new things like  `onEnter` and `OverrideState`. 
+We will cover `OverrideState` in a [dedicated section](#ChangeState), for now all you need to know is that every fu
 All you have to know about `setState` for now is that this is the way to set the next state in your state machine.
 Let's talk about `onEnter`:
 
 - **`onEnter { ... }` is running asynchronously in a coroutine**.
 That means whatever you do inside the `onEnter` block is not blocking anything else.
-You can totally run here long running and expensive calls (like doing an http request).
-- **`onEnter { ... }` doesn't get canceled** when the state machine transitioned to another state original state. Example:
- ```kotlin
- inState<LoadingState> {
-    onEnter { getState, setState ->
-        setState { ErrorState(Exception("Fake Exception") }
-        doA()
-        doSomethingLongRunning()
-    }
- }
- ```
- `doA()` and `doSomethingLongRunning()` are still executed even if `setState { ... }` which got executed before causes our state machine to move to the next state.
- The takeaway is: the full `onEnter { ... }` block will be executed once a state has been entered (there is an exception, we will talk about that in [FlatMapPolicy](#flatmappolicy) section).
+You can totally run here long-running and expensive calls (like doing an http request).
+- **`onEnter { ... }` expects a lambda (or function) with the following signature: `onEnter( (State) -> ChangeState<State> )`**: `OverrideState` extends from `ChangeState`.
 
 ### on`<Action>`
 How do we deal with external user input like clicks in FlowRedux? 
