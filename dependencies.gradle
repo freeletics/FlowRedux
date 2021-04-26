@@ -4,7 +4,7 @@ ext.versions = [
         targetSdk              : 28,
         minSdk                 : 21,
 
-        mavenPublish           : '0.8.0',
+        mavenPublish           : '0.15.0',
         dokka                  : '0.10.1',
         coroutines             : '1.3.9',
         dagger                 : '2.24',
@@ -102,5 +102,5 @@ ext.gradlePlugins = [
         mavenPublish   : "com.vanniktech:gradle-maven-publish-plugin:$versions.mavenPublish",
         dokka          : "org.jetbrains.dokka:dokka-gradle-plugin:$versions.dokka",
         kotlinxcodesync: "co.touchlab:kotlinxcodesync:0.2",
-        gradleMavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.13.0",
+        gradleMavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.15.0",
 ]
