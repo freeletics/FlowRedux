@@ -64,13 +64,116 @@ The `spec { ... }` block is actually where we write our DSL inside.
 ## ChangeState
 One key concept of the FlowRedux DSL is that the return type of every function such as `onEnter`, `onAction` and `collectWhileInState` 
 (we will learn about them later) is of type `ChangeState<State>`. 
+For example: 
+
+```kotlin
+suspend fun handleLoadingAction(snapshot : State) : ChangeState<State> {
+    val items = loadItems() // suspend function
+    return OverrideState(ShowContentState(items)) // OverrideState extends from ChangeState. We will talk about it in 1 minutes.
+}
+```
+
 As the name suggests `ChangeState<State>` is the way to tell the Redux store what the next state is or how to "compute" the next state(often also called reduce state).
 `ChangeState` is a sealed class. You never use `ChangeState` directly but only one of the subtypes. 
 There are 3 subtypes that cover different use cases:
 
- - `OverrideState<S>(nextState : S)`: OverrideState is overriding the current state of your redux store to whatever you pass in as parameter. This is used if computing the next state is indipendent from current state. You literally override the state regardless of what the current state is.
- - `MutateState<CurrentState, State>( reducer: (currentState : CurrentState) -> State )`: 
-Here is a very simple example
+- `OverrideState<S>(nextState : State)`
+- `MutateState<SubState, State>( reducer: (currentState : SubState) -> State )`
+- `NoStateChange`
+
+Next, let's talk about these 3 types of `ChangeState` in detail.
+
+### `OverrideState<S>(nextState : State)`
+
+`OverrideState<S>(nextState : State)` is overriding the current state of your redux store to whatever you pass in as parameter. 
+By using `OverrideState` you basically say "I don't care what the current state is, just set state to whatever I give you".
+This is used if computing the next state is independent of current state. 
+You literally override the state regardless of what the current state is.
+
+Usage:
+```kotlin
+suspend fun handleFooAction(action: Action, snapshot : State) : ChangeState<State> {
+   ...
+   return OverrideState(SomeOtherState())
+}
+```
+
+### `MutateState<SubState, State>( reducer: (currentState : SubState) -> State )`
+`MutateState<SubState, State>( reducer: (currentState : SubState) -> State )` is used if your next state computation is based on the current state. 
+Thus, `MutateState` expects a lambda block with signature `(State) -> State`. 
+This is a so-called reducer function to compute the next state. 
+You may wonder why `MutateState` takes such a lambda as constructor parameter and not a new state instance as `OverrideState` does?
+The reason is that FlowRedux is an asynchronous state machine meaning multiple coroutines can run in parallel and mutate state. 
+Here is a very simple example (we will discuss the exact details of the used DSL later in this documentat):
+```kotlin
+suspend fun createRandomItem() : Item {
+  val random = (0..10).random()
+  delay( random * 1000 ) // randomly wait for up to 10 seconds
+  return Item("random $random")
+}
+
+...
+// DSL specs
+spec {
+    inState<ShowContent> {
+        on<AddItemAction> { action: AddItemAction, state: ShowContent ->
+          val item : Item = createRandomItem()
+          MutateState { currentState : ShowContent -> currentState.copy(items = currentState.items + item) }
+        }        
+    }
+}
+```
+
+As you see `createRandomItem()` can take some time to return a value. 
+Furthermore, every invocation of `createRandomItem()` could take differently long to return a value.
+Let's take a look at the following scenario: current state of our FlowRedux state machine is `ShowContent(items = listof( Item("1"), Item("2")))`.
+Next we trigger `AddItemAction` 2 times very fast (within a few milliseconds) one after each other which eventually triggers `createRandomItem()` 2 times.
+Let's assume the first invocation of `createRandomItem()` takes 6 seconds to return new item, the second invocation takes 3 seconds. 
+What is the expected state after this two `AddItemAction` are handled?
+There should be 2 state changes: First `ShowContent(items = listof( Item("1"), Item("2"), Item("random 3")))` and secondly `ShowContent(items = listof( Item("1"), Item("2"), Item("random 3"), Item("random 6")))`.
+This is exactly what we get by using `MutateState`. 
+If we use `OverrideState` or `MutateState` would not have a reducer lambda as parameter then the code as follows:
+
+```kotlin
+// DSL specs
+spec {
+    inState<ShowContent> {
+        on<AddItemAction> { action: AddItemAction, state: ShowContent ->
+          val item : Item = createRandomItem()
+          // WRONG: don't do that. This is just to demo an issue (see explanation bellow).
+          OverrideState( state.copy(items = currentState.items + item) ) // or MutateState( state.copy(items = currentState.items + item) )
+        }        
+    }
+}
+```
+and state transition are as follows:
+First `ShowContent(items = listof( Item("1"), Item("2"), Item("random 3")))` and secondly `ShowContent(items = listof( Item("1"), Item("2"), Item("random 6")))`.
+How comes that the second state transition produces `ShowContent` without `Item("random 3")`? 
+The reson is that we are accessing the state parameter `on<AddItemAction> { action: AddItemAction, state: ShowContent -> ... }`
+and that this state parameter is acutally only a snapshot of the state when `on<AddItemAction>` did trigger. 
+In our example this is always capturing the following state `ShowContent(items = listof( Item("1"), Item("2") ) )`
+The state could have changed before reaching `return OverrideState(...)`. 
+Well, that is exactly what is happening. Remember, within a few milliseconds we dispatch 2 times `AddItemAction` and then it takes 3 and 6 seconds for `createRandomItem()` to return.
+Thus, the state transition actually overrides the first state transition.
+This is why you must use `MutateState` with a reducer lambda in such cases when you want to change some properties of the current state (but not transition to an entirely different state like `ErrorState`) to handle cases properly where parallel execution could have changed the state in the meantime.
+
+### `NoStateChange`
+`NoStateChange` is the last option that you have for `ChangeState` and it should be only used very carefully to cover some cases that could not be covered otherwise.
+`NoStateChange` is an `object`, thus a singleton.
+Basically what `NoStateChange` is good for is to tell that you actually dont want to do a state transition. 
+When you need this? 
+Again, there should be only very limited use case for `NoStateChange` but most likely if there is really no other way then at runtime check for some conditions and then either trigger `OverrideState`, `MutateState` or `NoChangeState` if state should really not change (but you really only know that at runtime only, but this is usually an indicator that you should rethink your state modelling to avoid having this issue).
+
+Usage:
+```kotlin
+suspend fun handleFooAction(action: Action, snapshot : State){
+    if (action.data == "foo" && snapshot.data == "bar") // just demo some random condition check
+        return NoStateChange
+   
+    ...
+   return OverrideState(OtherState())
+}
+```
 
 ## inState`<State>`
 The first concept we learn is `inState`
@@ -98,7 +201,7 @@ Next let's discuss what an `inState` can contain as triggers to actually "do som
 2. `on<Action>`: Triggers whenever we are in this state and the specified action is triggered from the outside by calling `FlowReduxStateMachine.dispatch(action)`.
 3. `collectWhileInState( flow )`: You can subscribe to any arbitrary `Flow` while your state machine is in that state.
 
-Let's try to go through them as we build our state machine:
+Let's go through them as we build our state machine.
 
 ### onEnter
 What do we want to do when we enter the `LoadingState`?
@@ -113,10 +216,10 @@ class MyStateMachine(
     init {
         spec {
             inState<LoadingState> {
-                onEnter { state : LoadingState ->
+                onEnter { snapshot : LoadingState ->
                     // we entered the LoadingState, so let's do the http request
                     try {
-                        val items = httpClient.loadItems()
+                        val items = httpClient.loadItems()  // loadItems() is a suspend function
                         OverrideState( ShowContentState(items) ) // return OverrideState
                     } catch (t : Throwable) {
                         OverrideState( ErrorState(t) )
@@ -129,14 +232,14 @@ class MyStateMachine(
 ```
 
 There are a some new things like  `onEnter` and `OverrideState`. 
-We will cover `OverrideState` in a [dedicated section](#ChangeState), for now all you need to know is that every fu
-All you have to know about `setState` for now is that this is the way to set the next state in your state machine.
+We covered `OverrideState` in a [dedicated section](#ChangeState).
 Let's talk about `onEnter`:
 
 - **`onEnter { ... }` is running asynchronously in a coroutine**.
 That means whatever you do inside the `onEnter` block is not blocking anything else.
-You can totally run here long-running and expensive calls (like doing an http request).
+You can totally run here long-running and expensive calls (like doing a http request).
 - **`onEnter { ... }` expects a lambda (or function) with the following signature: `onEnter( (State) -> ChangeState<State> )`**: `OverrideState` extends from `ChangeState`.
+- **The execution of the `onEnter { ... }` is canceled as soon as state condition specified in the surrounding `inState` doesn't hold anymore (i.e. state has been changes by something else).**
 
 ### on`<Action>`
 How do we deal with external user input like clicks in FlowRedux? 
@@ -159,22 +262,22 @@ class MyStateMachine(
                     // we entered the LoadingState, so let's do the http request
                     try {
                         val items = httpClient.loadItems()
-                        setState { ShowContentState(items) }
+                        OverrideState( ShowContentState(items) )
                     } catch (t : Throwable) {
-                        setState { ErrorState(t) }
+                        OverrideState( ErrorState(t) )
                     }
                 }
             }
             
-            // let's add a new inState{...} with an on{...} block 
+            // let's add a new inState{...} with an on{...} block
             inState<ErrorState> {
                on<RetryLoadingAction> { action, getState, setState ->
                   // This block triggers if we are in ErrorState 
                   // RetryLoadingAction has been dispatched to this state machine.
                   // In that case we transition to LoadingState which then starts the http
-                  // request to load items.
+                  // request to load items again as the inState<LoadingState> + onEnter { ... } triggers
                   
-                  setState { LoadingState }
+                  OverrideState( LoadingState )
                }
             }
         }
