@@ -616,23 +616,18 @@ class MyStateMachine(
                 }
 
                 collectWhileInState(timerThatEmitsEverySecond()) { value, stateSnapshot ->
-                    MutateState<State, State> {
-                        if (errorCountdown!! > 0)
-                            copy(errorCountdown = errorCountdown!! - 1) //  decrease the countdown by 1 second
+                    MutateState<ErrorState, State> {
+                        if (this.countdownTimeLeft > 0) // this is referencing ErrorState
+                            this.copy(countdown = countdownTimeLeft - 1)  //  decrease the countdown by 1 second
                         else
-                            State(
-                                loading = true,
-                                items = emptyList(),
-                                error = null,
-                                errorCountdown = null
-                            ) // transition to the LoadingState
+                            LoadingState  // transition to the LoadingState
                     }
                 }
             }
         }
     }
 
-    private fun timerThatEmitsEverySecond(): Flow<Int> {
+    private fun timerThatEmitsEverySecond(): Flow<Int> = flow {
         var timeElapsed = 0
         while (isActive) {  // is Flow still active?
             delay(1000)     // wait 1 second
@@ -669,9 +664,9 @@ class MyStateMachine(
             }
 
             inState<ErrorState> {
-                on<RetryLoadingAction> { _, _, setState ->
+                on<RetryLoadingAction> { action, stateSnapshot ->
                     // For a single line statement it's ok to keep the block instead of moving to a function reference
-                    setState { LoadingState }
+                    OverrideState(LoadingState)
                 }
 
                 collectWhileInState(
@@ -687,31 +682,28 @@ class MyStateMachine(
     // All the implementation details are in the functions below.
     //
 
-    private fun loadItemsAndMoveToContentOrErrorState(getState: GetState<State>, setState: SetState<State>) {
-        try {
+    private fun loadItemsAndMoveToContentOrErrorState(stateSnapshot: LoadingState): ChangeState<State> {
+        return try {
             val items = httpClient.loadItems()
-            setState { ShowContentState(items) }
+            OverrideState(ShowContentState(items))
         } catch (t: Throwable) {
-            setState { ErrorState(cause = t, countdown = 3) } // Countdown starts with 3 seconds
+            OverrideState(ErrorState(cause = t, countdown = 3)) // Countdown starts with 3 seconds
         }
     }
 
     private fun onSecondElapsedMoveToLoadingStateOrMoveToDecrementCountdown(
         value: Int,
-        getState: GetState<State>,
-        setState: SetState<State>
-    ) {
-        val state = getState()
-        if (state is ErrorState) {
-            val countdownTimeLeft = state.countdown
-            if (countdownTimeLeft > 0)
-                setState { state.copy(countdown = countdownTimeLeft - 1) } //  decrease the countdown by 1 second
+        stateSnapshot: ErrorState
+    ): ChangeState<State> {
+        return MutateState<ErrorState, State> {
+            if (this.countdownTimeLeft > 0) // this is referencing ErrorState
+                this.copy(countdown = countdownTimeLeft - 1)  //  decrease the countdown by 1 second
             else
-                setState { LoadingState } // transition to the LoadingState
+                LoadingState  // transition to the LoadingState
         }
     }
 
-    private fun timerThatEmitsEverySecond(): Flow<Int> {
+    private fun timerThatEmitsEverySecond(): Flow<Int> = flow {
         var timeElapsed = 0
         while (isActive) {  // is Flow still active?
             delay(1000)     // wait 1 second
