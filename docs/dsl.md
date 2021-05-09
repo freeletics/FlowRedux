@@ -671,7 +671,7 @@ class MyStateMachine(
 
                 collectWhileInState(
                     timerThatEmitsEverySecond(),
-                    ::onSecondElapsedMoveToLoadingStateOrMoveToDecrementCountdown
+                    ::onSecondElapsedMoveToLoadingStateOrDecrementCountdown
                 )
             }
         }
@@ -691,7 +691,7 @@ class MyStateMachine(
         }
     }
 
-    private fun onSecondElapsedMoveToLoadingStateOrMoveToDecrementCountdown(
+    private fun onSecondElapsedMoveToLoadingStateOrDecrementCountdown(
         value: Int,
         stateSnapshot: ErrorState
     ): ChangeState<State> {
