@@ -14,18 +14,3 @@ fun StateMachine(
 
     return sm
 }
-
-/*
-class StateMachine(
-    builderBlock: FlowReduxStoreBuilder<State, Action>.() -> Unit
-) : FlowReduxStateMachine<State, Action>(
-    CommandLineLogger,
-    State.Initial
-) {
-
-    init {
-        spec(builderBlock)
-    }
-}
-
- */

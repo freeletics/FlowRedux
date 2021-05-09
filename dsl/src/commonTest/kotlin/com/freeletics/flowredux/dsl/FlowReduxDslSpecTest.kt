@@ -7,7 +7,7 @@ import kotlin.test.fail
 class FlowReduxDslSpecTest {
 
     @Test
-    fun callingSpecTwiceThrowsException() {
+    fun `calling spec block twice throws exception`() {
 
         val sm = object : FlowReduxStateMachine<Any, Any>(Any()) {
 
@@ -31,7 +31,7 @@ class FlowReduxDslSpecTest {
     }
 
     @Test
-    fun noSpecSetThrowsException() {
+    fun `no spec block set throws exception`() {
 
         val sm = object : FlowReduxStateMachine<Any, Any>(Any()) {}
 
