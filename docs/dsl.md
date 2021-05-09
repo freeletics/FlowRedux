@@ -368,7 +368,7 @@ class MyStateMachine(
         }
     }
 
-    private fun timerThatEmitsEverySecond(): Flow<Int> {
+    private fun timerThatEmitsEverySecond(): Flow<Int> = flow {
         var timeElapsed = 0
         while (isActive) {  // is Flow still active?
             delay(1000)     // wait 1 second
