@@ -1,5 +1,7 @@
 package com.freeletics.flowredux.dsl
 
+// TODO remove this file as it doesnt work as expected but WorkingConnectInStateSideEffectBuilder.kt does
+
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy

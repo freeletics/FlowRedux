@@ -1,10 +1,25 @@
 package com.freeletics.flowredux.dsl
 
+import app.cash.turbine.test
+import kotlinx.coroutines.launch
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
+import kotlin.time.ExperimentalTime
 
-class FlowReduxDslSpecTest {
+@ExperimentalTime
+class FlowReduxStateMachineTest {
+
+    @Test
+    fun `empty statemachine just emits initial state`() = suspendTest {
+        val sm = StateMachine { }
+        launch {
+            sm.state.test {
+                assertEquals(TestState.Initial, expectItem())
+                expectComplete()
+            }
+        }
+    }
 
     @Test
     fun `calling spec block twice throws exception`() {
