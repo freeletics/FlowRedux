@@ -25,30 +25,32 @@ class MyStateMachine : FlowReduxStateMachine<State, Action>(LoadingState){
     init {
         spec {
             inState<LoadingState> {
-                onEnter  { getState, setState ->
+                onEnter { stateSnapshot : LoadingState ->
                     // executes this block whenever we enter LoadingState
                     try {
                         val items = loadItems() // suspending function / coroutine to load items
-                        setState { ContentState(items) } // Transition to ContentState
+                        OverrideState( ContentState(items) ) // Transition to ContentState
                     } catch (t : Throwable) {
-                        setState { ErrorState(t) } // Transition to ErrorState
+                        OverrideState( ErrorState(t) ) // Transition to ErrorState
                     }
                 }
             }
 
             inState<ErrorState> {
-                on<RetryLoadingAction> { action, getState, setState ->
-                    // executes this block whenever
-                    // ErrorState is current state and RetryLoadingAction is emitted
-                    setState { LoadingState } // Transition to LoadingState which loads list again
+                on<RetryLoadingAction> { action : RetryLoadingAction, stateSnapshot : ErrorState ->
+                    // executes this block whenever ErrorState is current state and RetryLoadingAction is emitted
+                    OverrideState( LoadingState ) // Transition to LoadingState which loads list again
                  }
             }
 
             inState<ContentState> {
-                collectWhileInState( flowOf(1,2,3) ) { getState, setState ->
+                collectWhileInState( flowOf(1,2,3) ) { value : Int, stateSnapshot : ContentState ->
                     // observes the given flow as long as state is ContentState.
                     // Once state is changed to another state the flow will automatically
                     // stop emitting.
+                    MutateState<ContentState, State> { 
+                        copy( items = this.items + Item("New item $value"))
+                    }
                 }
             }
         }
@@ -72,7 +74,7 @@ launch { // Launch a coroutine
 }
 ```
 
-In an Android Application you would use it with AndroidX `ViewModel` like that:
+In an Android Application you could use it with AndroidX `ViewModel` like that:
 
 ```kotlin
 class MyViewModel @Inject constructor(private val stateMachine : StateMachine) : ViewModel() {
@@ -101,35 +103,35 @@ There are two artifacts that you can include as dependency::
 
 ### Multiplatform
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux:0.4.0'
-implementation 'com.freeletics.flowredux:dsl:0.4.0'
+implementation 'com.freeletics.flowredux:flowredux:0.5.0'
+implementation 'com.freeletics.flowredux:dsl:0.5.0'
 ```
 
 ### JVM only
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux-jvm:0.4.0'
-implementation 'com.freeletics.flowredux:dsl-jvm:0.4.0'
+implementation 'com.freeletics.flowredux:flowredux-jvm:0.5.0'
+implementation 'com.freeletics.flowredux:dsl-jvm:0.5.0'
 ```
 
 ### Native binaries
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux-iosx64:0.4.0'
-implementation 'com.freeletics.flowredux:flowredux-iosarm64:0.4.0'
-implementation 'com.freeletics.flowredux:flowredux-iosarm32:0.4.0'
-implementation 'com.freeletics.flowredux:flowredux-watchosx86:0.4.0'
-implementation 'com.freeletics.flowredux:flowredux-watchosarm64:0.4.0'
-implementation 'com.freeletics.flowredux:flowredux-watchosarm32:0.4.0'
-implementation 'com.freeletics.flowredux:flowredux-tvosx64:0.4.0'
-implementation 'com.freeletics.flowredux:flowredux-tvosxarm64:0.4.0'
+implementation 'com.freeletics.flowredux:flowredux-iosx64:0.5.0'
+implementation 'com.freeletics.flowredux:flowredux-iosarm64:0.5.0'
+implementation 'com.freeletics.flowredux:flowredux-iosarm32:0.5.0'
+implementation 'com.freeletics.flowredux:flowredux-watchosx86:0.5.0'
+implementation 'com.freeletics.flowredux:flowredux-watchosarm64:0.5.0'
+implementation 'com.freeletics.flowredux:flowredux-watchosarm32:0.5.0'
+implementation 'com.freeletics.flowredux:flowredux-tvosx64:0.5.0'
+implementation 'com.freeletics.flowredux:flowredux-tvosxarm64:0.5.0'
 
-implementation 'com.freeletics.flowredux:dsl-iosx64:0.4.0'
-implementation 'com.freeletics.flowredux:dsl-iosarm64:0.4.0'
-implementation 'com.freeletics.flowredux:dsl-iosarm32:0.4.0'
-implementation 'com.freeletics.flowredux:dsl-watchosx86:0.4.0'
-implementation 'com.freeletics.flowredux:dsl-watchosarm64:0.4.0'
-implementation 'com.freeletics.flowredux:dsl-watchosarm32:0.4.0'
-implementation 'com.freeletics.flowredux:dsl-tvosx64:0.4.0'
-implementation 'com.freeletics.flowredux:dsl-tvosxarm64:0.4.0'
+implementation 'com.freeletics.flowredux:dsl-iosx64:0.5.0'
+implementation 'com.freeletics.flowredux:dsl-iosarm64:0.5.0'
+implementation 'com.freeletics.flowredux:dsl-iosarm32:0.5.0'
+implementation 'com.freeletics.flowredux:dsl-watchosx86:0.5.0'
+implementation 'com.freeletics.flowredux:dsl-watchosarm64:0.5.0'
+implementation 'com.freeletics.flowredux:dsl-watchosarm32:0.5.0'
+implementation 'com.freeletics.flowredux:dsl-tvosx64:0.5.0'
+implementation 'com.freeletics.flowredux:dsl-tvosxarm64:0.5.0'
 ```
 
 ### JavaScript
@@ -154,5 +156,5 @@ allprojects {
 
 Then just use `-SNAPSHOT`suffix as version like
 ```groovy
-implementation 'com.freeletics.flowredux:dsl:0.3.1-SNAPSHOT'
+implementation 'com.freeletics.flowredux:dsl:0.5.1-SNAPSHOT'
 ```
