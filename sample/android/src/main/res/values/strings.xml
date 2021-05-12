@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RxRedux</string>
+    <string name="app_name">FlowRedux</string>
     <string name="unexpected_error">An unexpected Error has occurred</string>
     <string name="unexpected_error_retry">An unexpected Error has occurred.\nClick here to retry</string>
 </resources>
