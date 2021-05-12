@@ -5,8 +5,8 @@ rm -rf docs/Javadoc
 mkdir docs/Javadoc
 mkdir docs/Javadoc/flowredux
 mkdir docs/Javadoc/dsl
-cp -R flowredux/build/dokka/gfm docs/Javadoc/flowredux/
-cp -R dsl/build/dokka/gfm docs/Javadoc/dsl/
+cp -R flowredux/build/dokka/gfm/. docs/Javadoc/flowredux/
+cp -R dsl/build/dokka/gfm/. docs/Javadoc/dsl/
 mkdocs build -d ../site
 git reset --hard
 git checkout gh-pages
