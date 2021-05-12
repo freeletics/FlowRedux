@@ -34,7 +34,7 @@ ext.versions = [
         espresso               : '3.0.2',
         screengrab             : '1.2.0',
         deviceAnimationsRule   : '0.0.2',
-        turbine                : '0.2.1',
+        turbine                : '0.4.1',
 
         // TODO remove
         kotlintest             : '3.4.2',
