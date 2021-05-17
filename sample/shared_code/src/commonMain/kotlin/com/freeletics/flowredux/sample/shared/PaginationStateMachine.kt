@@ -106,22 +106,18 @@ internal class InternalPaginationStateMachine(
 
     private suspend fun moveToLoadNextPageStateIfCanLoadNextPage(
         action: LoadNextPage,
-        state: ShowContentPaginationState
+        stateSnapshot: ShowContentPaginationState
     ): ChangeState<PaginationState> {
-        return MutateState {
-            when (val state = this) {
-                is ShowContentPaginationState -> {
-                    if (!state.canLoadNextPage)
-                        state
-                    else
-                        ShowContentAndLoadingNextPagePaginationState(
-                            items = state.items,
-                            currentPage = state.currentPage + 1, // load next page
-                            canLoadNextPage = true
-                        )
-                }
-                else -> state
-            }
+        return if (!stateSnapshot.canLoadNextPage) {
+            NoStateChange
+        } else {
+            OverrideState(
+                ShowContentAndLoadingNextPagePaginationState(
+                    items = stateSnapshot.items,
+                    currentPage = stateSnapshot.currentPage + 1, // load next page
+                    canLoadNextPage = true
+                )
+            )
         }
     }
 
@@ -129,7 +125,7 @@ internal class InternalPaginationStateMachine(
      * Loads the first page
      */
     private suspend fun loadFirstPage(
-        state: LoadFirstPagePaginationState
+        stateSnapshot: LoadFirstPagePaginationState
     ): ChangeState<PaginationState> {
         val nextState = try {
             when (val pageResult: PageResult = githubApi.loadPage(page = 0)) {
@@ -160,31 +156,31 @@ internal class InternalPaginationStateMachine(
      * [ShowContentAndLoadingNextPageErrorPaginationState]
      */
     private suspend fun loadNextPage(
-        state: ShowContentAndLoadingNextPagePaginationState
+        stateSnapshot: ShowContentAndLoadingNextPagePaginationState
     ): ChangeState<PaginationState> {
         val nextState = try {
-            when (val pageResult = githubApi.loadPage(page = state.currentPage)) {
+            when (val pageResult = githubApi.loadPage(page = stateSnapshot.currentPage)) {
                 PageResult.NoNextPage -> {
                     ShowContentPaginationState(
-                        items = state.items,
+                        items = stateSnapshot.items,
                         canLoadNextPage = false,
-                        currentPage = state.currentPage
+                        currentPage = stateSnapshot.currentPage
                     )
                 }
-                is PageResult.Page -> { // TODO should be MutateState
+                is PageResult.Page -> {
                     ShowContentPaginationState(
-                        items = state.items + pageResult.items,
+                        items = stateSnapshot.items + pageResult.items,
                         canLoadNextPage = true,
-                        currentPage = state.currentPage
+                        currentPage = stateSnapshot.currentPage
                     )
                 }
             }
         } catch (t: Throwable) {
             t.printStackTrace()
             ShowContentAndLoadingNextPageErrorPaginationState(
-                items = state.items,
-                canLoadNextPage = state.canLoadNextPage,
-                currentPage = max(0, state.currentPage - 1)
+                items = stateSnapshot.items,
+                canLoadNextPage = stateSnapshot.canLoadNextPage,
+                currentPage = max(0, stateSnapshot.currentPage - 1)
             )
         }
 
@@ -192,7 +188,7 @@ internal class InternalPaginationStateMachine(
     }
 
     private suspend fun moveToContentStateAfter3Seconds(
-        s: ShowContentAndLoadingNextPageErrorPaginationState
+        stateSnapshot: ShowContentAndLoadingNextPageErrorPaginationState
     ): ChangeState<PaginationState> {
         delay(3000)
         return MutateState<ShowContentAndLoadingNextPageErrorPaginationState, PaginationState> {
