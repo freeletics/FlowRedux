@@ -51,17 +51,17 @@ jobs:
     steps:
       - checkout
       - *restore_gradle_cache
-#      - run:
-#          name: Setting up Gradle signing
-#          command: |
-#            echo "signingInMemoryKey=$ASCII_AMORED_SIGNING_GPG_IN_MEMORY_KEY" >> gradle.properties
-#            echo "signingInMemoryPassword=$GPG_IN_MEMORY_PASSWORD" >> gradle.properties
+      - run:
+          name: Setting up Gradle signing
+          command: |
+            echo "signingInMemoryKey=$ASCII_AMORED_SIGNING_GPG_IN_MEMORY_KEY" >> gradle.properties
+            echo "signingInMemoryKeyPassword=$GPG_IN_MEMORY_PASSWORD" >> gradle.properties
       - run:
           name: Publish to OSS Sonatype
           command: ./gradlew publish --no-daemon --no-parallel --stacktrace
-#      - run:
-#          name: Release to Maven Central via OSS Sonatype
-#          command: ./gradlew closeAndReleaseRepository --stacktrace
+      - run:
+          name: Release to Maven Central via OSS Sonatype
+          command: ./gradlew closeAndReleaseRepository --stacktrace
       - *save_gradle_cache
   deploy_website:
     executor: mkdocs
