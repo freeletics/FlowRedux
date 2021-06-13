@@ -93,6 +93,5 @@ dokka {
  */
 
 if (gradle.ext.isCiServer) {
-    // apply from: "$rootDir/gradle-mvn-mpp-push.gradle"
     apply plugin: "com.vanniktech.maven.publish"
 }
