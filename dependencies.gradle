@@ -6,7 +6,7 @@ ext.versions = [
 
         dokka                  : '0.10.1',
         coroutines             : '1.4.3',
-        dagger                 : '2.24',
+        dagger                 : '2.37',
         kotlin                 : '1.4.32',
         rxJava                 : '2.2.12',
         rxAndroid              : '2.1.1',
