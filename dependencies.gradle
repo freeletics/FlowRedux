@@ -64,7 +64,8 @@ ext.libraries = [
         retrofit              : "com.squareup.retrofit2:retrofit:$versions.retrofit",
         retrofitMoshi         : "com.squareup.retrofit2:converter-moshi:$versions.retrofit",
         retrofitRxJava        : "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit",
-        okhttp                : "com.squareup.okhttp3:okhttp:$versions.okhttp"
+        okhttp                : "com.squareup.okhttp3:okhttp:$versions.okhttp",
+        flMadStateMachine     : "com.freeletics.mad:state-machine:0.1.1"
 ]
 
 ext.supportLibraries = [
