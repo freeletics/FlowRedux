@@ -28,6 +28,7 @@ kotlin {
         commonMain {
             dependencies {
                 api project(":flowredux")
+                api libraries.flMadStateMachine
             }
         }
 
@@ -83,6 +84,7 @@ kotlin {
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += ["-Xuse-experimental=kotlin.Experimental"]
+        jvmTarget = "1.8"
     }
 }
 /*
