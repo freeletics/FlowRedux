@@ -3,6 +3,8 @@ package com.freeletics.flowredux.dsl
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -19,9 +21,11 @@ internal class StoreWideCollectBuilderBlock<T, S, A>(
     private val block: StoreWideCollectorBlock<T, S>
 ) : StoreWideBuilderBlock<S, A>() {
 
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     override fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {
 
-        val sideEffect: SideEffect<S, Action<S, A>> = { actions: Flow<Action<S, A>>,
+        val sideEffect: SideEffect<S, Action<S, A>> = { _: Flow<Action<S, A>>,
                                                         getState: GetState<S> ->
 
             flow.flatMapWithPolicy(flatMapPolicy) {

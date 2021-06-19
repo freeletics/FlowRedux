@@ -2,6 +2,8 @@ package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -31,6 +33,8 @@ internal class Working_CollectInStateBuilder<T, InputState : S, S : Any, A : Any
     private val block: InStateObserverBlock<T, InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             when (flatMapPolicy) {
@@ -105,14 +109,14 @@ internal class Working_CollectInStateBuilder<T, InputState : S, S : Any, A : Any
             SUBSCRIBE, UNSUBSCRIBE, DO_NOTHING
         }
 
-        internal enum class StateChanged {
+        enum class StateChanged {
             SUBSCRIBE, UNSUBSCRIBE
         }
 
         private val mutex = Mutex()
         private var lastState: S? = null
 
-        internal val flow: Flow<StateChanged> = actions.map {
+        val flow: Flow<StateChanged> = actions.map {
             mutex.withLock {
 
                 val state = getState()

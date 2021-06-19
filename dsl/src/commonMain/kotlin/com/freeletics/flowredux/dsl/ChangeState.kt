@@ -35,7 +35,7 @@ class MutateState<InputState : S, S>(internal val reducer: InputState.() -> S) :
 
 
 /**
- * No change, this is semantially equivalent to use [OverrideState] and pass in the previous state
+ * No change, this is semantically equivalent to use [OverrideState] and pass in the previous state
  */
 object NoStateChange : ChangeState<Nothing>()
 

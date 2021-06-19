@@ -33,12 +33,12 @@ kotlin {
             dependencies {
                 implementation testLibraries.kotlinTest
                 implementation testLibraries.kotlinTestAnnotations
+                implementation testLibraries.kotestAssertions
                 implementation testLibraries.turbine
             }
         }
 
         jvmMain {
-            dependsOn commonMain
             dependencies {
                 implementation libraries.kotlinStdlibJdk8
             }
@@ -47,7 +47,6 @@ kotlin {
         jvmTest {
             dependencies {
                 implementation testLibraries.kotlinTestJunit
-                implementation testLibraries.kotestRunner
                 implementation testLibraries.coroutinesTest
             }
         }
@@ -78,6 +77,7 @@ kotlin {
     targets.all {
         compilations.all {
             kotlinOptions {
+                allWarningsAsErrors = true
                 freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"]
             }
         }

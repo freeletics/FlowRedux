@@ -1,7 +1,6 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -10,8 +9,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.fail
 import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
-@ExperimentalTime
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
 class CustomIsInStateDslTest {
 
     @Test
@@ -86,7 +87,6 @@ class CustomIsInStateDslTest {
                         delay(20)
                         reached = true
                         fail("This should never be reached")
-                        emit(9999)
                     }) { value, _ ->
                         OverrideState(TestState.GenericState(value.toString(), value))
                     }
@@ -113,11 +113,5 @@ class CustomIsInStateDslTest {
         }
 
         assertFalse(reached)
-    }
-
-    private fun dispatchAsync(sm: FlowReduxStateMachine<TestState, TestAction>, action: TestAction) {
-        GlobalScope.launch {
-            sm.dispatch(action)
-        }
     }
 }

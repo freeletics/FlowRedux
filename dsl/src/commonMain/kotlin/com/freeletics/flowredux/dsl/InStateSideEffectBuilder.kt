@@ -18,6 +18,7 @@ abstract class InStateSideEffectBuilder<InputState : S, S, A> internal construct
         // only start if is in state condition is still true
         if (isInState(currentState)) {
             try {
+                @Suppress("UNCHECKED_CAST")
                 val inputState = currentState as InputState
                 block(inputState)
             } catch (e: ClassCastException) {

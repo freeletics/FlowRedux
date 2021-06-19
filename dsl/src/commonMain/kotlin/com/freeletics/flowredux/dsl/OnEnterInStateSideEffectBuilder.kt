@@ -3,6 +3,8 @@ package com.freeletics.flowredux.dsl
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
@@ -17,6 +19,8 @@ class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     private val block: InStateOnEnterBlock<InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             actions

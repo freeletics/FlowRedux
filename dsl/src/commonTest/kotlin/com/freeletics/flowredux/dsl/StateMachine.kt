@@ -1,5 +1,9 @@
 package com.freeletics.flowredux.dsl
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 fun StateMachine(
         builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit
 ): FlowReduxStateMachine<TestState, TestAction> {
