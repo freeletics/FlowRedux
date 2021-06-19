@@ -144,7 +144,7 @@ class FlowReduxTest {
 
             flow {
                 emit(1)
-                //delay(10)
+                delay(10)
                 emit(2)
             }.reduxStore({ "" }, listOf(sideEffect1, sideEffect2)) { state, action ->
                 state + action
@@ -161,6 +161,53 @@ class FlowReduxTest {
                 assertEquals("1672", expectItem())
                 assertEquals("16726", expectItem())
                 assertEquals("167267", expectItem())
+
+                expectComplete()
+            }
+        }
+    }
+
+    @Test
+    fun `store with 2 simple side effects no delay`() = suspendTest {
+        launch {
+            val sideEffect1: SideEffect<String, Int> = { actions, _ ->
+                actions.flatMapConcat {
+                    if (it < 6) {
+                        flowOf(6)
+                    } else {
+                        emptyFlow()
+                    }
+                }
+            }
+            val sideEffect2: SideEffect<String, Int> = { actions, _ ->
+                actions.flatMapConcat {
+                    if (it < 6) {
+                        flowOf(7)
+                    } else {
+                        emptyFlow()
+                    }
+                }
+            }
+
+            flow {
+                emit(1)
+                emit(2)
+            }.reduxStore({ "" }, listOf(sideEffect1, sideEffect2)) { state, action ->
+                state + action
+            }.test {
+                // Initial State emission
+                assertEquals("", expectItem())
+
+                // emission of 1
+                assertEquals("1", expectItem())
+                // emission of 2
+                assertEquals("12", expectItem())
+                // side effect actions in response to 1
+                assertEquals("126", expectItem())
+                assertEquals("1267", expectItem())
+                // side effect actions in response to 2
+                assertEquals("12676", expectItem())
+                assertEquals("126767", expectItem())
 
                 expectComplete()
             }

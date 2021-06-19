@@ -5,7 +5,10 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.selects.select
 
@@ -34,7 +37,6 @@ fun <A, S> Flow<A>.reduxStore(
  * the flow starts.
  */
 @ExperimentalCoroutinesApi
-@FlowPreview
 fun <A, S> Flow<A>.reduxStore(
     initialStateSupplier: () -> S,
     sideEffects: Iterable<SideEffect<S, A>>,
@@ -50,45 +52,19 @@ fun <A, S> Flow<A>.reduxStore(
     logger?.log("Emitting initial state $currentState")
     emit(currentState)
 
-    suspend fun callReducer(origin: String, action: A) {
-        logger?.log("$origin: action $action received")
+    val upstreamActions = this@reduxStore
+    val sideEffectActions = sideEffects.map { it(loopback, getState) }
+
+    (sideEffectActions + upstreamActions).merge().collect { action ->
+        logger?.log("action $action received")
 
         // Change state
         val newState: S = reducer(currentState, action)
-        logger?.log("$origin: reducing $currentState with $action -> $newState")
+        logger?.log("reducing $currentState with $action -> $newState")
         currentState = newState
         emit(newState)
 
         // broadcast action
         loopback.emit(action)
-    }
-
-    coroutineScope {
-        val upstreamChannel = produceIn(this)
-        val sideEffectChannels = sideEffects.map { it(loopback, getState).produceIn(this) }
-
-        while (!upstreamChannel.isClosedForReceive || sideEffectChannels.any { !it.isClosedForReceive }) {
-            select<Unit> {
-                sideEffectChannels.forEachIndexed { index, sideEffectChannel ->
-                    if (!sideEffectChannel.isClosedForReceive) {
-                        sideEffectChannel.onReceiveCatching { result ->
-                            val action = result.getOrNull()
-                            if (action != null) {
-                                callReducer("SideEffect$index", action)
-                            }
-                        }
-                    }
-                }
-
-                if (!upstreamChannel.isClosedForReceive) {
-                    upstreamChannel.onReceiveCatching { result ->
-                        val action = result.getOrNull()
-                        if (action != null) {
-                            callReducer("Upstream", action)
-                        }
-                    }
-                }
-            }
-        }
     }
 }
