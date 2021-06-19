@@ -1,10 +1,10 @@
 ext.versions = [
-        agp                    : '4.1.1',
-        compileSdk             : 28,
-        targetSdk              : 28,
+        agp                    : '4.2.1',
+        compileSdk             : 30,
+        targetSdk              : 30,
         minSdk                 : 21,
 
-        dokka                  : '0.10.1',
+        dokka                  : '1.4.32',
         coroutines             : '1.4.3',
         dagger                 : '2.24',
         kotlin                 : '1.4.32',
@@ -26,25 +26,15 @@ ext.versions = [
         androidArch            : '2.1.0',
 
         junit                  : '4.12',
-        kotlinMockito          : '1.5.0',
-
-        assertJ                : '3.8.0',
-        karumi                 : '3.0.2',
-        testRunner             : '1.0.2',
-        espresso               : '3.0.2',
-        screengrab             : '1.2.0',
-        deviceAnimationsRule   : '0.0.2',
         turbine                : '0.4.1',
-
-        // TODO remove
-        kotlintest             : '3.4.2',
-        flowRecorder           : '0.2.0',
+        kotest                 : '4.5.0',
 ]
 
 ext.libraries = [
         dagger                : "com.google.dagger:dagger:$versions.dagger",
         daggerCompiler        : "com.google.dagger:dagger-compiler:$versions.dagger",
         kotlinStdlib          : "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin",
+        kotlinStdlibJdk8      : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$versions.kotlin",
         kotlinStdlibCommon    : "org.jetbrains.kotlin:kotlin-stdlib-common:$versions.kotlin",
         kotlinStdlibJs        : "org.jetbrains.kotlin:kotlin-stdlib-js:$versions.kotlin",
         kotlinReflect         : "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin",
@@ -79,27 +69,22 @@ ext.supportLibraries = [
 
 ext.testLibraries = [
         junit               : "junit:junit:$versions.junit",
+        turbine             : "app.cash.turbine:turbine:${versions.turbine}",
+        kotlinTest          : "org.jetbrains.kotlin:kotlin-test:$versions.kotlin",
+        kotlinTestAnnotations : "org.jetbrains.kotlin:kotlin-test-annotations-common:$versions.kotlin",
+        kotlinTestJunit     : "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin",
+        kotestAssertions    : "io.kotest:kotest-assertions-core:$versions.kotest",
+        kotestRunner        : "io.kotest:kotest-runner-junit5:$versions.kotest",
         mockWebServer       : "com.squareup.okhttp3:mockwebserver:$versions.okhttp",
         okhttpTls           : "com.squareup.okhttp3:okhttp-tls:$versions.okhttp",
         androidArchTesting  : "android.arch.core:core-testing:$versions.androidArch",
-        testRunner          : "com.android.support.test:runner:$versions.testRunner",
-        testRules           : "com.android.support.test:rules:$versions.testRunner",
-        espresso            : "com.android.support.test.espresso:espresso-core:$versions.espresso",
-        espressoContrib     : "com.android.support.test.espresso:espresso-contrib:$versions.espresso",
-        screengrab          : "tools.fastlane:screengrab:$versions.screengrab",
-        deviceAnimationsRule: "com.github.VictorAlbertos:DeviceAnimationTestRule:$versions.deviceAnimationsRule",
         coroutinesTest      : "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutines",
-        kotlintest          : "io.kotlintest:kotlintest-runner-junit5:$versions.kotlintest",
-        flowRecorder        : "com.freeletics.flow.test:recorder:$versions.flowRecorder",
-        turbine               : "app.cash.turbine:turbine:${versions.turbine}",
-
 ]
 
 ext.gradlePlugins = [
         android        : "com.android.tools.build:gradle:$versions.agp",
         kotlin         : "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin",
-        karumi         : "com.karumi:shot:$versions.karumi",
-        dokka          : "org.jetbrains.dokka:dokka-gradle-plugin:$versions.kotlin",
+        dokka          : "org.jetbrains.dokka:dokka-gradle-plugin:$versions.dokka",
         kotlinxcodesync: "co.touchlab:kotlinxcodesync:0.2",
         gradleMavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.15.1",
 ]

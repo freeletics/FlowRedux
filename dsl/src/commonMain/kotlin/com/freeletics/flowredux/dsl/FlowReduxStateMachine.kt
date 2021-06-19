@@ -1,7 +1,6 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.FlowReduxLogger
-import com.freeletics.mad.statemachine.StateMachine
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -9,7 +8,7 @@ import kotlinx.coroutines.flow.consumeAsFlow
 abstract class FlowReduxStateMachine<S : Any, A : Any>(
     logger: FlowReduxLogger?,
     initialStateSupplier: () -> S
-) : StateMachine<S, A> {
+) {
 
     // TODO remove constructor overloads
     constructor(
@@ -42,11 +41,11 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
 
     private val inputActionChannel = Channel<A>(Channel.UNLIMITED)
 
-    override suspend fun dispatch(action: A) {
+    suspend fun dispatch(action: A) {
         inputActionChannel.send(action)
     }
 
-    override val state: Flow<S> by lazy(LazyThreadSafetyMode.NONE) {
+    val state: Flow<S> by lazy(LazyThreadSafetyMode.NONE) {
         val spec = specBlock
         println("Spec is $spec")
            if (spec == null) {
