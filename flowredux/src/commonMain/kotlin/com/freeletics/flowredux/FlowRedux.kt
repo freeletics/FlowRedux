@@ -1,16 +1,11 @@
 package com.freeletics.flowredux
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.produceIn
-import kotlinx.coroutines.selects.select
 
 /**
  * Creates a Redux store with an initial state. If your initial state is an expensive computation
@@ -18,7 +13,6 @@ import kotlinx.coroutines.selects.select
  * first state lazily once the flow starts.
 
 @ExperimentalCoroutinesApi
-@FlowPreview
 fun <A, S> Flow<A>.reduxStore(
         initialState: S,
         sideEffects: Iterable<SideEffect<S, A>>,

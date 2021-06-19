@@ -2,12 +2,10 @@ package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.FlowReduxLogger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
 
-@FlowPreview
 @ExperimentalCoroutinesApi
 abstract class FlowReduxStateMachine<S : Any, A : Any>(
     logger: FlowReduxLogger?,
