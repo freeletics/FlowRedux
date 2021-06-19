@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Creates a Redux store with an initial state. If your initial state is an expensive computation
@@ -46,15 +47,15 @@ fun <A, S> Flow<A>.reduxStore(
     logger?.log("Emitting initial state $currentState")
     emit(currentState)
 
-    val upstreamActions = this@reduxStore
-    val sideEffectActions = sideEffects.map { it(loopback, getState) }
+    val upstreamActions = this@reduxStore.onEach { logger?.log("Upstream action $it received") }
+    val sideEffectActions = sideEffects.mapIndexed { index, sideEffect ->
+        sideEffect(loopback, getState).onEach { logger?.log("SideEffect $index action $it received") }
+    }
 
     (sideEffectActions + upstreamActions).merge().collect { action ->
-        logger?.log("action $action received")
-
         // Change state
         val newState: S = reducer(currentState, action)
-        logger?.log("reducing $currentState with $action -> $newState")
+        logger?.log("Reducing $currentState with $action -> $newState")
         currentState = newState
         emit(newState)
 
