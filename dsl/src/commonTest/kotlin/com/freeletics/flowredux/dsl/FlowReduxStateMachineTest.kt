@@ -59,7 +59,7 @@ class FlowReduxStateMachineTest {
                     "Example usage:\n" +
                     "\n" +
                     "class MyStateMachine : FlowReduxStateMachine<State, Action>(InitialState) {\n" +
-                    "    \n" +
+                    "\n" +
                     "    init{\n" +
                     "        spec {\n" +
                     "            inState<FooState> {\n" +

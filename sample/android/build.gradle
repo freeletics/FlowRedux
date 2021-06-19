@@ -116,12 +116,6 @@ dependencies {
 
     kaptTest libraries.daggerCompiler
     androidTestImplementation testLibraries.junit
-    androidTestImplementation testLibraries.testRunner
-    androidTestImplementation testLibraries.espresso
-    androidTestImplementation testLibraries.espressoContrib
-    androidTestImplementation testLibraries.testRules
-    // androidTestImplementation testLibraries.screengrab
-    androidTestImplementation testLibraries.deviceAnimationsRule
     androidTestImplementation testLibraries.mockWebServer
     androidTestImplementation libraries.moshiKotlin
     androidTestImplementation libraries.moshi
