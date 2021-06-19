@@ -1,8 +1,6 @@
 apply plugin: 'org.jetbrains.dokka'
 apply plugin: 'org.jetbrains.kotlin.multiplatform'
-
-gradle.ext.isCiServer = true // System.getenv().containsKey("CI")
-logger.warn("Running on CI: ${gradle.ext.isCiServer}")
+apply plugin: 'com.vanniktech.maven.publish'
 
 kotlin {
     /*
@@ -27,23 +25,31 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api 'org.jetbrains.kotlin:kotlin-stdlib-common'
+                api libraries.kotlinStdlibCommon
                 api libraries.coroutines
             }
         }
 
         commonTest {
             dependencies {
-                implementation 'org.jetbrains.kotlin:kotlin-test-multiplatform'
+                implementation testLibraries.kotlinTest
+                implementation testLibraries.kotlinTestAnnotations
                 implementation testLibraries.turbine
             }
         }
 
-        jvmTest {
+        jvmMain {
             dependsOn commonMain
             dependencies {
-                implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-                implementation testLibraries.junit
+                implementation libraries.kotlinStdlibJdk8
+            }
+        }
+
+        jvmTest {
+            dependencies {
+                implementation testLibraries.kotlinTestJunit
+                implementation testLibraries.kotestRunner
+                implementation testLibraries.coroutinesTest
             }
         }
 
@@ -69,21 +75,20 @@ kotlin {
             compilations.test.source(sourceSets.nativeTest)
         }
     }
-}
 
-
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    kotlinOptions {
-        freeCompilerArgs += ["-Xuse-experimental=kotlin.Experimental"]
+    targets.all {
+        compilations.all {
+            kotlinOptions {
+                freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"]
+            }
+        }
     }
-}
-/*
-dokka {
-    outputFormat = 'html'
-    outputDirectory = "$buildDir/javadoc"
-}
- */
 
-if (gradle.ext.isCiServer) {
-    apply plugin: "com.vanniktech.maven.publish"
+    targets.jvm {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
 }

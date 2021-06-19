@@ -1,8 +1,6 @@
 apply plugin: 'org.jetbrains.dokka'
 apply plugin: 'org.jetbrains.kotlin.multiplatform'
-
-gradle.ext.isCiServer = true // System.getenv().containsKey("CI")
-logger.warn("Running on CI: ${gradle.ext.isCiServer}")
+apply plugin: 'com.vanniktech.maven.publish'
 
 kotlin {
     /*
@@ -28,13 +26,13 @@ kotlin {
         commonMain {
             dependencies {
                 api project(":flowredux")
-                api libraries.flMadStateMachine
             }
         }
 
         commonTest {
             dependencies {
-                implementation 'org.jetbrains.kotlin:kotlin-test-multiplatform'
+                implementation testLibraries.kotlinTest
+                implementation testLibraries.kotlinTestAnnotations
                 implementation testLibraries.turbine
             }
         }
@@ -42,17 +40,15 @@ kotlin {
         jvmMain {
             dependsOn commonMain
             dependencies {
-                implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+                implementation libraries.kotlinStdlibJdk8
             }
         }
 
         jvmTest {
             dependencies {
-                implementation testLibraries.junit
-                implementation testLibraries.kotlintest
+                implementation testLibraries.kotlinTestJunit
+                implementation testLibraries.kotestRunner
                 implementation testLibraries.coroutinesTest
-                implementation testLibraries.flowRecorder
-                implementation 'com.freeletics.flow.test:test:0.0.2-SNAPSHOT'
             }
         }
 
@@ -78,22 +74,20 @@ kotlin {
             compilations.test.source(sourceSets.nativeTest)
         }
     }
-}
 
-
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    kotlinOptions {
-        freeCompilerArgs += ["-Xuse-experimental=kotlin.Experimental"]
-        jvmTarget = "1.8"
+    targets.all {
+        compilations.all {
+            kotlinOptions {
+                freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"]
+            }
+        }
     }
-}
-/*
-dokka {
-    outputFormat = 'html'
-    outputDirectory = "$buildDir/javadoc"
-}
- */
 
-if (gradle.ext.isCiServer) {
-    apply plugin: "com.vanniktech.maven.publish"
+    targets.jvm {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
 }
