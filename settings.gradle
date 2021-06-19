@@ -1,2 +1,1 @@
 include ':flowredux', ':dsl', ':sample:android', ':sample:shared_code'
-enableFeaturePreview('GRADLE_METADATA')
