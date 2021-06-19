@@ -1,7 +1,6 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -114,11 +113,5 @@ class CustomIsInStateDslTest {
         }
 
         assertFalse(reached)
-    }
-
-    private fun dispatchAsync(sm: FlowReduxStateMachine<TestState, TestAction>, action: TestAction) {
-        GlobalScope.launch {
-            sm.dispatch(action)
-        }
     }
 }

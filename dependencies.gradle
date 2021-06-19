@@ -5,9 +5,9 @@ ext.versions = [
         minSdk                 : 21,
 
         dokka                  : '1.4.32',
-        coroutines             : '1.4.3',
+        coroutines             : '1.5.0',
         dagger                 : '2.24',
-        kotlin                 : '1.4.32',
+        kotlin                 : '1.5.10',
         rxJava                 : '2.2.12',
         rxAndroid              : '2.1.1',
         rxBinding              : '2.2.0',
@@ -26,8 +26,8 @@ ext.versions = [
         androidArch            : '2.1.0',
 
         junit                  : '4.12',
-        turbine                : '0.4.1',
-        kotest                 : '4.5.0',
+        turbine                : '0.5.2',
+        kotest                 : '4.6.0',
 ]
 
 ext.libraries = [
@@ -74,7 +74,6 @@ ext.testLibraries = [
         kotlinTestAnnotations : "org.jetbrains.kotlin:kotlin-test-annotations-common:$versions.kotlin",
         kotlinTestJunit     : "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin",
         kotestAssertions    : "io.kotest:kotest-assertions-core:$versions.kotest",
-        kotestRunner        : "io.kotest:kotest-runner-junit5:$versions.kotest",
         mockWebServer       : "com.squareup.okhttp3:mockwebserver:$versions.okhttp",
         okhttpTls           : "com.squareup.okhttp3:okhttp-tls:$versions.okhttp",
         androidArchTesting  : "android.arch.core:core-testing:$versions.androidArch",

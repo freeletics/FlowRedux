@@ -34,6 +34,7 @@ kotlin {
             dependencies {
                 implementation testLibraries.kotlinTest
                 implementation testLibraries.kotlinTestAnnotations
+                implementation testLibraries.kotestAssertions
                 implementation testLibraries.turbine
             }
         }
@@ -47,7 +48,6 @@ kotlin {
         jvmTest {
             dependencies {
                 implementation testLibraries.kotlinTestJunit
-                implementation testLibraries.kotestRunner
                 implementation testLibraries.coroutinesTest
             }
         }
