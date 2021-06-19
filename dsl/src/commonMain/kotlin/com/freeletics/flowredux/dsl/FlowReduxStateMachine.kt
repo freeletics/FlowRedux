@@ -1,10 +1,14 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.FlowReduxLogger
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 abstract class FlowReduxStateMachine<S : Any, A : Any>(
     logger: FlowReduxLogger?,
     initialStateSupplier: () -> S
@@ -70,7 +74,7 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
            }
         inputActionChannel
             .consumeAsFlow()
-            .reduxStore<S, A>(logger, initialStateSupplier, spec)
+            .reduxStore(logger, initialStateSupplier, spec)
             .also {
                 specBlock = null // Free up memory
             }

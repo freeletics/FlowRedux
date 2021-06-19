@@ -68,3 +68,5 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         return _inStateSideEffectBuilders.map { it.generateSideEffect() }
     }
 }
+
+typealias InStateObserverBlock<T, InputState, S> = suspend (value: T, state: InputState) -> ChangeState<S>

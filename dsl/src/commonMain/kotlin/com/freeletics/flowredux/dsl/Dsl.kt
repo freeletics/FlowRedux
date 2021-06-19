@@ -8,10 +8,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlin.reflect.KClass
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 /**
  * Provides a fluent DSL to specify a ReduxStore
  */
+@FlowPreview
+@ExperimentalCoroutinesApi
 fun <S : Any, A : Any> Flow<A>.reduxStore(
     logger: FlowReduxLogger? = null,
     initialStateSupplier: () -> S,
@@ -20,11 +24,11 @@ fun <S : Any, A : Any> Flow<A>.reduxStore(
     val builder = FlowReduxStoreBuilder<S, A>()
     block(builder)
 
-    return this.map { ExternalWrappedAction<S, A>(it) as Action<S, A> }
+    return this.map<A, Action<S, A>> { ExternalWrappedAction(it) }
         .onStart {
-            emit(InitialStateAction<S, A>())
+            emit(InitialStateAction())
         }
-        .reduxStore<Action<S, A>, S>(
+        .reduxStore(
             logger = logger,
             initialStateSupplier = initialStateSupplier,
             reducer = ::reducer,
@@ -36,6 +40,8 @@ fun <S : Any, A : Any> Flow<A>.reduxStore(
 /**
  * Provides a fluent DSL to specify a ReduxStore
  */
+@FlowPreview
+@ExperimentalCoroutinesApi
 fun <S : Any, A : Any> Flow<A>.reduxStore(
     logger: FlowReduxLogger? = null,
     initialState: S,

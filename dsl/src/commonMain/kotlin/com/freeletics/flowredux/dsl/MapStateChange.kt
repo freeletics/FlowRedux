@@ -94,7 +94,7 @@ internal class MapStateChange<S : Any, A : Any>(
 internal fun <S: Any, A : Any> Flow<Action<S, A>>.mapStateChanges(
     getState: GetState<S>,
     isInState : (S) -> Boolean
-): Flow<MapStateChange.StateChanged> = MapStateChange<S, A>(
+): Flow<MapStateChange.StateChanged> = MapStateChange(
     actions = this,
     isInState = isInState,
     getState = getState

@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlin.reflect.KClass
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
@@ -18,6 +20,8 @@ class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     internal val onActionBlock: OnActionBlock<InputState, S, A>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
 

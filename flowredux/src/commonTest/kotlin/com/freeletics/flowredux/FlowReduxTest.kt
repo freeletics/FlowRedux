@@ -1,10 +1,20 @@
 package com.freeletics.flowredux
 
 import app.cash.turbine.test
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
 class FlowReduxTest {
@@ -12,10 +22,11 @@ class FlowReduxTest {
     @Test
     fun `initial state is emitted even without actions as input`() {
         var reducerInvocations = 0
+
         suspendTest {
             launch {
                 emptyFlow<Int>()
-                        .reduxStore({ 0 }, emptyList()) { state, action ->
+                        .reduxStore({ 0 }, emptyList()) { state, _ ->
                             reducerInvocations++
                             state + 1
                         }
@@ -31,7 +42,7 @@ class FlowReduxTest {
 
     @Test
     fun `store without side effects just runs reducer`() = suspendTest {
-        async {
+        launch {
             flow {
                 emit(1)
                 emit(2)
@@ -44,7 +55,6 @@ class FlowReduxTest {
                 expectComplete()
             }
         }
-
     }
 
     @Test
@@ -53,7 +63,6 @@ class FlowReduxTest {
 
         suspendTest {
             launch {
-
                 val sideEffect1: SideEffect<String, Int> = { actions, _ ->
                     actions.flatMapConcat {
                         sideEffect1Actions.add(it)
@@ -85,14 +94,12 @@ class FlowReduxTest {
         val sideEffect2Actions = mutableListOf<Int>()
 
         suspendTest {
-
             launch {
-
                 val sideEffect1: SideEffect<String, Int> = { actions, _ ->
-                    actions.flatMapConcat { sideEffect1Actions.add(it); emptyFlow<Int>() }
+                    actions.flatMapConcat { sideEffect1Actions.add(it); emptyFlow() }
                 }
                 val sideEffect2: SideEffect<String, Int> = { actions, _ ->
-                    actions.flatMapConcat { sideEffect2Actions.add(it); emptyFlow<Int>() }
+                    actions.flatMapConcat { sideEffect2Actions.add(it); emptyFlow() }
                 }
 
                 flow {
@@ -115,7 +122,7 @@ class FlowReduxTest {
 
     @Test
     fun `store with 2 simple side effects`() = suspendTest {
-        async {
+        launch {
             val sideEffect1: SideEffect<String, Int> = { actions, _ ->
                 actions.flatMapConcat {
                     if (it < 6) {
@@ -170,7 +177,6 @@ class FlowReduxTest {
 
         suspendTest {
             val job = launch {
-
                 val sideEffect1: SideEffect<String, Int> = { actions, _ ->
                     actions.map {
                         sideEffect1Started = true

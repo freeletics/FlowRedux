@@ -39,7 +39,6 @@ kotlin {
         }
 
         jvmMain {
-            dependsOn commonMain
             dependencies {
                 implementation libraries.kotlinStdlibJdk8
             }
@@ -79,6 +78,7 @@ kotlin {
     targets.all {
         compilations.all {
             kotlinOptions {
+                allWarningsAsErrors = true
                 freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"]
             }
         }

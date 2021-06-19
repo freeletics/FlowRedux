@@ -37,10 +37,10 @@ fun <A, S> Flow<A>.reduxStore(
 @ExperimentalCoroutinesApi
 @FlowPreview
 fun <A, S> Flow<A>.reduxStore(
-        initialStateSupplier: () -> S,
-        sideEffects: Iterable<SideEffect<S, A>>,
-        logger: FlowReduxLogger? = null,
-        reducer: Reducer<S, A>
+    initialStateSupplier: () -> S,
+    sideEffects: Iterable<SideEffect<S, A>>,
+    logger: FlowReduxLogger? = null,
+    reducer: Reducer<S, A>
 ): Flow<S> = flow {
 
     var currentState: S = initialStateSupplier()
@@ -48,7 +48,7 @@ fun <A, S> Flow<A>.reduxStore(
     val loopback: BroadcastChannel<A> = BroadcastChannel(1)
 
     // Emit the initial state
-    // println("Emitting initial state")
+    logger?.log("Emitting initial state $currentState")
     emit(currentState)
 
     suspend fun callReducer(origin: String, action: A) {
