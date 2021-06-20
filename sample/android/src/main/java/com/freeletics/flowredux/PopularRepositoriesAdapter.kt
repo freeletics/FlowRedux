@@ -3,7 +3,6 @@ package com.freeletics.flowredux
 import androidx.recyclerview.widget.DiffUtil
 import com.freeletics.flowredux.sample.shared.GithubRepository
 import com.hannesdorfmann.adapterdelegates4.AsyncListDifferDelegationAdapter
-import com.hannesdorfmann.adapterdelegates4.ListDelegationAdapter
 import com.hannesdorfmann.adapterdelegates4.dsl.adapterDelegateLayoutContainer
 import kotlinx.android.synthetic.main.item_repository.*
 
