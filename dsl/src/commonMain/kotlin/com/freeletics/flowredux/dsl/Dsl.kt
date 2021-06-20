@@ -7,14 +7,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 
 /**
  * Provides a fluent DSL to specify a ReduxStore
  */
-@FlowPreview
 @ExperimentalCoroutinesApi
 fun <S : Any, A : Any> Flow<A>.reduxStore(
     logger: FlowReduxLogger? = null,
@@ -40,7 +37,6 @@ fun <S : Any, A : Any> Flow<A>.reduxStore(
 /**
  * Provides a fluent DSL to specify a ReduxStore
  */
-@FlowPreview
 @ExperimentalCoroutinesApi
 fun <S : Any, A : Any> Flow<A>.reduxStore(
     logger: FlowReduxLogger? = null,

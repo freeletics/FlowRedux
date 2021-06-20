@@ -1,13 +1,12 @@
 package com.freeletics.flowredux
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.produceIn
-import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Creates a Redux store with an initial state. If your initial state is an expensive computation
@@ -15,7 +14,6 @@ import kotlinx.coroutines.selects.select
  * first state lazily once the flow starts.
 
 @ExperimentalCoroutinesApi
-@FlowPreview
 fun <A, S> Flow<A>.reduxStore(
         initialState: S,
         sideEffects: Iterable<SideEffect<S, A>>,
@@ -34,7 +32,6 @@ fun <A, S> Flow<A>.reduxStore(
  * the flow starts.
  */
 @ExperimentalCoroutinesApi
-@FlowPreview
 fun <A, S> Flow<A>.reduxStore(
     initialStateSupplier: () -> S,
     sideEffects: Iterable<SideEffect<S, A>>,
@@ -50,45 +47,19 @@ fun <A, S> Flow<A>.reduxStore(
     logger?.log("Emitting initial state $currentState")
     emit(currentState)
 
-    suspend fun callReducer(origin: String, action: A) {
-        logger?.log("$origin: action $action received")
+    val upstreamActions = this@reduxStore.onEach { logger?.log("Upstream action $it received") }
+    val sideEffectActions = sideEffects.mapIndexed { index, sideEffect ->
+        sideEffect(loopback, getState).onEach { logger?.log("SideEffect $index action $it received") }
+    }
 
+    (sideEffectActions + upstreamActions).merge().collect { action ->
         // Change state
         val newState: S = reducer(currentState, action)
-        logger?.log("$origin: reducing $currentState with $action -> $newState")
+        logger?.log("Reducing $currentState with $action -> $newState")
         currentState = newState
         emit(newState)
 
         // broadcast action
         loopback.emit(action)
-    }
-
-    coroutineScope {
-        val upstreamChannel = produceIn(this)
-        val sideEffectChannels = sideEffects.map { it(loopback, getState).produceIn(this) }
-
-        while (!upstreamChannel.isClosedForReceive || sideEffectChannels.any { !it.isClosedForReceive }) {
-            select<Unit> {
-                sideEffectChannels.forEachIndexed { index, sideEffectChannel ->
-                    if (!sideEffectChannel.isClosedForReceive) {
-                        sideEffectChannel.onReceiveCatching { result ->
-                            val action = result.getOrNull()
-                            if (action != null) {
-                                callReducer("SideEffect$index", action)
-                            }
-                        }
-                    }
-                }
-
-                if (!upstreamChannel.isClosedForReceive) {
-                    upstreamChannel.onReceiveCatching { result ->
-                        val action = result.getOrNull()
-                        if (action != null) {
-                            callReducer("Upstream", action)
-                        }
-                    }
-                }
-            }
-        }
     }
 }
