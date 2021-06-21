@@ -40,7 +40,6 @@ internal class MapStateChange<S : Any, A : Any>(
     private var lastState: S? = null
 
     internal val flow: Flow<StateChanged> = actions.map {
-        println("action $it")
         mutex.withLock {
 
             val state = getState()
