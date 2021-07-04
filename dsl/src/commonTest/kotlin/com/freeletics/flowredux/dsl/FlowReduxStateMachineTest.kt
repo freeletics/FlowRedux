@@ -1,13 +1,16 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.launch
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.MainScope
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
 class FlowReduxStateMachineTest {
@@ -26,7 +29,7 @@ class FlowReduxStateMachineTest {
     @Test
     fun `calling spec block twice throws exception`() {
 
-        val sm = object : FlowReduxStateMachine<Any, Any>(Any()) {
+        val sm = object : FlowReduxStateMachine<Any, Any>(Any(), CoroutineScope(EmptyCoroutineContext)) {
 
             init {
                 spec { }
@@ -50,7 +53,7 @@ class FlowReduxStateMachineTest {
     @Test
     fun `no spec block set throws exception`() {
 
-        val sm = object : FlowReduxStateMachine<Any, Any>(Any()) {}
+        val sm = object : FlowReduxStateMachine<Any, Any>(Any(), CoroutineScope(EmptyCoroutineContext)) {}
 
         try {
             sm.state

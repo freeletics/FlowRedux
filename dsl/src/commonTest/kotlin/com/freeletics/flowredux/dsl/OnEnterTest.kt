@@ -52,7 +52,7 @@ class OnEnterTest {
     }
 
     @Test
-    fun `on entering the same state doesnt tringer onEnter again`() {
+    fun `on entering the same state doesnt trigger onEnter again`() {
         suspendTest {
             var s1Entered = 0
             val sm = StateMachine {
@@ -73,7 +73,7 @@ class OnEnterTest {
 
             launch {
                 sm.state.test {
-                    assertEquals(TestState.Initial, expectItem())
+                    // switch to from Initial to S1 is immediate, before we start collecting
                     assertEquals(TestState.S1, expectItem())
                     repeat(2) {
                         dispatchAsync(sm, TestAction.A1) // Causes state transition to S1 again which is already current
