@@ -1,34 +1,29 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.FlowReduxLogger
+import com.freeletics.mad.statemachine.StateMachine
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onSubscription
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 abstract class FlowReduxStateMachine<S : Any, A : Any>(
-    logger: FlowReduxLogger?,
-    initialStateSupplier: () -> S
-) {
+    private val initialState: S,
+    private val scope: CoroutineScope,
+    private val logger: FlowReduxLogger? = null
+) : StateMachine<S, A> {
 
-    // TODO remove constructor overloads
-    constructor(
-        initialStateSupplier: () -> S
-    ) : this(
-        logger = null,
-        initialStateSupplier = initialStateSupplier
-    )
-
-    constructor(initialState: S) : this(logger = null, initialState = initialState)
-
-    constructor(
-        logger: FlowReduxLogger?,
-        initialState: S
-    ) : this(logger, { initialState })
+    private val inputActions = MutableSharedFlow<A>()
+    private val internalState = MutableStateFlow(initialState)
 
     private var specBlockSet = false
-    private var specBlock: (FlowReduxStoreBuilder<S, A>.() -> Unit)? = null
 
     protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
         if (specBlockSet) {
@@ -37,20 +32,26 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
                     "It's only allowed to call spec {...} once."
             )
         }
-        this.specBlock = specBlock
         this.specBlockSet = true
+        scope.launch {
+            inputActions.reduxStore(logger, initialStateSupplier = { initialState }, specBlock)
+                .collect(internalState::emit)
+        }
     }
 
-    private val inputActionChannel = Channel<A>(Channel.UNLIMITED)
-
-    suspend fun dispatch(action: A) {
-        inputActionChannel.send(action)
+    override val state: StateFlow<S> get() {
+        check(scope.isActive) { "The scope of this state machine was already cancelled." }
+        checkSpecBlockSet()
+        return internalState
     }
 
-    val state: Flow<S> by lazy(LazyThreadSafetyMode.NONE) {
-        val spec = specBlock
-        println("Spec is $spec")
-           if (spec == null) {
+    override suspend fun dispatch(action: A) {
+        check(scope.isActive) { "The scope of this state machine was already cancelled." }
+        inputActions.emit(action)
+    }
+
+    private fun checkSpecBlockSet() {
+           if (!specBlockSet) {
                throw IllegalStateException(
                    """
                         No state machine specs are defined. Did you call spec { ... } in init {...}?
@@ -70,11 +71,5 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
                     """.trimIndent()
                )
            }
-        inputActionChannel
-            .consumeAsFlow()
-            .reduxStore(logger, initialStateSupplier, spec)
-            .also {
-                specBlock = null // Free up memory
-            }
     }
 }

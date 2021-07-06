@@ -20,8 +20,6 @@ class CollectWhileInStateTest {
         val recordedValues = mutableListOf<Int>()
 
         suspendTest {
-
-
             val sm = StateMachine {
                 inState<TestState.Initial> {
                     collectWhileInState(flow {
@@ -39,7 +37,7 @@ class CollectWhileInStateTest {
 
             launch {
                 sm.state.test {
-                    assertEquals(TestState.Initial, expectItem())
+                    // switch to from Initial to S1 is immediate, before we start collecting
                     assertEquals(TestState.S1, expectItem())
                 }
             }
@@ -72,7 +70,7 @@ class CollectWhileInStateTest {
 
         launch {
             sm.state.test {
-                assertEquals(TestState.Initial, expectItem())
+                // switch to from Initial to S1 is immediate, before we start collecting
                 assertEquals(TestState.S1, expectItem())
 
                 dispatchAsync(sm, TestAction.A1)
