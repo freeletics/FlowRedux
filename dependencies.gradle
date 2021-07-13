@@ -24,7 +24,7 @@ ext.versions = [
 
         junit                  : '4.13.2',
         turbine                : '0.5.2',
-        kotest                 : '4.6.0',
+        kotest                 : '4.6.1',
 ]
 
 ext.libraries = [
