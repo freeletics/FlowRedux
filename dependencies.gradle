@@ -17,7 +17,7 @@ ext.versions = [
         recyclerView           : '1.2.1',
         supportConstraintLayout: '2.0.4',
         androidArch            : '2.2.0',
-        fragmentKtx            : '1.3.5',
+        fragmentKtx            : '1.3.6',
         viewModelKtx           : '2.3.1',
         material               : '1.4.0',
         adapterDelegates       : '4.3.0',
