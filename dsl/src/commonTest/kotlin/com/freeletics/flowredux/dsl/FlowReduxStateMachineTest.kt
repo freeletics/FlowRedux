@@ -2,7 +2,6 @@ package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlinx.coroutines.launch
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
