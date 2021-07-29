@@ -1,6 +1,7 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
+import com.freeletics.flowredux.dsl.internal.Action
 
 /**
  * It's just not an Interface to not expose internal class `Action` to the public.
