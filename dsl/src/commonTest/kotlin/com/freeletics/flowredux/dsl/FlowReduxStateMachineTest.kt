@@ -8,6 +8,7 @@ import kotlin.test.assertEquals
 import kotlin.test.fail
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.MainScope
@@ -18,11 +19,9 @@ class FlowReduxStateMachineTest {
     @Test
     fun `empty statemachine just emits initial state`() = suspendTest {
         val sm = StateMachine { }
-        launch {
-            sm.state.test {
-                assertEquals(TestState.Initial, expectItem())
-                expectComplete()
-            }
+        sm.state.test {
+            assertEquals(TestState.Initial, expectItem())
+            expectComplete()
         }
     }
 
