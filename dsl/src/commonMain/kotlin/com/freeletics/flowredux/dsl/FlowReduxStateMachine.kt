@@ -4,12 +4,11 @@ import com.freeletics.flowredux.FlowReduxLogger
 import com.freeletics.mad.statemachine.StateMachine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onSubscription
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -20,7 +19,7 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
     private val logger: FlowReduxLogger? = null
 ) : StateMachine<S, A> {
 
-    private val inputActions = MutableSharedFlow<A>()
+    private val inputActions = Channel<A>()
     private val internalState = MutableStateFlow(initialState)
 
     private var specBlockSet = false
@@ -34,7 +33,9 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
         }
         this.specBlockSet = true
         scope.launch {
-            inputActions.reduxStore(logger, initialStateSupplier = { initialState }, specBlock)
+            inputActions
+                .consumeAsFlow()
+                .reduxStore(logger, initialStateSupplier = { initialState }, specBlock)
                 .collect(internalState::emit)
         }
     }
@@ -47,7 +48,7 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
 
     override suspend fun dispatch(action: A) {
         check(scope.isActive) { "The scope of this state machine was already cancelled." }
-        inputActions.emit(action)
+        inputActions.send(action)
     }
 
     private fun checkSpecBlockSet() {

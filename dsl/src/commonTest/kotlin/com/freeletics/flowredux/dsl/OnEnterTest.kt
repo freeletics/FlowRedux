@@ -50,31 +50,38 @@ class OnEnterTest {
 
     @Test
     fun `on entering the same state doesnt trigger onEnter again`() = suspendTest {
-        var s1Entered = 0
+        var genericStateEntered = 0
+        var a1Received = 0
+
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
-                    OverrideState(TestState.S1)
+                    OverrideState(TestState.GenericState("from initial", 0))
                 }
             }
 
-            inState<TestState.S1> {
+            inState<TestState.GenericState> {
                 onEnter {
-                    s1Entered++
-                    MutateState { this }
+                    genericStateEntered++
+                    OverrideState(TestState.GenericState("onEnter", 0))
                 }
-                on<TestAction.A1> { _, _ -> OverrideState(TestState.S1) }
+
+                on<TestAction.A1> { _, _ ->
+                    a1Received++
+                    OverrideState(TestState.GenericState("onA1", a1Received))
+                }
             }
         }
 
         sm.state.test {
-            // switch to from Initial to S1 is immediate, before we start collecting
-            assertEquals(TestState.S1, expectItem())
-            repeat(2) {
-                dispatchAsync(sm, TestAction.A1) // Causes state transition to S1 again which is already current
-                expectNoEvents()
-                assertEquals(1, s1Entered)
+            assertEquals(TestState.Initial, expectItem())
+            assertEquals(TestState.GenericState("from initial", 0), expectItem())
+            assertEquals(TestState.GenericState("onEnter", 0), expectItem())
+            repeat(2) { index ->
+                sm.dispatch(TestAction.A1) // Causes state transition to S1 again which is already current
+                assertEquals(TestState.GenericState("onA1", index + 1), expectItem())
             }
         }
+        assertEquals(1, genericStateEntered)
     }
 }

@@ -34,7 +34,7 @@ class CollectWhileInStateTest {
         }
 
         sm.state.test {
-            // switch to from Initial to S1 is immediate, before we start collecting
+            assertEquals(TestState.Initial, expectItem())
             assertEquals(TestState.S1, expectItem())
         }
         assertEquals(listOf(1), recordedValues) // 2,3 is not emitted
@@ -64,7 +64,7 @@ class CollectWhileInStateTest {
         }
 
         sm.state.test {
-            // switch to from Initial to S1 is immediate, before we start collecting
+            assertEquals(TestState.Initial, expectItem())
             assertEquals(TestState.S1, expectItem())
 
             dispatchAsync(sm, TestAction.A1)

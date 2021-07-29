@@ -64,7 +64,6 @@ class OnActionTest {
                 on<TestAction.A2> { _, _ ->
                     OverrideState(TestState.S2)
                 }
-
             }
         }
 
