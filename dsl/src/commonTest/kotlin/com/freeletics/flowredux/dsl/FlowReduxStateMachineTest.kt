@@ -21,7 +21,6 @@ class FlowReduxStateMachineTest {
         val sm = StateMachine { }
         sm.state.test {
             assertEquals(TestState.Initial, expectItem())
-            expectComplete()
         }
     }
 
