@@ -43,12 +43,13 @@ class OnActionTest {
             dispatchAsync(sm, TestAction.A1)
             delay(delay/2)
             dispatchAsync(sm, TestAction.A2)
-            assertTrue(reachedBefore)
-            assertFalse(reached)
             assertEquals(TestState.S2, expectItem())
             delay(delay)
             expectNoEvents()
         }
+
+        assertTrue(reachedBefore)
+        assertFalse(reached)
     }
 
     @Test

@@ -39,13 +39,14 @@ class OnEnterTest {
         sm.state.test {
             assertEquals(TestState.Initial, expectItem())
             delay(delay / 2)
-            assertTrue(blockEntered)
             dispatchAsync(sm, TestAction.A2)
-            assertFalse(reached)
             assertEquals(TestState.S2, expectItem())
             delay(delay)
             expectNoEvents()
         }
+
+        assertTrue(blockEntered)
+        assertFalse(reached)
     }
 
     @Test
