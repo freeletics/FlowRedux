@@ -1,9 +1,10 @@
 package com.freeletics.flowredux
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -41,16 +42,19 @@ fun <A, S> Flow<A>.reduxStore(
 
     var currentState: S = initialStateSupplier()
     val getState: GetState<S> = { currentState }
-    val loopback: MutableSharedFlow<A> = MutableSharedFlow(extraBufferCapacity = 1)
 
     // Emit the initial state
     logger?.log("Emitting initial state $currentState")
     emit(currentState)
 
-    val upstreamActions = this@reduxStore.onEach { logger?.log("Upstream action $it received") }
-    val sideEffectActions = sideEffects.mapIndexed { index, sideEffect ->
-        sideEffect(loopback, getState).onEach { logger?.log("SideEffect $index action $it received") }
+    val loopbacks = sideEffects.map {
+        Channel<A>()
     }
+    val sideEffectActions = sideEffects.mapIndexed { index, sideEffect ->
+        val actionsFlow = loopbacks[index].consumeAsFlow()
+        sideEffect(actionsFlow, getState).onEach { logger?.log("SideEffect $index action $it received") }
+    }
+    val upstreamActions = this@reduxStore.onEach { logger?.log("Upstream action $it received") }
 
     (sideEffectActions + upstreamActions).merge().collect { action ->
         // Change state
@@ -60,6 +64,8 @@ fun <A, S> Flow<A>.reduxStore(
         emit(newState)
 
         // broadcast action
-        loopback.emit(action)
+        loopbacks.forEach {
+            it.send(action)
+        }
     }
 }
