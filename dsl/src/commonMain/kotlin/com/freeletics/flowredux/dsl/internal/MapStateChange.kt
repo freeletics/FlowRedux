@@ -1,4 +1,4 @@
-package com.freeletics.flowredux.dsl
+package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.GetState
 import kotlinx.coroutines.flow.Flow
