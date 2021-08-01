@@ -4,14 +4,13 @@ import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.FlatMapPolicy
 import com.freeletics.flowredux.dsl.InStateObserverBlock
+import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
@@ -27,8 +26,7 @@ import kotlinx.coroutines.sync.withLock
  * the given state. We use is instance of check to check if a new state has been reached and Flow<T>
  * is closed.
  */
-// TODO make [ObserveInStateSideEffectBuilder] work and remove this class.
-internal class Working_CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
+internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     private val flow: Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
@@ -39,43 +37,18 @@ internal class Working_CollectInStateBuilder<T, InputState : S, S : Any, A : Any
     @FlowPreview
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
-            when (flatMapPolicy) {
-                FlatMapPolicy.LATEST ->
-                    actions
-                        .filterState(getState = getState, isInState = isInState)
-                        .flatMapLatest { stateSubscription ->
-                            when (stateSubscription) {
-                                FilterState.StateChanged.SUBSCRIBE ->
-                                    flow.flatMapLatest {
-                                        setStateFlow(value = it, getState = getState)
-                                    }
-                                FilterState.StateChanged.UNSUBSCRIBE -> flow { }
+            actions
+                .filterState(getState = getState, isInState = isInState)
+                .flatMapLatest { stateSubscription ->
+                    when (stateSubscription) {
+                        FilterState.StateChanged.SUBSCRIBE -> {
+                            flow.flatMapWithPolicy(flatMapPolicy) {
+                                setStateFlow(value = it, getState = getState)
                             }
                         }
-                FlatMapPolicy.CONCAT -> actions
-                    .filterState(getState = getState, isInState = isInState)
-                    .flatMapLatest { stateSubscription ->
-                        when (stateSubscription) {
-                            FilterState.StateChanged.SUBSCRIBE ->
-                                flow.flatMapConcat {
-                                    setStateFlow(value = it, getState = getState)
-                                }
-                            FilterState.StateChanged.UNSUBSCRIBE -> flow { }
-                        }
+                        FilterState.StateChanged.UNSUBSCRIBE -> flow { }
                     }
-                FlatMapPolicy.MERGE -> actions
-                    .filterState(getState = getState, isInState = isInState)
-                    .flatMapLatest { stateSubscription ->
-                        when (stateSubscription) {
-                            FilterState.StateChanged.SUBSCRIBE ->
-                                flow.flatMapMerge {
-                                    setStateFlow(value = it, getState = getState)
-                                }
-                            FilterState.StateChanged.UNSUBSCRIBE -> flow { }
-                        }
-                    }
-            }
-
+                }
         }
     }
 
