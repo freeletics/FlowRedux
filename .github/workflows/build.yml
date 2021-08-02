@@ -29,10 +29,16 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build --stacktrace
 
-      - name: Print DSL module test results
+      - name: Upload dsl test report artifact
         if: ${{ failure() }}
-        run: cat /home/runner/work/FlowRedux/FlowRedux/dsl/build/reports/tests/allTests/index.html
+        uses: actions/upload-artifact@v2
+        with:
+          name: dsl-test-report
+          path: /home/runner/work/FlowRedux/FlowRedux/dsl/build/reports/tests/allTests/
 
-      - name: Print flowredux module test results
+      - name: Upload flowredux test report artifact
         if: ${{ failure() }}
-        run: cat /home/runner/work/FlowRedux/FlowRedux/flowredux/build/reports/tests/allTests/index.html
+        uses: actions/upload-artifact@v2
+        with:
+          name: flowredux-test-report
+          path: /home/runner/work/FlowRedux/FlowRedux/flowredux/build/reports/tests/allTests/
