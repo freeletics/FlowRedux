@@ -576,10 +576,9 @@ could complete before the first execution (because using a random time of waitin
 - `CONCAT`: In contrast to `MERGE` and `LATEST` `CONCAT` will not run `on<BarAction>` in parallel and will not cancel
   any previous execution. Instead, `CONCAT` will preserve the order and execute one block after another.
 
-All execution blocks can specify a `FlatMapPolicy`:
+All execution blocks except `onEnter` can specify a `FlatMapPolicy`:
 
 - `on<Action>(flatMapPolicy = FlatMapPolicy.LATEST){... }`
-- `onEnter(flatMapPolicy = FlatMapPolicy.LATEST) { ... }`
 - `collectWhileInState(flatMapPolicy = FlatMapPolicy.LATEST) { ... }`
 
 ## Best Practice
