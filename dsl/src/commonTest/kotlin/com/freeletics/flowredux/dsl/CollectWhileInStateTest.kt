@@ -4,7 +4,6 @@ import app.cash.turbine.test
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.ExperimentalTime
@@ -15,34 +14,28 @@ import kotlinx.coroutines.FlowPreview
 class CollectWhileInStateTest {
 
     @Test
-    fun `collectWhileInState stops after having moved to next state`() {
+    fun `collectWhileInState stops after having moved to next state`() = suspendTest {
 
         val recordedValues = mutableListOf<Int>()
 
-        suspendTest {
-
-
-            val sm = StateMachine {
-                inState<TestState.Initial> {
-                    collectWhileInState(flow {
-                        emit(1)
-                        delay(10)
-                        emit(2)
-                        delay(10)
-                        emit(3)
-                    }) { v, _ ->
-                        recordedValues.add(v)
-                        return@collectWhileInState OverrideState(TestState.S1)
-                    }
+        val sm = StateMachine {
+            inState<TestState.Initial> {
+                collectWhileInState(flow {
+                    emit(1)
+                    delay(10)
+                    emit(2)
+                    delay(10)
+                    emit(3)
+                }) { v, _ ->
+                    recordedValues.add(v)
+                    return@collectWhileInState OverrideState(TestState.S1)
                 }
             }
+        }
 
-            launch {
-                sm.state.test {
-                    assertEquals(TestState.Initial, expectItem())
-                    assertEquals(TestState.S1, expectItem())
-                }
-            }
+        sm.state.test {
+            assertEquals(TestState.Initial, expectItem())
+            assertEquals(TestState.S1, expectItem())
         }
         assertEquals(listOf(1), recordedValues) // 2,3 is not emitted
     }
@@ -70,23 +63,21 @@ class CollectWhileInStateTest {
             }
         }
 
-        launch {
-            sm.state.test {
-                assertEquals(TestState.Initial, expectItem())
-                assertEquals(TestState.S1, expectItem())
+        sm.state.test {
+            assertEquals(TestState.Initial, expectItem())
+            assertEquals(TestState.S1, expectItem())
 
-                dispatchAsync(sm, TestAction.A1)
-                assertEquals(TestState.S2, expectItem())
+            dispatchAsync(sm, TestAction.A1)
+            assertEquals(TestState.S2, expectItem())
 
-                dispatchAsync(sm, TestAction.A2)
-                assertEquals(TestState.S1, expectItem())
+            dispatchAsync(sm, TestAction.A2)
+            assertEquals(TestState.S1, expectItem())
 
-                dispatchAsync(sm, TestAction.A1)
-                assertEquals(TestState.S2, expectItem())
+            dispatchAsync(sm, TestAction.A1)
+            assertEquals(TestState.S2, expectItem())
 
-                dispatchAsync(sm, TestAction.A2)
-                assertEquals(TestState.S1, expectItem())
-            }
+            dispatchAsync(sm, TestAction.A2)
+            assertEquals(TestState.S1, expectItem())
         }
     }
 }

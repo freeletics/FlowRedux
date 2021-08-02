@@ -2,16 +2,22 @@ package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.FlowReduxLogger
 import com.freeletics.flowredux.SideEffect
+import com.freeletics.flowredux.dsl.internal.Action
+import com.freeletics.flowredux.dsl.internal.ExternalWrappedAction
+import com.freeletics.flowredux.dsl.internal.InitialStateAction
+import com.freeletics.flowredux.dsl.internal.reducer
 import com.freeletics.flowredux.reduxStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 /**
  * Provides a fluent DSL to specify a ReduxStore
  */
+@FlowPreview
 @ExperimentalCoroutinesApi
 fun <S : Any, A : Any> Flow<A>.reduxStore(
     logger: FlowReduxLogger? = null,
@@ -37,6 +43,7 @@ fun <S : Any, A : Any> Flow<A>.reduxStore(
 /**
  * Provides a fluent DSL to specify a ReduxStore
  */
+@FlowPreview
 @ExperimentalCoroutinesApi
 fun <S : Any, A : Any> Flow<A>.reduxStore(
     logger: FlowReduxLogger? = null,
@@ -45,6 +52,8 @@ fun <S : Any, A : Any> Flow<A>.reduxStore(
 ): Flow<S> =
     this.reduxStore(initialStateSupplier = { initialState }, logger = logger, block = block)
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class FlowReduxStoreBuilder<S : Any, A : Any> {
 
     // TODO is there a better workaround to hide implementation details like this while keep inline fun()
@@ -97,25 +106,6 @@ class FlowReduxStoreBuilder<S : Any, A : Any> {
         // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
         val builder = InStateBuilderBlock<S, S, A>(_isInState = isInState)
         block(builder)
-        builderBlocks.add(builder)
-    }
-
-    /**
-     * Define some global observer to be able to set the state directly from a flow that you observe.
-     * A common use case would be to observe a database
-     */
-    // TODO not sure if we actually need an observe or can have some kind of `setState` accessible
-    //  in the block directly and folks can collect a particular flow directly
-    fun <T> collectWhileInAnyState(
-        flow: Flow<T>,
-        flatMapPolicy: FlatMapPolicy = FlatMapPolicy.CONCAT, // TODO should be latest?
-        block: StoreWideCollectorBlock<T, S>
-    ) {
-        val builder = StoreWideCollectBuilderBlock<T, S, A>(
-            flow = flow,
-            flatMapPolicy = flatMapPolicy,
-            block = block
-        )
         builderBlocks.add(builder)
     }
 

@@ -1,13 +1,16 @@
-package com.freeletics.flowredux.dsl
+package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
-import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
+import com.freeletics.flowredux.dsl.ChangeState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 /**
  * A builder that generates a [SideEffect] that triggers every time the state machine enters
@@ -15,7 +18,6 @@ import kotlinx.coroutines.flow.flow
  */
 class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
-    private val flatMapPolicy: FlatMapPolicy,
     private val block: InStateOnEnterBlock<InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
@@ -24,10 +26,14 @@ class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             actions
-                .mapStateChanges(isInState = isInState, getState = getState)
-                .filter { it == MapStateChange.StateChanged.ENTERED }
-                .flatMapWithPolicy(flatMapPolicy) {
-                    setStateFlow(getState)
+                .map { isInState(getState()) }
+                .distinctUntilChanged()
+                .flatMapLatest {
+                    if (it) {
+                        setStateFlow(getState)
+                    } else {
+                        flowOf()
+                    }
                 }
         }
     }

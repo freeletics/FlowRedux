@@ -485,53 +485,49 @@ otherwise not (returning false). The rest still remains the same. You can use `o
 and `collectWhileInState` the exact way as you already know. However, since `inStateWithCondition` has no generics,
 FlowRedux cannot infer types in `onEnter`, `on`, etc.
 
-## collectWhileInAnyState()
+## Acting across multiple states
 
-If for whatever reason you want to trigger a state change out of  `inState<>`, `onEnter { ... }`, `on<Action>`
-or `collectWhileInState { ... }` by observing a `Flow` then `collectWhileInAnyState` is what you are looking for:
+If for whatever reason you want to trigger a state change for all states you can achieve that by
+using `inState<>` on a base class.
 
 ```kotlin
-class MyStateMachine(
-    private val httpClient: HttpClient
-) : FlowReduxStateMachine<State, Action>(initialState = LoadingState) {
+// DSL specs
+spec {
+    inState<State> {
+        // on, onEnter, collectWhileInState for all states
+        // because State is the base class these would never get cancelled
+    }
 
-    init {
-        spec {
-            inState<LoadingState> {
-                onEnter { stateSnapshot: LoadingState ->
-                    ...
-                }
-            }
+    inState<Loading> {
+        // on, onEnter, collectWhileInState specific to Loading
+    }
 
-            inState<ErrorState> {
-                on<RetryLoadingAction> { action: RetryLoadingAction, stateSnapshot: ErrorState ->
-                    ...
-                }
-
-                collectWhileInState(timer) { value, stateSnapshot: ErrorState ->
-                    ...
-                }
-            }
-
-            val aFlow: Flow<Int> = flowOf(1, 2, 3, 4)
-            collectWhileInAnyState(aFlow) { value: Int, stateSnapshot: State ->
-                // Will trigger anytime flow emits a value
-                ...
-            }
-
-            collectWhileInAnyState(anotherFlow) { value: String, stateSnapshot: State ->
-                // Will trigger anytime flow emits a value
-                ...
-            }
-        }
+    inState<ShowContent> {
+        // on, onEnter, collectWhileInState specific to ShowContent
     }
 }
 ```
 
-`collectWhileInAnyState()` is like `collectWhileInState()` just that it is not bound to the current state
-like `collectWhileInState()` is.
-`collectWhileInAnyState()` will stop collecting the passed in Flow only if the CoroutineScope of the whole
-FlowReduxStateMachine gets canceled.
+In case you want to trigger state changes from a subset of states you could introduce another
+level to your state class hierarchy. For example the following would allow you to have a
+`inState<PostLoadingState>` block to share actions between `ShowContentState` and `ErrorState`:
+
+```kotlin
+sealed class State {
+
+    // Shows a loading indicator on screen
+    object LoadingState : State()
+
+    sealed class PostLoadingState : State()
+
+    // List of items loaded successfully, show it on screen
+    data class ShowContentState(val items: List<Item>) : PostLoadingState()
+
+    // Error while loading happened
+    data class ErrorState(val cause: Throwable) : PostLoadingState()
+}
+```
+
 
 ## FlatMapPolicy
 
@@ -580,10 +576,9 @@ could complete before the first execution (because using a random time of waitin
 - `CONCAT`: In contrast to `MERGE` and `LATEST` `CONCAT` will not run `on<BarAction>` in parallel and will not cancel
   any previous execution. Instead, `CONCAT` will preserve the order and execute one block after another.
 
-All execution blocks can specify a `FlatMapPolicy`:
+All execution blocks except `onEnter` can specify a `FlatMapPolicy`:
 
 - `on<Action>(flatMapPolicy = FlatMapPolicy.LATEST){... }`
-- `onEnter(flatMapPolicy = FlatMapPolicy.LATEST) { ... }`
 - `collectWhileInState(flatMapPolicy = FlatMapPolicy.LATEST) { ... }`
 
 ## Best Practice

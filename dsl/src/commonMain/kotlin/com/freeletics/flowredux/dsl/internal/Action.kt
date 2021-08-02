@@ -1,4 +1,7 @@
-package com.freeletics.flowredux.dsl
+package com.freeletics.flowredux.dsl.internal
+
+import com.freeletics.flowredux.dsl.ChangeState
+import com.freeletics.flowredux.dsl.reduce
 
 internal sealed class Action<S, A>
 
