@@ -34,5 +34,5 @@ jobs:
         run: cat /home/runner/work/FlowRedux/FlowRedux/dsl/build/reports/tests/allTests/index.html
 
       - name: Print flowredux module test results
-          if: ${{ failure() }}
-          run: cat /home/runner/work/FlowRedux/FlowRedux/flowredux/build/reports/tests/allTests/index.html
+        if: ${{ failure() }}
+        run: cat /home/runner/work/FlowRedux/FlowRedux/flowredux/build/reports/tests/allTests/index.html
