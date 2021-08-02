@@ -43,12 +43,13 @@ class OnActionTest {
             dispatchAsync(sm, TestAction.A1)
             delay(delay/2)
             dispatchAsync(sm, TestAction.A2)
-            assertTrue(reachedBefore)
-            assertFalse(reached)
             assertEquals(TestState.S2, expectItem())
             delay(delay)
             expectNoEvents()
         }
+
+        assertTrue(reachedBefore)
+        assertFalse(reached)
     }
 
     @Test
@@ -64,7 +65,6 @@ class OnActionTest {
                 on<TestAction.A2> { _, _ ->
                     OverrideState(TestState.S2)
                 }
-
             }
         }
 

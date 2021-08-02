@@ -12,7 +12,7 @@ fun StateMachine(
 ): FlowReduxStateMachine<TestState, TestAction> {
     val sm = object : FlowReduxStateMachine<TestState, TestAction>(
         TestState.Initial,
-        CoroutineScope(Dispatchers.Unconfined),
+        CoroutineScope(Dispatchers.Default),
         CommandLineLogger
     ){
         init {

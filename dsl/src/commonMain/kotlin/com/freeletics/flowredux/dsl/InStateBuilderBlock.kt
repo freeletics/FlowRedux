@@ -8,9 +8,13 @@ import com.freeletics.flowredux.dsl.internal.InStateSideEffectBuilder
 import com.freeletics.flowredux.dsl.internal.OnActionBlock
 import com.freeletics.flowredux.dsl.internal.OnActionInStateSideEffectBuilder
 import com.freeletics.flowredux.dsl.internal.OnEnterInStateSideEffectBuilder
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 
 // TODO @DslMarker
+@FlowPreview
+@ExperimentalCoroutinesApi
 class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     /**
      * For private usage only
@@ -59,13 +63,11 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      * TODO add a sample
      */
     fun onEnter(
-        flatMapPolicy: FlatMapPolicy = FlatMapPolicy.LATEST,
         block: InStateOnEnterBlock<InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
             OnEnterInStateSideEffectBuilder(
                 isInState = _isInState,
-                flatMapPolicy = flatMapPolicy,
                 block = block
             )
         )
