@@ -3,9 +3,10 @@ package com.freeletics.flowredux.dsl
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.dsl.internal.Action
 import com.freeletics.flowredux.dsl.internal.CollectInStateBuilder
-import com.freeletics.flowredux.dsl.internal.InStateOnEnterBlock
+import com.freeletics.flowredux.dsl.internal.CollectStateInStateBuilder
+import com.freeletics.flowredux.dsl.internal.InStateOnEnterHandler
 import com.freeletics.flowredux.dsl.internal.InStateSideEffectBuilder
-import com.freeletics.flowredux.dsl.internal.OnActionBlock
+import com.freeletics.flowredux.dsl.internal.OnActionHandler
 import com.freeletics.flowredux.dsl.internal.OnActionInStateSideEffectBuilder
 import com.freeletics.flowredux.dsl.internal.OnEnterInStateSideEffectBuilder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,51 +25,136 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
 
     val _inStateSideEffectBuilders = ArrayList<InStateSideEffectBuilder<InputState, S, A>>()
 
+    /**
+     * Triggers every time an action of type [SubAction] is dispatched while the state machine is
+     * in this state.
+     *
+     * An ongoing [handler] is cancelled when leaving this state or when a new [SubAction] is
+     * dispatched.
+     */
     inline fun <reified SubAction : A> on(
-        flatMapPolicy: FlatMapPolicy = FlatMapPolicy.LATEST,
-        noinline block: OnActionBlock<InputState, S, SubAction>
+        noinline handler: OnActionHandler<InputState, S, SubAction>
     ) {
+        on(FlatMapPolicy.LATEST, handler)
+    }
 
+    /**
+     * Triggers every time an action of type [SubAction] is dispatched while the state machine is
+     * in this state.
+     *
+     * An ongoing [handler] is cancelled when leaving this state. [flatMapPolicy] is used to
+     * determine the behavior when a new [SubAction] is dispatched while the previous [handler]
+     * execution is still ongoing.
+     */
+    inline fun <reified SubAction : A> on(
+        flatMapPolicy: FlatMapPolicy,
+        noinline handler: OnActionHandler<InputState, S, SubAction>
+    ) {
         @Suppress("UNCHECKED_CAST")
         val builder = OnActionInStateSideEffectBuilder<InputState, S, A>(
             flatMapPolicy = flatMapPolicy,
             subActionClass = SubAction::class,
             isInState = _isInState,
-            onActionBlock = block as OnActionBlock<InputState, S, A>
+            handler = handler as OnActionHandler<InputState, S, A>
         )
 
         _inStateSideEffectBuilders.add(builder)
     }
 
+    /**
+     * Triggers every time the state machine enters this state.
+     *
+     * An ongoing [handler] is cancelled when leaving this state.
+     */
+    fun onEnter(
+        handler: InStateOnEnterHandler<InputState, S>
+    ) {
+        _inStateSideEffectBuilders.add(
+            OnEnterInStateSideEffectBuilder(
+                isInState = _isInState,
+                handler = handler
+            )
+        )
+    }
+
+    /**
+     * Triggers every time the state machine enters this state. The passed [flow] will be collected
+     * and any emission will be passed to [handler].
+     *
+     * The collection as well as any ongoing [handler] is cancelled when leaving this state.
+     *
+     * [handler] will only be called for a new emission from [flow] after a previous [handler]
+     * invocation completed.
+     */
     fun <T> collectWhileInState(
         flow: Flow<T>,
-        flatMapPolicy: FlatMapPolicy = FlatMapPolicy.CONCAT,
-        block: InStateObserverBlock<T, InputState, S>
+        handler: InStateObserverHandler<T, InputState, S>
+    ) {
+        collectWhileInState(flow, FlatMapPolicy.CONCAT, handler)
+    }
+
+    /**
+     * Triggers every time the state machine enters this state. The passed [flow] will be collected
+     * and any emission will be passed to [handler].
+     *
+     * The collection as well as any ongoing [handler] is cancelled when leaving this state.
+     *
+     * [flatMapPolicy] is used to determine the behavior when a new emission from [flow] arrives
+     * before the previous [handler] invocation completed.
+     */
+    fun <T> collectWhileInState(
+        flow: Flow<T>,
+        flatMapPolicy: FlatMapPolicy,
+        handler: InStateObserverHandler<T, InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
             CollectInStateBuilder(
                 isInState = _isInState,
                 flow = flow,
                 flatMapPolicy = flatMapPolicy,
-                block = block
+                handler = handler
             )
         )
     }
 
     /**
-     * Triggers every time the state machine enters this state.
+     * Triggers every time the state machine enters this state. [flowBuilder] will get a
+     * [Flow] that emits the current [InputState] and any change to it. The transformed `Flow` that
+     * [flowBuilder] returns will be collected and any emission will be passed to [handler].
      *
-     * This does not cancel any ongoing block when the state changes.
+     * The collection as well as any ongoing [handler] is cancelled when leaving this state.
      *
-     * TODO add a sample
+     * [handler] will only be called for a new emission from [flowBuilder]'s `Flow` after a
+     * previous [handler] invocation completed.
      */
-    fun onEnter(
-        block: InStateOnEnterBlock<InputState, S>
+    fun <T> collectWhileInState(
+        flowBuilder: (Flow<InputState>) -> Flow<T>,
+        handler: InStateObserverHandler<T, InputState, S>
+    ) {
+        collectWhileInState(flowBuilder, FlatMapPolicy.CONCAT, handler)
+    }
+
+    /**
+     * Triggers every time the state machine enters this state. [flowBuilder] will get a
+     * [Flow] that emits the current [InputState] and any change to it. The transformed `Flow` that
+     * [flowBuilder] returns will be collected and any emission will be passed to [handler].
+     *
+     * The collection as well as any ongoing [handler] is cancelled when leaving this state.
+     *
+     * [flatMapPolicy] is used to determine the behavior when a new emission from [flowBuilder]'s
+     * `Flow` arrives before the previous [handler] invocation completed.
+     */
+    fun <T> collectWhileInState(
+        flowBuilder: (Flow<InputState>) -> Flow<T>,
+        flatMapPolicy: FlatMapPolicy,
+        handler: InStateObserverHandler<T, InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
-            OnEnterInStateSideEffectBuilder(
+            CollectStateInStateBuilder(
                 isInState = _isInState,
-                block = block
+                flowBuilder = flowBuilder,
+                flatMapPolicy = flatMapPolicy,
+                handler = handler
             )
         )
     }
@@ -78,4 +164,4 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     }
 }
 
-typealias InStateObserverBlock<T, InputState, S> = suspend (value: T, state: InputState) -> ChangeState<S>
+typealias InStateObserverHandler<T, InputState, S> = suspend (value: T, state: InputState) -> ChangeState<S>

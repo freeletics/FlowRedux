@@ -21,7 +21,7 @@ class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     internal val subActionClass: KClass<out A>,
     internal val flatMapPolicy: FlatMapPolicy,
-    internal val onActionBlock: OnActionBlock<InputState, S, A>
+    internal val handler: OnActionHandler<InputState, S, A>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
@@ -56,7 +56,7 @@ class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
         flow {
 
             runOnlyIfInInputState(getState, isInState) { inputState ->
-                val changeState = onActionBlock.invoke(
+                val changeState = handler.invoke(
                     action,
                     inputState
                 )
@@ -76,5 +76,5 @@ class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
 }
 
 
-typealias OnActionBlock<InputState, S, A> = suspend (action: A, state: InputState) -> ChangeState<S>
+typealias OnActionHandler<InputState, S, A> = suspend (action: A, state: InputState) -> ChangeState<S>
 

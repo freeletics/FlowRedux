@@ -3,7 +3,7 @@ package com.freeletics.flowredux.dsl.internal
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.FlatMapPolicy
-import com.freeletics.flowredux.dsl.InStateObserverBlock
+import com.freeletics.flowredux.dsl.InStateObserverHandler
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -30,7 +30,7 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     private val flow: Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
-    private val block: InStateObserverBlock<T, InputState, S>
+    private val handler: InStateObserverHandler<T, InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
     @ExperimentalCoroutinesApi
@@ -58,7 +58,7 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     ): Flow<Action<S, A>> = flow {
 
         runOnlyIfInInputState(getState, isInState) { inputState ->
-            val changeState = block(value, inputState)
+            val changeState = handler(value, inputState)
             emit(
                 ChangeStateAction<S, A>(
                     loggingInfo = "collectWhileInState<>", // TODO better logging
