@@ -4,7 +4,6 @@ import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.dsl.internal.Action
 import com.freeletics.flowredux.dsl.internal.CollectInStateBasedOnStateBuilder
 import com.freeletics.flowredux.dsl.internal.CollectInStateBuilder
-import com.freeletics.flowredux.dsl.internal.CollectStateInStateBuilder
 import com.freeletics.flowredux.dsl.internal.InStateOnEnterHandler
 import com.freeletics.flowredux.dsl.internal.InStateSideEffectBuilder
 import com.freeletics.flowredux.dsl.internal.OnActionHandler
