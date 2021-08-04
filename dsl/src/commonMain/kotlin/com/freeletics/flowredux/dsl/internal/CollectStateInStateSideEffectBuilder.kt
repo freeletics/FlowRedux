@@ -27,18 +27,30 @@ internal class CollectStateInStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val handler: InStateObserverHandler<T, InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
-    @Suppress("unchecked_cast")
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             actions.whileInState(isInState, getState) { inStateActions ->
-                inStateActions.map { getState() as InputState }
-                    .distinctUntilChanged()
-                    .let(flowBuilder)
+                currentStateFlow(inStateActions, getState)
+                    .transformWithFlowBuilder()
                     .flatMapWithPolicy(flatMapPolicy) {
                         setStateFlow(value = it, getState = getState)
                     }
             }
         }
+    }
+
+    @Suppress("unchecked_cast")
+    private fun currentStateFlow(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<InputState> {
+        // after every state change there is a guaranteed action emission so we use this 
+        // to get the current state
+        return actions.map { getState() as InputState }
+            // an action emission does not guarantee that the state changed so we need to filter
+            // out multiple emissions of identical state objects    
+            .distinctUntilChanged()
+    }
+    
+    private fun Flow<InputState>.transformWithFlowBuilder(): Flow<T> {
+        return flowBuilder(this)
     }
 
     private suspend fun setStateFlow(
