@@ -30,7 +30,7 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             actions.whileInState(isInState, getState) { inStateActions ->
-                currentStateAsFlow(inStateActions, getState)
+                flowOfCurrentState(inStateActions, getState)
                     .transformWithFlowBuilder()
                     .flatMapWithPolicy(flatMapPolicy) {
                         setStateFlow(value = it, getState = getState)
@@ -40,7 +40,7 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
     }
 
     @Suppress("unchecked_cast")
-    private fun currentStateAsFlow(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<InputState> {
+    private fun flowOfCurrentState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<InputState> {
         // after every state change there is a guaranteed action emission so we use this 
         // to get the current state
         return actions.map { getState() as InputState }
