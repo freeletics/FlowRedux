@@ -47,11 +47,11 @@ class CustomIsInStateDslTest {
 
         sm.state.test {
             assertEquals(TestState.Initial, expectItem())
-            dispatchAsync(sm, TestAction.A1)
+            sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1, expectItem())
-            dispatchAsync(sm, TestAction.A1)
+            sm.dispatchAsync(TestAction.A1)
             assertEquals(gs2, expectItem())
-            dispatchAsync(sm, TestAction.A1)
+            sm.dispatchAsync(TestAction.A1)
             assertEquals(TestState.S1, expectItem())
         }
 
@@ -94,7 +94,7 @@ class CustomIsInStateDslTest {
 
         sm.state.test {
             assertEquals(TestState.Initial, expectItem())
-            dispatchAsync(sm, TestAction.A1)
+            sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1, expectItem())
             assertEquals(gs2, expectItem())
             assertEquals(TestState.S1, expectItem())

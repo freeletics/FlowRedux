@@ -39,7 +39,7 @@ class OnEnterTest {
         sm.state.test {
             assertEquals(TestState.Initial, expectItem())
             delay(delay / 2)
-            dispatchAsync(sm, TestAction.A2)
+            sm.dispatchAsync(TestAction.A2)
             assertEquals(TestState.S2, expectItem())
             delay(delay)
             expectNoEvents()
