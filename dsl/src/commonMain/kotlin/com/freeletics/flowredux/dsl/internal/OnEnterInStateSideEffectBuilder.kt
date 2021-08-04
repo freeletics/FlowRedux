@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.map
  */
 class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
-    private val block: InStateOnEnterBlock<InputState, S>
+    private val handler: InStateOnEnterHandler<InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
     @FlowPreview
@@ -43,7 +43,7 @@ class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     ): Flow<Action<S, A>> = flow {
 
         runOnlyIfInInputState(getState, isInState) { inputState ->
-            val changeState = block(inputState)
+            val changeState = handler(inputState)
             emit(
                 ChangeStateAction<S, A>(
                     loggingInfo = "onEnter<>", // TODO logging
@@ -55,5 +55,5 @@ class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     }
 }
 
-typealias InStateOnEnterBlock<InputState, S> = suspend (state: InputState) -> ChangeState<S>
+typealias InStateOnEnterHandler<InputState, S> = suspend (state: InputState) -> ChangeState<S>
 

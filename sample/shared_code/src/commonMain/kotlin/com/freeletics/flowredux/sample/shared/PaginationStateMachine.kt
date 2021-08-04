@@ -82,7 +82,7 @@ internal class InternalPaginationStateMachine(
         spec {
 
             inState<LoadFirstPagePaginationState> {
-                onEnter(block = ::loadFirstPage)
+                onEnter(::loadFirstPage)
             }
 
             inState<LoadingFirstPageError> {
@@ -92,15 +92,15 @@ internal class InternalPaginationStateMachine(
             }
 
             inState<ShowContentPaginationState> {
-                on<LoadNextPage>(block = ::moveToLoadNextPageStateIfCanLoadNextPage)
+                on(::moveToLoadNextPageStateIfCanLoadNextPage)
             }
 
             inState<ShowContentAndLoadingNextPagePaginationState> {
-                onEnter(block = ::loadNextPage)
+                onEnter(::loadNextPage)
             }
 
             inState<ShowContentAndLoadingNextPageErrorPaginationState> {
-                onEnter(block = ::moveToContentStateAfter3Seconds)
+                onEnter(::moveToContentStateAfter3Seconds)
             }
         }
     }
