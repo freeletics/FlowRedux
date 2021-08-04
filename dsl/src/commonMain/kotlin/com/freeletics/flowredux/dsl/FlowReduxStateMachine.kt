@@ -6,12 +6,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -22,30 +21,25 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
 ) : StateMachine<S, A> {
 
     private val inputActions = Channel<A>()
-    private val internalState = MutableStateFlow(initialState)
-
-    private var specBlockSet = false
+    private var internalState: StateFlow<S>? = null
 
     protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
-        if (specBlockSet) {
+        if (internalState != null) {
             throw IllegalStateException(
                 "State machine spec has already been set. " +
                     "It's only allowed to call spec {...} once."
             )
         }
-        this.specBlockSet = true
-        scope.launch {
-            inputActions
-                .consumeAsFlow()
-                .reduxStore(logger, initialStateSupplier = { initialState }, specBlock)
-                .collect(internalState::emit)
-        }
+        internalState = inputActions
+            .consumeAsFlow()
+            .reduxStore(logger, initialState, specBlock)
+            .stateIn(scope, SharingStarted.Lazily, initialState)
     }
 
     override val state: StateFlow<S> get() {
         check(scope.isActive) { "The scope of this state machine was already cancelled." }
         checkSpecBlockSet()
-        return internalState
+        return internalState!!
     }
 
     override suspend fun dispatch(action: A) {
@@ -54,25 +48,25 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
     }
 
     private fun checkSpecBlockSet() {
-           if (!specBlockSet) {
-               throw IllegalStateException(
-                   """
-                        No state machine specs are defined. Did you call spec { ... } in init {...}?
-                        Example usage:
+       if (internalState == null) {
+           throw IllegalStateException(
+               """
+                    No state machine specs are defined. Did you call spec { ... } in init {...}?
+                    Example usage:
 
-                        class MyStateMachine : FlowReduxStateMachine<State, Action>(InitialState) {
+                    class MyStateMachine : FlowReduxStateMachine<State, Action>(InitialState) {
 
-                            init{
-                                spec {
-                                    inState<FooState> {
-                                        on<BarAction> { ... }
-                                    }
-                                    ...
+                        init{
+                            spec {
+                                inState<FooState> {
+                                    on<BarAction> { ... }
                                 }
+                                ...
                             }
                         }
-                    """.trimIndent()
-               )
-           }
+                    }
+                """.trimIndent()
+           )
+       }
     }
 }

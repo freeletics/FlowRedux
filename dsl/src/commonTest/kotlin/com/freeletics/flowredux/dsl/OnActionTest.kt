@@ -40,9 +40,9 @@ class OnActionTest {
 
         sm.state.test {
             assertEquals(TestState.Initial, expectItem())
-            dispatchAsync(sm, TestAction.A1)
+            sm.dispatchAsync(TestAction.A1)
             delay(delay/2)
-            dispatchAsync(sm, TestAction.A2)
+            sm.dispatchAsync(TestAction.A2)
             assertEquals(TestState.S2, expectItem())
             delay(delay)
             expectNoEvents()
@@ -70,9 +70,9 @@ class OnActionTest {
 
         sm.state.test {
             assertEquals(TestState.Initial, expectItem())
-            dispatchAsync(sm, TestAction.A1)
+            sm.dispatchAsync(TestAction.A1)
             assertEquals(TestState.S1, expectItem())
-            dispatchAsync(sm, TestAction.A2)
+            sm.dispatchAsync(TestAction.A2)
             assertEquals(TestState.S2, expectItem())
         }
     }

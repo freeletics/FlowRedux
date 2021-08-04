@@ -67,16 +67,16 @@ class CollectWhileInStateTest {
             assertEquals(TestState.Initial, expectItem())
             assertEquals(TestState.S1, expectItem())
 
-            dispatchAsync(sm, TestAction.A1)
+            sm.dispatchAsync(TestAction.A1)
             assertEquals(TestState.S2, expectItem())
 
-            dispatchAsync(sm, TestAction.A2)
+            sm.dispatchAsync(TestAction.A2)
             assertEquals(TestState.S1, expectItem())
 
-            dispatchAsync(sm, TestAction.A1)
+            sm.dispatchAsync(TestAction.A1)
             assertEquals(TestState.S2, expectItem())
 
-            dispatchAsync(sm, TestAction.A2)
+            sm.dispatchAsync(TestAction.A2)
             assertEquals(TestState.S1, expectItem())
         }
     }
