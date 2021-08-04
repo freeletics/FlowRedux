@@ -2,6 +2,7 @@ package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.dsl.internal.Action
+import com.freeletics.flowredux.dsl.internal.CollectInStateBasedOnStateBuilder
 import com.freeletics.flowredux.dsl.internal.CollectInStateBuilder
 import com.freeletics.flowredux.dsl.internal.CollectStateInStateBuilder
 import com.freeletics.flowredux.dsl.internal.InStateOnEnterHandler
@@ -150,7 +151,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         handler: InStateObserverHandler<T, InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
-            CollectStateInStateBuilder(
+            CollectInStateBasedOnStateBuilder(
                 isInState = _isInState,
                 flowBuilder = flowBuilder,
                 flatMapPolicy = flatMapPolicy,
