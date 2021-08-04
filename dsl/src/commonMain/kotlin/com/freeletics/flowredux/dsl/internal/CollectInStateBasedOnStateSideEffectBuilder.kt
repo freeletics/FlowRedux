@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.map
  */
 @FlowPreview
 @ExperimentalCoroutinesApi
-internal class CollectStateInStateBuilder<T, InputState : S, S : Any, A : Any>(
+internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     private val flowBuilder: (Flow<InputState>) -> Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
@@ -30,7 +30,7 @@ internal class CollectStateInStateBuilder<T, InputState : S, S : Any, A : Any>(
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             actions.whileInState(isInState, getState) { inStateActions ->
-                currentStateFlow(inStateActions, getState)
+                inStateActions.currentStateAsFlow(getState)
                     .transformWithFlowBuilder()
                     .flatMapWithPolicy(flatMapPolicy) {
                         setStateFlow(value = it, getState = getState)
@@ -40,10 +40,10 @@ internal class CollectStateInStateBuilder<T, InputState : S, S : Any, A : Any>(
     }
 
     @Suppress("unchecked_cast")
-    private fun currentStateFlow(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<InputState> {
+    private fun Flow<Action<S, A>>.currentStateAsFlow(getState: GetState<S>): Flow<InputState> {
         // after every state change there is a guaranteed action emission so we use this 
         // to get the current state
-        return actions.map { getState() as InputState }
+        return map { getState() as InputState }
             // an action emission does not guarantee that the state changed so we need to filter
             // out multiple emissions of identical state objects    
             .distinctUntilChanged()
