@@ -32,7 +32,7 @@ class FlowReduxTest {
                         }
                         .test {
                             assertEquals(0, awaitItem())
-                            expectComplete()
+                            awaitComplete()
                         }
             }
         }
@@ -52,7 +52,7 @@ class FlowReduxTest {
                 assertEquals("", awaitItem())
                 assertEquals("1", awaitItem())
                 assertEquals("12", awaitItem())
-                expectComplete()
+                awaitComplete()
             }
         }
     }
@@ -79,7 +79,7 @@ class FlowReduxTest {
                     assertEquals("", awaitItem())
                     assertEquals("1", awaitItem())
                     assertEquals("12", awaitItem())
-                    expectComplete()
+                    awaitComplete()
                 }
             }
         }
@@ -111,7 +111,7 @@ class FlowReduxTest {
                     assertEquals("", awaitItem())
                     assertEquals("1", awaitItem())
                     assertEquals("12", awaitItem())
-                    expectComplete()
+                    awaitComplete()
                 }
             }
         }
@@ -162,7 +162,7 @@ class FlowReduxTest {
                 assertEquals("16726", awaitItem())
                 assertEquals("167267", awaitItem())
 
-                expectComplete()
+                awaitComplete()
             }
         }
     }
@@ -209,7 +209,7 @@ class FlowReduxTest {
                 assertEquals("12676", awaitItem())
                 assertEquals("126767", awaitItem())
 
-                expectComplete()
+                awaitComplete()
             }
         }
     }
