@@ -19,7 +19,7 @@ class FlowReduxStateMachineTest {
     fun `empty statemachine just emits initial state`() = suspendTest {
         val sm = StateMachine { }
         sm.state.test {
-            assertEquals(TestState.Initial, expectItem())
+            assertEquals(TestState.Initial, awaitItem())
         }
     }
 
