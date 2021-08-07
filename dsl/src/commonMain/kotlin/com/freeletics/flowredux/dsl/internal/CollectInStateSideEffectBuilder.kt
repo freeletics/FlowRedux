@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -38,15 +39,15 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             actions
-                .filterState(getState = getState, isInState = isInState)
-                .flatMapLatest { stateSubscription ->
-                    when (stateSubscription) {
-                        FilterState.StateChanged.SUBSCRIBE -> {
-                            flow.flatMapWithPolicy(flatMapPolicy) {
-                                setStateFlow(value = it, getState = getState)
-                            }
+                .map { isInState(getState()) }
+                .distinctUntilChanged()
+                .flatMapLatest {
+                    if (it) {
+                        flow.flatMapWithPolicy(flatMapPolicy) {
+                            setStateFlow(value = it, getState = getState)
                         }
-                        FilterState.StateChanged.UNSUBSCRIBE -> flow { }
+                    } else {
+                        flowOf()
                     }
                 }
         }
@@ -68,86 +69,4 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
             )
         }
     }
-
-    /**
-     * Internal implementation of an operator that keeps track if you have to subscribe
-     * or unsubscribe of a certain Flow.
-     *
-     */
-    private class FilterState<S : Any, A : Any>(
-        actions: Flow<Action<S, A>>,
-        getState: GetState<S>,
-        private val isInState: (S) -> Boolean
-    ) {
-
-        private enum class InternalStateChangedSubscription {
-            SUBSCRIBE, UNSUBSCRIBE, DO_NOTHING
-        }
-
-        enum class StateChanged {
-            SUBSCRIBE, UNSUBSCRIBE
-        }
-
-        private val mutex = Mutex()
-        private var lastState: S? = null
-
-        val flow: Flow<StateChanged> = actions.map {
-            mutex.withLock {
-
-                val state = getState()
-                val previousState = lastState
-                val isInExpectedState = isInState(state)
-                val previousStateInExpectedState = if (previousState == null) {
-                    false
-                } else {
-                    isInState(previousState)
-                }
-
-                if (previousState == null) {
-                    if (isInExpectedState) {
-                        InternalStateChangedSubscription.SUBSCRIBE
-                    } else {
-                        InternalStateChangedSubscription.DO_NOTHING
-                    }
-                } else {
-                    when {
-                        isInExpectedState && previousStateInExpectedState -> InternalStateChangedSubscription.DO_NOTHING
-                        isInExpectedState && !previousStateInExpectedState -> InternalStateChangedSubscription.SUBSCRIBE
-                        !isInExpectedState && previousStateInExpectedState -> InternalStateChangedSubscription.UNSUBSCRIBE
-                        !isInExpectedState && !previousStateInExpectedState -> InternalStateChangedSubscription.DO_NOTHING
-                        else -> throw IllegalStateException(
-                            "An internal error occurred: " +
-                                    "isInExpectedState: $isInExpectedState" +
-                                    "and previousStateInExpectedState: $previousStateInExpectedState " +
-                                    "is not possible. Please file an issue on Github."
-                        )
-
-                    }
-                }.also {
-                    lastState = state
-                }
-
-            }
-        }
-            .filter { it != InternalStateChangedSubscription.DO_NOTHING }
-            .distinctUntilChanged()
-            .map {
-                when (it) {
-                    InternalStateChangedSubscription.SUBSCRIBE -> StateChanged.SUBSCRIBE
-                    InternalStateChangedSubscription.UNSUBSCRIBE -> StateChanged.UNSUBSCRIBE
-                    InternalStateChangedSubscription.DO_NOTHING -> throw IllegalStateException(
-                        "Internal Error occurred. File an issue on Github."
-                    )
-                }
-            }
-    }
-
-    private fun Flow<Action<S, A>>.filterState(
-        getState: GetState<S>,
-        isInState: (S) -> Boolean
-    ): Flow<FilterState.StateChanged> = FilterState<S, A>(
-        actions = this,
-        isInState = isInState,
-        getState = getState
-    ).flow
 }
