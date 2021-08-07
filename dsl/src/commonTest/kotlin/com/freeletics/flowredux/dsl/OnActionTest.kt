@@ -53,6 +53,42 @@ class OnActionTest {
     }
 
     @Test
+    fun `action effect block does NOT stop when moved to another state`() = suspendTest {
+        var reached = false;
+        var reachedBefore = false
+        val sm = StateMachine {
+            inState<TestState.Initial> {
+                onActionEffect<TestAction.A1>() { _, _ ->
+                    reachedBefore = true
+                    delay(delay)
+                    // this should never be reached because state transition did happen in the meantime,
+                    // therefore this whole block must be canceled
+                    reached = true
+                }
+
+                on<TestAction.A2> { _, _ ->
+                    OverrideState(TestState.S2)
+                }
+
+            }
+
+        }
+
+        sm.state.test {
+            assertEquals(TestState.Initial, expectItem())
+            sm.dispatchAsync(TestAction.A1)
+            delay(delay/2)
+            sm.dispatchAsync(TestAction.A2)
+            assertEquals(TestState.S2, expectItem())
+            delay(delay)
+            expectNoEvents()
+        }
+
+        assertTrue(reachedBefore)
+        assertTrue(reached)
+    }
+
+    @Test
     fun `on action gets triggered and moves to next state`() = suspendTest {
         val sm = StateMachine {
             inState<TestState.Initial> {

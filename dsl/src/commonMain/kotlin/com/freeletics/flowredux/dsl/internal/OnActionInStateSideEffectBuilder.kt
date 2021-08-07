@@ -6,6 +6,7 @@ import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.ChangeState
 import com.freeletics.flowredux.dsl.FlatMapPolicy
+import com.freeletics.flowredux.dsl.OnActionHandler
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import com.freeletics.flowredux.dsl.flow.whileInState
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.mapNotNull
 @ExperimentalCoroutinesApi
 class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
+    private val cancelWhenStateChanges: Boolean,
     internal val subActionClass: KClass<out A>,
     internal val flatMapPolicy: FlatMapPolicy,
     internal val handler: OnActionHandler<InputState, S, A>
@@ -27,7 +29,7 @@ class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
 
-            actions.whileInState(isInState, getState) { inStateAction ->
+            actions.whileInState(isInState, getState, cancelWhenStateChanges) { inStateAction ->
                 inStateAction.mapNotNull {
                     when (it) {
                         is ExternalWrappedAction<*, *> -> if (subActionClass.isInstance(it.action)) {
@@ -74,7 +76,3 @@ class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
         }
 
 }
-
-
-typealias OnActionHandler<InputState, S, A> = suspend (action: A, state: InputState) -> ChangeState<S>
-

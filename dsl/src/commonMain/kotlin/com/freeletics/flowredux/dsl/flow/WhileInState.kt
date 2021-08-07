@@ -14,10 +14,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
-internal fun <S, A> Flow<Action<S, A>>.whileInState(
+internal fun <S, A, T> Flow<Action<S, A>>.whileInState(
     isInState: (S) -> Boolean,
     getState: GetState<S>,
-    transform: (Flow<Action<S, A>>) -> Flow<Action<S, A>>
+    cancelWhenStateChanges: Boolean,
+    transform: (Flow<Action<S, A>>) -> Flow<T>
 ) = channelFlow {
     var currentChannel: Channel<Action<S, A>>? = null
 
@@ -37,9 +38,15 @@ internal fun <S, A> Flow<Action<S, A>>.whileInState(
             // send the action to the transform because the state machin is in state
             currentChannel!!.send(value)
         } else {
-            // closing the channel with an exception will cancel the FlowCollector that
-            // collects it and thefor cancels the collection
-            currentChannel?.close(CancellationException("StateMachine left the state"))
+            if (cancelWhenStateChanges) {
+                // closing the channel with an exception will cancel the FlowCollector that
+                // collects it and thefore cancels the collection
+                currentChannel?.close(CancellationException("StateMachine left the state"))
+            } else {
+                // this will just complete the flow, everything that was already downstream
+                // can still run
+                currentChannel?.close()
+            }
             currentChannel = null
         }
     }

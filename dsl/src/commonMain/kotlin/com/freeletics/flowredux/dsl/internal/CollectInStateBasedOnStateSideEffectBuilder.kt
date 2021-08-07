@@ -2,8 +2,8 @@ package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
+import com.freeletics.flowredux.dsl.CollectWhileInStateHandler
 import com.freeletics.flowredux.dsl.FlatMapPolicy
-import com.freeletics.flowredux.dsl.InStateObserverHandler
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import com.freeletics.flowredux.dsl.flow.whileInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,14 +22,15 @@ import kotlinx.coroutines.flow.map
 @ExperimentalCoroutinesApi
 internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
+    private val cancelWhenStateChanges: Boolean,
     private val flowBuilder: (Flow<InputState>) -> Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
-    private val handler: InStateObserverHandler<T, InputState, S>
+    private val handler: CollectWhileInStateHandler<T, InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
-            actions.whileInState(isInState, getState) { inStateActions ->
+            actions.whileInState(isInState, getState, cancelWhenStateChanges) { inStateActions ->
                 flowOfCurrentState(inStateActions, getState)
                     .transformWithFlowBuilder()
                     .flatMapWithPolicy(flatMapPolicy) {
@@ -41,14 +42,14 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
 
     @Suppress("unchecked_cast")
     private fun flowOfCurrentState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<InputState> {
-        // after every state change there is a guaranteed action emission so we use this 
+        // after every state change there is a guaranteed action emission so we use this
         // to get the current state
         return actions.map { getState() as InputState }
             // an action emission does not guarantee that the state changed so we need to filter
-            // out multiple emissions of identical state objects    
+            // out multiple emissions of identical state objects
             .distinctUntilChanged()
     }
-    
+
     private fun Flow<InputState>.transformWithFlowBuilder(): Flow<T> {
         return flowBuilder(this)
     }

@@ -4,9 +4,7 @@ import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.dsl.internal.Action
 import com.freeletics.flowredux.dsl.internal.CollectInStateBasedOnStateBuilder
 import com.freeletics.flowredux.dsl.internal.CollectInStateBuilder
-import com.freeletics.flowredux.dsl.internal.InStateOnEnterHandler
 import com.freeletics.flowredux.dsl.internal.InStateSideEffectBuilder
-import com.freeletics.flowredux.dsl.internal.OnActionHandler
 import com.freeletics.flowredux.dsl.internal.OnActionInStateSideEffectBuilder
 import com.freeletics.flowredux.dsl.internal.OnEnterInStateSideEffectBuilder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -55,7 +53,47 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
             flatMapPolicy = flatMapPolicy,
             subActionClass = SubAction::class,
             isInState = _isInState,
+            cancelWhenStateChanges = true,
             handler = handler as OnActionHandler<InputState, S, A>
+        )
+
+        _inStateSideEffectBuilders.add(builder)
+    }
+
+    /**
+     * Triggers every time an action of type [SubAction] is dispatched while the state machine is
+     * in this state.
+     *
+     * An ongoing [handler] is NOT cancelled when leaving this state or when a new [SubAction] is
+     * dispatched.
+     */
+    inline fun <reified SubAction : A> onActionEffect(
+        noinline handler: OnActionEffectHandler<InputState, SubAction>
+    ) {
+        onActionEffect(FlatMapPolicy.CONCAT, handler)
+    }
+
+    /**
+     * Triggers every time an action of type [SubAction] is dispatched while the state machine is
+     * in this state.
+     *
+     * An ongoing [handler] is NOT cancelled when leaving this state. [flatMapPolicy] is used to
+     * determine the behavior when a new [SubAction] is dispatched while the previous [handler]
+     * execution is still ongoing.
+     */
+    inline fun <reified SubAction : A> onActionEffect(
+        flatMapPolicy: FlatMapPolicy,
+        noinline handler: OnActionEffectHandler<InputState, SubAction>
+    ) {
+        val builder = OnActionInStateSideEffectBuilder<InputState, S, A>(
+            isInState = _isInState,
+            cancelWhenStateChanges = false,
+            subActionClass = SubAction::class,
+            flatMapPolicy = flatMapPolicy,
+            handler = { action, stateSnapshot ->
+                handler(action as SubAction, stateSnapshot)
+                NoStateChange
+            }
         )
 
         _inStateSideEffectBuilders.add(builder)
@@ -67,12 +105,33 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      * An ongoing [handler] is cancelled when leaving this state.
      */
     fun onEnter(
-        handler: InStateOnEnterHandler<InputState, S>
+        handler: OnEnterHandler<InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
             OnEnterInStateSideEffectBuilder(
                 isInState = _isInState,
+                cancelWhenStateChanges = true,
                 handler = handler
+            )
+        )
+    }
+
+    /**
+     * Triggers every time the state machine enters this state.
+     *
+     * An ongoing [handler] is NOT cancelled when leaving this state.
+     */
+    fun onEnterEffect(
+        handler: OnEnterEffectHandler<InputState>
+    ) {
+        _inStateSideEffectBuilders.add(
+            OnEnterInStateSideEffectBuilder(
+                isInState = _isInState,
+                cancelWhenStateChanges = false,
+                handler = {
+                    handler(it)
+                    NoStateChange
+                }
             )
         )
     }
@@ -88,7 +147,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      */
     fun <T> collectWhileInState(
         flow: Flow<T>,
-        handler: InStateObserverHandler<T, InputState, S>
+        handler: CollectWhileInStateHandler<T, InputState, S>
     ) {
         collectWhileInState(flow, FlatMapPolicy.CONCAT, handler)
     }
@@ -105,7 +164,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     fun <T> collectWhileInState(
         flow: Flow<T>,
         flatMapPolicy: FlatMapPolicy,
-        handler: InStateObserverHandler<T, InputState, S>
+        handler: CollectWhileInStateHandler<T, InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
             CollectInStateBuilder(
@@ -129,7 +188,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      */
     fun <T> collectWhileInState(
         flowBuilder: (Flow<InputState>) -> Flow<T>,
-        handler: InStateObserverHandler<T, InputState, S>
+        handler: CollectWhileInStateHandler<T, InputState, S>
     ) {
         collectWhileInState(flowBuilder, FlatMapPolicy.CONCAT, handler)
     }
@@ -147,11 +206,12 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     fun <T> collectWhileInState(
         flowBuilder: (Flow<InputState>) -> Flow<T>,
         flatMapPolicy: FlatMapPolicy,
-        handler: InStateObserverHandler<T, InputState, S>
+        handler: CollectWhileInStateHandler<T, InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
             CollectInStateBasedOnStateBuilder(
                 isInState = _isInState,
+                cancelWhenStateChanges = true,
                 flowBuilder = flowBuilder,
                 flatMapPolicy = flatMapPolicy,
                 handler = handler
@@ -164,4 +224,12 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     }
 }
 
-typealias InStateObserverHandler<T, InputState, S> = suspend (value: T, state: InputState) -> ChangeState<S>
+typealias OnActionHandler<InputState, S, A> = suspend (action: A, state: InputState) -> ChangeState<S>
+
+typealias OnActionEffectHandler<InputState, A> = suspend (action: A, state: InputState) -> Unit
+
+typealias OnEnterHandler<InputState, S> = suspend (state: InputState) -> ChangeState<S>
+
+typealias OnEnterEffectHandler<InputState> = suspend (state: InputState) -> Unit
+
+typealias CollectWhileInStateHandler<T, InputState, S> = suspend (value: T, state: InputState) -> ChangeState<S>

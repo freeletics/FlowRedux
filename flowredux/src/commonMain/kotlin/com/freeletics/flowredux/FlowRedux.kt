@@ -48,10 +48,10 @@ fun <A, S> Flow<A>.reduxStore(
     emit(currentState)
 
     val loopbacks = sideEffects.map {
-        Channel<A>()
+        Channel<A>(Int.MAX_VALUE)
     }
     val sideEffectActions = sideEffects.mapIndexed { index, sideEffect ->
-        val actionsFlow = loopbacks[index].consumeAsFlow()
+        val actionsFlow = loopbacks[index].consumeAsFlow().onEach { logger?.log("SideEffect $index action $it sent") }
         sideEffect(actionsFlow, getState).onEach { logger?.log("SideEffect $index action $it received") }
     }
     val upstreamActions = this@reduxStore.onEach { logger?.log("Upstream action $it received") }

@@ -50,6 +50,37 @@ class OnEnterTest {
     }
 
     @Test
+    fun `onEnterEffect block does NOT stop when moved to another state`() = suspendTest {
+        var reached = false;
+        var blockEntered = false
+        val sm = StateMachine {
+            inState<TestState.Initial> {
+                onEnterEffect {
+                    blockEntered = true
+                    delay(delay)
+                    reached = true
+                }
+
+                on<TestAction.A2> { _, _ ->
+                    OverrideState(TestState.S2)
+                }
+            }
+        }
+
+        sm.state.test {
+            assertEquals(TestState.Initial, expectItem())
+            delay(delay / 2)
+            sm.dispatchAsync(TestAction.A2)
+            assertEquals(TestState.S2, expectItem())
+            delay(delay)
+            expectNoEvents()
+        }
+
+        assertTrue(blockEntered)
+        assertTrue(reached)
+    }
+
+    @Test
     fun `on entering the same state doesnt trigger onEnter again`() = suspendTest {
         var genericStateEntered = 0
         var a1Received = 0
