@@ -5,17 +5,13 @@ import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.FlatMapPolicy
 import com.freeletics.flowredux.dsl.InStateObserverHandler
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
+import com.freeletics.flowredux.dsl.flow.mapToIsInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 /**
  * A builder to create a [SideEffect] that observes a Flow<T> as long as the redux store is in
@@ -39,8 +35,7 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             actions
-                .map { isInState(getState()) }
-                .distinctUntilChanged()
+                .mapToIsInState(isInState, getState)
                 .flatMapLatest {
                     if (it) {
                         flow.flatMapWithPolicy(flatMapPolicy) {
