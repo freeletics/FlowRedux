@@ -47,7 +47,7 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
                             setStateFlow(value = it, getState = getState)
                         }
                     } else {
-                        flowOf()
+                        emptyFlow()
                     }
                 }
         }

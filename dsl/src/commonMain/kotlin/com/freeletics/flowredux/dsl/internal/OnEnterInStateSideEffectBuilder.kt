@@ -32,7 +32,7 @@ class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
                     if (it) {
                         setStateFlow(getState)
                     } else {
-                        flowOf()
+                        emptyFlow()
                     }
                 }
         }
