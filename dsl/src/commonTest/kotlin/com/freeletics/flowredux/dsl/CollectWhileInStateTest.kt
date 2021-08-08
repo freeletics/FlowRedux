@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -44,7 +45,6 @@ class CollectWhileInStateTest {
 
     @Test
     fun `collectWhileInState with flowBuilder stops after having moved to next state`() = suspendTest {
-
         val recordedValues = mutableListOf<Int>()
 
         val sm = StateMachine {
@@ -71,6 +71,100 @@ class CollectWhileInStateTest {
             assertEquals(TestState.S1, expectItem())
         }
         assertEquals(listOf(1), recordedValues) // 2,3 is not emitted
+    }
+
+    @Test
+    fun `collectWhileInStateEffect handler does NOT stop after having moved to next state`() = suspendTest {
+        var reached = false
+        val recordedValues = mutableListOf<Int>()
+
+        val sm = StateMachine {
+            inState<TestState.Initial> {
+                collectWhileInStateEffect(flow {
+                    println("emit 1")
+                    emit(1)
+                    println("emitted 1")
+                    delay(100)
+                    println("emit 2")
+                    emit(2)
+                    println("emitted 2")
+                    delay(100)
+                    println("emit 3")
+                    emit(3)
+                    println("emitted 3")
+                }) { v, _ ->
+                    println("got $v")
+                    recordedValues.add(v)
+                    delay(50)
+                    println("reached")
+                    reached = true
+                }
+
+                on<TestAction.A1> { _, _ ->
+                    OverrideState(TestState.S1)
+                }
+            }
+        }
+
+        sm.state.test {
+            assertEquals(TestState.Initial, expectItem())
+            delay(10)
+            sm.dispatchAsync(TestAction.A1)
+            assertEquals(TestState.S1, expectItem())
+            delay(300)
+        }
+        println("END")
+        assertEquals(listOf(1), recordedValues) // 2,3 is not emitted
+        assertTrue(reached)
+    }
+
+
+    @Test
+    fun `collectWhileInStateEffect with flowBuilder handler does NOT stop after having moved to next state`() = suspendTest {
+        var reached = false
+        val recordedValues = mutableListOf<Int>()
+
+        val sm = StateMachine {
+            inState<TestState.Initial> {
+                collectWhileInStateEffect({
+                    it.flatMapConcat {
+                        flow {
+                            println("emit 1")
+                            emit(1)
+                            println("emitted 1")
+                            delay(100)
+                            println("emit 2")
+                            emit(2)
+                            println("emitted 2")
+                            delay(100)
+                            println("emit 3")
+                            emit(3)
+                            println("emitted 3")
+                        }
+                    }
+                }) { v, _ ->
+                    println("got $v")
+                    recordedValues.add(v)
+                    delay(50)
+                    println("reached")
+                    reached = true
+                }
+
+                on<TestAction.A1> { _, _ ->
+                    OverrideState(TestState.S1)
+                }
+            }
+        }
+
+        sm.state.test {
+            assertEquals(TestState.Initial, expectItem())
+            delay(10)
+            sm.dispatchAsync(TestAction.A1)
+            assertEquals(TestState.S1, expectItem())
+            delay(300)
+        }
+        assertEquals(listOf(1), recordedValues) // 2,3 is not emitted
+        assertTrue(reached)
     }
 
 

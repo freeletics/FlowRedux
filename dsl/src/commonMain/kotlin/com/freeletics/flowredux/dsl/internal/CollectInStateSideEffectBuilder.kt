@@ -10,7 +10,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
@@ -28,6 +27,7 @@ import kotlinx.coroutines.sync.withLock
  */
 internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
+    private val cancelWhenStateChanges: Boolean,
     private val flow: Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
     private val handler: CollectWhileInStateHandler<T, InputState, S>
@@ -37,14 +37,26 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     @FlowPreview
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
+            val stateChangeFlatMapPolicy = if (cancelWhenStateChanges) {
+                FlatMapPolicy.LATEST
+            } else {
+                FlatMapPolicy.CONCAT
+            }
             actions
                 .filterState(getState = getState, isInState = isInState)
-                .flatMapLatest { stateSubscription ->
+                .flatMapWithPolicy(stateChangeFlatMapPolicy) { stateSubscription ->
                     when (stateSubscription) {
                         FilterState.StateChanged.SUBSCRIBE -> {
-                            flow.flatMapWithPolicy(flatMapPolicy) {
-                                setStateFlow(value = it, getState = getState)
-                            }
+                            flow
+                                // when cancelWhenStateChanges is false we don't want to
+                                // receive more from the upstream flow but we can't cancel
+                                // the flow because we want
+                                // TODO this delays the upstream cancellation until it emits the
+                                //  next value, so it would not immediately cancel
+                                //.takeWhile { isInState(getState()) }
+                                .flatMapWithPolicy(flatMapPolicy) {
+                                    setStateFlow(value = it, getState = getState)
+                                }
                         }
                         FilterState.StateChanged.UNSUBSCRIBE -> flow { }
                     }

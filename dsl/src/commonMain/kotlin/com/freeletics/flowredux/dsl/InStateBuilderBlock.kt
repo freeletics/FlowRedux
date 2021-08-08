@@ -169,6 +169,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         _inStateSideEffectBuilders.add(
             CollectInStateBuilder(
                 isInState = _isInState,
+                cancelWhenStateChanges = true,
                 flow = flow,
                 flatMapPolicy = flatMapPolicy,
                 handler = handler
@@ -219,6 +220,100 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         )
     }
 
+    /**
+     * Triggers every time the state machine enters this state. The passed [flow] will be collected
+     * and any emission will be passed to [handler].
+     *
+     * The collection is cancelled when leaving this state, while an any ongoing [handler] is NOT
+     * cancelled.
+     *
+     * [handler] will only be called for a new emission from [flow] after a previous [handler]
+     * invocation completed.
+     */
+    fun <T> collectWhileInStateEffect(
+        flow: Flow<T>,
+        handler: CollectWhileInStateEffectHandler<T, InputState>
+    ) {
+        collectWhileInStateEffect(flow, FlatMapPolicy.CONCAT, handler)
+    }
+
+    /**
+     * Triggers every time the state machine enters this state. The passed [flow] will be collected
+     * and any emission will be passed to [handler].
+     *
+     * The collection is cancelled when leaving this state, while an any ongoing [handler] is NOT
+     * cancelled.
+     *
+     * [flatMapPolicy] is used to determine the behavior when a new emission from [flow] arrives
+     * before the previous [handler] invocation completed.
+     */
+    fun <T> collectWhileInStateEffect(
+        flow: Flow<T>,
+        flatMapPolicy: FlatMapPolicy,
+        handler: CollectWhileInStateEffectHandler<T, InputState>
+    ) {
+        _inStateSideEffectBuilders.add(
+            CollectInStateBuilder(
+                isInState = _isInState,
+                cancelWhenStateChanges = false,
+                flow = flow,
+                flatMapPolicy = flatMapPolicy,
+                handler = { value, state ->
+                    handler(value, state)
+                    NoStateChange
+                }
+            )
+        )
+    }
+
+    /**
+     * Triggers every time the state machine enters this state. [flowBuilder] will get a
+     * [Flow] that emits the current [InputState] and any change to it. The transformed `Flow` that
+     * [flowBuilder] returns will be collected and any emission will be passed to [handler].
+     *
+     * The collection is cancelled when leaving this state, while an any ongoing [handler] is NOT
+     * cancelled.
+     *
+     * [handler] will only be called for a new emission from [flowBuilder]'s `Flow` after a
+     * previous [handler] invocation completed.
+     */
+    fun <T> collectWhileInStateEffect(
+        flowBuilder: (Flow<InputState>) -> Flow<T>,
+        handler: CollectWhileInStateEffectHandler<T, InputState>
+    ) {
+        collectWhileInStateEffect(flowBuilder, FlatMapPolicy.CONCAT, handler)
+    }
+
+    /**
+     * Triggers every time the state machine enters this state. [flowBuilder] will get a
+     * [Flow] that emits the current [InputState] and any change to it. The transformed `Flow` that
+     * [flowBuilder] returns will be collected and any emission will be passed to [handler].
+     *
+     * The collection is cancelled when leaving this state, while an any ongoing [handler] is NOT
+     * cancelled.
+     *
+     * [flatMapPolicy] is used to determine the behavior when a new emission from [flowBuilder]'s
+     * `Flow` arrives before the previous [handler] invocation completed.
+     */
+    fun <T> collectWhileInStateEffect(
+        flowBuilder: (Flow<InputState>) -> Flow<T>,
+        flatMapPolicy: FlatMapPolicy,
+        handler: CollectWhileInStateEffectHandler<T, InputState>
+    ) {
+        _inStateSideEffectBuilders.add(
+            CollectInStateBasedOnStateBuilder(
+                isInState = _isInState,
+                cancelWhenStateChanges = false,
+                flowBuilder = flowBuilder,
+                flatMapPolicy = flatMapPolicy,
+                handler = { value, state ->
+                    handler(value, state)
+                    NoStateChange
+                }
+            )
+        )
+    }
+
     override fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {
         return _inStateSideEffectBuilders.map { it.generateSideEffect() }
     }
@@ -233,3 +328,5 @@ typealias OnEnterHandler<InputState, S> = suspend (state: InputState) -> ChangeS
 typealias OnEnterEffectHandler<InputState> = suspend (state: InputState) -> Unit
 
 typealias CollectWhileInStateHandler<T, InputState, S> = suspend (value: T, state: InputState) -> ChangeState<S>
+
+typealias CollectWhileInStateEffectHandler<T, InputState> = suspend (value: T, state: InputState) -> Unit
