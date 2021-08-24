@@ -3,14 +3,13 @@ package com.freeletics.flowredux.dsl.internal
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.ChangeState
+import com.freeletics.flowredux.dsl.flow.mapToIsInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 
 /**
  * A builder that generates a [SideEffect] that triggers every time the state machine enters
@@ -26,13 +25,12 @@ class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             actions
-                .map { isInState(getState()) }
-                .distinctUntilChanged()
+                .mapToIsInState(isInState, getState)
                 .flatMapLatest {
                     if (it) {
                         setStateFlow(getState)
                     } else {
-                        flowOf()
+                        emptyFlow()
                     }
                 }
         }
