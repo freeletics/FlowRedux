@@ -31,8 +31,8 @@ class FlowReduxTest {
                             state + 1
                         }
                         .test {
-                            assertEquals(0, expectItem())
-                            expectComplete()
+                            assertEquals(0, awaitItem())
+                            awaitComplete()
                         }
             }
         }
@@ -49,10 +49,10 @@ class FlowReduxTest {
             }.reduxStore({ "" }, listOf(), CommandLineLogger) { state, action ->
                 state + action
             }.test {
-                assertEquals("", expectItem())
-                assertEquals("1", expectItem())
-                assertEquals("12", expectItem())
-                expectComplete()
+                assertEquals("", awaitItem())
+                assertEquals("1", awaitItem())
+                assertEquals("12", awaitItem())
+                awaitComplete()
             }
         }
     }
@@ -76,10 +76,10 @@ class FlowReduxTest {
                 }.reduxStore({ "" }, listOf(sideEffect1), CommandLineLogger) { state, action ->
                     state + action
                 }.test {
-                    assertEquals("", expectItem())
-                    assertEquals("1", expectItem())
-                    assertEquals("12", expectItem())
-                    expectComplete()
+                    assertEquals("", awaitItem())
+                    assertEquals("1", awaitItem())
+                    assertEquals("12", awaitItem())
+                    awaitComplete()
                 }
             }
         }
@@ -108,10 +108,10 @@ class FlowReduxTest {
                 }.reduxStore({ "" }, listOf(sideEffect1, sideEffect2)) { state, action ->
                     state + action
                 }.test {
-                    assertEquals("", expectItem())
-                    assertEquals("1", expectItem())
-                    assertEquals("12", expectItem())
-                    expectComplete()
+                    assertEquals("", awaitItem())
+                    assertEquals("1", awaitItem())
+                    assertEquals("12", awaitItem())
+                    awaitComplete()
                 }
             }
         }
@@ -150,19 +150,19 @@ class FlowReduxTest {
                 state + action
             }.test {
                 // Initial State emission
-                assertEquals("", expectItem())
+                assertEquals("", awaitItem())
 
                 // emission of 1
-                assertEquals("1", expectItem())
-                assertEquals("16", expectItem())
-                assertEquals("167", expectItem())
+                assertEquals("1", awaitItem())
+                assertEquals("16", awaitItem())
+                assertEquals("167", awaitItem())
 
                 // emission of 2
-                assertEquals("1672", expectItem())
-                assertEquals("16726", expectItem())
-                assertEquals("167267", expectItem())
+                assertEquals("1672", awaitItem())
+                assertEquals("16726", awaitItem())
+                assertEquals("167267", awaitItem())
 
-                expectComplete()
+                awaitComplete()
             }
         }
     }
@@ -196,20 +196,20 @@ class FlowReduxTest {
                 state + action
             }.test {
                 // Initial State emission
-                assertEquals("", expectItem())
+                assertEquals("", awaitItem())
 
                 // emission of 1
-                assertEquals("1", expectItem())
+                assertEquals("1", awaitItem())
                 // emission of 2
-                assertEquals("12", expectItem())
+                assertEquals("12", awaitItem())
                 // side effect actions in response to 1
-                assertEquals("126", expectItem())
-                assertEquals("1267", expectItem())
+                assertEquals("126", awaitItem())
+                assertEquals("1267", awaitItem())
                 // side effect actions in response to 2
-                assertEquals("12676", expectItem())
-                assertEquals("126767", expectItem())
+                assertEquals("12676", awaitItem())
+                assertEquals("126767", awaitItem())
 
-                expectComplete()
+                awaitComplete()
             }
         }
     }
@@ -246,8 +246,8 @@ class FlowReduxTest {
                 }.reduxStore({ "" }, listOf(sideEffect1, sideEffect2)) { state, action ->
                     state + action
                 }.test {
-                    assertEquals("", expectItem())
-                    assertEquals("1", expectItem())
+                    assertEquals("", awaitItem())
+                    assertEquals("1", awaitItem())
                 }
             }
 

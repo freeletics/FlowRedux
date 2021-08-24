@@ -35,8 +35,8 @@ class CollectWhileInStateTest {
         }
 
         sm.state.test {
-            assertEquals(TestState.Initial, expectItem())
-            assertEquals(TestState.S1, expectItem())
+            assertEquals(TestState.Initial, awaitItem())
+            assertEquals(TestState.S1, awaitItem())
         }
         assertEquals(listOf(1), recordedValues) // 2,3 is not emitted
     }
@@ -67,8 +67,8 @@ class CollectWhileInStateTest {
         }
 
         sm.state.test {
-            assertEquals(TestState.Initial, expectItem())
-            assertEquals(TestState.S1, expectItem())
+            assertEquals(TestState.Initial, awaitItem())
+            assertEquals(TestState.S1, awaitItem())
         }
         assertEquals(listOf(1), recordedValues) // 2,3 is not emitted
     }
@@ -98,20 +98,20 @@ class CollectWhileInStateTest {
         }
 
         sm.state.test {
-            assertEquals(TestState.Initial, expectItem())
-            assertEquals(TestState.S1, expectItem())
+            assertEquals(TestState.Initial, awaitItem())
+            assertEquals(TestState.S1, awaitItem())
 
             sm.dispatchAsync(TestAction.A1)
-            assertEquals(TestState.S2, expectItem())
+            assertEquals(TestState.S2, awaitItem())
 
             sm.dispatchAsync(TestAction.A2)
-            assertEquals(TestState.S1, expectItem())
+            assertEquals(TestState.S1, awaitItem())
 
             sm.dispatchAsync(TestAction.A1)
-            assertEquals(TestState.S2, expectItem())
+            assertEquals(TestState.S2, awaitItem())
 
             sm.dispatchAsync(TestAction.A2)
-            assertEquals(TestState.S1, expectItem())
+            assertEquals(TestState.S1, awaitItem())
         }
     }
 
@@ -143,13 +143,13 @@ class CollectWhileInStateTest {
         }
 
         sm.state.test {
-            assertEquals(TestState.Initial, expectItem())
-            assertEquals(TestState.GenericState("", 0), expectItem())
-            assertEquals(TestState.GenericState("1", 1), expectItem())
-            assertEquals(TestState.GenericState("111", 11), expectItem())
-            assertEquals(TestState.GenericState("111111", 111), expectItem())
-            assertEquals(TestState.GenericState("1111111111", 1111), expectItem())
-            assertEquals(TestState.S1, expectItem())
+            assertEquals(TestState.Initial, awaitItem())
+            assertEquals(TestState.GenericState("", 0), awaitItem())
+            assertEquals(TestState.GenericState("1", 1), awaitItem())
+            assertEquals(TestState.GenericState("111", 11), awaitItem())
+            assertEquals(TestState.GenericState("111111", 111), awaitItem())
+            assertEquals(TestState.GenericState("1111111111", 1111), awaitItem())
+            assertEquals(TestState.S1, awaitItem())
         }
     }
 }

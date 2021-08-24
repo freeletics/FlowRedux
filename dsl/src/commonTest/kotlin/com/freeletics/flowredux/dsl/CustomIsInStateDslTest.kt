@@ -46,13 +46,13 @@ class CustomIsInStateDslTest {
         }
 
         sm.state.test {
-            assertEquals(TestState.Initial, expectItem())
+            assertEquals(TestState.Initial, awaitItem())
             sm.dispatchAsync(TestAction.A1)
-            assertEquals(gs1, expectItem())
+            assertEquals(gs1, awaitItem())
             sm.dispatchAsync(TestAction.A1)
-            assertEquals(gs2, expectItem())
+            assertEquals(gs2, awaitItem())
             sm.dispatchAsync(TestAction.A1)
-            assertEquals(TestState.S1, expectItem())
+            assertEquals(TestState.S1, awaitItem())
         }
 
         assertEquals(1, counter1)
@@ -93,11 +93,11 @@ class CustomIsInStateDslTest {
         }
 
         sm.state.test {
-            assertEquals(TestState.Initial, expectItem())
+            assertEquals(TestState.Initial, awaitItem())
             sm.dispatchAsync(TestAction.A1)
-            assertEquals(gs1, expectItem())
-            assertEquals(gs2, expectItem())
-            assertEquals(TestState.S1, expectItem())
+            assertEquals(gs1, awaitItem())
+            assertEquals(gs2, awaitItem())
+            assertEquals(TestState.S1, awaitItem())
         }
 
         assertFalse(reached)
