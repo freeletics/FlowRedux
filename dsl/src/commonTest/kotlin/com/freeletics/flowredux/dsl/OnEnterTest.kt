@@ -2,13 +2,10 @@ package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
 import kotlinx.coroutines.delay
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlin.test.*
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
 class OnEnterTest {
@@ -37,10 +34,10 @@ class OnEnterTest {
         }
 
         sm.state.test {
-            assertEquals(TestState.Initial, expectItem())
+            assertEquals(TestState.Initial, awaitItem())
             delay(delay / 2)
             sm.dispatchAsync(TestAction.A2)
-            assertEquals(TestState.S2, expectItem())
+            assertEquals(TestState.S2, awaitItem())
             delay(delay)
             expectNoEvents()
         }
@@ -75,12 +72,12 @@ class OnEnterTest {
         }
 
         sm.state.test {
-            assertEquals(TestState.Initial, expectItem())
-            assertEquals(TestState.GenericState("from initial", 0), expectItem())
-            assertEquals(TestState.GenericState("onEnter", 0), expectItem())
+            assertEquals(TestState.Initial, awaitItem())
+            assertEquals(TestState.GenericState("from initial", 0), awaitItem())
+            assertEquals(TestState.GenericState("onEnter", 0), awaitItem())
             repeat(2) { index ->
                 sm.dispatch(TestAction.A1) // Causes state transition to S1 again which is already current
-                assertEquals(TestState.GenericState("onA1", index + 1), expectItem())
+                assertEquals(TestState.GenericState("onA1", index + 1), awaitItem())
             }
         }
         assertEquals(1, genericStateEntered)
