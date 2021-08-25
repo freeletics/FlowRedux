@@ -397,6 +397,42 @@ The passed Flow (in our case the timer) is automatically canceled once the state
 triggers `on<RetryLoadingAction>` which causes a state transition to `LoadingState` or when 3 seconds have elapsed
 because then the defined `MutateState` causes a transitions to `LoadingState`.
 
+## Effects
+If you don't want to change the state but do some work without changing the state i.e. logging,
+triggering google analytics or trigger navigation then Effects is what you are looking for.
+
+The following counterparts to `on<Action>`, `onEnter` and `collectWhileInState` exists:
+- `onActionEffect<Action>`: Like `on<Action>` this triggers whenever the described Action is dispatched.
+- `onEnterEffect`: Like `onEnter` this triggers whenever you enter the state.
+- `collectWhileInStateEffect`: Like `collectWhileInState` this is used to collect a `Flow`.
+
+Effects behave the same way as their counterparts, i.e. cancelation etc. works just the same way as described in the section of `on<Action>`, `onEnter` and `collectWhileInState`.Effects
+
+Usage:
+```kotlin
+class MyStateMachine : FlowReduxStateMachine<State, Action>(initialState = LoadingState) {
+
+    init {
+        spec {
+            inState<ShowContentState> {
+               onEnterEffect { stateSnapshot ->
+                   logMessage("Did enter $state") // note there is no state change
+               }
+
+               onActionEffect<ButtonClickedAction> { action, stateSnapshot ->
+                    analyticsTracker.track(ButtonClickedEvent()) // note there is no state change
+               }
+
+               collectWhileInStateEffect(someFlow) {value, stateSnapshot ->
+                    logMessage("Collected $value from flow while in state $stateSnapshot") // note there is no state change
+               }
+            }
+
+        }
+    }
+}
+```
+
 ## Custom condition for inState
 
 We already covered `inState<State>` that builds upon the recommended best practice that every State in your state
