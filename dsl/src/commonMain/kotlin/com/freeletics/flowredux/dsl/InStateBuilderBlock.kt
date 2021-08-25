@@ -87,11 +87,9 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     inline fun <reified SubAction : A> onActionEffect(
         noinline handler: OnActionEffectHandler<InputState, SubAction>
     ) {
-        on(flatMapPolicy = FlatMapPolicy.LATEST,
-            handler = { action: SubAction, state: InputState ->
-                handler(action, state)
-                NoStateChange
-            }
+        onActionEffect(
+            flatMapPolicy = FlatMapPolicy.LATEST,
+            handler = handler
         )
     }
 
