@@ -30,52 +30,51 @@ class SubStateMachineSideEffectBuilder<SubStateMachineState : Any, SubStateMachi
 
     private fun Flow<Action<S, A>>.subscribeToStateMachineStateAndDispatchActionsToIt(getState: GetState<S>): Flow<Action<S, A>> {
         val upstreamActions: Flow<Action<S, A>> = this
-        return flow {
-            coroutineScope {
+        return channelFlow {
 
-                // collect the state of the sub state machine
-                launch {
-                    upstreamActions
-                        .mapToIsInState(isInState, getState)
-                        .flatMapLatest { inState: Boolean ->
-                            if (inState) {
-                                // start collecting state of sub state machine
-                                subStateMachine.state
-                            } else {
-                                // stop collecting state of sub state machine
-                                emptyFlow()
-                            }
-                        }.collect { subStateMachineState: SubStateMachineState ->
+            // collect the state of the sub state machine
+            launch {
+                upstreamActions
+                    .mapToIsInState(isInState, getState)
+                    .flatMapLatest { inState: Boolean ->
+                        if (inState) {
+                            // start collecting state of sub state machine
+                            subStateMachine.state
+                        } else {
+                            // stop collecting state of sub state machine
+                            emptyFlow()
+                        }
+                    }.collect { subStateMachineState: SubStateMachineState ->
 
-                            runOnlyIfInInputState(getState, isInState) { inputState ->
+                        runOnlyIfInInputState(getState, isInState) { inputState ->
 
-                                val changeStateAction = ChangeStateAction<S, A>(
-                                    loggingInfo = "Sub StateMachine",
-                                    runReduceOnlyIf = isInState,
-                                    changeState = stateMapper(
-                                        inputState,
-                                        subStateMachineState
-                                    )
+                            val changeStateAction = ChangeStateAction<S, A>(
+                                loggingInfo = "Sub StateMachine",
+                                runReduceOnlyIf = isInState,
+                                changeState = stateMapper(
+                                    inputState,
+                                    subStateMachineState
                                 )
-                                emit(changeStateAction)
-                            }
+                            )
+                            send(changeStateAction)
                         }
-                }
-
-                // Collect upstream actions and dispatch it to the sub state machine
-                launch {
-                    upstreamActions
-                        .whileInState(isInState, getState) { actions: Flow<Action<S, A>> ->
-                            actions
-                                .filterIsInstance<ExternalWrappedAction<S, A>>()
-                                .onEach { externalAction: ExternalWrappedAction<S, A> ->
-                                    // TODO: do we need to launch this in another coroutine?
-                                    subStateMachine.dispatch(actionMapper(externalAction.action))
-                                }
-                        }
-                        .collect()
-                }
+                    }
             }
+
+            // Collect upstream actions and dispatch it to the sub state machine
+            launch {
+                upstreamActions
+                    .whileInState(isInState, getState) { actions: Flow<Action<S, A>> ->
+                        actions
+                            .filterIsInstance<ExternalWrappedAction<S, A>>()
+                            .onEach { externalAction: ExternalWrappedAction<S, A> ->
+                                // TODO: do we need to launch this in another coroutine?
+                                subStateMachine.dispatch(actionMapper(externalAction.action))
+                            }
+                    }
+                    .collect()
+            }
+
         }
     }
 }
