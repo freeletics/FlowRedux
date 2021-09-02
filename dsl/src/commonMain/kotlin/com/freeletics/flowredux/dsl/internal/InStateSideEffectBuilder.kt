@@ -2,6 +2,8 @@ package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.SideEffect
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 /**
  * It's just not an Interface to not expose internal class `Action` to the public.
@@ -9,6 +11,8 @@ import com.freeletics.flowredux.SideEffect
  */
 // TODO verify if this should be internal.
 abstract class InStateSideEffectBuilder<InputState : S, S, A> internal constructor() {
+    @ExperimentalCoroutinesApi
+    @FlowPreview
     internal abstract fun generateSideEffect(): SideEffect<S, Action<S, A>>
 
 
