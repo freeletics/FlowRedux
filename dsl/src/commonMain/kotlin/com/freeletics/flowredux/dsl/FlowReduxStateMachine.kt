@@ -1,5 +1,7 @@
 package com.freeletics.flowredux.dsl
 
+import co.touchlab.stately.concurrency.AtomicReference
+import co.touchlab.stately.concurrency.value
 import com.freeletics.flowredux.FlowReduxLogger
 import com.freeletics.mad.statemachine.StateMachine
 import kotlinx.coroutines.CoroutineScope
@@ -21,16 +23,16 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
 ) : StateMachine<S, A> {
 
     private val inputActions = Channel<A>()
-    private var internalState: StateFlow<S>? = null
+    private var internalState: AtomicReference<StateFlow<S>?> = AtomicReference(null)
 
     protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
-        if (internalState != null) {
+        if (internalState.value != null) {
             throw IllegalStateException(
                 "State machine spec has already been set. " +
                     "It's only allowed to call spec {...} once."
             )
         }
-        internalState = inputActions
+        internalState.value = inputActions
             .consumeAsFlow()
             .reduxStore(logger, initialState, specBlock)
             .stateIn(scope, SharingStarted.Lazily, initialState)
@@ -39,7 +41,7 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
     override val state: StateFlow<S> get() {
         check(scope.isActive) { "The scope of this state machine was already cancelled." }
         checkSpecBlockSet()
-        return internalState!!
+        return internalState.value!!
     }
 
     override suspend fun dispatch(action: A) {
@@ -48,7 +50,7 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
     }
 
     private fun checkSpecBlockSet() {
-       if (internalState == null) {
+        if (internalState.value == null) {
            throw IllegalStateException(
                """
                     No state machine specs are defined. Did you call spec { ... } in init {...}?
