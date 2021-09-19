@@ -57,7 +57,7 @@ fun <S : Any, A : Any> Flow<A>.reduxStore(
 class FlowReduxStoreBuilder<S : Any, A : Any> {
 
     // TODO is there a better workaround to hide implementation details like this while keep inline fun()
-    val builderBlocks: MutableList<StoreWideBuilderBlock<S, A>> = ArrayList<StoreWideBuilderBlock<S, A>>()
+    val builderBlocks: MutableList<StoreWideBuilderBlock<S, A>> = ArrayList()
 
     /**
      * Define what happens if the store is in a certain state.
