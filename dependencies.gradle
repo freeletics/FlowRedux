@@ -65,5 +65,5 @@ ext.gradlePlugins = [
         kotlin            : "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin",
         dokka             : "org.jetbrains.dokka:dokka-gradle-plugin:$versions.dokka",
         kotlinxcodesync   : "co.touchlab:kotlinxcodesync:0.2",
-        gradleMavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.17.0",
+        gradleMavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.18.0",
 ]
