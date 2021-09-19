@@ -1,5 +1,25 @@
 package com.freeletics.flowredux.dsl
 
-typealias OnActionEffectHandler<InputState, A> = suspend (action: A, state: InputState) -> Unit
-typealias OnEnterStateEffectHandler<InputState> = suspend (state: InputState) -> Unit
-typealias CollectFlowEffectHandler<T, InputState> = suspend (value: T, state: InputState) -> Unit
+fun interface OnActionHandler<InputState, S, A> {
+    suspend fun handle(action: A, state: InputState): ChangeState<S>
+}
+
+fun interface OnActionEffectHandler<InputState, A> {
+    suspend fun handle(action: A, state: InputState)
+}
+
+fun interface OnEnterHandler<InputState, S> {
+    suspend fun handle(state: InputState): ChangeState<S>
+}
+
+fun interface OnEnterStateEffectHandler<InputState> {
+    suspend fun handle(state: InputState)
+}
+
+fun interface CollectFlowHandler<T, InputState, S> {
+    suspend fun handle(value: T, state: InputState): ChangeState<S>
+}
+
+fun interface CollectFlowEffectHandler<T, InputState> {
+    suspend fun handle(value: T, state: InputState)
+}
