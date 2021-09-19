@@ -11,7 +11,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 
 /**
  * A builder to create a [SideEffect] that observes a Flow<T> as long as the redux store is in
@@ -43,7 +43,7 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
     private fun flowOfCurrentState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<InputState> {
         // after every state change there is a guaranteed action emission so we use this 
         // to get the current state
-        return actions.map { getState() as InputState }
+        return actions.mapNotNull { getState() as? InputState }
             // an action emission does not guarantee that the state changed so we need to filter
             // out multiple emissions of identical state objects    
             .distinctUntilChanged()
