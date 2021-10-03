@@ -7,14 +7,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-fun StateMachine(
-    builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit
-): TestStateMachine {
-    return TestStateMachine(builderBlock)
-}
-
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-class TestStateMachine constructor(
+class StateMachine constructor(
     specBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit
 ) : FlowReduxStateMachine<TestState, TestAction>(
     logger = CommandLineLogger,
