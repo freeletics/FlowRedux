@@ -13,7 +13,7 @@ class SubStateMachineTest {
 
     @Test
     fun `delegate to sub statemachine while in state`() = suspendTest {
-        val child = ChildStateMachine(this) {
+        val child = ChildStateMachine {
 
             inState<TestState.Initial> {
                 on<TestAction.A1> { _, _ ->
@@ -45,12 +45,10 @@ class SubStateMachineTest {
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 private fun ChildStateMachine(
-    coroutineScope: CoroutineScope,
     builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit
 ): FlowReduxStateMachine<TestState, TestAction> {
     return object : FlowReduxStateMachine<TestState, TestAction>(
         TestState.Initial,
-        coroutineScope,
         CommandLineLogger
     ) {
 
