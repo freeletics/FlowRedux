@@ -7,6 +7,7 @@ import com.freeletics.flowredux.dsl.internal.CollectInStateBuilder
 import com.freeletics.flowredux.dsl.internal.InStateSideEffectBuilder
 import com.freeletics.flowredux.dsl.internal.OnActionInStateSideEffectBuilder
 import com.freeletics.flowredux.dsl.internal.OnEnterInStateSideEffectBuilder
+import com.freeletics.flowredux.dsl.internal.SubStateMachineSideEffectBuilder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
