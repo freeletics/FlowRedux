@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.consumeAsFlow
 @FlowPreview
 @ExperimentalCoroutinesApi
 abstract class FlowReduxStateMachine<S : Any, A : Any>(
-    private val initialStateSupplier: () -> S,
+    private var initialStateSupplier: () -> S,
     private val logger: FlowReduxLogger? = null
 ) {
 
@@ -18,19 +18,7 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
     private var specBlock: (FlowReduxStoreBuilder<S, A>.() -> Unit)? = null
     private var specBlockSet = false
 
-    constructor(
-        initialStateSupplier: () -> S
-    ) : this(
-        logger = null,
-        initialStateSupplier = initialStateSupplier
-    )
-
-    constructor(initialState: S) : this(logger = null, initialState = initialState)
-
-    constructor(
-        initialState: S,
-        logger: FlowReduxLogger?
-    ) : this(logger = logger, initialStateSupplier = { initialState })
+    constructor(initialState: S) : this(logger = null, initialStateSupplier = { initialState })
 
     protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
 
@@ -52,6 +40,7 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
             .reduxStore(logger, initialStateSupplier, specBlock!!)
             .also {
                 specBlock = null // Free up memory
+                // TODO do we need to free up the initialStateSupplier as well to avoid leaks?
             }
     }
 
