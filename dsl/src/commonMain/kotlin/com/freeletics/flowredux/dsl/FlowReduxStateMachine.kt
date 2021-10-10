@@ -18,7 +18,9 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
     private var specBlock: (FlowReduxStoreBuilder<S, A>.() -> Unit)? = null
     private var specBlockSet = false
 
-    constructor(initialState: S) : this(logger = null, initialStateSupplier = { initialState })
+    constructor(initialState: S, logger: FlowReduxLogger? = null) : this(
+        logger = logger,
+        initialStateSupplier = { initialState })
 
     protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
 
