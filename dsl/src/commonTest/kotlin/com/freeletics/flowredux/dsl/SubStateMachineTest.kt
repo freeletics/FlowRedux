@@ -36,7 +36,7 @@ class SubStateMachineTest {
 
         parent.state.test {
             assertEquals(TestState.Initial, awaitItem())
-            parent.dispatch(TestAction.A1)
+            parent.dispatchAsync(TestAction.A1)
             assertEquals(TestState.S1, awaitItem())
         }
     }
