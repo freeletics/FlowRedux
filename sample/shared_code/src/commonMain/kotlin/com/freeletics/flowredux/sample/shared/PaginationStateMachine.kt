@@ -76,7 +76,7 @@ data class ShowContentAndLoadingNextPageErrorPaginationState(
 internal class InternalPaginationStateMachine(
     logger: FlowReduxLogger,
     private val githubApi: GithubApi
-) : FlowReduxStateMachine<PaginationState, Action>(LoadFirstPagePaginationState, logger) {
+) : FlowReduxStateMachine<PaginationState, Action>({ LoadFirstPagePaginationState }, logger) {
     init {
         spec {
 
