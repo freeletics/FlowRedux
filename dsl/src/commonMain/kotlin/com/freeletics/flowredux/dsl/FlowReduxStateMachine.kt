@@ -22,7 +22,7 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
         initialStateSupplier = { initialState })
 
     protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
-        if (::internalState.isInitialized)
+        if (::outputState.isInitialized)
             throw IllegalStateException(
                 "State machine spec has already been set. " +
                         "It's only allowed to call spec {...} once."
@@ -46,7 +46,7 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
     }
 
     private fun checkSpecBlockSet() {
-        if (!::internalState.isInitialized) {
+        if (!::outputState.isInitialized) {
             throw IllegalStateException(
                 """
                     No state machine specs are defined. Did you call spec { ... } in init {...}?
