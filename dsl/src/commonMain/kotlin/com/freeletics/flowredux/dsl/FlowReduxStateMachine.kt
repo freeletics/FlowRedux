@@ -15,44 +15,38 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
 ) {
 
     private val inputActions = Channel<A>()
-    private var specBlock: (FlowReduxStoreBuilder<S, A>.() -> Unit)? = null
-    private var specBlockSet = false
+    private lateinit var outputState: Flow<S>
 
     constructor(initialState: S, logger: FlowReduxLogger? = null) : this(
         logger = logger,
         initialStateSupplier = { initialState })
 
     protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
-
-        if (this.specBlock != null)
+        if (::internalState.isInitialized)
             throw IllegalStateException(
                 "State machine spec has already been set. " +
                         "It's only allowed to call spec {...} once."
             )
-
-        this.specBlock = specBlock
-        this.specBlockSet = true
-
-    }
-
-    val state: Flow<S> by lazy(LazyThreadSafetyMode.NONE) {
-        checkSpecBlockSet()
-        inputActions
+            
+        outputState = inputActions
             .consumeAsFlow()
-            .reduxStore(logger, initialStateSupplier, specBlock!!)
-            .also {
-                specBlock = null // Free up memory
-                // TODO do we need to free up the initialStateSupplier as well to avoid leaks?
-            }
+            .reduxStore(logger, initialStateSupplier, specBlock)
+
     }
 
+    val state: Flow<S> 
+        get() {
+            checkSpecBlockSet()
+            return outputState
+        }
+        
     suspend fun dispatch(action: A) {
         checkSpecBlockSet()
         inputActions.send(action)
     }
 
     private fun checkSpecBlockSet() {
-        if (!specBlockSet) {
+        if (!::internalState.isInitialized) {
             throw IllegalStateException(
                 """
                     No state machine specs are defined. Did you call spec { ... } in init {...}?
