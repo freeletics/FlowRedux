@@ -22,16 +22,16 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
         initialStateSupplier = { initialState })
 
     protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
-        if (::outputState.isInitialized)
+        if (::outputState.isInitialized) {
             throw IllegalStateException(
                 "State machine spec has already been set. " +
                         "It's only allowed to call spec {...} once."
             )
+        }
             
         outputState = inputActions
             .consumeAsFlow()
             .reduxStore(logger, initialStateSupplier, specBlock)
-
     }
 
     val state: Flow<S> 
