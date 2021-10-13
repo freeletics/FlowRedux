@@ -4,8 +4,8 @@ package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
-import com.freeletics.flowredux.dsl.ChangeState
 import com.freeletics.flowredux.dsl.FlatMapPolicy
+import com.freeletics.flowredux.dsl.OnActionHandler
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import com.freeletics.flowredux.dsl.flow.whileInState
 import kotlinx.coroutines.flow.Flow
@@ -56,7 +56,7 @@ class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
         flow {
 
             runOnlyIfInInputState(getState, isInState) { inputState ->
-                val changeState = handler.invoke(
+                val changeState = handler.handle(
                     action,
                     inputState
                 )
@@ -70,11 +70,5 @@ class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
                 )
 
             }
-
         }
-
 }
-
-
-typealias OnActionHandler<InputState, S, A> = suspend (action: A, state: InputState) -> ChangeState<S>
-
