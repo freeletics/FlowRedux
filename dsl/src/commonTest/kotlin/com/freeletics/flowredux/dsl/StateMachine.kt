@@ -11,7 +11,11 @@ class StateMachine constructor(
     specBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit
 ) : FlowReduxStateMachine<TestState, TestAction>(
     logger = CommandLineLogger,
+<<<<<<< HEAD
     initialState = TestState.Initial
+=======
+    initialStateSupplier = { TestState.Initial }
+>>>>>>> main
 ) {
 
     init {
