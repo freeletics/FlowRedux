@@ -1,10 +1,12 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
-import com.freeletics.flowredux.dsl.internal.*
 import com.freeletics.flowredux.dsl.internal.Action
 import com.freeletics.flowredux.dsl.internal.CollectInStateBasedOnStateBuilder
 import com.freeletics.flowredux.dsl.internal.CollectInStateBuilder
+import com.freeletics.flowredux.dsl.internal.InStateSideEffectBuilder
+import com.freeletics.flowredux.dsl.internal.OnActionInStateSideEffectBuilder
+import com.freeletics.flowredux.dsl.internal.OnEnterInStateSideEffectBuilder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +31,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      * dispatched.
      */
     inline fun <reified SubAction : A> on(
-        noinline handler: OnActionHandler<InputState, S, SubAction>
+        handler: OnActionHandler<InputState, S, SubAction>
     ) {
         on(FlatMapPolicy.LATEST, handler)
     }
@@ -44,10 +46,10 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      */
     inline fun <reified SubAction : A> on(
         flatMapPolicy: FlatMapPolicy,
-        noinline handler: OnActionHandler<InputState, S, SubAction>
+        handler: OnActionHandler<InputState, S, SubAction>
     ) {
         @Suppress("UNCHECKED_CAST")
-        val builder = OnActionInStateSideEffectBuilder<InputState, S, A>(
+        val builder = OnActionInStateSideEffectBuilder(
             flatMapPolicy = flatMapPolicy,
             subActionClass = SubAction::class,
             isInState = _isInState,
@@ -65,11 +67,11 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      */
     inline fun <reified SubAction : A> onActionEffect(
         flatMapPolicy: FlatMapPolicy,
-        noinline handler: OnActionEffectHandler<InputState, SubAction>
+        handler: OnActionEffectHandler<InputState, SubAction>
     ) {
         on(flatMapPolicy = flatMapPolicy,
             handler = { action: SubAction, state: InputState ->
-                handler(action, state)
+                handler.handle(action, state)
                 NoStateChange
             }
         )
@@ -85,7 +87,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      *  Per default it uses [FlatMapPolicy.LATEST].
      */
     inline fun <reified SubAction : A> onActionEffect(
-        noinline handler: OnActionEffectHandler<InputState, SubAction>
+        handler: OnActionEffectHandler<InputState, SubAction>
     ) {
         onActionEffect(
             flatMapPolicy = FlatMapPolicy.LATEST,
@@ -101,7 +103,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      * An ongoing [handler] is cancelled when leaving this state.
      */
     fun onEnter(
-        handler: InStateOnEnterHandler<InputState, S>
+        handler: OnEnterHandler<InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
             OnEnterInStateSideEffectBuilder(
@@ -121,7 +123,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      */
     fun onEnterEffect(handler: OnEnterStateEffectHandler<InputState>) {
         onEnter { state ->
-            handler(state)
+            handler.handle(state)
             NoStateChange
         }
     }
@@ -139,7 +141,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      */
     fun <T> collectWhileInState(
         flow: Flow<T>,
-        handler: InStateObserverHandler<T, InputState, S>
+        handler: CollectFlowHandler<T, InputState, S>
     ) {
         collectWhileInState(flow, FlatMapPolicy.CONCAT, handler)
     }
@@ -156,7 +158,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     fun <T> collectWhileInState(
         flow: Flow<T>,
         flatMapPolicy: FlatMapPolicy,
-        handler: InStateObserverHandler<T, InputState, S>
+        handler: CollectFlowHandler<T, InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
             CollectInStateBuilder(
@@ -180,7 +182,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      */
     fun <T> collectWhileInState(
         flowBuilder: (Flow<InputState>) -> Flow<T>,
-        handler: InStateObserverHandler<T, InputState, S>
+        handler: CollectFlowHandler<T, InputState, S>
     ) {
         collectWhileInState(flowBuilder, FlatMapPolicy.CONCAT, handler)
     }
@@ -199,7 +201,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     fun <T> collectWhileInState(
         flowBuilder: (Flow<InputState>) -> Flow<T>,
         flatMapPolicy: FlatMapPolicy,
-        handler: InStateObserverHandler<T, InputState, S>
+        handler: CollectFlowHandler<T, InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
             CollectInStateBasedOnStateBuilder(
@@ -249,7 +251,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
             flow = flow,
             flatMapPolicy = flatMapPolicy,
             handler = { value: T, state: InputState ->
-                handler(value, state)
+                handler.handle(value, state)
                 NoStateChange
             }
         )
@@ -292,7 +294,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         collectWhileInState(flowBuilder = flowBuilder,
             flatMapPolicy = flatMapPolicy,
             handler = { value: T, state: InputState ->
-                handler(value, state)
+                handler.handle(value, state)
                 NoStateChange
             })
     }
@@ -301,5 +303,3 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         return _inStateSideEffectBuilders.map { it.generateSideEffect() }
     }
 }
-
-typealias InStateObserverHandler<T, InputState, S> = suspend (value: T, state: InputState) -> ChangeState<S>

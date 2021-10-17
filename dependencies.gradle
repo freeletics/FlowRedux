@@ -15,7 +15,7 @@ ext.versions = [
 
         support                : '1.3.1',
         recyclerView           : '1.2.1',
-        supportConstraintLayout: '2.1.0',
+        supportConstraintLayout: '2.1.1',
         androidArch            : '2.2.0',
         fragmentKtx            : '1.3.6',
         viewModelKtx           : '2.3.1',
@@ -23,8 +23,8 @@ ext.versions = [
         adapterDelegates       : '4.3.0',
 
         junit                  : '4.13.2',
-        turbine                : '0.6.0',
-        kotest                 : '4.6.2',
+        turbine                : '0.6.1',
+        kotest                 : '4.6.3',
 ]
 
 ext.libraries = [
