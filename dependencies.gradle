@@ -23,7 +23,7 @@ ext.versions = [
         adapterDelegates       : '4.3.0',
 
         junit                  : '4.13.2',
-        turbine                : '0.6.0',
+        turbine                : '0.6.1',
         kotest                 : '4.6.3',
 ]
 
