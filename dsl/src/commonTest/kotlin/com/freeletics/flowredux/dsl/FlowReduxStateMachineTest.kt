@@ -26,7 +26,7 @@ class FlowReduxStateMachineTest {
     @Test
     fun `calling spec block twice throws exception`() {
 
-        val sm = object : FlowReduxStateMachine<Any, Any>(Any(), CoroutineScope(EmptyCoroutineContext)) {
+        val sm = object : FlowReduxStateMachine<Any, Any>(Any()) {
 
             init {
                 spec { }
@@ -50,7 +50,7 @@ class FlowReduxStateMachineTest {
     @Test
     fun `no spec block set throws exception`() {
 
-        val sm = object : FlowReduxStateMachine<Any, Any>(Any(), CoroutineScope(EmptyCoroutineContext)) {}
+        val sm = object : FlowReduxStateMachine<Any, Any>(Any()) {}
 
         try {
             sm.state
