@@ -3,7 +3,7 @@ package com.freeletics.flowredux.dsl.internal
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.FlatMapPolicy
-import com.freeletics.flowredux.dsl.InStateObserverHandler
+import com.freeletics.flowredux.dsl.CollectFlowHandler
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import com.freeletics.flowredux.dsl.flow.whileInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -11,7 +11,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 
 /**
  * A builder to create a [SideEffect] that observes a Flow<T> as long as the redux store is in
@@ -24,7 +24,7 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
     private val isInState: (S) -> Boolean,
     private val flowBuilder: (Flow<InputState>) -> Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
-    private val handler: InStateObserverHandler<T, InputState, S>
+    private val handler: CollectFlowHandler<T, InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
@@ -43,7 +43,7 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
     private fun flowOfCurrentState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<InputState> {
         // after every state change there is a guaranteed action emission so we use this 
         // to get the current state
-        return actions.map { getState() as InputState }
+        return actions.mapNotNull { getState() as? InputState }
             // an action emission does not guarantee that the state changed so we need to filter
             // out multiple emissions of identical state objects    
             .distinctUntilChanged()
@@ -59,7 +59,7 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
     ): Flow<Action<S, A>> = flow {
 
         runOnlyIfInInputState(getState, isInState) { inputState ->
-            val changeState = handler(value, inputState)
+            val changeState = handler.handle(value, inputState)
             emit(
                 ChangeStateAction<S, A>(
                     loggingInfo = "collectWhileInState<>", // TODO better logging

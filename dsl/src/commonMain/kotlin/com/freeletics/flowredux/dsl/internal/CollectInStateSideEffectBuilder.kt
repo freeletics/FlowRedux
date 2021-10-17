@@ -3,7 +3,7 @@ package com.freeletics.flowredux.dsl.internal
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.FlatMapPolicy
-import com.freeletics.flowredux.dsl.InStateObserverHandler
+import com.freeletics.flowredux.dsl.CollectFlowHandler
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import com.freeletics.flowredux.dsl.flow.mapToIsInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,15 +23,15 @@ import kotlinx.coroutines.flow.flow
  * the given state. We use is instance of check to check if a new state has been reached and Flow<T>
  * is closed.
  */
+@ExperimentalCoroutinesApi
+@FlowPreview
 internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     private val flow: Flow<T>,
     private val flatMapPolicy: FlatMapPolicy,
-    private val handler: InStateObserverHandler<T, InputState, S>
+    private val handler: CollectFlowHandler<T, InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             actions
@@ -54,7 +54,7 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     ): Flow<Action<S, A>> = flow {
 
         runOnlyIfInInputState(getState, isInState) { inputState ->
-            val changeState = handler(value, inputState)
+            val changeState = handler.handle(value, inputState)
             emit(
                 ChangeStateAction<S, A>(
                     loggingInfo = "collectWhileInState<>", // TODO better logging
