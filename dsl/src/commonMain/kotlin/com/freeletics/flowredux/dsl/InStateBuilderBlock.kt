@@ -181,7 +181,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      * previous [handler] invocation completed.
      */
     fun <T> collectWhileInState(
-        flowBuilder: (Flow<InputState>) -> Flow<T>,
+        flowBuilder: FlowBuilder<InputState, T>,
         handler: CollectFlowHandler<T, InputState, S>
     ) {
         collectWhileInState(flowBuilder, FlatMapPolicy.CONCAT, handler)
@@ -199,7 +199,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      * `Flow` arrives before the previous [handler] invocation completed.
      */
     fun <T> collectWhileInState(
-        flowBuilder: (Flow<InputState>) -> Flow<T>,
+        flowBuilder: FlowBuilder<InputState, T>,
         flatMapPolicy: FlatMapPolicy,
         handler: CollectFlowHandler<T, InputState, S>
     ) {
@@ -268,7 +268,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      * Per default [FlatMapPolicy.CONCAT] is applied.
      */
     fun <T> collectWhileInStateEffect(
-        flowBuilder: (Flow<InputState>) -> Flow<T>,
+        flowBuilder: FlowBuilder<InputState, T>,
         handler: CollectFlowEffectHandler<T, InputState>
     ) {
         collectWhileInStateEffect(
@@ -287,7 +287,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      * when it triggers and when it gets canceled.
      */
     fun <T> collectWhileInStateEffect(
-        flowBuilder: (Flow<InputState>) -> Flow<T>,
+        flowBuilder: FlowBuilder<InputState, T>,
         flatMapPolicy: FlatMapPolicy,
         handler: CollectFlowEffectHandler<T, InputState>
     ) {
