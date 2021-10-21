@@ -34,7 +34,6 @@ kotlin {
             dependencies {
                 implementation testLibraries.kotlinTest
                 implementation testLibraries.kotlinTestAnnotations
-                implementation testLibraries.kotestAssertions
                 implementation testLibraries.turbine
             }
         }
