@@ -24,7 +24,6 @@ ext.versions = [
 
         junit                  : '4.13.2',
         turbine                : '0.6.1',
-        kotest                 : '4.6.3',
 ]
 
 ext.libraries = [
@@ -56,7 +55,6 @@ ext.testLibraries = [
         kotlinTest           : "org.jetbrains.kotlin:kotlin-test:$versions.kotlin",
         kotlinTestAnnotations: "org.jetbrains.kotlin:kotlin-test-annotations-common:$versions.kotlin",
         kotlinTestJunit      : "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin",
-        kotestAssertions     : "io.kotest:kotest-assertions-core:$versions.kotest",
         coroutinesTest       : "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutines",
 ]
 
