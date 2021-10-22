@@ -4,6 +4,7 @@ import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.FlatMapPolicy
 import com.freeletics.flowredux.dsl.CollectFlowHandler
+import com.freeletics.flowredux.dsl.FlowBuilder
 import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
 import com.freeletics.flowredux.dsl.flow.whileInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,7 +23,7 @@ import kotlinx.coroutines.flow.mapNotNull
 @ExperimentalCoroutinesApi
 internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
-    private val flowBuilder: (Flow<InputState>) -> Flow<T>,
+    private val flowBuilder: FlowBuilder<InputState, T>,
     private val flatMapPolicy: FlatMapPolicy,
     private val handler: CollectFlowHandler<T, InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
@@ -55,7 +56,7 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
     }
 
     private fun Flow<InputState>.transformWithFlowBuilder(): Flow<T> {
-        return flowBuilder(this)
+        return flowBuilder.build(this)
     }
 
     private suspend fun setStateFlow(
