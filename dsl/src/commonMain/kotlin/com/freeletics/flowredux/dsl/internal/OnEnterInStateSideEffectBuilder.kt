@@ -22,18 +22,20 @@ class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     private val handler: OnEnterHandler<InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
-    override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
-        return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
-            actions
-                .mapToIsInState(isInState, getState)
-                .flatMapLatest {
-                    if (it) {
-                        setStateFlow(getState)
-                    } else {
-                        emptyFlow()
+    override fun generateSideEffect(): List<SideEffect<S, Action<S, A>>> {
+        return listOf(
+            { actions: Flow<Action<S, A>>, getState: GetState<S> ->
+                actions
+                    .mapToIsInState(isInState, getState)
+                    .flatMapLatest {
+                        if (it) {
+                            setStateFlow(getState)
+                        } else {
+                            emptyFlow()
+                        }
                     }
-                }
-        }
+            }
+        )
     }
 
     private suspend fun setStateFlow(

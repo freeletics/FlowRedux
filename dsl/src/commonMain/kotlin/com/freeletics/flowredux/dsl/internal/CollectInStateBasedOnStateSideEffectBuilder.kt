@@ -27,20 +27,25 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
     private val handler: CollectFlowHandler<T, InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
-    override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
-        return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
-            actions.whileInState(isInState, getState) { inStateActions ->
-                flowOfCurrentState(inStateActions, getState)
-                    .transformWithFlowBuilder()
-                    .flatMapWithPolicy(flatMapPolicy) {
-                        setStateFlow(value = it, getState = getState)
-                    }
+    override fun generateSideEffect(): List<SideEffect<S, Action<S, A>>> {
+        return listOf(
+            { actions: Flow<Action<S, A>>, getState: GetState<S> ->
+                actions.whileInState(isInState, getState) { inStateActions ->
+                    flowOfCurrentState(inStateActions, getState)
+                        .transformWithFlowBuilder()
+                        .flatMapWithPolicy(flatMapPolicy) {
+                            setStateFlow(value = it, getState = getState)
+                        }
+                }
             }
-        }
+        )
     }
 
     @Suppress("unchecked_cast")
-    private fun flowOfCurrentState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<InputState> {
+    private fun flowOfCurrentState(
+        actions: Flow<Action<S, A>>,
+        getState: GetState<S>
+    ): Flow<InputState> {
         // after every state change there is a guaranteed action emission so we use this 
         // to get the current state
         return actions.mapNotNull { getState() as? InputState }
@@ -48,7 +53,7 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
             // out multiple emissions of identical state objects    
             .distinctUntilChanged()
     }
-    
+
     private fun Flow<InputState>.transformWithFlowBuilder(): Flow<T> {
         return flowBuilder(this)
     }

@@ -22,13 +22,22 @@ class SubStateMachineSideEffectBuilder<SubStateMachineState : Any, SubStateMachi
     private val isInState: (S) -> Boolean
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
-    override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
-        return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
-            actions.subscribeToStateMachineStateAndDispatchActionsToIt(getState)
-        }
+    override fun generateSideEffect(): List<SideEffect<S, Action<S, A>>> {
+        return listOf(
+
+            { actions: Flow<Action<S, A>>, getState: GetState<S> ->
+                actions.subscribeToStateMachineState(getState)
+
+            },
+
+            { actions: Flow<Action<S, A>>, getState: GetState<S> ->
+                actions.dispatchActionsToSubStateMachine(getState)
+            },
+
+        )
     }
 
-    private fun Flow<Action<S, A>>.subscribeToStateMachineStateAndDispatchActionsToIt(getState: GetState<S>): Flow<Action<S, A>> {
+    private fun Flow<Action<S, A>>.subscribeToStateMachineState(getState: GetState<S>): Flow<Action<S, A>> {
         val upstreamActions: Flow<Action<S, A>> = this
         return channelFlow {
 
@@ -60,6 +69,13 @@ class SubStateMachineSideEffectBuilder<SubStateMachineState : Any, SubStateMachi
                         }
                     }
             }
+        }
+    }
+
+
+    private fun Flow<Action<S, A>>.dispatchActionsToSubStateMachine(getState: GetState<S>): Flow<Action<S, A>> {
+        val upstreamActions: Flow<Action<S, A>> = this
+        return channelFlow {
 
             // Collect upstream actions and dispatch it to the sub state machine
             launch {
@@ -78,4 +94,3 @@ class SubStateMachineSideEffectBuilder<SubStateMachineState : Any, SubStateMachi
         }
     }
 }
-
