@@ -13,11 +13,24 @@ class SubStateMachineTest {
 
     @Test
     fun `delegate to sub statemachine while in state`() = suspendTest {
-        val child = ChildStateMachine {
+        var inS3onA1Action = 0
+        var inS2OnA1Action = 0
+        val receivedChildStateUpdates = mutableListOf<TestState>()
+        val receivedChildStateUpdatesParentState = mutableListOf<TestState>()
 
-            inState<TestState.Initial> {
+        val child = ChildStateMachine(initialState = TestState.S3) {
+
+            inState<TestState.S3> {
                 on<TestAction.A1> { _, _ ->
+                    inS3onA1Action++
                     OverrideState(TestState.S1)
+                }
+            }
+
+            inState<TestState.S2> {
+                on<TestAction.A1> { _, _ ->
+                    inS2OnA1Action = 0
+                    OverrideState(TestState.S2)
                 }
             }
         }
@@ -27,8 +40,14 @@ class SubStateMachineTest {
 
                 stateMachine(
                     stateMachine = child,
-                    actionMapper = { it }) { _, subStateMachineState ->
-                    OverrideState(subStateMachineState)
+                    actionMapper = { it }) { parentState, subStateMachineState ->
+                    receivedChildStateUpdates += subStateMachineState
+                    receivedChildStateUpdatesParentState += parentState
+                    if (subStateMachineState == TestState.S3) {
+                        NoStateChange
+                    } else {
+                        OverrideState(subStateMachineState)
+                    }
                 }
 
             }
@@ -36,8 +55,17 @@ class SubStateMachineTest {
 
         parent.state.test {
             assertEquals(TestState.Initial, awaitItem())
+            
             parent.dispatchAsync(TestAction.A1)
             assertEquals(TestState.S1, awaitItem())
+
+            assertEquals(1, inS3onA1Action)
+            assertEquals(0, inS2OnA1Action)
+            assertEquals(listOf(TestState.S3, TestState.S1), receivedChildStateUpdates)
+            assertEquals(
+                listOf<TestState>(TestState.Initial, TestState.Initial),
+                receivedChildStateUpdatesParentState
+            )
         }
     }
 }
@@ -45,10 +73,11 @@ class SubStateMachineTest {
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 private fun ChildStateMachine(
+    initialState: TestState = TestState.Initial,
     builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit
 ): FlowReduxStateMachine<TestState, TestAction> {
     return object : FlowReduxStateMachine<TestState, TestAction>(
-        TestState.Initial,
+        initialState,
         CommandLineLogger
     ) {
 

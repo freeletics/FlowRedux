@@ -301,7 +301,6 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     }
 
 
-    // TODO: find a better name like "delegateToStateMachine()" or "composeStateMachine()" or ...
     fun <SubStateMachineState : Any, SubStateMachineAction : Any> stateMachine(
         stateMachine: FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
         actionMapper: (A) -> SubStateMachineAction,
@@ -316,6 +315,16 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
             )
         )
     }
+
+    /*
+    fun <SubStateMachineState : Any, SubStateMachineAction : Any> stateMachine(
+        stateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
+        actionMapper: (A) -> SubStateMachineAction,
+        stateMapper: (InputState, SubStateMachineState) -> ChangeState<S>
+    ) {
+
+        // TODO writ test
+    }*/
 
     override fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {
         return _inStateSideEffectBuilders.flatMap { it.generateSideEffect() }
