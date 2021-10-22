@@ -12,7 +12,23 @@ import kotlin.time.ExperimentalTime
 class SubStateMachineTest {
 
     @Test
-    fun `delegate to sub statemachine while in state`() = suspendTest {
+    fun `child statemachine emits initial state to parent state machine`() = suspendTest {
+        val child = ChildStateMachine(initialState = TestState.S3) { }
+        val parentStateMachine = StateMachine {
+            inState<TestState.Initial> {
+                stateMachine(child)
+            }
+        }
+
+        parentStateMachine.state.test {
+            assertEquals(TestState.Initial, awaitItem()) // parent initial state
+            assertEquals(TestState.S3, awaitItem()) // child initial state
+        }
+    }
+
+
+    @Test
+    fun `delegate to child sub statemachine while in state`() = suspendTest {
         var inS3onA1Action = 0
         var inS2OnA1Action = 0
         val receivedChildStateUpdates = mutableListOf<TestState>()
@@ -40,7 +56,8 @@ class SubStateMachineTest {
 
                 stateMachine(
                     stateMachine = child,
-                    actionMapper = { it }) { parentState, subStateMachineState ->
+                    actionMapper = { it }
+                ) { parentState, subStateMachineState ->
                     receivedChildStateUpdates += subStateMachineState
                     receivedChildStateUpdatesParentState += parentState
                     if (subStateMachineState == TestState.S3) {
@@ -55,7 +72,7 @@ class SubStateMachineTest {
 
         parent.state.test {
             assertEquals(TestState.Initial, awaitItem())
-            
+
             parent.dispatchAsync(TestAction.A1)
             assertEquals(TestState.S1, awaitItem())
 
