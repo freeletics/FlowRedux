@@ -8,10 +8,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class StateMachine constructor(
+    initialState : TestState = TestState.Initial,
     specBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit
 ) : FlowReduxStateMachine<TestState, TestAction>(
     logger = CommandLineLogger,
-    initialStateSupplier = { TestState.Initial }
+    initialStateSupplier = { initialState }
 ) {
 
     init {
