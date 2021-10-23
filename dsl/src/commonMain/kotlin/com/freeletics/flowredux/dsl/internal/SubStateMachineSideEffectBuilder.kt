@@ -23,60 +23,16 @@ class SubStateMachineSideEffectBuilder<SubStateMachineState : Any, SubStateMachi
     private val isInState: (S) -> Boolean
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
-    override fun generateSideEffect(): List<SideEffect<S, Action<S, A>>> {
-        return listOf(
-
-            { actions: Flow<Action<S, A>>, getState: GetState<S> ->
-                actions.dispatchActionsToSubStateMachine(getState)
-            },
-
-            )
-    }
-
-    private fun Flow<Action<S, A>>.subscribeToStateMachineState(getState: GetState<S>): Flow<Action<S, A>> {
-        val upstreamActions: Flow<Action<S, A>> = this
-        return channelFlow {
-
-            // collect the state of the sub state machine
-            launch {
-                upstreamActions
-                    .mapToIsInState(isInState, getState)
-                    .flatMapLatest { inState: Boolean ->
-                        if (inState) {
-                            // start collecting state of sub state machine
-                            val currentState = getState() as? InputState
-                            if (currentState == null) {
-                                emptyFlow()
-                            } else {
-                                val subStateMachine = subStateMachineFactory(currentState)
-                                subStateMachine.state
-                            }
-                        } else {
-                            // stop collecting state of sub state machine
-                            emptyFlow()
-                        }
-                    }.collect { subStateMachineState: SubStateMachineState ->
-
-                        runOnlyIfInInputState(getState, isInState) { inputState ->
-
-                            val changeStateAction = ChangeStateAction<S, A>(
-                                loggingInfo = "Sub StateMachine",
-                                runReduceOnlyIf = isInState,
-                                changeState = stateMapper(
-                                    inputState,
-                                    subStateMachineState
-                                )
-                            )
-                            send(changeStateAction)
-                        }
-                    }
-            }
+    override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
+        return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
+            dispatchActionsToSubStateMachineAndCollectSubStateMachineState(actions, getState)
         }
     }
 
-
-    private fun Flow<Action<S, A>>.dispatchActionsToSubStateMachine(getState: GetState<S>): Flow<Action<S, A>> {
-        val upstreamActions: Flow<Action<S, A>> = this
+    private fun dispatchActionsToSubStateMachineAndCollectSubStateMachineState(
+        upstreamActions: Flow<Action<S, A>>,
+        getState: GetState<S>
+    ): Flow<Action<S, A>> {
         return upstreamActions
             .whileInState(isInState, getState) { actions: Flow<Action<S, A>> ->
                 val stateOnEntering = getState() as? InputState

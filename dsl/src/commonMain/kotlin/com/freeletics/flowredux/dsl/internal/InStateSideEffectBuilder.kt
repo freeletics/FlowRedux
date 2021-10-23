@@ -14,7 +14,7 @@ abstract class InStateSideEffectBuilder<InputState : S, S, A> internal construct
 
     @ExperimentalCoroutinesApi
     @FlowPreview
-    internal abstract fun generateSideEffect(): List<SideEffect<S, Action<S, A>>>
+    internal abstract fun generateSideEffect(): SideEffect<S, Action<S, A>>
 
     internal suspend inline fun runOnlyIfInInputState(
         getState: GetState<S>,

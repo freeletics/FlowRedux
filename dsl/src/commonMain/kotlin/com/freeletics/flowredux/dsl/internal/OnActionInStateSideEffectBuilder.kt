@@ -24,31 +24,29 @@ class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     internal val handler: OnActionHandler<InputState, S, A>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
-    override fun generateSideEffect(): List<SideEffect<S, Action<S, A>>> {
-        return listOf(
-            { actions: Flow<Action<S, A>>, getState: GetState<S> ->
+    override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
+        return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
 
-                actions.whileInState(isInState, getState) { inStateAction ->
-                    inStateAction.mapNotNull {
-                        when (it) {
-                            is ExternalWrappedAction<*, *> -> if (subActionClass.isInstance(it.action)) {
-                                it.action as A
-                            } else {
-                                null
-                            }
-                            is ChangeStateAction -> null
-                            is InitialStateAction -> null
+            actions.whileInState(isInState, getState) { inStateAction ->
+                inStateAction.mapNotNull {
+                    when (it) {
+                        is ExternalWrappedAction<*, *> -> if (subActionClass.isInstance(it.action)) {
+                            it.action as A
+                        } else {
+                            null
                         }
+                        is ChangeStateAction -> null
+                        is InitialStateAction -> null
                     }
-                        .flatMapWithPolicy(flatMapPolicy) { action ->
-                            onActionSideEffectFactory(
-                                action = action,
-                                getState = getState
-                            )
-                        }
                 }
+                    .flatMapWithPolicy(flatMapPolicy) { action ->
+                        onActionSideEffectFactory(
+                            action = action,
+                            getState = getState
+                        )
+                    }
             }
-        )
+        }
     }
 
     private fun onActionSideEffectFactory(
