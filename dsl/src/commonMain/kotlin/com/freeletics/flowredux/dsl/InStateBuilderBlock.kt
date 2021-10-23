@@ -320,25 +320,28 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         actionMapper: (A) -> SubStateMachineAction,
         stateMapper: (InputState, SubStateMachineState) -> ChangeState<S>
     ) {
+        stateMachine(
+            stateMachineFactory = { stateMachine },
+            actionMapper = actionMapper,
+            stateMapper = stateMapper
+        )
+    }
+
+
+    fun <SubStateMachineState : Any, SubStateMachineAction : Any> stateMachine(
+        stateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
+        actionMapper: (A) -> SubStateMachineAction,
+        stateMapper: (InputState, SubStateMachineState) -> ChangeState<S>
+    ) {
         _inStateSideEffectBuilders.add(
             SubStateMachineSideEffectBuilder(
-                subStateMachine = stateMachine,
+                subStateMachineFactory = stateMachineFactory,
                 actionMapper = actionMapper,
                 stateMapper = stateMapper,
                 isInState = _isInState
             )
         )
     }
-
-    /*
-    fun <SubStateMachineState : Any, SubStateMachineAction : Any> stateMachine(
-        stateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
-        actionMapper: (A) -> SubStateMachineAction,
-        stateMapper: (InputState, SubStateMachineState) -> ChangeState<S>
-    ) {
-
-        // TODO writ test
-    }*/
 
     override fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {
         return _inStateSideEffectBuilders.flatMap { it.generateSideEffect() }
