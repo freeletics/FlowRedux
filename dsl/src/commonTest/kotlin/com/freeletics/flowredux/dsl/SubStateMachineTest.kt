@@ -47,7 +47,7 @@ class SubStateMachineTest {
 
             inState<TestState.S2> {
                 on<TestAction.A1> { _, _ ->
-                    inS2OnA1Action = 0
+                    inS2OnA1Action++
                     OverrideState(TestState.S2)
                 }
             }
