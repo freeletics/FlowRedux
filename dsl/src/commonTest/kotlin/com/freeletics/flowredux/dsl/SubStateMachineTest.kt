@@ -147,7 +147,7 @@ class SubStateMachineTest {
         }
 
     @Test
-    fun `sub statemachine factory is called every time perent state is entered`() =
+    fun `sub statemachine factory is called every time parent state is entered`() =
         suspendTest {
 
             var factoryInvocations = 0
@@ -209,6 +209,117 @@ class SubStateMachineTest {
                 assertEquals(2, factoryInvocations)
                 assertEquals(2, childEntersInitialState)
             }
+        }
+
+    @Test
+    fun `actions are only dispatched to sub statemachine while parent statemachine is in state`() =
+        suspendTest {
+            var childActionInvocations = 0
+            var parentActionInvocations = 0
+            val child = ChildStateMachine(initialState = TestState.S1) {
+                inState<TestState.S1> {
+                    on<TestAction.A1> { _, _ ->
+                        childActionInvocations++
+                        NoStateChange
+                    }
+                }
+            }
+
+            val sm = StateMachine(initialState = TestState.S1) {
+                inState<TestState.S1> {
+                    stateMachine(child)
+                    on<TestAction.A2> { _, _ -> OverrideState(TestState.S2) }
+                }
+                inState<TestState.S2> {
+                    on<TestAction.A1> { _, _ ->
+                        parentActionInvocations++
+                        NoStateChange
+                    }
+                }
+            }
+
+            sm.state.test {
+                // initial state
+                assertEquals(TestState.S1, awaitItem())
+
+                // dispatch action to child statemachine
+                sm.dispatch(TestAction.A1)
+                delay(10) // give child a bit of time before continueing
+                assertEquals(childActionInvocations, 1)
+
+                // transition parent to other state
+                sm.dispatch(TestAction.A2)
+                assertEquals(TestState.S2, awaitItem())
+
+                // dispatch A1 action which is part of child definition but should not be
+                //  handled by child because parent not in state where delegation to child happens
+                for (i in 1..3) {
+                    sm.dispatch(TestAction.A1)
+                    delay(10)
+                    assertEquals(parentActionInvocations, i)
+                    assertEquals(childActionInvocations, 1) // still 1, no change
+                }
+
+            }
+        }
+
+    @Test
+    fun `reentering state so that substatemachine triggers works with same child instate`() =
+        suspendTest {
+
+            var childOnEnterS2 = 0
+            var childActionA2 = 0
+            var parentS2 = 0
+            var childFactory = 0
+
+            val child = ChildStateMachine(initialState = TestState.S2) {
+                inState<TestState.S2> {
+                    onEnter {
+                        childOnEnterS2++
+                        NoStateChange
+                    }
+                    on<TestAction.A2> { _, _ ->
+                        childActionA2++
+                        OverrideState(TestState.S1)
+                    }
+                }
+            }
+
+            val sm = StateMachine(initialState = TestState.S1) {
+                inState<TestState.S1> {
+                    on<TestAction.A1> { _, _ -> OverrideState(TestState.S2) }
+                }
+                inState<TestState.S2> {
+                    onEnterEffect { parentS2++ }
+                    stateMachine(
+                        stateMachineFactory = { childFactory++; child },
+                        actionMapper = { it },
+                        stateMapper = { _, childState -> OverrideState(childState) }
+                    )
+                }
+            }
+
+            sm.state.test {
+                // initial state
+                assertEquals(TestState.S1, awaitItem())
+
+                for (i in 1..3) {
+                    // move to S2
+                    sm.dispatch(TestAction.A1)
+                    assertEquals(TestState.S2, awaitItem())
+                    assertEquals(i, parentS2)
+                    assertEquals(i, childOnEnterS2)
+                    assertEquals(i, childFactory)
+
+                    // dispatch action to child and move back to S1
+                    sm.dispatch(TestAction.A2)
+                    assertEquals(TestState.S1, awaitItem())
+                    assertEquals(i, childActionA2)
+                    assertEquals(i, childOnEnterS2)
+                }
+
+            }
+
         }
 }
 
