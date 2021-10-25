@@ -1,19 +1,15 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.fail
-import kotlin.time.ExperimentalTime
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.Flow
-import kotlin.test.assertFails
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.fail
+import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
 class FlowReduxStateMachineTest {
@@ -93,4 +89,47 @@ class FlowReduxStateMachineTest {
 
         assertEquals(expectedMsg, exception.message)
     }
+
+    @Test
+    fun `state flow is cold by starting on initial state and dispatches to latest Flow only`() =
+        suspendTest {
+
+            val sm = StateMachine {
+                inState<TestState.Initial> {
+                    on<TestAction.A1> { _, _ -> OverrideState(TestState.S1) }
+                }
+                inState<TestState.S1> {
+                    on<TestAction.A1> { _, _ -> OverrideState(TestState.S2) }
+                }
+            }
+
+            val job1 = launch {
+                val flow1 = sm.state
+                flow1.test {
+                    assertEquals(TestState.Initial, awaitItem())
+                    sm.dispatch(TestAction.A1)
+                    assertEquals(TestState.S1, awaitItem())
+                    delay(50) // wait until flow2 did some work, see below
+                    expectNoEvents()
+                }
+            }
+
+            val job2 = launch {
+                delay(30) // ensure that job1 starts first
+                val flow2 = sm.state
+
+                flow2.test {
+                    // although flow1 is in TestState S1,
+                    // the "cold" flow2 starts in initial state again
+                    assertEquals(TestState.Initial, awaitItem())
+
+                    sm.dispatch(TestAction.A1) // dispatching A1 only impacts flow2
+                    assertEquals(TestState.S1, awaitItem())
+                }
+
+            }
+
+            job1.join()
+            job2.join()
+        }
 }
