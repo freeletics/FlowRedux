@@ -11,12 +11,16 @@ import kotlinx.coroutines.FlowPreview
  */
 // TODO verify if this should be internal.
 abstract class InStateSideEffectBuilder<InputState : S, S, A> internal constructor() {
+
     @ExperimentalCoroutinesApi
     @FlowPreview
     internal abstract fun generateSideEffect(): SideEffect<S, Action<S, A>>
 
-
-    internal suspend inline fun runOnlyIfInInputState(getState: GetState<S>, isInState: (S) -> Boolean, crossinline block: suspend (InputState) -> Unit) {
+    internal suspend inline fun runOnlyIfInInputState(
+        getState: GetState<S>,
+        isInState: (S) -> Boolean,
+        crossinline block: suspend (InputState) -> Unit
+    ) {
 
         val currentState = getState()
         // only start if is in state condition is still true

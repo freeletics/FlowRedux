@@ -39,12 +39,12 @@ class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
                         is InitialStateAction -> null
                     }
                 }
-                .flatMapWithPolicy(flatMapPolicy) { action ->
-                    onActionSideEffectFactory(
-                        action = action,
-                        getState = getState
-                    )
-                }
+                    .flatMapWithPolicy(flatMapPolicy) { action ->
+                        onActionSideEffectFactory(
+                            action = action,
+                            getState = getState
+                        )
+                    }
             }
         }
     }

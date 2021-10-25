@@ -46,6 +46,7 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
                     }
                 }
         }
+
     }
 
     private suspend fun setStateFlow(

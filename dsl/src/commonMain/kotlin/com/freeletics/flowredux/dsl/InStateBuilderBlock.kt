@@ -7,6 +7,7 @@ import com.freeletics.flowredux.dsl.internal.CollectInStateBuilder
 import com.freeletics.flowredux.dsl.internal.InStateSideEffectBuilder
 import com.freeletics.flowredux.dsl.internal.OnActionInStateSideEffectBuilder
 import com.freeletics.flowredux.dsl.internal.OnEnterInStateSideEffectBuilder
+import com.freeletics.flowredux.dsl.internal.SubStateMachineSideEffectBuilder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -297,6 +298,49 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
                 handler.handle(value, state)
                 NoStateChange
             })
+    }
+
+    fun <SubStateMachineState : S> stateMachine(
+        stateMachine: FlowReduxStateMachine<SubStateMachineState, A>,
+        stateMapper: (InputState, SubStateMachineState) -> ChangeState<S> = { _, substateMachineState ->
+            OverrideState(
+                substateMachineState
+            )
+        }
+    ) {
+        stateMachine(
+            stateMachine = stateMachine,
+            actionMapper = { it },
+            stateMapper = stateMapper
+        )
+    }
+
+    fun <SubStateMachineState : Any, SubStateMachineAction : Any> stateMachine(
+        stateMachine: FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
+        actionMapper: (A) -> SubStateMachineAction,
+        stateMapper: (InputState, SubStateMachineState) -> ChangeState<S>
+    ) {
+        stateMachine(
+            stateMachineFactory = { stateMachine },
+            actionMapper = actionMapper,
+            stateMapper = stateMapper
+        )
+    }
+
+
+    fun <SubStateMachineState : Any, SubStateMachineAction : Any> stateMachine(
+        stateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
+        actionMapper: (A) -> SubStateMachineAction,
+        stateMapper: (InputState, SubStateMachineState) -> ChangeState<S>
+    ) {
+        _inStateSideEffectBuilders.add(
+            SubStateMachineSideEffectBuilder(
+                subStateMachineFactory = stateMachineFactory,
+                actionMapper = actionMapper,
+                stateMapper = stateMapper,
+                isInState = _isInState
+            )
+        )
     }
 
     override fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {

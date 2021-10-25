@@ -7,6 +7,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -31,7 +32,7 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
         }
             
         outputState = inputActions
-            .consumeAsFlow()
+            .receiveAsFlow()
             .reduxStore(logger, initialStateSupplier, specBlock)
     }
 
