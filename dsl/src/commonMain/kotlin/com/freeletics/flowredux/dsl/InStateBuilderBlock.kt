@@ -34,24 +34,24 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     inline fun <reified SubAction : A> on(
         handler: OnActionHandler<InputState, S, SubAction>
     ) {
-        on(FlatMapPolicy.LATEST, handler)
+        on(ExecutionPolicy.CANCEL_PREVIOUS, handler)
     }
 
     /**
      * Triggers every time an action of type [SubAction] is dispatched while the state machine is
      * in this state.
      *
-     * An ongoing [handler] is cancelled when leaving this state. [flatMapPolicy] is used to
+     * An ongoing [handler] is cancelled when leaving this state. [executionPolicy] is used to
      * determine the behavior when a new [SubAction] is dispatched while the previous [handler]
      * execution is still ongoing.
      */
     inline fun <reified SubAction : A> on(
-        flatMapPolicy: FlatMapPolicy,
+        executionPolicy: ExecutionPolicy,
         handler: OnActionHandler<InputState, S, SubAction>
     ) {
         @Suppress("UNCHECKED_CAST")
         val builder = OnActionInStateSideEffectBuilder(
-            flatMapPolicy = flatMapPolicy,
+            executionPolicy = executionPolicy,
             subActionClass = SubAction::class,
             isInState = _isInState,
             handler = handler as OnActionHandler<InputState, S, A>
@@ -67,10 +67,10 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      *  This is the "effect counterpart" to handling actions that you would do with [on].
      */
     inline fun <reified SubAction : A> onActionEffect(
-        flatMapPolicy: FlatMapPolicy,
+        executionPolicy: ExecutionPolicy,
         handler: OnActionEffectHandler<InputState, SubAction>
     ) {
-        on(flatMapPolicy = flatMapPolicy,
+        on(executionPolicy = executionPolicy,
             handler = { action: SubAction, state: InputState ->
                 handler.handle(action, state)
                 NoStateChange
@@ -85,13 +85,13 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      *  This is the "effect counterpart" to handling actions that you would do with [on].
      *  Thus, cancellation and so on works the same way as [on].
      *
-     *  Per default it uses [FlatMapPolicy.LATEST].
+     *  Per default it uses [ExecutionPolicy.CANCEL_PREVIOUS].
      */
     inline fun <reified SubAction : A> onActionEffect(
         handler: OnActionEffectHandler<InputState, SubAction>
     ) {
         onActionEffect(
-            flatMapPolicy = FlatMapPolicy.LATEST,
+            executionPolicy = ExecutionPolicy.CANCEL_PREVIOUS,
             handler = handler
         )
     }
@@ -138,13 +138,13 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      * [handler] will only be called for a new emission from [flow] after a previous [handler]
      * invocation completed.
      *
-     * Per default [FlatMapPolicy.CONCAT] is applied.
+     * Per default [ExecutionPolicy.ORDERED] is applied.
      */
     fun <T> collectWhileInState(
         flow: Flow<T>,
         handler: CollectFlowHandler<T, InputState, S>
     ) {
-        collectWhileInState(flow, FlatMapPolicy.CONCAT, handler)
+        collectWhileInState(flow, ExecutionPolicy.ORDERED, handler)
     }
 
     /**
@@ -153,19 +153,19 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      *
      * The collection as well as any ongoing [handler] is cancelled when leaving this state.
      *
-     * [flatMapPolicy] is used to determine the behavior when a new emission from [flow] arrives
+     * [executionPolicy] is used to determine the behavior when a new emission from [flow] arrives
      * before the previous [handler] invocation completed.
      */
     fun <T> collectWhileInState(
         flow: Flow<T>,
-        flatMapPolicy: FlatMapPolicy,
+        executionPolicy: ExecutionPolicy,
         handler: CollectFlowHandler<T, InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
             CollectInStateBuilder(
                 isInState = _isInState,
                 flow = flow,
-                flatMapPolicy = flatMapPolicy,
+                flatMapPolicy = executionPolicy,
                 handler = handler
             )
         )
@@ -185,7 +185,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         flowBuilder: FlowBuilder<InputState, T>,
         handler: CollectFlowHandler<T, InputState, S>
     ) {
-        collectWhileInState(flowBuilder, FlatMapPolicy.CONCAT, handler)
+        collectWhileInState(flowBuilder, ExecutionPolicy.ORDERED, handler)
     }
 
 
@@ -196,19 +196,19 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      *
      * The collection as well as any ongoing [handler] is cancelled when leaving this state.
      *
-     * [flatMapPolicy] is used to determine the behavior when a new emission from [flowBuilder]'s
+     * [executionPolicy] is used to determine the behavior when a new emission from [flowBuilder]'s
      * `Flow` arrives before the previous [handler] invocation completed.
      */
     fun <T> collectWhileInState(
         flowBuilder: FlowBuilder<InputState, T>,
-        flatMapPolicy: FlatMapPolicy,
+        executionPolicy: ExecutionPolicy,
         handler: CollectFlowHandler<T, InputState, S>
     ) {
         _inStateSideEffectBuilders.add(
             CollectInStateBasedOnStateBuilder(
                 isInState = _isInState,
                 flowBuilder = flowBuilder,
-                flatMapPolicy = flatMapPolicy,
+                flatMapPolicy = executionPolicy,
                 handler = handler
             )
         )
@@ -222,7 +222,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      * This is the "effect counterpart" of [collectWhileInState] and follows the same logic
      * when it triggers and when it gets canceled.
      *
-     * Per default [FlatMapPolicy.CONCAT] is applied.
+     * Per default [ExecutionPolicy.ORDERED] is applied.
      */
     fun <T> collectWhileInStateEffect(
         flow: Flow<T>,
@@ -230,7 +230,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     ) {
         collectWhileInStateEffect(
             flow = flow,
-            flatMapPolicy = FlatMapPolicy.CONCAT,
+            executionPolicy = ExecutionPolicy.ORDERED,
             handler = handler
         )
     }
@@ -245,12 +245,12 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      */
     fun <T> collectWhileInStateEffect(
         flow: Flow<T>,
-        flatMapPolicy: FlatMapPolicy,
+        executionPolicy: ExecutionPolicy,
         handler: CollectFlowEffectHandler<T, InputState>
     ) {
         collectWhileInState(
             flow = flow,
-            flatMapPolicy = flatMapPolicy,
+            executionPolicy = executionPolicy,
             handler = { value: T, state: InputState ->
                 handler.handle(value, state)
                 NoStateChange
@@ -266,7 +266,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      * This is the "effect counterpart" of [collectWhileInState] and follows the same logic
      * when it triggers and when it gets canceled.
      *
-     * Per default [FlatMapPolicy.CONCAT] is applied.
+     * Per default [ExecutionPolicy.ORDERED] is applied.
      */
     fun <T> collectWhileInStateEffect(
         flowBuilder: FlowBuilder<InputState, T>,
@@ -274,7 +274,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     ) {
         collectWhileInStateEffect(
             flowBuilder = flowBuilder,
-            flatMapPolicy = FlatMapPolicy.CONCAT,
+            executionPolicy = ExecutionPolicy.ORDERED,
             handler = handler
         )
     }
@@ -289,11 +289,11 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      */
     fun <T> collectWhileInStateEffect(
         flowBuilder: FlowBuilder<InputState, T>,
-        flatMapPolicy: FlatMapPolicy,
+        executionPolicy: ExecutionPolicy,
         handler: CollectFlowEffectHandler<T, InputState>
     ) {
         collectWhileInState(flowBuilder = flowBuilder,
-            flatMapPolicy = flatMapPolicy,
+            executionPolicy = executionPolicy,
             handler = { value: T, state: InputState ->
                 handler.handle(value, state)
                 NoStateChange
