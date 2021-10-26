@@ -165,7 +165,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
             CollectInStateBuilder(
                 isInState = _isInState,
                 flow = flow,
-                flatMapPolicy = executionPolicy,
+                executionPolicy = executionPolicy,
                 handler = handler
             )
         )
@@ -208,7 +208,7 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
             CollectInStateBasedOnStateBuilder(
                 isInState = _isInState,
                 flowBuilder = flowBuilder,
-                flatMapPolicy = executionPolicy,
+                executionPolicy = executionPolicy,
                 handler = handler
             )
         )
