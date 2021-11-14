@@ -4,7 +4,7 @@ package com.freeletics.flowredux.dsl
  * Defines which behavior a DSL Block such as `on<Action>` should have whenever
  * a new action or value is emitted.
  */
-enum class ExecutionPolicy {
+public enum class ExecutionPolicy {
     /**
      * Cancels the previous execution.
      * By applying this [ExecutionPolicy] the previous execution of the

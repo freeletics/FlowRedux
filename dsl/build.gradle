@@ -26,6 +26,8 @@ kotlin {
     watchosX86()
     watchosSimulatorArm64()
 
+    explicitApi()
+
     sourceSets {
         commonMain {
             dependencies {
