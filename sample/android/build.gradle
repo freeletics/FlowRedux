@@ -24,6 +24,14 @@ android {
         }
     }
 
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion versions.compose
+    }
+
     compileOptions {
         sourceCompatibility 1.8
         targetCompatibility 1.8
@@ -71,14 +79,17 @@ dependencies {
     implementation supportLibraries.appCompat
     implementation supportLibraries.recyclerView
     implementation supportLibraries.constraintLayout
-    implementation supportLibraries.viewModel
     implementation supportLibraries.viewModelKtx
+    implementation supportLibraries.livedata
     implementation supportLibraries.fragmentKtx
     implementation supportLibraries.adapterDelegates
     implementation supportLibraries.material
     implementation libraries.rxJava
     implementation libraries.rxAndroid
     implementation libraries.timber
+    implementation compose.runtime
+    implementation compose.ui
+    implementation compose.activity
 
     implementation project(':sample:shared_code')
     implementation project(':flowredux')

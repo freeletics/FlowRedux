@@ -1,6 +1,7 @@
-package com.freeletics.flowredux
+package com.freeletics.flowredux.traditional
 
 import androidx.recyclerview.widget.DiffUtil
+import com.freeletics.flowredux.R
 import com.freeletics.flowredux.sample.shared.GithubRepository
 import com.hannesdorfmann.adapterdelegates4.AsyncListDifferDelegationAdapter
 import com.hannesdorfmann.adapterdelegates4.dsl.adapterDelegateLayoutContainer

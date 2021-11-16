@@ -1,12 +1,9 @@
-package com.freeletics.flowredux
+package com.freeletics.flowredux.traditional
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.activity.ComponentActivity
+import androidx.activity.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.freeletics.flowredux.sample.shared.LoadFirstPagePaginationState
 import com.freeletics.flowredux.sample.shared.LoadNextPage
@@ -17,28 +14,33 @@ import com.freeletics.flowredux.sample.shared.ShowContentAndLoadingNextPageError
 import com.freeletics.flowredux.sample.shared.ShowContentAndLoadingNextPagePaginationState
 import com.freeletics.flowredux.sample.shared.ShowContentPaginationState
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.fragment_repositories.*
 import timber.log.Timber
 
-class PopularRepositoriesFragment : Fragment() {
+class TraditionalPopularRepositoriesActivity : ComponentActivity() {
 
     private val viewModel by viewModels<PopularRepositoriesViewModel>()
-    private var adapter: PopularRepositoriesAdapter? = null
+    private lateinit var adapter: PopularRepositoriesAdapter
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var loading: View
+    private lateinit var error: View
+    private lateinit var rootView : View
     private var snackbar: Snackbar? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_repositories, container, false)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.fragment_repositories)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        rootView = findViewById(R.id.rootView)
+        recyclerView = findViewById(R.id.recyclerView)
+        loading = findViewById(R.id.loading)
+        error = findViewById(R.id.error)
+
         adapter = PopularRepositoriesAdapter()
         recyclerView.adapter = adapter
-        viewModel.liveData.observe(viewLifecycleOwner, Observer {
+        viewModel.liveData.observe(this) {
             Timber.d("render $it")
             render(it)
-        })
+        }
         error.setOnClickListener { viewModel.dispatch(RetryLoadingFirstPage) }
 
         val endOfListReached = object : RecyclerView.OnScrollListener() {
@@ -54,7 +56,9 @@ class PopularRepositoriesFragment : Fragment() {
         }
 
         recyclerView.addOnScrollListener(endOfListReached)
+
     }
+
 
     private fun render(state: PaginationState) = when (state) {
         LoadFirstPagePaginationState -> {
@@ -64,26 +68,26 @@ class PopularRepositoriesFragment : Fragment() {
             snackbar?.dismiss()
         }
         is ShowContentPaginationState -> {
-            adapter!!.items = state.items
+            adapter.items = state.items
             error.gone
             recyclerView.visible
             snackbar?.dismiss()
             loading.gone
         }
         is ShowContentAndLoadingNextPagePaginationState -> {
-            adapter!!.items = state.items + LoadingItem
-            recyclerView.smoothScrollToPosition(adapter!!.itemCount)
+            adapter.items = state.items + LoadingItem
+            recyclerView.smoothScrollToPosition(adapter.itemCount)
             error.gone
             recyclerView.visible
             loading.gone
             snackbar?.dismiss()
         }
         is ShowContentAndLoadingNextPageErrorPaginationState -> {
-            adapter!!.items = state.items
+            adapter.items = state.items
             error.gone
             recyclerView.visible
             loading.gone
-            snackbar = Snackbar.make(view!!, "An error occurred", Snackbar.LENGTH_LONG)
+            snackbar = Snackbar.make(rootView, "An error occurred", Snackbar.LENGTH_LONG)
             snackbar!!.show()
         }
         is LoadingFirstPageError -> {
@@ -94,11 +98,6 @@ class PopularRepositoriesFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        adapter = null
-        snackbar = null
-    }
 }
 
 private val View.gone: Unit
@@ -110,3 +109,5 @@ private val View.visible: Unit
     get() {
         visibility = View.VISIBLE
     }
+
+

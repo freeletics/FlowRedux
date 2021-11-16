@@ -15,7 +15,7 @@ import kotlinx.coroutines.sync.withLock
 @FlowPreview
 @ExperimentalCoroutinesApi
 abstract class FlowReduxStateMachine<S : Any, A : Any>(
-    private var initialStateSupplier: () -> S,
+    val initialStateSupplier: () -> S,
     private val logger: FlowReduxLogger? = null
 ) : StateMachine<S, A> {
 
