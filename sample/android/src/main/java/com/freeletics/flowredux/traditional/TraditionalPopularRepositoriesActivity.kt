@@ -5,6 +5,7 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.RecyclerView
+import com.freeletics.flowredux.R
 import com.freeletics.flowredux.sample.shared.LoadFirstPagePaginationState
 import com.freeletics.flowredux.sample.shared.LoadNextPage
 import com.freeletics.flowredux.sample.shared.LoadingFirstPageError
@@ -28,7 +29,7 @@ class TraditionalPopularRepositoriesActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_repositories)
+        setContentView(R.layout.activity_traditional_popular_repositories)
 
         rootView = findViewById(R.id.rootView)
         recyclerView = findViewById(R.id.recyclerView)

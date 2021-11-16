@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".TraditionalPopularRepositoriesActivity"
+            android:name=".traditional.TraditionalPopularRepositoriesActivity"
             android:exported="false" />
     </application>
 
