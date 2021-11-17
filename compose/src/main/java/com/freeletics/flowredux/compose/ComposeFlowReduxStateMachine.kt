@@ -18,20 +18,24 @@ fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.asState(): State<S> {
     }
 }
 
-typealias Dispatch<A> = (A) -> Unit
+@Composable
+fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.dispatchAsync(action: A) {
+    val stateMachine = this
+    LaunchedEffect(true) {
+        stateMachine.dispatch(action)
+    }
+}
 
 data class StateAndDispatch<S : Any, A : Any>(
     val state: State<S>,
-    val dispatch: Dispatch<A>
+    val dispatch: (A) -> Unit
 )
 
 @Composable
 fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.asStateAndDispatch(): StateAndDispatch<S, A> {
     val stateMachine = this
-
+    val scope = rememberCoroutineScope()
     return StateAndDispatch(state = stateMachine.asState(), dispatch = { action: A ->
-        LaunchedEffect(true) {
-            stateMachine.dispatch(action)
-        }
+        scope.launch { stateMachine.dispatch(action) }
     })
 }
