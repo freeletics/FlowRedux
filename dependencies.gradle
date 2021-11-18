@@ -13,7 +13,7 @@ ext.versions = [
 
         timber                 : '5.0.1',
 
-        compose                : '1.0.4',
+        compose                : '1.0.5',
         support                : '1.3.1',
         recyclerView           : '1.2.1',
         supportConstraintLayout: '2.1.1',
@@ -44,7 +44,8 @@ ext.libraries = [
 ext.compose = [
         runtime : "androidx.compose.runtime:runtime:$versions.compose",
         ui      : "androidx.compose.ui:ui:$versions.compose",
-        activity: "androidx.activity:activity-compose:$versions.activity"
+        activity: "androidx.activity:activity-compose:$versions.activity",
+        material: "androidx.compose.material:material:$versions.compose"
 ]
 
 ext.supportLibraries = [

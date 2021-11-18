@@ -90,9 +90,11 @@ dependencies {
     implementation compose.runtime
     implementation compose.ui
     implementation compose.activity
+    implementation compose.material
 
     implementation project(':sample:shared_code')
     implementation project(':flowredux')
+    implementation project(':compose')
 
     testImplementation testLibraries.junit
 

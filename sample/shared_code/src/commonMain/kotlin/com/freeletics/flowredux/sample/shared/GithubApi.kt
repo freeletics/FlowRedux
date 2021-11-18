@@ -11,7 +11,7 @@ class GithubApi {
             counter++ % 4 == 0
 
     suspend fun loadPage(page: Int): PageResult {
-        delay(300)
+        delay(2000)
         if (shouldFail())
             throw Exception("Faked network error")
         val start = page * pageSize
