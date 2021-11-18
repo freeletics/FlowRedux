@@ -1,9 +1,14 @@
 package com.freeletics.flowredux.compose
 
 import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
 import com.freeletics.flowredux.AndroidFlowReduxLogger
+import com.freeletics.flowredux.R
 import com.freeletics.flowredux.sample.shared.*
+import kotlinx.coroutines.launch
 
 @Composable
 fun PopularRepositoriesUi() {
@@ -14,14 +19,27 @@ fun PopularRepositoriesUi() {
 
     val (state, dispatch) = stateMachine.stateAndDispatch()
 
+    val scaffoldState = rememberScaffoldState()
+
     SampleTheme {
-        Scaffold() {
+        Scaffold(scaffoldState = scaffoldState) {
             when (val s = state.value) {
                 is LoadFirstPagePaginationState -> LoadingUi()
                 is LoadingFirstPageError -> ErrorUi(dispatch)
                 is ContainsContentPaginationState -> {
-                    val loadNextPageUi: Boolean = s.shouldShowLoadMoreIndicator()
-                    ReposListUi(repos = s.items, loadMore = loadNextPageUi, dispatch = dispatch)
+                    val showLoadNextPageUi = s.shouldShowLoadMoreIndicator()
+                    val showErrorSnackBar = s.shouldShowErrorSnackbar()
+
+                    ReposListUi(repos = s.items, loadMore = showLoadNextPageUi, dispatch = dispatch)
+
+                    val errorMessage = stringResource(R.string.unexpected_error)
+                    if (showErrorSnackBar) {
+                        LaunchedEffect(showErrorSnackBar) {
+                            launch {
+                                scaffoldState.snackbarHostState.showSnackbar(errorMessage)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -34,3 +52,6 @@ private fun ContainsContentPaginationState.shouldShowLoadMoreIndicator(): Boolea
     is ShowContentAndLoadingNextPageErrorPaginationState -> false
     is ShowContentAndLoadingNextPagePaginationState -> true
 }
+
+private fun ContainsContentPaginationState.shouldShowErrorSnackbar(): Boolean =
+    this is ShowContentAndLoadingNextPageErrorPaginationState

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.freeletics.flowredux.R
 import com.freeletics.flowredux.sample.shared.Action
 import com.freeletics.flowredux.sample.shared.RetryLoadingFirstPage
@@ -30,7 +31,7 @@ fun ErrorUi(dispatch: (Action) -> Unit) {
                 painter = painterResource(R.drawable.ic_warning),
                 contentDescription = "Error"
             )
-            Text("An error occurred\nclick here to try again")
+            Text(stringResource(R.string.unexpected_error_retry))
         }
 
     }

@@ -4,9 +4,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -22,7 +24,9 @@ object LoadNextPageIndicatorItem : Item
 
 @Composable
 fun ReposListUi(repos: List<GithubRepository>, loadMore: Boolean, dispatch: (Action) -> Unit) {
-    LazyColumn(modifier = Modifier.wrapContentSize()) {
+    val listState = rememberLazyListState()
+
+    LazyColumn(state = listState, modifier = Modifier.wrapContentSize()) {
         itemsIndexed(repos) { index, repo ->
             GithubRepoUi(repo)
             if (index == repos.size - 1) {
@@ -34,6 +38,12 @@ fun ReposListUi(repos: List<GithubRepository>, loadMore: Boolean, dispatch: (Act
             item {
                 LoadNextPageUi()
             }
+        }
+    }
+
+    if (loadMore) {
+        LaunchedEffect(loadMore) {
+            listState.animateScrollToItem(repos.size)
         }
     }
 }
