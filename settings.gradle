@@ -1,2 +1,1 @@
-include ':flowredux', ':dsl', ':sample:android', ':sample:shared_code'
-include ':compose'
+include ':flowredux', ':dsl', ':sample:android', ':sample:shared_code', ':compose'

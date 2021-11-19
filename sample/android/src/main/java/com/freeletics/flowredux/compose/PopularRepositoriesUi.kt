@@ -1,6 +1,7 @@
 package com.freeletics.flowredux.compose
 
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,25 +20,27 @@ fun PopularRepositoriesUi() {
 
     val (state, dispatch) = stateMachine.stateAndDispatch()
 
+    // Timber.d("New State ${state.value}")
     val scaffoldState = rememberScaffoldState()
 
-    SampleTheme {
-        Scaffold(scaffoldState = scaffoldState) {
-            when (val s = state.value) {
-                is LoadFirstPagePaginationState -> LoadingUi()
-                is LoadingFirstPageError -> ErrorUi(dispatch)
-                is ContainsContentPaginationState -> {
-                    val showLoadNextPageUi = s.shouldShowLoadMoreIndicator()
-                    val showErrorSnackBar = s.shouldShowErrorSnackbar()
+    Scaffold(scaffoldState = scaffoldState) {
+        when (val s = state.value) {
+            is LoadFirstPagePaginationState -> LoadingUi()
+            is LoadingFirstPageError -> ErrorUi(dispatch)
+            is ContainsContentPaginationState -> {
+                val showLoadNextPageUi = s.shouldShowLoadMoreIndicator()
+                val showErrorSnackBar = s.shouldShowErrorSnackbar()
 
-                    ReposListUi(repos = s.items, loadMore = showLoadNextPageUi, dispatch = dispatch)
+                ReposListUi(repos = s.items, loadMore = showLoadNextPageUi, dispatch = dispatch)
 
-                    val errorMessage = stringResource(R.string.unexpected_error)
-                    if (showErrorSnackBar) {
-                        LaunchedEffect(showErrorSnackBar) {
-                            launch {
-                                scaffoldState.snackbarHostState.showSnackbar(errorMessage)
-                            }
+                val errorMessage = stringResource(R.string.unexpected_error)
+                if (showErrorSnackBar) {
+                    LaunchedEffect(scaffoldState.snackbarHostState) {
+                        launch {
+                            scaffoldState.snackbarHostState.showSnackbar(
+                                errorMessage,
+                                duration = SnackbarDuration.Indefinite // Will be dismissed by changing state
+                            )
                         }
                     }
                 }

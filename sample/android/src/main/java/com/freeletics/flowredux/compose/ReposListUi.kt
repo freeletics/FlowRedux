@@ -18,10 +18,6 @@ import com.freeletics.flowredux.sample.shared.Action
 import com.freeletics.flowredux.sample.shared.GithubRepository
 import com.freeletics.flowredux.sample.shared.LoadNextPage
 
-sealed interface Item
-data class RepoItem(val repo: GithubRepository) : Item
-object LoadNextPageIndicatorItem : Item
-
 @Composable
 fun ReposListUi(repos: List<GithubRepository>, loadMore: Boolean, dispatch: (Action) -> Unit) {
     val listState = rememberLazyListState()
@@ -29,7 +25,8 @@ fun ReposListUi(repos: List<GithubRepository>, loadMore: Boolean, dispatch: (Act
     LazyColumn(state = listState, modifier = Modifier.wrapContentSize()) {
         itemsIndexed(repos) { index, repo ->
             GithubRepoUi(repo)
-            if (index == repos.size - 1) {
+            if (index == repos.size - 1) { // user scrolls until the end of the list.
+                // identifying if user scrolled until the end can be done differently
                 dispatch(LoadNextPage)
             }
         }

@@ -100,6 +100,7 @@ class MyViewModel @Inject constructor(private val stateMachine : StateMachine) :
 There are two artifacts that you can include as dependency::
 1. `flowredux`: this is the core library. Usually you dont want to use the core library directly but rather use the `dsl`.
 2. `dsl` which provides a convenient DSL on top of the core library. Usually this is what you want.
+3. `compose`: contains some convenient extensions to work with `FlowReduxStateMachine` in [Jetpack Compose](https://developer.android.com/jetpack/compose).
 
 ### Multiplatform
 ```groovy
@@ -137,6 +138,11 @@ implementation 'com.freeletics.flowredux:dsl-tvosxarm64:0.10.0'
 ### JavaScript
 No javascript version release yet but its on our TODO list.
 
+### Jetpack Compose
+Contains some convenient extensions to work with `FlowReduxStateMachine` with [Jetpack Compose](https://developer.android.com/jetpack/compose).
+```groovy
+implementation 'com.freeletics.flowredux:compose:0.11.0'
+```
 
 #### Snapshot
 Latest snapshot (directly published from master branch from Travis CI):
