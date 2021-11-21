@@ -12,27 +12,18 @@ import com.freeletics.flowredux.sample.shared.*
 import kotlinx.coroutines.launch
 
 @Composable
-fun PopularRepositoriesUi() {
-    val stateMachine = InternalPaginationStateMachine(
-        githubApi = GithubApi(),
-        logger = AndroidFlowReduxLogger
-    )
-
-    val (state, dispatch) = stateMachine.stateAndDispatch()
-
-    // Timber.d("New State ${state.value}")
+fun PopularRepositoriesUi(state : PaginationState, dispatch: (Action) -> Unit) {
     val scaffoldState = rememberScaffoldState()
-
     SampleTheme {
         Scaffold(scaffoldState = scaffoldState) {
-            when (val s = state.value) {
+            when (state) {
                 is LoadFirstPagePaginationState -> LoadingUi()
                 is LoadingFirstPageError -> ErrorUi(dispatch)
                 is ContainsContentPaginationState -> {
-                    val showLoadNextPageUi = s.shouldShowLoadMoreIndicator()
-                    val showErrorSnackBar = s.shouldShowErrorSnackbar()
+                    val showLoadNextPageUi = state.shouldShowLoadMoreIndicator()
+                    val showErrorSnackBar = state.shouldShowErrorSnackbar()
 
-                    ReposListUi(repos = s.items, loadMore = showLoadNextPageUi, dispatch = dispatch)
+                    ReposListUi(repos = state.items, loadMore = showLoadNextPageUi, dispatch = dispatch)
 
                     val errorMessage = stringResource(R.string.unexpected_error)
                     if (showErrorSnackBar) {
