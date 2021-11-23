@@ -6,7 +6,7 @@ ext.versions = [
 
         dokka                  : '1.5.31',
         coroutines             : '1.5.2',
-        kotlin                 : '1.5.31',
+        kotlin                 : '1.6.0',
         rxJava                 : '2.2.21',
         rxAndroid              : '2.1.1',
         rxReplayingShare       : '2.2.0',
