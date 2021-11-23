@@ -1,0 +1,45 @@
+apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.dokka'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.vanniktech.maven.publish'
+
+android {
+    compileSdkVersion versions.compileSdk
+
+    defaultConfig {
+        targetSdkVersion versions.targetSdk
+        minSdkVersion versions.minSdk
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion versions.compose
+    }
+}
+
+dependencies {
+    implementation compose.runtime
+    implementation project(':dsl')
+}
