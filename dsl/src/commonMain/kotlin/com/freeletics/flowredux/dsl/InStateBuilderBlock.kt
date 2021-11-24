@@ -327,6 +327,20 @@ class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         )
     }
 
+    fun <SubStateMachineState : S> stateMachine(
+        stateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, A>,
+    ) {
+
+        stateMachine(
+            stateMachineFactory = stateMachineFactory,
+            actionMapper = { it },
+            stateMapper = { _, substateMachineState ->
+                OverrideState(
+                    substateMachineState
+                )
+            }
+        )
+    }
 
     fun <SubStateMachineState : Any, SubStateMachineAction : Any> stateMachine(
         stateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
