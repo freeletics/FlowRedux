@@ -357,7 +357,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         )
     }
 
-    fun <SubStateMachineState : S> stateMachine(
+    public fun <SubStateMachineState : S> stateMachine(
         stateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, A>,
     ) {
 
