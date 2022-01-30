@@ -2,6 +2,8 @@ package com.freeletics.flowredux.compose
 
 import androidx.compose.runtime.*
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
@@ -9,8 +11,10 @@ import kotlinx.coroutines.launch
 /**
  * Get a Compose [State] object from a [FlowReduxStateMachine].
  */
+@ExperimentalCoroutinesApi
+@FlowPreview
 @Composable
-fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberState(): State<S> {
+public fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberState(): State<S> {
     return produceState(initialValue = this.initialState, this) {
         state.drop(1) // skip the first one as it is the initial state which is already submitted with produceState's initial state
             .collect { value = it }
@@ -31,9 +35,9 @@ fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberState(): State<S> {
  * }
  * ```
  */
-data class StateAndDispatch<S : Any, A : Any>(
-    val state: State<S>,
-    val dispatchAction: (A) -> Unit
+public data class StateAndDispatch<S : Any, A : Any>(
+    public val state: State<S>,
+    public val dispatchAction: (A) -> Unit
 )
 
 /**
@@ -43,8 +47,10 @@ data class StateAndDispatch<S : Any, A : Any>(
  * The dispatch function `(Action) -> Unit` is tight to the same Composable component and launches
  * a coroutine to dispatch actions async. to the `FlowReduxStateMachine`
  */
+@ExperimentalCoroutinesApi
+@FlowPreview
 @Composable
-fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberStateAndDispatch(): StateAndDispatch<S, A> {
+public fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberStateAndDispatch(): StateAndDispatch<S, A> {
     val stateMachine = this
     val scope = rememberCoroutineScope()
     return StateAndDispatch(

@@ -14,12 +14,12 @@ import kotlinx.coroutines.sync.withLock
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-abstract class FlowReduxStateMachine<S : Any, A : Any>(
+public abstract class FlowReduxStateMachine<S : Any, A : Any>(
     initialStateSupplier: () -> S,
     private val logger: FlowReduxLogger? = null
 ) : StateMachine<S, A> {
 
-    val initialState: S by lazy(LazyThreadSafetyMode.NONE, initialStateSupplier)
+    public val initialState: S by lazy(LazyThreadSafetyMode.NONE, initialStateSupplier)
 
     private val inputActions = Channel<A>()
     private lateinit var outputState: Flow<S>
@@ -27,7 +27,7 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
     private val activeFlowCounterMutex = Mutex()
     private var activeFlowCounter = 0
 
-    constructor(initialState: S, logger: FlowReduxLogger? = null) : this(
+    public constructor(initialState: S, logger: FlowReduxLogger? = null) : this(
         logger = logger,
         initialStateSupplier = { initialState })
 

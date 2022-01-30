@@ -16,18 +16,20 @@ package com.freeletics.flowredux.dsl
  * Then you may wonder how do you write unit test for one of your functions that return a [ChangeState]?
  * You need to call [ChangeState.reduce] to get the actual result of the change state.
  */
-sealed class ChangeState<out S>
+public sealed class ChangeState<out S>
 
 /**
  * Sets a new state by directly override any previous state
  */
-data class OverrideState<S>(internal val newState: S) : ChangeState<S>()
+public data class OverrideState<S>(internal val newState: S) : ChangeState<S>()
 
 /**
  * Use this function if you want to "mutate" the current state by copying the old state and modify some properties in
  * the copy of the new state. A common use case is to call .copy() on your state defined as data class.
  */
-class MutateState<InputState : S, S>(internal val reducer: InputState.() -> S) : ChangeState<S>() {
+public class MutateState<InputState : S, S>(
+    internal val reducer: InputState.() -> S
+) : ChangeState<S>() {
     @Suppress("UNCHECKED_CAST")
     internal fun reduceImpl(state: S): S =
         reducer(state as InputState)
@@ -37,9 +39,9 @@ class MutateState<InputState : S, S>(internal val reducer: InputState.() -> S) :
 /**
  * No change, this is semantically equivalent to use [OverrideState] and pass in the previous state
  */
-object NoStateChange : ChangeState<Nothing>()
+public object NoStateChange : ChangeState<Nothing>()
 
-fun <S> ChangeState<S>.reduce(state: S): S {
+internal fun <S> ChangeState<S>.reduce(state: S): S {
     return when (val change = this) {
         is OverrideState -> change.newState
         is NoStateChange -> state // TODO throw exception instead?

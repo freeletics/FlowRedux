@@ -36,8 +36,8 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             actions
                 .mapToIsInState(isInState, getState)
-                .flatMapLatest {
-                    if (it) {
+                .flatMapLatest { inState ->
+                    if (inState) {
                         flow.flatMapWithExecutionPolicy(executionPolicy) {
                             setStateFlow(value = it, getState = getState)
                         }
