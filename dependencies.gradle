@@ -4,7 +4,7 @@ ext.versions = [
         targetSdk              : 31,
         minSdk                 : 21,
 
-        dokka                  : '1.5.31',
+        dokka                  : '1.6.10',
         coroutines             : '1.5.2',
         kotlin                 : '1.6.10',
         rxJava                 : '2.2.21',
