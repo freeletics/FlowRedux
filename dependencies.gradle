@@ -6,21 +6,21 @@ ext.versions = [
 
         dokka                  : '1.5.31',
         coroutines             : '1.5.2',
-        kotlin                 : '1.5.31',
+        kotlin                 : '1.6.10',
         rxJava                 : '2.2.21',
         rxAndroid              : '2.1.1',
         rxReplayingShare       : '2.2.0',
 
         timber                 : '5.0.1',
 
-        compose                : '1.0.5',
+        compose                : '1.1.0',
         support                : '1.3.1',
         recyclerView           : '1.2.1',
         supportConstraintLayout: '2.1.2',
         androidArch            : '2.2.0',
         lifecycle              : '2.4.0',
         fragmentKtx            : '1.4.0',
-        viewModelKtx           : '2.4.0',
+        viewModelKtx           : '2.4.1',
         material               : '1.4.0',
         adapterDelegates       : '4.3.1',
         activity               : "1.4.0",
@@ -56,7 +56,7 @@ ext.supportLibraries = [
         viewModelKtx    : "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.viewModelKtx",
         fragmentKtx     : "androidx.fragment:fragment-ktx:$versions.fragmentKtx",
         material        : "com.google.android.material:material:$versions.material",
-        adapterDelegates: "com.hannesdorfmann:adapterdelegates4-kotlin-dsl-layoutcontainer:$versions.adapterDelegates",
+        adapterDelegates: "com.hannesdorfmann:adapterdelegates4-kotlin-dsl:$versions.adapterDelegates",
         livedata: "androidx.lifecycle:lifecycle-livedata-ktx:$versions.lifecycle"
 ]
 
