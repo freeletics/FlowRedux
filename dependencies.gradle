@@ -56,7 +56,7 @@ ext.supportLibraries = [
         viewModelKtx    : "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.viewModelKtx",
         fragmentKtx     : "androidx.fragment:fragment-ktx:$versions.fragmentKtx",
         material        : "com.google.android.material:material:$versions.material",
-        adapterDelegates: "com.hannesdorfmann:adapterdelegates4-kotlin-dsl-layoutcontainer:$versions.adapterDelegates",
+        adapterDelegates: "com.hannesdorfmann:adapterdelegates4-kotlin-dsl:$versions.adapterDelegates",
         livedata: "androidx.lifecycle:lifecycle-livedata-ktx:$versions.lifecycle"
 ]
 
