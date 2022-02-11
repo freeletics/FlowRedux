@@ -3,9 +3,8 @@ ext.versions = [
         compileSdk             : 31,
         targetSdk              : 31,
         minSdk                 : 21,
-
-        dokka                  : '1.5.31',
-        coroutines             : '1.5.2',
+        dokka                  : '1.6.10',
+        coroutines             : '1.6.0',
         kotlin                 : '1.6.10',
         rxJava                 : '2.2.21',
         rxAndroid              : '2.1.1',
@@ -18,9 +17,9 @@ ext.versions = [
         recyclerView           : '1.2.1',
         supportConstraintLayout: '2.1.3',
         androidArch            : '2.2.0',
-        lifecycle              : '2.4.0',
+        lifecycle              : '2.4.1',
         fragmentKtx            : '1.4.0',
-        viewModelKtx           : '2.4.0',
+        viewModelKtx           : '2.4.1',
         material               : '1.4.0',
         adapterDelegates       : '4.3.1',
         activity               : "1.4.0",
@@ -38,7 +37,7 @@ ext.libraries = [
         coroutines        : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines",
         rxJava            : "io.reactivex.rxjava2:rxjava:$versions.rxJava",
         rxAndroid         : "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid",
-        flMadStateMachine : "com.freeletics.mad:state-machine:0.3.0-alpha10",
+        flMadStateMachine : "com.freeletics.mad:state-machine:0.3.0-alpha21",
 ]
 
 ext.compose = [
