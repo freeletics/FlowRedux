@@ -1,15 +1,14 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.ExperimentalTime
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.flatMapConcat
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
 class CollectWhileInStateEffectTest {
@@ -19,13 +18,15 @@ class CollectWhileInStateEffectTest {
 
         val recordedValues = mutableListOf<Int>()
 
+        val delayMs = 20L
+
         val sm = StateMachine {
             inState<TestState.Initial> {
                 val flow = flow {
                     emit(1)
-                    delay(10)
+                    delay(delayMs)
                     emit(2)
-                    delay(10)
+                    delay(delayMs)
                     emit(3)
                 }
 
@@ -34,8 +35,8 @@ class CollectWhileInStateEffectTest {
                 }
 
                 collectWhileInState(flow {
-                    delay(5)
-                    emit(1)
+                    delay(delayMs / 2)
+                    emit(Unit)
                 }) { _, _ ->
                     OverrideState(TestState.S1)
                 }
@@ -46,6 +47,7 @@ class CollectWhileInStateEffectTest {
             assertEquals(TestState.Initial, awaitItem())
             assertEquals(TestState.S1, awaitItem())
         }
+        delay(delayMs * 3) // wait until all flow emission could in theory be happened
         assertEquals(listOf(1), recordedValues) // 2,3 is not emitted
     }
 
