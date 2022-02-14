@@ -56,6 +56,8 @@ class CollectWhileInStateEffectTest {
     fun `collectWhileInStateEffect with flowBuilder stops after having moved to next state`() =
         suspendTest {
 
+            val delayMs = 20L
+
             val recordedValues = mutableListOf<Int>()
 
             val sm = StateMachine {
@@ -63,8 +65,8 @@ class CollectWhileInStateEffectTest {
                     collectWhileInState({
                         it.flatMapConcat {
                             flow {
-                                delay(7)
-                                emit(1)
+                                delay(delayMs / 2)
+                                emit(Unit)
                             }
                         }
                     }) { _, _ ->
@@ -75,9 +77,9 @@ class CollectWhileInStateEffectTest {
                         it.flatMapConcat {
                             flow {
                                 emit(1)
-                                delay(10)
+                                delay(delayMs)
                                 emit(2)
-                                delay(10)
+                                delay(delayMs)
                                 emit(3)
                             }
                         }
@@ -92,6 +94,7 @@ class CollectWhileInStateEffectTest {
                 assertEquals(TestState.Initial, awaitItem())
                 assertEquals(TestState.S1, awaitItem())
             }
+            delay(delayMs * 3)
             assertEquals(listOf(1), recordedValues) // 2,3 is not emitted
         }
 }
