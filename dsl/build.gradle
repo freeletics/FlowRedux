@@ -14,7 +14,7 @@ kotlin {
     iosArm64()
     iosX64()
     iosSimulatorArm64()
-    linuxX64()
+//    linuxX64()
     macosX64()
     macosArm64()
     mingwX64()
@@ -58,16 +58,27 @@ kotlin {
         }
 
         nativeMain {
+            dependencies {
+                implementation (libraries.coroutinesNativeMT) {
+                    force = true
+                }
+            }
         }
         nativeTest {
+            dependencies {
+                implementation (libraries.coroutinesNativeMT) {
+                    force = true
+                }
+            }
         }
+
 
         configure([
                 targets.iosArm32,
                 targets.iosArm64,
                 targets.iosX64,
                 targets.iosSimulatorArm64,
-                targets.linuxX64,
+//                targets.linuxX64,
                 targets.macosX64,
                 targets.macosArm64,
                 targets.mingwX64,
