@@ -6,19 +6,28 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-abstract class FlowReduxStateMachine<S : Any, A : Any>(
-    private var initialStateSupplier: () -> S,
+public abstract class FlowReduxStateMachine<S : Any, A : Any>(
+    initialStateSupplier: () -> S,
     private val logger: FlowReduxLogger? = null
 ) : StateMachine<S, A> {
+
+    public val initialState: S by lazy(LazyThreadSafetyMode.NONE, initialStateSupplier)
 
     private val inputActions = Channel<A>()
     private lateinit var outputState: Flow<S>
 
-    constructor(initialState: S, logger: FlowReduxLogger? = null) : this(
+    private val activeFlowCounterMutex = Mutex()
+    private var activeFlowCounter = 0
+
+    public constructor(initialState: S, logger: FlowReduxLogger? = null) : this(
         logger = logger,
         initialStateSupplier = { initialState })
 
@@ -29,20 +38,39 @@ abstract class FlowReduxStateMachine<S : Any, A : Any>(
                         "It's only allowed to call spec {...} once."
             )
         }
-            
+
         outputState = inputActions
-            .consumeAsFlow()
-            .reduxStore(logger, initialStateSupplier, specBlock)
+            .receiveAsFlow()
+            .reduxStore(logger, initialState, specBlock)
+            .onStart {
+                activeFlowCounterMutex.withLock {
+                    activeFlowCounter++
+                }
+            }
+            .onCompletion {
+                activeFlowCounterMutex.withLock {
+                    activeFlowCounter--
+                }
+            }
     }
 
-    override val state: Flow<S> 
+    override val state: Flow<S>
         get() {
             checkSpecBlockSet()
             return outputState
         }
-        
+
     override suspend fun dispatch(action: A) {
         checkSpecBlockSet()
+        activeFlowCounterMutex.withLock {
+            if (activeFlowCounter <= 0) {
+                throw IllegalStateException(
+                    "Cannot dispatch action $action because state Flow of this " +
+                            "FlowReduxStateMachine is not collected yet. " +
+                            "Start collecting the state Flow before dispatching any action."
+                )
+            }
+        }
         inputActions.send(action)
     }
 

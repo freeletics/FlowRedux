@@ -36,7 +36,7 @@ internal fun <S, A> Flow<Action<S, A>>.whileInState(
             currentChannel!!.send(value)
         } else {
             // closing the channel with an exception will cancel the FlowCollector that
-            // collects it and thefor cancels the collection
+            // collects it and therefore cancels the collection
             currentChannel?.close(CancellationException("StateMachine left the state"))
             currentChannel = null
         }

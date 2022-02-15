@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.flow
  */
 @FlowPreview
 @ExperimentalCoroutinesApi
-class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
+internal class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     private val handler: OnEnterHandler<InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {

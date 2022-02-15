@@ -1,10 +1,11 @@
-package com.freeletics.flowredux
+package com.freeletics.flowredux.traditional
 
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
+import com.freeletics.flowredux.R
 import com.freeletics.flowredux.sample.shared.GithubRepository
 import com.hannesdorfmann.adapterdelegates4.AsyncListDifferDelegationAdapter
-import com.hannesdorfmann.adapterdelegates4.dsl.adapterDelegateLayoutContainer
-import kotlinx.android.synthetic.main.item_repository.*
+import com.hannesdorfmann.adapterdelegates4.dsl.adapterDelegate
 
 /**
  * Represents a loading object
@@ -23,14 +24,15 @@ class PopularRepositoriesAdapter : AsyncListDifferDelegationAdapter<Any>(
 )
 
 private fun githubAdapterDelegate() =
-    adapterDelegateLayoutContainer<GithubRepository, Any>(R.layout.item_repository) {
+    adapterDelegate<GithubRepository, Any>(R.layout.item_repository) {
+        val repoName = findViewById<TextView>(R.id.repoName)
+        val starCount = findViewById<TextView>(R.id.starCount)
         bind {
             repoName.text = item.name
             starCount.text = item.stargazersCount.toString()
         }
     }
 
-private fun loadingAdapterDelegate() =
-    adapterDelegateLayoutContainer<LoadingItem, Any>(R.layout.item_load_next) {
+private fun loadingAdapterDelegate() = adapterDelegate<LoadingItem, Any>(R.layout.item_load_next) {
         // Nothing to bind
     }
