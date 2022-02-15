@@ -100,43 +100,49 @@ class MyViewModel @Inject constructor(private val stateMachine : StateMachine) :
 There are two artifacts that you can include as dependency::
 1. `flowredux`: this is the core library. Usually you dont want to use the core library directly but rather use the `dsl`.
 2. `dsl` which provides a convenient DSL on top of the core library. Usually this is what you want.
+3. `compose`: contains some convenient extensions to work with `FlowReduxStateMachine` in [Jetpack Compose](https://developer.android.com/jetpack/compose).
 
 ### Multiplatform
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux:0.8.0'
-implementation 'com.freeletics.flowredux:dsl:0.8.0'
+implementation 'com.freeletics.flowredux:flowredux:0.11.0'
+implementation 'com.freeletics.flowredux:dsl:0.11.0'
 ```
 
 ### JVM only
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux-jvm:0.8.0'
-implementation 'com.freeletics.flowredux:dsl-jvm:0.8.0'
+implementation 'com.freeletics.flowredux:flowredux-jvm:0.11.0'
+implementation 'com.freeletics.flowredux:dsl-jvm:0.11.0'
 ```
 
 ### Native binaries
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux-iosx64:0.8.0'
-implementation 'com.freeletics.flowredux:flowredux-iosarm64:0.8.0'
-implementation 'com.freeletics.flowredux:flowredux-iosarm32:0.8.0'
-implementation 'com.freeletics.flowredux:flowredux-watchosx86:0.8.0'
-implementation 'com.freeletics.flowredux:flowredux-watchosarm64:0.8.0'
-implementation 'com.freeletics.flowredux:flowredux-watchosarm32:0.8.0'
-implementation 'com.freeletics.flowredux:flowredux-tvosx64:0.8.0'
-implementation 'com.freeletics.flowredux:flowredux-tvosxarm64:0.8.0'
+implementation 'com.freeletics.flowredux:flowredux-iosx64:0.11.0'
+implementation 'com.freeletics.flowredux:flowredux-iosarm64:0.11.0'
+implementation 'com.freeletics.flowredux:flowredux-iosarm32:0.11.0'
+implementation 'com.freeletics.flowredux:flowredux-watchosx86:0.11.0'
+implementation 'com.freeletics.flowredux:flowredux-watchosarm64:0.11.0'
+implementation 'com.freeletics.flowredux:flowredux-watchosarm32:0.11.0'
+implementation 'com.freeletics.flowredux:flowredux-tvosx64:0.11.0'
+implementation 'com.freeletics.flowredux:flowredux-tvosxarm64:0.11.0'
 
-implementation 'com.freeletics.flowredux:dsl-iosx64:0.8.0'
-implementation 'com.freeletics.flowredux:dsl-iosarm64:0.8.0'
-implementation 'com.freeletics.flowredux:dsl-iosarm32:0.8.0'
-implementation 'com.freeletics.flowredux:dsl-watchosx86:0.8.0'
-implementation 'com.freeletics.flowredux:dsl-watchosarm64:0.8.0'
-implementation 'com.freeletics.flowredux:dsl-watchosarm32:0.8.0'
-implementation 'com.freeletics.flowredux:dsl-tvosx64:0.8.0'
-implementation 'com.freeletics.flowredux:dsl-tvosxarm64:0.8.0'
+implementation 'com.freeletics.flowredux:dsl-iosx64:0.11.0'
+implementation 'com.freeletics.flowredux:dsl-iosarm64:0.11.0'
+implementation 'com.freeletics.flowredux:dsl-iosarm32:0.11.0'
+implementation 'com.freeletics.flowredux:dsl-watchosx86:0.11.0'
+implementation 'com.freeletics.flowredux:dsl-watchosarm64:0.11.0'
+implementation 'com.freeletics.flowredux:dsl-watchosarm32:0.11.0'
+implementation 'com.freeletics.flowredux:dsl-tvosx64:0.11.0'
+implementation 'com.freeletics.flowredux:dsl-tvosxarm64:0.11.0'
 ```
 
 ### JavaScript
 No javascript version release yet but its on our TODO list.
 
+### Jetpack Compose
+Contains some convenient extensions to work with `FlowReduxStateMachine` with [Jetpack Compose](https://developer.android.com/jetpack/compose).
+```groovy
+implementation 'com.freeletics.flowredux:compose:0.11.0'
+```
 
 #### Snapshot
 Latest snapshot (directly published from master branch from Travis CI):
@@ -156,5 +162,5 @@ allprojects {
 
 Then just use `-SNAPSHOT`suffix as version like
 ```groovy
-implementation 'com.freeletics.flowredux:dsl:0.8.1-SNAPSHOT'
+implementation 'com.freeletics.flowredux:dsl:0.11.1-SNAPSHOT'
 ```

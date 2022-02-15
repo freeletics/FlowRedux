@@ -2,9 +2,10 @@ package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
-import com.freeletics.flowredux.dsl.FlatMapPolicy
+import com.freeletics.flowredux.dsl.ExecutionPolicy
 import com.freeletics.flowredux.dsl.CollectFlowHandler
-import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
+import com.freeletics.flowredux.dsl.FlowBuilder
+import com.freeletics.flowredux.dsl.flow.flatMapWithExecutionPolicy
 import com.freeletics.flowredux.dsl.flow.whileInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -22,8 +23,8 @@ import kotlinx.coroutines.flow.mapNotNull
 @ExperimentalCoroutinesApi
 internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
-    private val flowBuilder: (Flow<InputState>) -> Flow<T>,
-    private val flatMapPolicy: FlatMapPolicy,
+    private val flowBuilder: FlowBuilder<InputState, T>,
+    private val executionPolicy: ExecutionPolicy,
     private val handler: CollectFlowHandler<T, InputState, S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
@@ -32,15 +33,19 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
             actions.whileInState(isInState, getState) { inStateActions ->
                 flowOfCurrentState(inStateActions, getState)
                     .transformWithFlowBuilder()
-                    .flatMapWithPolicy(flatMapPolicy) {
+                    .flatMapWithExecutionPolicy(executionPolicy) {
                         setStateFlow(value = it, getState = getState)
                     }
             }
         }
+
     }
 
     @Suppress("unchecked_cast")
-    private fun flowOfCurrentState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<InputState> {
+    private fun flowOfCurrentState(
+        actions: Flow<Action<S, A>>,
+        getState: GetState<S>
+    ): Flow<InputState> {
         // after every state change there is a guaranteed action emission so we use this 
         // to get the current state
         return actions.mapNotNull { getState() as? InputState }
@@ -48,9 +53,9 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
             // out multiple emissions of identical state objects    
             .distinctUntilChanged()
     }
-    
+
     private fun Flow<InputState>.transformWithFlowBuilder(): Flow<T> {
-        return flowBuilder(this)
+        return flowBuilder.build(this)
     }
 
     private suspend fun setStateFlow(

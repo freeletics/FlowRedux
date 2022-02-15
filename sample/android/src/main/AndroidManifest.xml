@@ -5,20 +5,26 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="com.freeletics.flowredux.SampleApplication"
+        android:name=".SampleApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
-        <activity android:name="com.freeletics.flowredux.PopularRepositoriesActivity">
+        <activity
+            android:name=".compose.ComposeActivity"
+            android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".traditional.TraditionalPopularRepositoriesActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

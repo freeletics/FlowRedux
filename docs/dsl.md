@@ -567,7 +567,7 @@ sealed class State {
 ```
 
 
-## FlatMapPolicy
+## ExecutionPolicy
 
 Have you ever wondered what would happen if you would execute `Action` very fast 1 after another? For example:
 
@@ -585,19 +585,19 @@ spec {
 The example above shows a problem with async. state machines like FlowRedux:
 If our state machine is in `FooState` and a `BarAction` got triggered, we wait for 5 seconds and then set the state to
 another state. What if while waiting 5 seconds (i.e. let's say after 3 seconds of waiting) another `BarAction` gets
-triggered. That is possible right? With `FlatMapPolicy` you can specify what should happen in that case. There are three
+triggered. That is possible right? With `ExecutionPolicy` you can specify what should happen in that case. There are three
 options to choose from:
 
-- `LATEST`: This is the default one. It would cancel any previous execution and just run the latest one. In the example
+- `CANCEL_PREVIOUS`: This is the default one. It would cancel any previous execution and just run the latest one. In the example
   above it would meanwhile wait 5 seconds another `BarAction` gets triggered, the first execution of `on<BarAction>`
   block gets stopped and a new `on<BarAction>` block starts.
-- `MERGE`: Choosing this causes all the blocks to continue running but there are no guarantees in which order. For
+- `UNORDERED`: Choosing this causes all the blocks to continue running but there are no guarantees in which order. For
   example:
 
 ```kotlin
 spec {
     inState<FooState> {
-        on<BarAction>(flatMapPolicy = FlapMapPolicy.MERGE) { _, _, setState ->
+        on<BarAction>(executionPolicy = FlapMapPolicy.UNORDERED) { _, _, setState ->
             delay(randomInt()) // wait for some random time
             setState { OtherState }
         }
@@ -606,18 +606,19 @@ spec {
 ```
 
 Let's assume that we trigger two times `BarAction`. We use random amount of seconds for waiting. Since we
-use `MERGE` `on<BarAction>` block gets executed 2 times without canceling the previous one (that is the difference
-to `LATEST`). Moreover, `MERGE` doesn't make any promise on order of execution of the block (see `CONCAT` if you need
+use `UNORDERED` `on<BarAction>` block gets executed 2 times without canceling the previous one (that is the difference
+to `CANCEL_PREVIOUS`). Moreover, `UNORDERED` doesn't make any promise on order of execution of the block (see `ORDERED` if you need
 promises on order). So if `on<BarAction>` gets executed two times it will run in parallel and the the second execution
 could complete before the first execution (because using a random time of waiting).
 
-- `CONCAT`: In contrast to `MERGE` and `LATEST` `CONCAT` will not run `on<BarAction>` in parallel and will not cancel
-  any previous execution. Instead, `CONCAT` will preserve the order and execute one block after another.
+- `ORDERED`: In contrast to `UNORDERED` and `CANCEL_PREVIOUS` `ORDERED` will not run `on<BarAction>` in parallel and will not cancel
+  any previous execution. Instead, `ORDERED` will preserve the order.
 
-All execution blocks except `onEnter` can specify a `FlatMapPolicy`:
+All execution blocks except `onEnter` can specify a `ExecutionPolicy`:
 
-- `on<Action>(flatMapPolicy = FlatMapPolicy.LATEST){... }`
-- `collectWhileInState(flatMapPolicy = FlatMapPolicy.LATEST) { ... }`
+- `on<Action>(executionPolicy = ExecutionPolicy.
+){... }`
+- `collectWhileInState(executionPolicy = ExecutionPolicy.CANCEL_PREVIOUS) { ... }`
 
 ## Best Practice
 
