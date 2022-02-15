@@ -13,7 +13,7 @@ kotlin {
     iosArm32()
     iosArm64()
     iosX64()
-    linuxX64()
+   // linuxX64()
     macosX64()
     mingwX64()
     tvosArm64()
@@ -72,7 +72,7 @@ kotlin {
                 targets.iosArm32,
                 targets.iosArm64,
                 targets.iosX64,
-                targets.linuxX64,
+//                targets.linuxX64,
                 targets.macosX64,
                 targets.mingwX64,
                 targets.tvosArm64,
