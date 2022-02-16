@@ -13,7 +13,7 @@ import com.freeletics.flowredux.dsl.internal.Action
  * That is not that nice as it all subclasses are implementation detail heavy.
  * There is no need to have a hundreds of lines of code in one file just to have sealed classes.
  */
-abstract class StoreWideBuilderBlock<S, A> internal constructor() {
+public abstract class StoreWideBuilderBlock<S, A> internal constructor() {
 
     /**
      * You can think of this as some kind of factory method that generates a list of sideeffects

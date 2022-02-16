@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 @ExperimentalCoroutinesApi
 @FlowPreview
 // TODO find better name: i.e. DelegateToStateMachineSideEffectBuilder?
-class SubStateMachineSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, S, A>(
+internal class SubStateMachineSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, S, A>(
     private val subStateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
     private val actionMapper: (A) -> SubStateMachineAction,
     private val stateMapper: (InputState, SubStateMachineState) -> ChangeState<S>,

@@ -73,7 +73,14 @@ data class ShowContentAndLoadingNextPageErrorPaginationState(
     internal override val canLoadNextPage: Boolean
 ) : ContainsContentPaginationState()
 
-internal class InternalPaginationStateMachine(
+/**
+ * It's callend `Internal` because it is note meant to be accessed publicly as it exposes coroutines
+ * Flow and suspending function to dispatch.
+ *
+ * Instead the "wrappter class" [PaginationStateMachine] should be used which hides `Flow` etc.
+ * but uses traditional "callbacks". That way it is easier to use on iOS.
+ */
+class InternalPaginationStateMachine(
     logger: FlowReduxLogger,
     private val githubApi: GithubApi
 ) : FlowReduxStateMachine<PaginationState, Action>({ LoadFirstPagePaginationState }, logger) {
@@ -201,6 +208,10 @@ internal class InternalPaginationStateMachine(
     }
 }
 
+/**
+ * A wrapper class around [InternalPaginationStateMachine] so that you dont need to deal with `Flow`
+ * and suspend functions from iOS.
+ */
 class PaginationStateMachine(
     logger: FlowReduxLogger,
     githubApi: GithubApi,

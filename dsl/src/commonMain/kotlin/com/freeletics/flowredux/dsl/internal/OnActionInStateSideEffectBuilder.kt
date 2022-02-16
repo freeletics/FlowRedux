@@ -4,9 +4,9 @@ package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
-import com.freeletics.flowredux.dsl.FlatMapPolicy
+import com.freeletics.flowredux.dsl.ExecutionPolicy
 import com.freeletics.flowredux.dsl.OnActionHandler
-import com.freeletics.flowredux.dsl.flow.flatMapWithPolicy
+import com.freeletics.flowredux.dsl.flow.flatMapWithExecutionPolicy
 import com.freeletics.flowredux.dsl.flow.whileInState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -17,10 +17,10 @@ import kotlinx.coroutines.flow.mapNotNull
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
+internal class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     internal val subActionClass: KClass<out A>,
-    internal val flatMapPolicy: FlatMapPolicy,
+    internal val executionPolicy: ExecutionPolicy,
     internal val handler: OnActionHandler<InputState, S, A>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
@@ -39,7 +39,7 @@ class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
                         is InitialStateAction -> null
                     }
                 }
-                    .flatMapWithPolicy(flatMapPolicy) { action ->
+                    .flatMapWithExecutionPolicy(executionPolicy) { action ->
                         onActionSideEffectFactory(
                             action = action,
                             getState = getState
