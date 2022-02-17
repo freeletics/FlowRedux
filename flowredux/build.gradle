@@ -56,18 +56,8 @@ kotlin {
         }
 
         nativeMain {
-            dependencies {
-                implementation (libraries.coroutinesNativeMT) {
-                    force = true
-                }
-            }
         }
         nativeTest {
-            dependencies {
-                implementation (libraries.coroutinesNativeMT) {
-                    force = true
-                }
-            }
         }
 
         configure([
