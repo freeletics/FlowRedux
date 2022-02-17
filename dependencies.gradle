@@ -37,7 +37,7 @@ ext.libraries = [
         kotlinStdlibJs    : "org.jetbrains.kotlin:kotlin-stdlib-js:$versions.kotlin",
         timber            : "com.jakewharton.timber:timber:$versions.timber",
         coroutines        : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines",
-        coroutinesNativeMT: "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}-native-mt",
+        coroutinesNativeMT: "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}",
         rxJava            : "io.reactivex.rxjava2:rxjava:$versions.rxJava",
         rxAndroid         : "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid",
         flMadStateMachine : "com.freeletics.mad:state-machine:0.3.0-alpha26",
