@@ -28,7 +28,6 @@ ext.versions = [
 
         junit                  : '4.13.2',
         turbine                : '0.7.0',
-        stately                : '1.2.0'
 ]
 
 ext.libraries = [
@@ -42,7 +41,6 @@ ext.libraries = [
         rxJava            : "io.reactivex.rxjava2:rxjava:$versions.rxJava",
         rxAndroid         : "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid",
         flMadStateMachine : "com.freeletics.mad:state-machine:0.3.0-alpha26",
-        stately           : "co.touchlab:stately-concurrency:$versions.stately",
 ]
 
 ext.compose = [

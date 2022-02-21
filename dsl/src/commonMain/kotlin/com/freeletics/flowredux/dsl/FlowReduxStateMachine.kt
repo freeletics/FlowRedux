@@ -1,8 +1,8 @@
 package com.freeletics.flowredux.dsl
 
-import co.touchlab.stately.concurrency.AtomicInt
-import co.touchlab.stately.concurrency.value
 import com.freeletics.flowredux.FlowReduxLogger
+import com.freeletics.flowredux.dsl.util.AtomicInt
+import com.freeletics.flowredux.dsl.util.value
 import com.freeletics.mad.statemachine.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
