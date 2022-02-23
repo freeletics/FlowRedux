@@ -7,6 +7,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 
@@ -16,7 +17,8 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
     initialStateSupplier: () -> S,
 ) : StateMachine<S, A> {
 
-    public val initialState: S by lazy(LazyThreadSafetyMode.NONE, initialStateSupplier)
+    private val initialState: S by lazy(LazyThreadSafetyMode.NONE, initialStateSupplier)
+    private var currentState: S? = null
 
     private val inputActions = Channel<A>()
     private lateinit var outputState: Flow<S>
@@ -35,7 +37,8 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
 
         outputState = inputActions
             .receiveAsFlow()
-            .reduxStore(initialState, specBlock)
+            .reduxStore({ currentState ?: initialState }, specBlock)
+            .onEach { currentState = it }
             .onStart {
                 activeFlowCounter.incrementAndGet()
             }
@@ -49,6 +52,10 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
             checkSpecBlockSet()
             return outputState
         }
+
+    public fun stateAndInitialState(): StateWithInitialState<S> {
+        return StateWithInitialState(state, currentState ?: initialState)
+    }
 
     override suspend fun dispatch(action: A) {
         checkSpecBlockSet()
@@ -84,4 +91,9 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
             )
         }
     }
+
+    public data class StateWithInitialState<S : Any>(
+        val state: Flow<S>,
+        val initialState: S,
+    )
 }

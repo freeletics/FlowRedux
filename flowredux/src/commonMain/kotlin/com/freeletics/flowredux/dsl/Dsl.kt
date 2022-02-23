@@ -35,15 +35,3 @@ internal fun <S : Any, A : Any> Flow<A>.reduxStore(
         )
         .distinctUntilChanged { old, new -> old === new } // distinct until not the same object reference.
 }
-
-/**
- * Provides a fluent DSL to specify a ReduxStore
- */
-@FlowPreview
-@ExperimentalCoroutinesApi
-public fun <S : Any, A : Any> Flow<A>.reduxStore(
-    initialState: S,
-    block: FlowReduxStoreBuilder<S, A>.() -> Unit
-): Flow<S> =
-    this.reduxStore(initialStateSupplier = { initialState }, block = block)
-

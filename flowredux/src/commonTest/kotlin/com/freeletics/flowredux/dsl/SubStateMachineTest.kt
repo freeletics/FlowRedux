@@ -270,15 +270,17 @@ class SubStateMachineTest {
             var parentS2 = 0
             var childFactory = 0
 
-            val child = ChildStateMachine(initialState = TestState.S2) {
-                inState<TestState.S2> {
-                    onEnter {
-                        childOnEnterS2++
-                        NoStateChange
-                    }
-                    on<TestAction.A2> { _, _ ->
-                        childActionA2++
-                        OverrideState(TestState.S1)
+            val createChild = {
+                ChildStateMachine(initialState = TestState.S2) {
+                    inState<TestState.S2> {
+                        onEnter {
+                            childOnEnterS2++
+                            NoStateChange
+                        }
+                        on<TestAction.A2> { _, _ ->
+                            childActionA2++
+                            OverrideState(TestState.S1)
+                        }
                     }
                 }
             }
@@ -290,7 +292,7 @@ class SubStateMachineTest {
                 inState<TestState.S2> {
                     onEnterEffect { parentS2++ }
                     stateMachine(
-                        stateMachineFactory = { childFactory++; child },
+                        stateMachineFactory = { childFactory++; createChild() },
                         actionMapper = { it },
                         stateMapper = { _, childState -> OverrideState(childState) }
                     )
