@@ -1,7 +1,7 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.FlowReduxLogger
-import com.freeletics.flowredux.dsl.util.AtomicInt
+import com.freeletics.flowredux.dsl.util.AtomicCounter
 import com.freeletics.flowredux.dsl.util.value
 import com.freeletics.mad.statemachine.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,7 +24,7 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
     private val inputActions = Channel<A>()
     private lateinit var outputState: Flow<S>
 
-    private val activeFlowCounter = AtomicInt(0)
+    private val activeFlowCounter = AtomicCounter(0)
 
     public constructor(initialState: S, logger: FlowReduxLogger? = null) : this(
         logger = logger,
