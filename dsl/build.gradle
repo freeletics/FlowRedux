@@ -58,20 +58,10 @@ kotlin {
         }
 
         nativeMain {
-            dependencies {
-                implementation (libraries.coroutinesNativeMT) {
-                    force = true
-                }
-            }
+            dependsOn commonMain
         }
         nativeTest {
-            dependencies {
-                implementation (libraries.coroutinesNativeMT) {
-                    force = true
-                }
-            }
         }
-
 
         configure([
                 targets.iosArm32,
