@@ -6,12 +6,11 @@ import com.freeletics.flowredux.dsl.reduce
 internal sealed class Action<S, A>
 
 internal data class ChangeStateAction<S, A>(
-    private val loggingInfo: String,
     internal val runReduceOnlyIf: (S) -> Boolean,
     internal val changeState: ChangeState<S>
 ) : Action<S, A>() {
     override fun toString(): String {
-        return "SetStateAction $loggingInfo"
+        return "SetStateAction"
     }
 }
 

@@ -67,7 +67,6 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
             val changeState = handler.handle(value, inputState)
             emit(
                 ChangeStateAction<S, A>(
-                    loggingInfo = "collectWhileInState<>", // TODO better logging
                     changeState = changeState,
                     runReduceOnlyIf = { state -> isInState(state) }
                 )

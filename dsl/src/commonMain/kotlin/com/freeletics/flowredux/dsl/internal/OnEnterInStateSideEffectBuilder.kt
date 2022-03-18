@@ -44,7 +44,6 @@ internal class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>
             val changeState = handler.handle(inputState)
             emit(
                 ChangeStateAction<S, A>(
-                    loggingInfo = "onEnter<>", // TODO logging
                     changeState = changeState,
                     runReduceOnlyIf = { state -> isInState(state) }
                 )
