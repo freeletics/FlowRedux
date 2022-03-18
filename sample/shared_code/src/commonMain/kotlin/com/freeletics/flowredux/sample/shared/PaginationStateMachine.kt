@@ -1,10 +1,8 @@
 package com.freeletics.flowredux.sample.shared
 
-import com.freeletics.flowredux.FlowReduxLogger
 import com.freeletics.flowredux.dsl.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
@@ -81,9 +79,8 @@ data class ShowContentAndLoadingNextPageErrorPaginationState(
  * but uses traditional "callbacks". That way it is easier to use on iOS.
  */
 class InternalPaginationStateMachine(
-    logger: FlowReduxLogger,
     private val githubApi: GithubApi
-) : FlowReduxStateMachine<PaginationState, Action>({ LoadFirstPagePaginationState }, logger) {
+) : FlowReduxStateMachine<PaginationState, Action>(LoadFirstPagePaginationState) {
     init {
         spec {
 
@@ -213,14 +210,10 @@ class InternalPaginationStateMachine(
  * and suspend functions from iOS.
  */
 class PaginationStateMachine(
-    logger: FlowReduxLogger,
     githubApi: GithubApi,
     private val scope: CoroutineScope
 ) {
-    private val stateMachine = InternalPaginationStateMachine(
-        logger = logger,
-        githubApi = githubApi
-    )
+    private val stateMachine = InternalPaginationStateMachine(githubApi = githubApi)
 
     fun dispatch(action: Action) {
         scope.launch {

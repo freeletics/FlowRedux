@@ -36,7 +36,6 @@ fun <A, S> Flow<A>.reduxStore(
 fun <A, S> Flow<A>.reduxStore(
     initialStateSupplier: () -> S,
     sideEffects: Iterable<SideEffect<S, A>>,
-    logger: FlowReduxLogger? = null,
     reducer: Reducer<S, A>
 ): Flow<S> = flow {
 
@@ -44,7 +43,6 @@ fun <A, S> Flow<A>.reduxStore(
     val getState: GetState<S> = { currentState }
 
     // Emit the initial state
-    logger?.log("Emitting initial state $currentState")
     emit(currentState)
 
     val loopbacks = sideEffects.map {
@@ -52,14 +50,13 @@ fun <A, S> Flow<A>.reduxStore(
     }
     val sideEffectActions = sideEffects.mapIndexed { index, sideEffect ->
         val actionsFlow = loopbacks[index].consumeAsFlow()
-        sideEffect(actionsFlow, getState).onEach { logger?.log("SideEffect $index action $it received") }
+        sideEffect(actionsFlow, getState)
     }
-    val upstreamActions = this@reduxStore.onEach { logger?.log("Upstream action $it received") }
+    val upstreamActions = this@reduxStore
 
     (sideEffectActions + upstreamActions).merge().collect { action ->
         // Change state
         val newState: S = reducer(currentState, action)
-        logger?.log("Reducing $currentState with $action -> $newState")
         currentState = newState
         emit(newState)
 

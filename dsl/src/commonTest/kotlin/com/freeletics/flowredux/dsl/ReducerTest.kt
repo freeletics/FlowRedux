@@ -16,7 +16,6 @@ class ReducerTest {
     fun `run SelfReducableAction on returning True`() {
         val action =
             ChangeStateAction<TestState, Any>(
-                loggingInfo = "info",
                 changeState = OverrideState(TestState.B),
                 runReduceOnlyIf = { true }
             )
@@ -34,7 +33,6 @@ class ReducerTest {
     fun `dont run SelfReducableAction on returning False`() {
         val action =
             ChangeStateAction<TestState, Any>(
-                loggingInfo = "info",
                 changeState = OverrideState(TestState.B),
                 runReduceOnlyIf = { false }
             )

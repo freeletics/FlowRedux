@@ -63,7 +63,6 @@ internal class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any
 
                 emit(
                     ChangeStateAction<S, A>(
-                        loggingInfo = "Caused by on<$action>",
                         changeState = changeState,
                         runReduceOnlyIf = { state -> isInState(state) }
                     )

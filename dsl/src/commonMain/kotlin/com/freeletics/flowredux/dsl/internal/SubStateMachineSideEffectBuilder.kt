@@ -82,7 +82,6 @@ internal class SubStateMachineSideEffectBuilder<SubStateMachineState : Any, SubS
 
                                 runOnlyIfInInputState(getState, isInState) { inputState ->
                                     changeStateAction = ChangeStateAction<S, A>(
-                                        loggingInfo = "Sub StateMachine",
                                         runReduceOnlyIf = isInState,
                                         changeState = stateMapper(
                                             inputState,

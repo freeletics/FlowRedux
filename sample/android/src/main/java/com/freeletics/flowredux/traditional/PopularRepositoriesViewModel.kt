@@ -3,7 +3,6 @@ package com.freeletics.flowredux.traditional
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.freeletics.flowredux.AndroidFlowReduxLogger
 import com.freeletics.flowredux.sample.shared.Action
 import com.freeletics.flowredux.sample.shared.GithubApi
 import com.freeletics.flowredux.sample.shared.PaginationState
@@ -14,7 +13,6 @@ class PopularRepositoriesViewModel : ViewModel() {
     val liveData = MutableLiveData<PaginationState>()
 
     private val stateMachine = PaginationStateMachine(
-        logger = AndroidFlowReduxLogger,
         githubApi = GithubApi(),
         scope = viewModelScope
     ).also {

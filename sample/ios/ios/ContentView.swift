@@ -14,7 +14,6 @@ import os.log
 struct ContentView: View {
     @State private var state : PaginationState = LoadFirstPagePaginationState()
     private let stateMachine : PaginationStateMachine = PaginationStateMachine(
-        logger: Logger(),
         githubApi: GithubApi(),
         scope: NsQueueCoroutineScope()
     )
@@ -62,13 +61,6 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
       ContentView()
-    }
-}
-
-class Logger : FlowreduxFlowReduxLogger{
-    
-    func log(message: String) {
-        // NSLog(message)
     }
 }
 
