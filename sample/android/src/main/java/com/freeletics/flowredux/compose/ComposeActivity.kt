@@ -8,10 +8,7 @@ import com.freeletics.flowredux.sample.shared.InternalPaginationStateMachine
 
 class ComposeActivity : ComponentActivity() {
 
-    private val stateMachine = InternalPaginationStateMachine(
-        githubApi = GithubApi(),
-        logger = AndroidFlowReduxLogger
-    )
+    private val stateMachine = InternalPaginationStateMachine(githubApi = GithubApi())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
