@@ -23,7 +23,7 @@ ext.versions = [
         viewModelKtx           : '2.4.1',
 
         material               : '1.5.0',
-        adapterDelegates       : '4.3.1',
+        adapterDelegates       : '4.3.2',
         activity               : "1.4.0",
 
         junit                  : '4.13.2',
@@ -40,7 +40,7 @@ ext.libraries = [
         coroutinesNativeMT: "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}",
         rxJava            : "io.reactivex.rxjava2:rxjava:$versions.rxJava",
         rxAndroid         : "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid",
-        flMadStateMachine : "com.freeletics.mad:state-machine:0.3.0-alpha26",
+        flMadStateMachine : "com.freeletics.mad:state-machine:0.3.0-alpha27",
 ]
 
 ext.compose = [
@@ -76,5 +76,5 @@ ext.gradlePlugins = [
         kotlin            : "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin",
         dokka             : "org.jetbrains.dokka:dokka-gradle-plugin:$versions.dokka",
         kotlinxcodesync   : "co.touchlab:kotlinxcodesync:0.2",
-        gradleMavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.18.0",
+        gradleMavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.19.0",
 ]
