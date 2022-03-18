@@ -1,6 +1,5 @@
 package com.freeletics.flowredux.dsl
 
-import com.freeletics.flowredux.FlowReduxLogger
 import com.freeletics.flowredux.dsl.internal.Action
 import com.freeletics.flowredux.dsl.internal.ExternalWrappedAction
 import com.freeletics.flowredux.dsl.internal.InitialStateAction
@@ -19,7 +18,6 @@ import kotlinx.coroutines.FlowPreview
 @FlowPreview
 @ExperimentalCoroutinesApi
 public fun <S : Any, A : Any> Flow<A>.reduxStore(
-    logger: FlowReduxLogger? = null,
     initialStateSupplier: () -> S,
     block: FlowReduxStoreBuilder<S, A>.() -> Unit
 ): Flow<S> {
@@ -31,7 +29,6 @@ public fun <S : Any, A : Any> Flow<A>.reduxStore(
             emit(InitialStateAction())
         }
         .reduxStore(
-            logger = logger,
             initialStateSupplier = initialStateSupplier,
             reducer = ::reducer,
             sideEffects = builder.generateSideEffects()
@@ -45,9 +42,8 @@ public fun <S : Any, A : Any> Flow<A>.reduxStore(
 @FlowPreview
 @ExperimentalCoroutinesApi
 public fun <S : Any, A : Any> Flow<A>.reduxStore(
-    logger: FlowReduxLogger? = null,
     initialState: S,
     block: FlowReduxStoreBuilder<S, A>.() -> Unit
 ): Flow<S> =
-    this.reduxStore(initialStateSupplier = { initialState }, logger = logger, block = block)
+    this.reduxStore(initialStateSupplier = { initialState }, block = block)
 

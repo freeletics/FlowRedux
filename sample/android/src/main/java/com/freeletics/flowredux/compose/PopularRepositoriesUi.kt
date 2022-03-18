@@ -6,7 +6,6 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.stringResource
-import com.freeletics.flowredux.AndroidFlowReduxLogger
 import com.freeletics.flowredux.R
 import com.freeletics.flowredux.sample.shared.*
 import kotlinx.coroutines.launch

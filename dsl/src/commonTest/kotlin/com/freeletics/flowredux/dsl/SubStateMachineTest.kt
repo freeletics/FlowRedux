@@ -28,7 +28,6 @@ class SubStateMachineTest {
         }
     }
 
-
     @Test
     fun `delegate to child sub statemachine while in state`() = suspendTest {
         var inS3onA1Action = 0
@@ -323,16 +322,12 @@ class SubStateMachineTest {
         }
 }
 
-
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 private fun ChildStateMachine(
     initialState: TestState = TestState.Initial,
-    builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit
+    builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit,
 ): FlowReduxStateMachine<TestState, TestAction> {
-    return object : FlowReduxStateMachine<TestState, TestAction>(
-        initialState,
-        CommandLineLogger
-    ) {
+    return object : FlowReduxStateMachine<TestState, TestAction>(initialState) {
 
         init {
             spec(builderBlock)

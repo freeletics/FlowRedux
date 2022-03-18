@@ -3,7 +3,6 @@ package com.freeletics.flowredux.compose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.freeletics.flowredux.AndroidFlowReduxLogger
 import com.freeletics.flowredux.sample.shared.GithubApi
 import com.freeletics.flowredux.sample.shared.InternalPaginationStateMachine
 

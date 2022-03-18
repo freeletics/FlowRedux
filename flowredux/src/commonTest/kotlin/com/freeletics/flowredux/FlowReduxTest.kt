@@ -46,7 +46,7 @@ class FlowReduxTest {
             flow {
                 emit(1)
                 emit(2)
-            }.reduxStore({ "" }, listOf(), CommandLineLogger) { state, action ->
+            }.reduxStore({ "" }, listOf()) { state, action ->
                 state + action
             }.test {
                 assertEquals("", awaitItem())
@@ -73,7 +73,7 @@ class FlowReduxTest {
                 flow {
                     emit(1)
                     emit(2)
-                }.reduxStore({ "" }, listOf(sideEffect1), CommandLineLogger) { state, action ->
+                }.reduxStore({ "" }, listOf(sideEffect1)) { state, action ->
                     state + action
                 }.test {
                     assertEquals("", awaitItem())

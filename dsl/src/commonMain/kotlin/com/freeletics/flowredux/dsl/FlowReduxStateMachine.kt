@@ -1,6 +1,5 @@
 package com.freeletics.flowredux.dsl
 
-import com.freeletics.flowredux.FlowReduxLogger
 import com.freeletics.flowredux.dsl.util.AtomicCounter
 import com.freeletics.flowredux.dsl.util.value
 import com.freeletics.mad.statemachine.StateMachine
@@ -16,7 +15,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 @ExperimentalCoroutinesApi
 public abstract class FlowReduxStateMachine<S : Any, A : Any>(
     initialStateSupplier: () -> S,
-    private val logger: FlowReduxLogger? = null
 ) : StateMachine<S, A> {
 
     public val initialState: S by lazy(LazyThreadSafetyMode.NONE, initialStateSupplier)
@@ -26,21 +24,19 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
 
     private val activeFlowCounter = AtomicCounter(0)
 
-    public constructor(initialState: S, logger: FlowReduxLogger? = null) : this(
-        logger = logger,
-        initialStateSupplier = { initialState })
+    public constructor(initialState: S) : this(initialStateSupplier = { initialState })
 
     protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
         if (::outputState.isInitialized) {
             throw IllegalStateException(
                 "State machine spec has already been set. " +
-                        "It's only allowed to call spec {...} once."
+                    "It's only allowed to call spec {...} once."
             )
         }
 
         outputState = inputActions
             .receiveAsFlow()
-            .reduxStore(logger, initialState, specBlock)
+            .reduxStore(initialState, specBlock)
             .onStart {
                 activeFlowCounter.incrementAndGet()
             }
@@ -60,8 +56,8 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
         if (activeFlowCounter.value <= 0) {
             throw IllegalStateException(
                 "Cannot dispatch action $action because state Flow of this " +
-                        "FlowReduxStateMachine is not collected yet. " +
-                        "Start collecting the state Flow before dispatching any action."
+                    "FlowReduxStateMachine is not collected yet. " +
+                    "Start collecting the state Flow before dispatching any action."
             )
         }
         inputActions.send(action)
