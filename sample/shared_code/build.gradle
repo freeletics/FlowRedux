@@ -42,7 +42,7 @@ kotlin {
         commonMain.dependencies {
             // Kotlin
             implementation libraries.kotlinStdlibCommon
-            api project(':dsl')
+            api project(':flowredux')
         }
 
         androidMain.dependencies {
