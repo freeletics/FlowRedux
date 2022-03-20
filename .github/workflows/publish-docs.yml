@@ -38,8 +38,6 @@ jobs:
           cp README.md docs/index.md
           mkdir -p docs/Javadoc/flowredux
           cp -R flowredux/build/dokka/gfm/. docs/Javadoc/flowredux/
-          mkdir -p docs/Javadoc/dsl
-          cp -R dsl/build/dokka/gfm/. docs/Javadoc/dsl/
 
       - name: Deploy MkDocs
         run: |
