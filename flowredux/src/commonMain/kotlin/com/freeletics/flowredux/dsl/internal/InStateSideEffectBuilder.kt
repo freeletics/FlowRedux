@@ -2,8 +2,6 @@ package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.SideEffect
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 
 /**
  * It's just not an Interface to not expose internal class `Action` to the public.
