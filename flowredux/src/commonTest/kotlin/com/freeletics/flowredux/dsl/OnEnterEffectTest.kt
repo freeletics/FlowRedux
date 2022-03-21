@@ -1,11 +1,15 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
-import kotlinx.coroutines.delay
-import kotlin.time.ExperimentalTime
+import com.freeletics.flowredux.suspendTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlin.test.*
+import kotlinx.coroutines.delay
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
 class OnEnterEffectTest {

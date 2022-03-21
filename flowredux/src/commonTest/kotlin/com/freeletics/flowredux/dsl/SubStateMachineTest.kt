@@ -1,8 +1,7 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
-import com.freeletics.flowredux.dsl.internal.Action
-import kotlinx.coroutines.CoroutineScope
+import com.freeletics.flowredux.suspendTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay

@@ -1,19 +1,14 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.fail
-import kotlin.time.ExperimentalTime
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.freeletics.flowredux.suspendTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.Flow
-import kotlin.test.assertFails
+import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.fail
+import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
 class FlowReduxStateMachineTest {
