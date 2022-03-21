@@ -11,8 +11,6 @@ import kotlinx.coroutines.FlowPreview
  */
 internal abstract class InStateSideEffectBuilder<InputState : S, S, A> {
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
     internal abstract fun generateSideEffect(): SideEffect<S, Action<S, A>>
 
     internal suspend inline fun runOnlyIfInInputState(

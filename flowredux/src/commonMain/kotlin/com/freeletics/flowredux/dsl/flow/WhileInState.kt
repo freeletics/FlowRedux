@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 
-@ExperimentalCoroutinesApi
 internal fun <S, A> Flow<Action<S, A>>.whileInState(
     isInState: (S) -> Boolean,
     getState: GetState<S>,
