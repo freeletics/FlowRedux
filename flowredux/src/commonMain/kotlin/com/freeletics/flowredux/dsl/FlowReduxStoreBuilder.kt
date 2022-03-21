@@ -11,7 +11,7 @@ import kotlinx.coroutines.FlowPreview
 @ExperimentalCoroutinesApi
 public class FlowReduxStoreBuilder<S : Any, A : Any> {
 
-    private val builderBlocks: MutableList<StoreWideBuilderBlock<S, A>> = ArrayList()
+    private val builderBlocks: MutableList<InStateBuilderBlock<*, S, A>> = ArrayList()
 
     /**
      * Define what happens if the store is in a certain state.
@@ -39,7 +39,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
             subStateClass.isInstance(state)
         })
         block(builder)
-        builderBlocks.add(builder as StoreWideBuilderBlock<S, A>)
+        builderBlocks.add(builder)
     }
 
     /**
@@ -72,7 +72,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
             subStateClass.isInstance(state) && additionalIsInState(state as SubState)
         })
         block(builder)
-        builderBlocks.add(builder as StoreWideBuilderBlock<S, A>)
+        builderBlocks.add(builder)
     }
 
     /**
