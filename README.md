@@ -102,14 +102,14 @@ There are two artifacts that you can include as dependency::
 
 ### Multiplatform
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux:0.11.0'
-implementation 'com.freeletics.flowredux:compose:0.11.0'
+implementation 'com.freeletics.flowredux:flowredux:0.12.0'
+implementation 'com.freeletics.flowredux:compose:0.12.0'
 ```
 
 ### JVM / Android only
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux-jvm:0.11.0'
-implementation 'com.freeletics.flowredux:compose:0.11.0'
+implementation 'com.freeletics.flowredux:flowredux-jvm:0.12.0'
+implementation 'com.freeletics.flowredux:compose:0.12.0'
 ```
 
 ### JavaScript
@@ -133,5 +133,5 @@ allprojects {
 
 Then just use `-SNAPSHOT`suffix as version like
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux:0.11.1-SNAPSHOT'
+implementation 'com.freeletics.flowredux:flowredux:0.12.1-SNAPSHOT'
 ```
