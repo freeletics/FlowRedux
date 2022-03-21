@@ -9,4 +9,4 @@ package com.freeletics.flowredux
  * @param S The type of the state
  * @param A The type of the Actions
  */
-typealias Reducer<S, A> = (S, A) -> S
+internal typealias Reducer<S, A> = (S, A) -> S

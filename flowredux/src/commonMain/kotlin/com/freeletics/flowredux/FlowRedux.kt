@@ -3,11 +3,9 @@ package com.freeletics.flowredux
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
 
 /**
  * Creates a Redux store with an initial state. If your initial state is an expensive computation
@@ -33,7 +31,7 @@ fun <A, S> Flow<A>.reduxStore(
  * the flow starts.
  */
 @ExperimentalCoroutinesApi
-fun <A, S> Flow<A>.reduxStore(
+internal fun <A, S> Flow<A>.reduxStore(
     initialStateSupplier: () -> S,
     sideEffects: Iterable<SideEffect<S, A>>,
     reducer: Reducer<S, A>

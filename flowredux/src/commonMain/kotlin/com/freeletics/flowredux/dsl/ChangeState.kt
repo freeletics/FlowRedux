@@ -44,7 +44,7 @@ public object NoStateChange : ChangeState<Nothing>()
 internal fun <S> ChangeState<S>.reduce(state: S): S {
     return when (val change = this) {
         is OverrideState -> change.newState
-        is NoStateChange -> state // TODO throw exception instead?
+        is NoStateChange -> state
         is MutateState<*, S> -> change.reduceImpl(state)
     }
 }

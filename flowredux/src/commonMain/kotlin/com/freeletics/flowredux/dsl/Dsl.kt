@@ -5,19 +5,19 @@ import com.freeletics.flowredux.dsl.internal.ExternalWrappedAction
 import com.freeletics.flowredux.dsl.internal.InitialStateAction
 import com.freeletics.flowredux.dsl.internal.reducer
 import com.freeletics.flowredux.reduxStore
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 
 /**
  * Provides a fluent DSL to specify a ReduxStore
  */
 @FlowPreview
 @ExperimentalCoroutinesApi
-public fun <S : Any, A : Any> Flow<A>.reduxStore(
+internal fun <S : Any, A : Any> Flow<A>.reduxStore(
     initialStateSupplier: () -> S,
     block: FlowReduxStoreBuilder<S, A>.() -> Unit
 ): Flow<S> {
