@@ -31,6 +31,7 @@ kotlin {
             dependencies {
                 api libraries.kotlinStdlibCommon
                 api libraries.coroutines
+                api libraries.flMadStateMachine
             }
         }
 
@@ -56,6 +57,7 @@ kotlin {
         }
 
         nativeMain {
+            dependsOn commonMain
         }
         nativeTest {
         }

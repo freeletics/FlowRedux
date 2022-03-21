@@ -10,11 +10,10 @@ import kotlinx.coroutines.flow.Flow
  * (i.e using filter or ofType operator)
  * @param state [GetState] to get the latest state of the state machine
  */
-// TODO find better name?
-typealias SideEffect<S, A> = (actions: Flow<A>, getState: GetState<S>) -> Flow<A>
+internal typealias SideEffect<S, A> = (actions: Flow<A>, getState: GetState<S>) -> Flow<A>
 
 /**
  * The GetState is basically just a deferred way to get a state of a [reduxStore] at any given point in time.
  * So you have to call this method to get the state.
  */
-typealias GetState<S> = () -> S
+internal typealias GetState<S> = () -> S

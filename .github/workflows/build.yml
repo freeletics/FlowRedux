@@ -29,13 +29,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build --stacktrace
 
-      - name: Upload dsl test report artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: dsl-test-report
-          path: /home/runner/work/FlowRedux/FlowRedux/dsl/build/reports/tests/allTests/
-
       - name: Upload flowredux test report artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v2
