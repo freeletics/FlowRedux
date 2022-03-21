@@ -7,7 +7,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 
@@ -15,7 +14,7 @@ import kotlinx.coroutines.launch
 internal fun <S, A> Flow<Action<S, A>>.whileInState(
     isInState: (S) -> Boolean,
     getState: GetState<S>,
-    transform: (Flow<Action<S, A>>) -> Flow<Action<S, A>>
+    transform: (Flow<Action<S, A>>) -> Flow<Action<S, A>>,
 ) = channelFlow {
     var currentChannel: Channel<Action<S, A>>? = null
 

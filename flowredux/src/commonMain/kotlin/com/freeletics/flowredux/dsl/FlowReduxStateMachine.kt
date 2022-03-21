@@ -1,7 +1,6 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.dsl.util.AtomicCounter
-import com.freeletics.flowredux.dsl.util.value
 import com.freeletics.mad.statemachine.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -53,7 +52,7 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
 
     override suspend fun dispatch(action: A) {
         checkSpecBlockSet()
-        if (activeFlowCounter.value <= 0) {
+        if (activeFlowCounter.get() <= 0) {
             throw IllegalStateException(
                 "Cannot dispatch action $action because state Flow of this " +
                     "FlowReduxStateMachine is not collected yet. " +
