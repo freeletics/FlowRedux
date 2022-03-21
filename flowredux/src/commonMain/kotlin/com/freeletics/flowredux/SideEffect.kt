@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.Flow
  * (i.e using filter or ofType operator)
  * @param state [GetState] to get the latest state of the state machine
  */
-// TODO find better name?
 internal typealias SideEffect<S, A> = (actions: Flow<A>, getState: GetState<S>) -> Flow<A>
 
 /**
