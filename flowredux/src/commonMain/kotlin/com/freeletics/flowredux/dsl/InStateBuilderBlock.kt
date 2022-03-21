@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.Flow
 @ExperimentalCoroutinesApi
 public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     private val _isInState: (S) -> Boolean
-) : StoreWideBuilderBlock<S, A>() {
+) {
 
     private val _inStateSideEffectBuilders = ArrayList<InStateSideEffectBuilder<InputState, S, A>>()
 
@@ -387,7 +387,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         )
     }
 
-    override fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {
+    internal fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {
         return _inStateSideEffectBuilders.map { it.generateSideEffect() }
     }
 }
