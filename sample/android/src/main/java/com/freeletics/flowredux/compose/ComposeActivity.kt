@@ -14,7 +14,10 @@ class ComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val (state, dispatch) = stateMachine.rememberStateAndDispatch()
-            PopularRepositoriesUi(state.value, dispatch)
+            val stateValue = state.value
+            if (stateValue != null) {
+                PopularRepositoriesUi(stateValue, dispatch)
+            }
         }
     }
 }

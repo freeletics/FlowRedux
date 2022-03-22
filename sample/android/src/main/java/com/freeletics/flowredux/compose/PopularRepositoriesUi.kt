@@ -11,11 +11,12 @@ import com.freeletics.flowredux.sample.shared.*
 import kotlinx.coroutines.launch
 
 @Composable
-fun PopularRepositoriesUi(state : PaginationState, dispatch: (Action) -> Unit) {
+fun PopularRepositoriesUi(state: PaginationState?, dispatch: (Action) -> Unit) {
     val scaffoldState = rememberScaffoldState()
     SampleTheme {
         Scaffold(scaffoldState = scaffoldState) {
             when (state) {
+                null, // null means state machine did not emit yet the first state --> in mean time show Loading
                 is LoadFirstPagePaginationState -> LoadingUi()
                 is LoadingFirstPageError -> ErrorUi(dispatch)
                 is ContainsContentPaginationState -> {
@@ -37,10 +38,10 @@ fun PopularRepositoriesUi(state : PaginationState, dispatch: (Action) -> Unit) {
                     }
                 }
             }
+
         }
     }
 }
-
 
 private fun ContainsContentPaginationState.shouldShowLoadMoreIndicator(): Boolean = when (this) {
     is ShowContentPaginationState -> false
