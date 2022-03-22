@@ -96,7 +96,8 @@ class MyViewModel @Inject constructor(private val stateMachine : StateMachine) :
 ```
 
 ## Dependencies
-There are two artifacts that you can include as dependency::
+There are two artifacts that you can include as dependency:
+
 1. `flowredux`: this is the core library and includes the DSL.
 2. `compose`: contains some convenient extensions to work with `FlowReduxStateMachine` in [Jetpack Compose](https://developer.android.com/jetpack/compose).
 
