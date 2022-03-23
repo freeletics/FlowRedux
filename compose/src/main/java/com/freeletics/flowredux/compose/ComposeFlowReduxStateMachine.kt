@@ -10,14 +10,22 @@ import kotlinx.coroutines.launch
 
 /**
  * Get a Compose [State] object from a [FlowReduxStateMachine].
+ *
+ * The returned [State.value] can be `null`.
+ * `null` means that the [FlowReduxStateMachine] has not emitted a state yet.
+ * That is the case when the coroutine has launched to collect [FlowReduxStateMachine.state]
+ * but since it runs async in a coroutine (a new coroutines is launched under
+ * the hood of [rememberState]) the [FlowReduxStateMachine] has not emitted state yet
+ * while Jetpack Compose continue its work on the main thread.
+ * Therefore, `null` is used as some sort of initial value and the first value of
+ * [FlowReduxStateMachine] is emitted just a bit later (non null value then).
  */
 @ExperimentalCoroutinesApi
 @FlowPreview
 @Composable
-public fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberState(): State<S> {
-    return produceState(initialValue = this.initialState, this) {
-        state.drop(1) // skip the first one as it is the initial state which is already submitted with produceState's initial state
-            .collect { value = it }
+public fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberState(): State<S?> {
+    return produceState<S?>(initialValue = null, this) {
+        state.collect { value = it }
     }
 }
 
@@ -36,7 +44,7 @@ public fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberState(): State
  * ```
  */
 public data class StateAndDispatch<S : Any, A : Any>(
-    public val state: State<S>,
+    public val state: State<S?>,
     public val dispatchAction: (A) -> Unit
 )
 
@@ -45,7 +53,16 @@ public data class StateAndDispatch<S : Any, A : Any>(
  * and a function of type `(Action) -> Unit` to dispatch Actions to a [FlowReduxStateMachine].
  * Under the hood `State` will be updated only as long as the surrounding Composable is in use.
  * The dispatch function `(Action) -> Unit` is tight to the same Composable component and launches
- * a coroutine to dispatch actions async. to the `FlowReduxStateMachine`
+ * a coroutine to dispatch actions async. to the `FlowReduxStateMachine`.
+ *
+ * The returned [State.value] can be `null`.
+ * `null` means that the [FlowReduxStateMachine]  has not emitted a state yet.
+ * That is the case when the coroutine has launched to collect [FlowReduxStateMachine.state]
+ * but since it runs async in a coroutine (a new coroutine is launched under
+ * the hood of [rememberStateAndDispatch]) the [FlowReduxStateMachine] has not emitted state yet
+ * while Jetpack Compose continue its work on the main thread.
+ * Therefore, `null` is used as some sort of initial value and the first value of
+ * [FlowReduxStateMachine] is emitted just a bit later (non null value then).
  */
 @ExperimentalCoroutinesApi
 @FlowPreview

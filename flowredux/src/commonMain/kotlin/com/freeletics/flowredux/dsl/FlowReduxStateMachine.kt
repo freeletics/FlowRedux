@@ -13,10 +13,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 @FlowPreview
 @ExperimentalCoroutinesApi
 public abstract class FlowReduxStateMachine<S : Any, A : Any>(
-    initialStateSupplier: () -> S,
+    private val initialStateSupplier: () -> S,
 ) : StateMachine<S, A> {
-
-    public val initialState: S by lazy(LazyThreadSafetyMode.NONE, initialStateSupplier)
 
     private val inputActions = Channel<A>()
     private lateinit var outputState: Flow<S>
@@ -35,7 +33,7 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
 
         outputState = inputActions
             .receiveAsFlow()
-            .reduxStore(initialState, specBlock)
+            .reduxStore(initialStateSupplier, specBlock)
             .onStart {
                 activeFlowCounter.incrementAndGet()
             }
