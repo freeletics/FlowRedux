@@ -42,6 +42,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
             actions.whileInState(isInState, getState) { inStateAction ->
 
                 inStateAction.mapNotNull<Action<S,A>, ActionThatTriggeredStartingStateMachine> {
+                    println("Action1 $it")
                     when (it) {
                         is ExternalWrappedAction<*, *> -> if (subActionClass.isInstance(it.action)) {
                             it.action as ActionThatTriggeredStartingStateMachine
@@ -64,11 +65,12 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                         var subStateMachine: FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>? =
                             subStateMachineFactory(actionThatStartsStateMachine, stateOnEntering)
 
+                        println("StateMachine created from Factory $subStateMachine")
                         inStateAction.onEach { action ->
                             // Forward all incoming actions to the sub-statemachine
 
                             if (action is ExternalWrappedAction<S, A>) {
-                                // dispatch the incoming actions to the statemachine
+                                // dispatch the incoming actions to the sub-statemachine
                                 coroutineScope {
                                     launch {
                                         // safety net:
@@ -82,9 +84,9 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                             .mapToIsInState(isInState, getState)
                             .flatMapMerge { isInState: Boolean ->
                                 if (!isInState) {
-                                    emptyFlow() // No longer in state, cancel
+                                    emptyFlow() // No longer in state --> cancel
                                 } else {
-                                    subStateMachine?.state
+                                    subStateMachine?.state  // start collecting substatemachine
                                         ?: emptyFlow()  // safety net, should never happen
                                 }
                             }
