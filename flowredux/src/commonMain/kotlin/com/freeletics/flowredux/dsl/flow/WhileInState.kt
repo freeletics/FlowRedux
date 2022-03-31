@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 internal fun <S, A> Flow<Action<S, A>>.whileInState(
     isInState: (S) -> Boolean,
     getState: GetState<S>,
-    transform: (Flow<Action<S, A>>) -> Flow<Action<S, A>>,
+    transform: suspend (Flow<Action<S, A>>) -> Flow<Action<S, A>>,
 ) = channelFlow {
     var currentChannel: Channel<Action<S, A>>? = null
 

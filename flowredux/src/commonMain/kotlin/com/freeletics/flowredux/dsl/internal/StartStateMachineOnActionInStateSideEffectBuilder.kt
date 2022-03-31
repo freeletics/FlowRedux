@@ -1,4 +1,5 @@
 @file:Suppress("UNCHECKED_CAST")
+
 package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.SideEffect
@@ -16,6 +17,8 @@ import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapMerge
@@ -26,7 +29,7 @@ import kotlinx.coroutines.launch
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, ActionThatTriggeredStartingStateMachine: A, S : Any, A : Any>
+internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, ActionThatTriggeredStartingStateMachine : A, S : Any, A : Any>
 (
     private val subStateMachineFactory: (action: ActionThatTriggeredStartingStateMachine, state: InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
     private val actionMapper: (A) -> SubStateMachineAction,
@@ -40,80 +43,64 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
 
             actions.whileInState(isInState, getState) { inStateAction ->
+                channelFlow<Action<S, A>> {
 
-                inStateAction.mapNotNull<Action<S,A>, ActionThatTriggeredStartingStateMachine> {
-                    println("Action1 $it")
-                    when (it) {
-                        is ExternalWrappedAction<*, *> -> if (subActionClass.isInstance(it.action)) {
-                            it.action as ActionThatTriggeredStartingStateMachine
-                        } else {
-                            null
-                        }
-                        is ChangeStateAction -> null
-                        is InitialStateAction -> null
-                    }
-                }.flatMapMerge { actionThatStartsStateMachine : ActionThatTriggeredStartingStateMachine ->
+                    inStateAction.collect { action ->
+                        // collect upstream
+                        when (action) {
+                            is ChangeStateAction,
+                            is InitialStateAction,
+                            -> {
+                                // Nothing needs to be done, these Actions are not interesting for
+                                // this operator, so we can just safely ignore them
+                            }
+                            is ExternalWrappedAction<*, *> ->
+                                runOnlyIfInInputState(getState, isInState) { currentState ->
 
-                    // TODO take ExecutionPolicy
 
-                    val stateOnEntering = getState() as? InputState
-                    if (stateOnEntering == null) {
-                        emptyFlow() // somehow we left already the state but flow did not cancel yet
-                    } else {
-                        // create sub statemachine via factory.
-                        // Cleanup of instantiated sub statemachine reference is happening in .onComplete {...}
-                        var subStateMachine: FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>? =
-                            subStateMachineFactory(actionThatStartsStateMachine, stateOnEntering)
+                                    if (subActionClass.isInstance(action.action)) {
+                                        val actionThatStartsStateMachine =
+                                            action.action as ActionThatTriggeredStartingStateMachine
 
-                        println("StateMachine created from Factory $subStateMachine")
-                        inStateAction.onEach { action ->
-                            // Forward all incoming actions to the sub-statemachine
+                                        val stateMachine = subStateMachineFactory(
+                                            actionThatStartsStateMachine, currentState
+                                        )
 
-                            if (action is ExternalWrappedAction<S, A>) {
-                                // dispatch the incoming actions to the sub-statemachine
-                                coroutineScope {
-                                    launch {
-                                        // safety net:
-                                        // if sub statemachine is null then flow got canceled but
-                                        // somehow this code still executes
-                                        subStateMachine?.dispatch(actionMapper(action.action))
+                                        // Launch substatemachine
+                                        coroutineScope {
+                                            launch {
+                                                stateMachine.state.collect { subStateMachineState ->
+                                                    runOnlyIfInInputState(getState, isInState) { parentState ->
+                                                        send(
+                                                            ChangeStateAction(
+                                                                runReduceOnlyIf = isInState,
+                                                                changeState = stateMapper(parentState, subStateMachineState)
+                                                            )
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                    } else {
+                                        // a regular action that needs to be forwarded
+                                        // to the active sub state machine
+                                        
+
                                     }
                                 }
-                            }
                         }
-                            .mapToIsInState(isInState, getState)
-                            .flatMapMerge { isInState: Boolean ->
-                                if (!isInState) {
-                                    emptyFlow() // No longer in state --> cancel
-                                } else {
-                                    subStateMachine?.state  // start collecting substatemachine
-                                        ?: emptyFlow()  // safety net, should never happen
-                                }
-                            }
-                            .mapNotNull { subStateMachineState: SubStateMachineState ->
-                                var changeStateAction: ChangeStateAction<S, A>? = null
-
-                                runOnlyIfInInputState(getState, isInState) { inputState ->
-                                    changeStateAction = ChangeStateAction<S, A>(
-                                        runReduceOnlyIf = isInState,
-                                        changeState = stateMapper(
-                                            inputState,
-                                            subStateMachineState
-                                        )
-                                    )
-                                }
-
-                                changeStateAction
-                                // can be null if not in input state (safety net, should never happen)
-                                // but null will be filtered out by .mapNotNull()
-                            }
-                            .onCompletion { subStateMachine = null }
-
                     }
-
-                    emptyFlow()
                 }
             }
         }
     }
 }
+
+/*
+data class StateMachineAndJob<S : Any, A : Any>(
+    val
+    val stateMachines: FlowReduxStateMachine<S, A>,
+    val job =,
+)
+*/

@@ -25,7 +25,7 @@ class StartStateMachineOnActionInStateTest {
             }
         }
 
-        parentStateMachine.state.test(10_000) {
+        parentStateMachine.state.test {
             assertEquals(TestState.Initial, awaitItem()) // parent initial state
             parentStateMachine.dispatch(TestAction.A1)
             delay(50)
@@ -34,6 +34,65 @@ class StartStateMachineOnActionInStateTest {
             expectNoEvents()
         }
     }
+
+    @Test
+    fun `actions are forwarded to the sub statemachine while in state`() = suspendTest {
+        var childStateChanged = 0
+        var childA1Handeld = 0
+        val child = ChildStateMachine(initialState = TestState.S3) {
+            inState<TestState.S3> {
+                on<TestAction.A2> { _, _ ->
+                    childA1Handeld++
+                    NoStateChange
+                }
+            }
+        }
+
+        val parentStateMachine = StateMachine(initialState = TestState.GenericState("", 0)) {
+            inState<TestState.GenericState> {
+                onActionStartStateMachine<TestAction.A1, TestState>(child) { _, _ ->
+                    childStateChanged++
+                    MutateState<TestState.GenericState, TestState> { copy(anInt = this.anInt + 1) }
+                }
+
+                on<TestAction.A3> { _, _ ->
+                    OverrideState(TestState.S3)
+                }
+            }
+        }
+
+        parentStateMachine.state.test {
+            assertEquals(TestState.GenericState("", 0), awaitItem()) // parent initial state
+            parentStateMachine.dispatch(TestAction.A1) // starts child
+            assertEquals(TestState.GenericState("", 1), awaitItem()) // initial state of substatemachine caused this change
+            assertEquals(1, childStateChanged)
+
+            parentStateMachine.dispatch(TestAction.A2) // dispatch Action to child state machine
+            assertEquals(TestState.GenericState("", 2), awaitItem()) // state change because of A2
+            assertEquals( 1, childA1Handeld)
+            assertEquals(2, childStateChanged)
+
+
+            parentStateMachine.dispatch(TestAction.A2) // dispatch Action to child state machine
+            assertEquals(TestState.GenericState("", 3), awaitItem()) // state change because of A2
+            assertEquals( 2, childA1Handeld)
+            assertEquals( 3, childStateChanged)
+
+            parentStateMachine.dispatch(TestAction.A3) // dispatch Action to parent state machine, causes state change
+            assertEquals(TestState.S3, awaitItem())
+
+            // Child state machine should have stopped because we are in S3 state
+            parentStateMachine.dispatchAsync(TestAction.A2) // should not be handled by child statemaching
+            delay(50)
+            // verify child state machine had no interactions
+            assertEquals( 2, childA1Handeld)
+            assertEquals( 3, childStateChanged)
+
+            expectNoEvents()
+        }
+
+    }
+
 /*
     @Test
     fun `delegate to child sub statemachine while in state`() = suspendTest {

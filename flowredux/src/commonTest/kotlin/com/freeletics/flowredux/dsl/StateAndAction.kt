@@ -3,6 +3,7 @@ package com.freeletics.flowredux.dsl
 sealed class TestAction {
     object A1 : TestAction()
     object A2 : TestAction()
+    object A3 : TestAction()
 }
 
 sealed class TestState {
