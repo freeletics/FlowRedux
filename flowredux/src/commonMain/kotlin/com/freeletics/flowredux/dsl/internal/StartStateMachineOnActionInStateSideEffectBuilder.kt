@@ -15,6 +15,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -34,72 +35,75 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
 
-            actions.whileInState(isInState, getState) { inStateAction ->
+            actions.onEach { println("actions $it") }.whileInState(isInState, getState) { inStateAction ->
                 channelFlow<Action<S, A>> {
                     val subStateMachinesMap = StateMachinesMap<SubStateMachineState, SubStateMachineAction, ActionThatTriggeredStartingStateMachine>()
                     val subStateMachinesMapMutex = Mutex()
 
-                    inStateAction.collect { action ->
-                        // collect upstream
-                        when (action) {
-                            is ChangeStateAction,
-                            is InitialStateAction,
-                            -> {
-                                // Nothing needs to be done, these Actions are not interesting for
-                                // this operator, so we can just safely ignore them
-                            }
-                            is ExternalWrappedAction<*, *> ->
-                                runOnlyIfInInputState(getState, isInState) { currentState ->
+                    inStateAction
+                        .onEach { println("onEach $it ${getState()}") }
+                        .collect { action ->
+                            // collect upstream
 
-                                    if (subActionClass.isInstance(action.action)) {
-                                        val actionThatStartsStateMachine =
-                                            action.action as ActionThatTriggeredStartingStateMachine
+                            when (action) {
+                                is ChangeStateAction,
+                                is InitialStateAction,
+                                -> {
+                                    // Nothing needs to be done, these Actions are not interesting for
+                                    // this operator, so we can just safely ignore them
+                                }
+                                is ExternalWrappedAction<*, *> ->
+                                    runOnlyIfInInputState(getState, isInState) { currentState ->
 
-                                        val stateMachine = subStateMachineFactory(
-                                            actionThatStartsStateMachine, currentState
-                                        )
+                                        if (subActionClass.isInstance(action.action)) {
+                                            val actionThatStartsStateMachine =
+                                                action.action as ActionThatTriggeredStartingStateMachine
 
-                                        subStateMachinesMapMutex.withLock {
+                                            val stateMachine = subStateMachineFactory(
+                                                actionThatStartsStateMachine, currentState
+                                            )
 
-                                            // Launch substatemachine
-                                            val job = coroutineScope {
-                                                launch {
-                                                    stateMachine.state.collect { subStateMachineState ->
-                                                        runOnlyIfInInputState(getState, isInState) { parentState ->
-                                                            send(
-                                                                ChangeStateAction(
-                                                                    runReduceOnlyIf = isInState,
-                                                                    changeState = stateMapper(parentState, subStateMachineState)
+                                            subStateMachinesMapMutex.withLock {
+
+                                                // Launch substatemachine
+                                                val job = coroutineScope {
+                                                    launch {
+                                                        stateMachine.state.collect { subStateMachineState ->
+                                                            runOnlyIfInInputState(getState, isInState) { parentState ->
+                                                                send(
+                                                                    ChangeStateAction(
+                                                                        runReduceOnlyIf = isInState,
+                                                                        changeState = stateMapper(parentState, subStateMachineState)
+                                                                    )
                                                                 )
-                                                            )
+                                                            }
                                                         }
                                                     }
                                                 }
+
+                                                subStateMachinesMap.add(
+                                                    actionThatStartedStateMachine = actionThatStartsStateMachine,
+                                                    stateMachine = stateMachine,
+                                                    job = job
+                                                )
                                             }
 
-                                            subStateMachinesMap.add(
-                                                actionThatStartedStateMachine = actionThatStartsStateMachine,
-                                                stateMachine = stateMachine,
-                                                job = job
-                                            )
-                                        }
-
-                                    } else {
-                                        // a regular action that needs to be forwarded
-                                        // to the active sub state machine
-                                        subStateMachinesMapMutex.withLock {
-                                            // TODO should this be launched in its own coroutine?
-                                            subStateMachinesMap.forEachStateMachine { stateMachine ->
-                                                println("Dispatching ${action.action}")
-                                                stateMachine.dispatch(
-                                                    actionMapper(action.action as A)
-                                                )
+                                        } else {
+                                            // a regular action that needs to be forwarded
+                                            // to the active sub state machine
+                                            subStateMachinesMapMutex.withLock {
+                                                // TODO should this be launched in its own coroutine?
+                                                subStateMachinesMap.forEachStateMachine { stateMachine ->
+                                                    println("Dispatching ${action.action}")
+                                                    stateMachine.dispatch(
+                                                        actionMapper(action.action as A)
+                                                    )
+                                                }
                                             }
                                         }
                                     }
-                                }
+                            }
                         }
-                    }
                 }
             }
         }

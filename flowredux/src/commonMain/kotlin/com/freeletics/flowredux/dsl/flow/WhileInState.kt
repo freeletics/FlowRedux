@@ -30,6 +30,7 @@ internal fun <S, A> Flow<Action<S, A>>.whileInState(
                 }
             }
             // send the action to the transform because the state machin is in state
+            println("While in state $value")
             currentChannel!!.send(value)
         } else {
             // closing the channel with an exception will cancel the FlowCollector that
