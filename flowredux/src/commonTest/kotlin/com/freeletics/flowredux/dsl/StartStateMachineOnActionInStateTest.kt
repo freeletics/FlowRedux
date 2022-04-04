@@ -38,13 +38,20 @@ class StartStateMachineOnActionInStateTest {
     @Test
     fun `actions are forwarded to the sub statemachine while in state`() = suspendTest {
         var childStateChanged = 0
-        var childA1Handeld = 0
+        var childS3A2Handeld = 0
+        var childS1A2Handeld = 0
         val child = ChildStateMachine(initialState = TestState.S3) {
             inState<TestState.S3> {
                 on<TestAction.A2> { _, _ ->
                     println("Received A2")
-                    childA1Handeld++
+                    childS3A2Handeld++
                     OverrideState(TestState.S1) // Doesn't really matter which state, parent ignores it anyway
+                }
+            }
+            inState<TestState.S1> {
+                on<TestAction.A2> {_, _ ->
+                    childS1A2Handeld++
+                    OverrideState(TestState.S3)
                 }
             }
         }
@@ -72,13 +79,15 @@ class StartStateMachineOnActionInStateTest {
             parentStateMachine.dispatch(TestAction.A2) // dispatch Action to child state machine
             println("parent has dispatched A2")
             assertEquals(TestState.GenericState("", 2), awaitItem()) // state change because of A2
-            assertEquals(1, childA1Handeld)
+            assertEquals(1, childS3A2Handeld)
+            assertEquals(0, childS1A2Handeld)
             assertEquals(2, childStateChanged)
 
 
             parentStateMachine.dispatch(TestAction.A2) // dispatch Action to child state machine
             assertEquals(TestState.GenericState("", 3), awaitItem()) // state change because of A2
-            assertEquals(2, childA1Handeld)
+            assertEquals(1, childS3A2Handeld)
+            assertEquals(1, childS1A2Handeld)
             assertEquals(3, childStateChanged)
 
             parentStateMachine.dispatch(TestAction.A3) // dispatch Action to parent state machine, causes state change
@@ -88,7 +97,8 @@ class StartStateMachineOnActionInStateTest {
             parentStateMachine.dispatchAsync(TestAction.A2) // should not be handled by child statemaching
             delay(50)
             // verify child state machine had no interactions
-            assertEquals(2, childA1Handeld)
+            assertEquals(1, childS3A2Handeld)
+            assertEquals(1, childS1A2Handeld)
             assertEquals(3, childStateChanged)
 
             expectNoEvents()
