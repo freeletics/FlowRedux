@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 internal fun <S, A> Flow<Action<S, A>>.whileInState(
@@ -15,9 +16,11 @@ internal fun <S, A> Flow<Action<S, A>>.whileInState(
     transform: suspend (Flow<Action<S, A>>) -> Flow<Action<S, A>>,
 ) = channelFlow {
     var currentChannel: Channel<Action<S, A>>? = null
+    println("WhileInState Collect ${this@whileInState}")
 
     // collect upstream
     collect { value ->
+        println("WhileInState ${this@whileInState} $value ${isInState(getState())}")
         if (isInState(getState())) {
             // if there is no Channel yet the state machine just entered the state
             if (currentChannel == null) {
@@ -26,11 +29,12 @@ internal fun <S, A> Flow<Action<S, A>>.whileInState(
                     // transform actions sent to the the channel with the given function
                     // and emit the result downstream
                     transform(currentChannel!!.consumeAsFlow())
+                        .onEach { println("WhileInState ${this@whileInState} in state forwards $it") }
                         .collect { send(it) }
                 }
             }
-            // send the action to the transform because the state machin is in state
-            println("While in state $value")
+            // send the action to the transform because the state machine is in state
+            println("WhileInState ${this@whileInState} send to channel $value")
             currentChannel!!.send(value)
         } else {
             // closing the channel with an exception will cancel the FlowCollector that

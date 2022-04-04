@@ -63,43 +63,46 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                                 actionThatStartsStateMachine, currentState
                                             )
 
-                                            subStateMachinesMapMutex.withLock {
-
-                                                // Launch substatemachine
-                                                val job = coroutineScope {
-                                                    launch {
-                                                        stateMachine.state.collect { subStateMachineState ->
-                                                            runOnlyIfInInputState(getState, isInState) { parentState ->
-                                                                send(
-                                                                    ChangeStateAction(
-                                                                        runReduceOnlyIf = isInState,
-                                                                        changeState = stateMapper(parentState, subStateMachineState)
-                                                                    )
-                                                                )
-                                                            }
-                                                        }
+                                            // Launch substatemachine
+                                            val j = launch {
+                                                stateMachine.state.collect { subStateMachineState ->
+                                                    runOnlyIfInInputState(getState, isInState) { parentState ->
+                                                        send(
+                                                            ChangeStateAction(
+                                                                runReduceOnlyIf = isInState,
+                                                                changeState = stateMapper(parentState, subStateMachineState)
+                                                            )
+                                                        )
                                                     }
                                                 }
-
+                                            }
+                                            println("job started $j")
+                                            subStateMachinesMapMutex.withLock {
                                                 subStateMachinesMap.add(
                                                     actionThatStartedStateMachine = actionThatStartsStateMachine,
                                                     stateMachine = stateMachine,
-                                                    job = job
+                                                    job = j
                                                 )
                                             }
+                                            println("Added to map")
 
                                         } else {
                                             // a regular action that needs to be forwarded
                                             // to the active sub state machine
+                                            println("Other Action to dispatch to substatemachine $action")
                                             subStateMachinesMapMutex.withLock {
                                                 // TODO should this be launched in its own coroutine?
                                                 subStateMachinesMap.forEachStateMachine { stateMachine ->
                                                     println("Dispatching ${action.action}")
-                                                    stateMachine.dispatch(
-                                                        actionMapper(action.action as A)
-                                                    )
+                                                    launch {
+                                                        stateMachine.dispatch(
+                                                            actionMapper(action.action as A)
+                                                        )
+                                                    }
+                                                    println("Adter dispatched ${action.action}")
                                                 }
                                             }
+                                            println("After Mutex closed")
                                         }
                                     }
                             }
