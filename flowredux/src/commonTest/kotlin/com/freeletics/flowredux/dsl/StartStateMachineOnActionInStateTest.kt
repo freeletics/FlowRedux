@@ -15,7 +15,7 @@ class StartStateMachineOnActionInStateTest {
     @Test
     fun `child statemachine emits initial state to parent state machine`() = suspendTest {
         var childStateChanged = 0
-        val child = ChildStateMachine(initialState = TestState.S3) { }
+        val child = ChildStateMachine(initialState = TestState.S3)
         val parentStateMachine = StateMachine {
             inState<TestState.Initial> {
                 onActionStartStateMachine<TestAction.A1, TestState>(child) { _, childState ->
@@ -403,7 +403,7 @@ class StartStateMachineOnActionInStateTest {
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 private fun ChildStateMachine(
     initialState: TestState = TestState.Initial,
-    builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit,
+    builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit = { },
 ): FlowReduxStateMachine<TestState, TestAction> {
     return object : FlowReduxStateMachine<TestState, TestAction>(initialState) {
 
