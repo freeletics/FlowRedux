@@ -13,4 +13,6 @@ sealed class TestState {
     object S3 : TestState()
 
     data class GenericState(val aString : String, val anInt : Int) : TestState()
+
+    data class CounterState(val counter : Int) : TestState()
 }

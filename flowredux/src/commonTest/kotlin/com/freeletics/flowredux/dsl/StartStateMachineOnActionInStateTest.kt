@@ -36,7 +36,7 @@ class StartStateMachineOnActionInStateTest {
     }
 
     @Test
-    fun `actions are forwarded to the sub statemachine while in state`() = suspendTest {
+    fun `actions are forwarded to the sub statemachine ONLY while in state`() = suspendTest {
         var childStateChanged = 0
         var childS3A2Handeld = 0
         var childS1A2Handeld = 0
@@ -48,18 +48,18 @@ class StartStateMachineOnActionInStateTest {
                 }
             }
             inState<TestState.S1> {
-                on<TestAction.A2> {_, _ ->
+                on<TestAction.A2> { _, _ ->
                     childS1A2Handeld++
                     OverrideState(TestState.S3)
                 }
             }
         }
 
-        val parentStateMachine = StateMachine(initialState = TestState.GenericState("", 0)) {
-            inState<TestState.GenericState> {
+        val parentStateMachine = StateMachine(initialState = TestState.CounterState(0)) {
+            inState<TestState.CounterState> {
                 onActionStartStateMachine<TestAction.A1, TestState>(child) { _, _ ->
                     childStateChanged++
-                    MutateState<TestState.GenericState, TestState> { copy(anInt = this.anInt + 1) }
+                    MutateState<TestState.CounterState, TestState> { copy(counter = this.counter + 1) }
                 }
 
                 on<TestAction.A3> { _, _ ->
@@ -68,21 +68,21 @@ class StartStateMachineOnActionInStateTest {
             }
         }
 
-        parentStateMachine.state.test(10_000) {
-            assertEquals(TestState.GenericState("", 0), awaitItem()) // parent initial state
+        parentStateMachine.state.test {
+            assertEquals(TestState.CounterState(0), awaitItem()) // parent initial state
             parentStateMachine.dispatch(TestAction.A1) // starts child
-            assertEquals(TestState.GenericState("", 1), awaitItem()) // initial state of substatemachine caused this change
+            assertEquals(TestState.CounterState(1), awaitItem()) // initial state of substatemachine caused this change
             assertEquals(1, childStateChanged)
 
             parentStateMachine.dispatch(TestAction.A2) // dispatch Action to child state machine
-            assertEquals(TestState.GenericState("", 2), awaitItem()) // state change because of A2
+            assertEquals(TestState.CounterState(2), awaitItem()) // state change because of A2
             assertEquals(1, childS3A2Handeld)
             assertEquals(0, childS1A2Handeld)
             assertEquals(2, childStateChanged)
 
 
             parentStateMachine.dispatch(TestAction.A2) // dispatch Action to child state machine
-            assertEquals(TestState.GenericState("", 3), awaitItem()) // state change because of A2
+            assertEquals(TestState.CounterState( 3), awaitItem()) // state change because of A2
             assertEquals(1, childS3A2Handeld)
             assertEquals(1, childS1A2Handeld)
             assertEquals(3, childStateChanged)
