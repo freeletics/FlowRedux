@@ -43,7 +43,6 @@ class StartStateMachineOnActionInStateTest {
         val child = ChildStateMachine(initialState = TestState.S3) {
             inState<TestState.S3> {
                 on<TestAction.A2> { _, _ ->
-                    println("Received A2")
                     childS3A2Handeld++
                     OverrideState(TestState.S1) // Doesn't really matter which state, parent ignores it anyway
                 }
@@ -75,9 +74,7 @@ class StartStateMachineOnActionInStateTest {
             assertEquals(TestState.GenericState("", 1), awaitItem()) // initial state of substatemachine caused this change
             assertEquals(1, childStateChanged)
 
-            // BUG 👇 : dispatched but not consumed somehow
             parentStateMachine.dispatch(TestAction.A2) // dispatch Action to child state machine
-            println("parent has dispatched A2")
             assertEquals(TestState.GenericState("", 2), awaitItem()) // state change because of A2
             assertEquals(1, childS3A2Handeld)
             assertEquals(0, childS1A2Handeld)

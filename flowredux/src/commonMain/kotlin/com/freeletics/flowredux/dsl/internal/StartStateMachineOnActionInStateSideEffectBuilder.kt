@@ -13,7 +13,6 @@ import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -35,16 +34,14 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
 
-            actions.onEach { println("actions $it") }.whileInState(isInState, getState) { inStateAction ->
+            actions.whileInState(isInState, getState) { inStateAction ->
                 channelFlow<Action<S, A>> {
                     val subStateMachinesMap = StateMachinesMap<SubStateMachineState, SubStateMachineAction, ActionThatTriggeredStartingStateMachine>()
                     val subStateMachinesMapMutex = Mutex()
 
                     inStateAction
-                        .onEach { println("onEach $it ${getState()}") }
                         .collect { action ->
                             // collect upstream
-
                             when (action) {
                                 is ChangeStateAction,
                                 is InitialStateAction,
@@ -64,7 +61,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                             )
 
                                             // Launch substatemachine
-                                            val j = launch {
+                                            val job = launch {
                                                 stateMachine.state.collect { subStateMachineState ->
                                                     runOnlyIfInInputState(getState, isInState) { parentState ->
                                                         send(
@@ -76,33 +73,26 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                                     }
                                                 }
                                             }
-                                            println("job started $j")
                                             subStateMachinesMapMutex.withLock {
                                                 subStateMachinesMap.add(
                                                     actionThatStartedStateMachine = actionThatStartsStateMachine,
                                                     stateMachine = stateMachine,
-                                                    job = j
+                                                    job = job
                                                 )
                                             }
-                                            println("Added to map")
 
                                         } else {
                                             // a regular action that needs to be forwarded
                                             // to the active sub state machine
-                                            println("Other Action to dispatch to substatemachine $action")
                                             subStateMachinesMapMutex.withLock {
-                                                // TODO should this be launched in its own coroutine?
                                                 subStateMachinesMap.forEachStateMachine { stateMachine ->
-                                                    println("Dispatching ${action.action}")
                                                     launch {
                                                         stateMachine.dispatch(
                                                             actionMapper(action.action as A)
                                                         )
                                                     }
-                                                    println("Adter dispatched ${action.action}")
                                                 }
                                             }
-                                            println("After Mutex closed")
                                         }
                                     }
                             }

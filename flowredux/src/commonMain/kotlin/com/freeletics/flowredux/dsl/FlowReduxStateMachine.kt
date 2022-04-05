@@ -34,7 +34,6 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
 
         outputState = inputActions
             .receiveAsFlow()
-            .onEach { println("FlowReduxStateMachine $it") }
             .reduxStore(initialStateSupplier, specBlock)
             .onStart {
                 activeFlowCounter.incrementAndGet()
