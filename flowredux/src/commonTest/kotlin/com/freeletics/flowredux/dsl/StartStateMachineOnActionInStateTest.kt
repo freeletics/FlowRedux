@@ -15,7 +15,7 @@ class StartStateMachineOnActionInStateTest {
     @Test
     fun `child statemachine emits initial state to parent state machine`() = suspendTest {
         var childStateChanged = 0
-        val child = ChildStateMachine(initialState = TestState.S3)
+        val child = StateMachine(initialState = TestState.S3)
         val parentStateMachine = StateMachine {
             inState<TestState.Initial> {
                 onActionStartStateMachine<TestAction.A1, TestState>(child) { _, childState ->
@@ -28,12 +28,39 @@ class StartStateMachineOnActionInStateTest {
         parentStateMachine.state.test {
             assertEquals(TestState.Initial, awaitItem()) // parent initial state
             parentStateMachine.dispatch(TestAction.A1)
-            delay(50)
             assertEquals(TestState.S3, awaitItem()) // child initial state
             assertEquals(1, childStateChanged)
             expectNoEvents()
         }
     }
+
+    @Test
+    fun `child state machine stops after leaving While In State`() = suspendTest {
+        var childStateChanged = 0
+        val child = StateMachine(initialState = TestState.S3)
+        val parentStateMachine = StateMachine {
+            inState<TestState.Initial> {
+                onActionStartStateMachine<TestAction.A1, TestState>(child) { _, _ ->
+                    childStateChanged++
+                    OverrideState(TestState.S1)
+                }
+            }
+        }
+
+
+        parentStateMachine.state.test {
+            assertEquals(TestState.Initial, awaitItem()) // parent initial state
+            assertEquals(child.stateFlowStarted, 0)
+            assertEquals(child.stateFlowCompleted, 0)
+            parentStateMachine.dispatch(TestAction.A1)
+            assertEquals(TestState.S1, awaitItem()) // child initial state causes state transition
+            assertEquals(child.stateFlowStarted, 1)
+            assertEquals(child.stateFlowCompleted, 1)
+            assertEquals(1, childStateChanged)
+            expectNoEvents()
+        }
+    }
+
 
     @Test
     fun `actions are forwarded to the sub statemachine and sub state is propagated back ONLY while in state`() = suspendTest {
@@ -42,7 +69,7 @@ class StartStateMachineOnActionInStateTest {
         var childS1A2Handled = 0
         val recordedSubStates = mutableListOf<TestState>()
 
-        val child = ChildStateMachine(initialState = TestState.S3) {
+        val child = StateMachine(initialState = TestState.S3) {
             inState<TestState.S3> {
                 on<TestAction.A2> { _, _ ->
                     childS3A2Handeld++
@@ -84,7 +111,6 @@ class StartStateMachineOnActionInStateTest {
             assertEquals(0, childS1A2Handled)
             assertEquals(2, childStateChanged)
             assertEquals<List<TestState>>(listOf(TestState.S3, TestState.S1), recordedSubStates)
-
 
 
             parentStateMachine.dispatch(TestAction.A2) // dispatch Action to child state machine
@@ -406,17 +432,4 @@ class StartStateMachineOnActionInStateTest {
         }
 
  */
-}
-
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-private fun ChildStateMachine(
-    initialState: TestState = TestState.Initial,
-    builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit = { },
-): FlowReduxStateMachine<TestState, TestAction> {
-    return object : FlowReduxStateMachine<TestState, TestAction>(initialState) {
-
-        init {
-            spec(builderBlock)
-        }
-    }
 }
