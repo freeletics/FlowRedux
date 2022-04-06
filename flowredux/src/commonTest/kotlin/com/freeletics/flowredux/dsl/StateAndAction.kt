@@ -4,6 +4,7 @@ sealed class TestAction {
     object A1 : TestAction()
     object A2 : TestAction()
     object A3 : TestAction()
+    data class A4(val i : Int) : TestAction()
 }
 
 sealed class TestState {

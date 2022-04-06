@@ -1,6 +1,7 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
+import com.freeletics.flowredux.dsl.internal.Action
 import com.freeletics.flowredux.suspendTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -60,7 +61,6 @@ class StartStateMachineOnActionInStateTest {
             expectNoEvents()
         }
     }
-
 
     @Test
     fun `actions are forwarded to the sub statemachine and sub state is propagated back ONLY while in state`() = suspendTest {
@@ -135,6 +135,58 @@ class StartStateMachineOnActionInStateTest {
             expectNoEvents()
         }
 
+    }
+
+    @Test
+    fun `sub statmachine factory is invoked on re-enter and action and state mapper are invoked`() = suspendTest {
+
+        val actionMapperRecordings = mutableListOf<TestAction>()
+        val factoryParamsRecordings = mutableListOf<Pair<TestAction, TestState>>()
+        val stateMapperRecordings = mutableListOf<Pair<TestState, TestState>>()
+
+        val child = StateMachine(initialState = TestState.S1) {
+            inState<TestState.S1> {
+                on<TestAction.A2> { _, _ -> OverrideState(TestState.S2) }
+            }
+        }
+        val parent = StateMachine(initialState = TestState.CounterState(0)) {
+            inState<TestState.CounterState> {
+                onActionStartStateMachine<TestAction.A4, TestState, TestAction>(
+                    stateMachineFactory = { action, inputState ->
+                        factoryParamsRecordings += pairOf(action, inputState)
+                        child
+                    },
+                    actionMapper = {
+                        actionMapperRecordings += it
+                        it
+                    },
+                    stateMapper = { inputState, subState ->
+                        stateMapperRecordings += pairOf(inputState, subState)
+                        if (subState is TestState.S2)
+                            OverrideState(TestState.S2)
+                        else
+                            MutateState<TestState.CounterState, TestState> {
+                                copy(counter = this.counter + 1)
+                            }
+                    }
+                )
+            }
+        }
+
+        parent.state.test {
+            assertEquals(TestState.CounterState(0), awaitItem()) // initial state
+            assertEquals(emptyList(), factoryParamsRecordings) // factory should not have been invoked
+            assertEquals(child.stateFlowStarted, 0)
+
+            parent.dispatch(TestAction.A4(1))
+            assertEquals(TestState.CounterState(1), awaitItem()) // inital state of child
+            assertEquals(
+                listOf<Pair<TestAction, TestState>>(
+                    pairOf(TestAction.A4(1), TestState.CounterState(0))
+                ), factoryParamsRecordings) // factory should not have been invoked
+            assertEquals(child.stateFlowStarted, 1)
+            assertEquals(child.stateFlowCompleted, 0)
+        }
     }
 
 /*
@@ -433,3 +485,5 @@ class StartStateMachineOnActionInStateTest {
 
  */
 }
+
+private fun <A, B> pairOf(a: A, b: B): Pair<A, B> = a to b
