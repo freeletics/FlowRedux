@@ -36,10 +36,12 @@ class StartStateMachineOnActionInStateTest {
     }
 
     @Test
-    fun `actions are forwarded to the sub statemachine ONLY while in state`() = suspendTest {
+    fun `actions are forwarded to the sub statemachine and sub state is propagated back ONLY while in state`() = suspendTest {
         var childStateChanged = 0
         var childS3A2Handeld = 0
-        var childS1A2Handeld = 0
+        var childS1A2Handled = 0
+        val recordedSubStates = mutableListOf<TestState>()
+
         val child = ChildStateMachine(initialState = TestState.S3) {
             inState<TestState.S3> {
                 on<TestAction.A2> { _, _ ->
@@ -49,7 +51,7 @@ class StartStateMachineOnActionInStateTest {
             }
             inState<TestState.S1> {
                 on<TestAction.A2> { _, _ ->
-                    childS1A2Handeld++
+                    childS1A2Handled++
                     OverrideState(TestState.S3)
                 }
             }
@@ -57,8 +59,9 @@ class StartStateMachineOnActionInStateTest {
 
         val parentStateMachine = StateMachine(initialState = TestState.CounterState(0)) {
             inState<TestState.CounterState> {
-                onActionStartStateMachine<TestAction.A1, TestState>(child) { _, _ ->
+                onActionStartStateMachine<TestAction.A1, TestState>(child) { _, childState ->
                     childStateChanged++
+                    recordedSubStates += childState
                     MutateState<TestState.CounterState, TestState> { copy(counter = this.counter + 1) }
                 }
 
@@ -73,19 +76,24 @@ class StartStateMachineOnActionInStateTest {
             parentStateMachine.dispatch(TestAction.A1) // starts child
             assertEquals(TestState.CounterState(1), awaitItem()) // initial state of substatemachine caused this change
             assertEquals(1, childStateChanged)
+            assertEquals<List<TestState>>(listOf(TestState.S3), recordedSubStates)
 
             parentStateMachine.dispatch(TestAction.A2) // dispatch Action to child state machine
             assertEquals(TestState.CounterState(2), awaitItem()) // state change because of A2
             assertEquals(1, childS3A2Handeld)
-            assertEquals(0, childS1A2Handeld)
+            assertEquals(0, childS1A2Handled)
             assertEquals(2, childStateChanged)
+            assertEquals<List<TestState>>(listOf(TestState.S3, TestState.S1), recordedSubStates)
+
 
 
             parentStateMachine.dispatch(TestAction.A2) // dispatch Action to child state machine
-            assertEquals(TestState.CounterState( 3), awaitItem()) // state change because of A2
+            assertEquals(TestState.CounterState(3), awaitItem()) // state change because of A2
             assertEquals(1, childS3A2Handeld)
-            assertEquals(1, childS1A2Handeld)
+            assertEquals(1, childS1A2Handled)
             assertEquals(3, childStateChanged)
+            assertEquals<List<TestState>>(listOf(TestState.S3, TestState.S1, TestState.S3), recordedSubStates)
+
 
             parentStateMachine.dispatch(TestAction.A3) // dispatch Action to parent state machine, causes state change
             assertEquals(TestState.S3, awaitItem())
@@ -95,7 +103,7 @@ class StartStateMachineOnActionInStateTest {
             delay(50)
             // verify child state machine had no interactions
             assertEquals(1, childS3A2Handeld)
-            assertEquals(1, childS1A2Handeld)
+            assertEquals(1, childS1A2Handled)
             assertEquals(3, childStateChanged)
 
             expectNoEvents()
