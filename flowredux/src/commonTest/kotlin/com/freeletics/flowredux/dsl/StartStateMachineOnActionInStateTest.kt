@@ -285,6 +285,23 @@ class StartStateMachineOnActionInStateTest {
                 stateMapperRecordings
             )
 
+            //
+            // Dispatch an action that is forwarded to child state machine
+            //
+            parent.dispatch(TestAction.A3)
+            assertEquals(TestState.CounterState(12), awaitItem())
+            // state mapper check
+            assertEquals(listOf<Pair<TestState, TestState>>(
+                pairOf(TestState.CounterState(10), TestState.S1),
+                pairOf(TestState.CounterState(11), TestState.S2)),
+                stateMapperRecordings
+            )
+            // action mapper checks
+            assertEquals(listOf<TestAction>(TestAction.A3), actionMapperRecordings)
+            // factory checks
+            assertEquals(1, factoryParamsRecordings.size) // factory not invoked
+            assertEquals(child.stateFlowStarted, 2)
+            assertEquals(child.stateFlowCompleted, 1)
         }
     }
 
