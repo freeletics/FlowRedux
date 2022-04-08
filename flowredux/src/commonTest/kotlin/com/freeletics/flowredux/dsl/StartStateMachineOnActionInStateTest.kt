@@ -155,6 +155,9 @@ class StartStateMachineOnActionInStateTest {
             }
         }
         val parent = StateMachine(initialState = initialState) {
+            inState<TestState.S3> {
+                on<TestAction.A1> { _, _ -> OverrideState(TestState.CounterState(10)) }
+            }
             inState<TestState.CounterState> {
                 onActionStartStateMachine<TestAction.A4, TestState, TestAction>(
                     stateMachineFactory = { action, inputState ->
@@ -167,7 +170,7 @@ class StartStateMachineOnActionInStateTest {
                     },
                     stateMapper = { inputState, subState ->
                         stateMapperRecordings += pairOf(inputState, subState)
-                       if (subState is TestState.S3)
+                        if (subState is TestState.S3)
                             OverrideState(TestState.S3)
                         else
                             MutateState<TestState.CounterState, TestState> {
@@ -235,12 +238,52 @@ class StartStateMachineOnActionInStateTest {
                 stateMapperRecordings
             )
             // action mapper checks
-            assertEquals(listOf<TestAction>(TestAction.A3, TestAction.A2), actionMapperRecordings)
+            assertEquals(listOf(TestAction.A3, TestAction.A2), actionMapperRecordings)
             // factory checks
             assertEquals(1, factoryParamsRecordings.size) // factory not invoked
             // child should be canceled because inState condition doesnt hold anymore
             assertEquals(child.stateFlowStarted, 1)
             assertEquals(child.stateFlowCompleted, 1)
+
+            //
+            // Clear up stuff for validation of next re-enterance and child state machine starts
+            //
+            factoryParamsRecordings.clear()
+            actionMapperRecordings.clear()
+            stateMapperRecordings.clear()
+
+            //
+            // Re-enter the state again
+            //
+            parent.dispatch(TestAction.A1)
+            assertEquals(TestState.CounterState(10), awaitItem())
+            // check for actions (should not be dispatched to child)
+            assertEquals(emptyList(), actionMapperRecordings)
+            // factory checks
+            assertEquals(emptyList(), factoryParamsRecordings) // factory not invoked
+            // child should not have changed since before
+            assertEquals(child.stateFlowStarted, 1)
+            assertEquals(child.stateFlowCompleted, 1)
+
+            //
+            // Dispatch action to start child state machine
+            //
+            parent.dispatch(TestAction.A4(2))
+            assertEquals(TestState.CounterState(11), awaitItem()) // initial emission of child
+            // check factory
+            assertEquals(  // factory should have been invoked
+                listOf<Pair<TestAction, TestState>>(
+                    pairOf(TestAction.A4(2), TestState.CounterState(10))
+                ), factoryParamsRecordings)
+            assertEquals(child.stateFlowStarted, 2)
+            assertEquals(child.stateFlowCompleted, 1)
+            // check action mapper (not changed since last check)
+            assertEquals(emptyList(), actionMapperRecordings)
+            // check state mapper
+            assertEquals(listOf<Pair<TestState, TestState>>(
+                pairOf(TestState.CounterState(10), TestState.S1)),
+                stateMapperRecordings
+            )
 
         }
     }
