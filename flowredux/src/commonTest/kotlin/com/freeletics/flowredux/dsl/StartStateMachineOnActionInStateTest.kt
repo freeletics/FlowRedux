@@ -143,13 +143,15 @@ class StartStateMachineOnActionInStateTest {
         val actionMapperRecordings = mutableListOf<TestAction>()
         val factoryParamsRecordings = mutableListOf<Pair<TestAction, TestState>>()
         val stateMapperRecordings = mutableListOf<Pair<TestState, TestState>>()
+        val initialState = TestState.CounterState(0)
 
         val child = StateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
-                on<TestAction.A2> { _, _ -> OverrideState(TestState.S2) }
+                on<TestAction.A2> { _, _ -> println("A2 handeled"); OverrideState(TestState.S2) }
+                on<TestAction.A3> { _, _ -> println("A3 handeled"); OverrideState(TestState.S3) }
             }
         }
-        val parent = StateMachine(initialState = TestState.CounterState(0)) {
+        val parent = StateMachine(initialState = initialState) {
             inState<TestState.CounterState> {
                 onActionStartStateMachine<TestAction.A4, TestState, TestAction>(
                     stateMachineFactory = { action, inputState ->
@@ -158,34 +160,89 @@ class StartStateMachineOnActionInStateTest {
                     },
                     actionMapper = {
                         actionMapperRecordings += it
+                        println("mapping $it")
                         it
                     },
                     stateMapper = { inputState, subState ->
                         stateMapperRecordings += pairOf(inputState, subState)
-                        if (subState is TestState.S2)
+                        println("Sub $subState")
+                        val ns = if (subState is TestState.S2)
                             OverrideState(TestState.S2)
                         else
                             MutateState<TestState.CounterState, TestState> {
                                 copy(counter = this.counter + 1)
                             }
+                        println("New $ns")
+                        ns
                     }
                 )
             }
         }
 
         parent.state.test {
+            //
+            // Initial setup an initial state emission checks
+            //
             assertEquals(TestState.CounterState(0), awaitItem()) // initial state
             assertEquals(emptyList(), factoryParamsRecordings) // factory should not have been invoked
             assertEquals(child.stateFlowStarted, 0)
 
+            //
+            // Dispatch action to start child state machine and check factory
+            //
             parent.dispatch(TestAction.A4(1))
-            assertEquals(TestState.CounterState(1), awaitItem()) // inital state of child
-            assertEquals(
+            assertEquals(TestState.CounterState(1), awaitItem()) // initial emission of child
+            assertEquals(  // factory should have been invoked
                 listOf<Pair<TestAction, TestState>>(
-                    pairOf(TestAction.A4(1), TestState.CounterState(0))
-                ), factoryParamsRecordings) // factory should not have been invoked
+                    pairOf(TestAction.A4(1), initialState)
+                ), factoryParamsRecordings)
             assertEquals(child.stateFlowStarted, 1)
             assertEquals(child.stateFlowCompleted, 0)
+            assertEquals(emptyList(), actionMapperRecordings)
+            assertEquals(listOf<Pair<TestState, TestState>>(
+                pairOf(initialState, TestState.S1)),
+                stateMapperRecordings
+            )
+
+            //
+            // Dispatch an action that is forwarded to child state machine
+            //
+            parent.dispatch(TestAction.A3)
+            assertEquals(TestState.CounterState(2), awaitItem())
+            // state mapper check
+            assertEquals(listOf<Pair<TestState, TestState>>(
+                pairOf(initialState, TestState.S1),
+                pairOf(TestState.CounterState(1), TestState.S3)),
+                stateMapperRecordings
+            )
+            // action mapper checks
+            assertEquals(listOf<TestAction>(TestAction.A3), actionMapperRecordings)
+            // factory checks
+            assertEquals(1, factoryParamsRecordings.size) // factory not invoked
+            assertEquals(child.stateFlowStarted, 1)
+            assertEquals(child.stateFlowCompleted, 0)
+
+            //
+            // Dispatch another action that is forwarded to child state machine which
+            // then also causes leaving the inState<CounterState> so sub child should be canceled
+            //
+            parent.dispatch(TestAction.A2)
+            assertEquals(TestState.S2, awaitItem())
+            // State mapper checks
+            assertEquals(listOf<Pair<TestState, TestState>>(
+                pairOf(initialState, TestState.S1),
+                pairOf(TestState.CounterState(1), TestState.S3),
+                pairOf(TestState.CounterState(1), TestState.S2)),
+                stateMapperRecordings
+            )
+            // action mapper checks
+            assertEquals(listOf<TestAction>(TestAction.A3, TestAction.A2), actionMapperRecordings)
+            // factory checks
+            assertEquals(1, factoryParamsRecordings.size) // factory not invoked
+            // child should be canceled because inState condition doesnt hold anymore
+            assertEquals(child.stateFlowStarted, 1)
+            assertEquals(child.stateFlowCompleted, 1)
+
         }
     }
 
