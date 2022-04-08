@@ -51,7 +51,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                 }
                                 is ExternalWrappedAction<*, *> ->
                                     runOnlyIfInInputState(getState, isInState) { currentState ->
-
+                                        // TODO take ExecutionPolicy into account
                                         if (subActionClass.isInstance(action.action)) {
                                             val actionThatStartsStateMachine =
                                                 action.action as ActionThatTriggeredStartingStateMachine
@@ -133,4 +133,7 @@ internal class StateMachinesMap<S : Any, A : Any, ActionThatTriggeredStartingSta
         }
     }
 
+    override fun toString(): String {
+        return "${stateMachinesAndJobsMap.size}-statemachines-${super.toString()}"
+    }
 }

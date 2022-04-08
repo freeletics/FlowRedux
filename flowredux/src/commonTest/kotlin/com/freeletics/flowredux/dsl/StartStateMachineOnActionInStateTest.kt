@@ -147,8 +147,11 @@ class StartStateMachineOnActionInStateTest {
 
         val child = StateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
-                on<TestAction.A2> { _, _ -> println("A2 handeled"); OverrideState(TestState.S2) }
-                on<TestAction.A3> { _, _ -> println("A3 handeled"); OverrideState(TestState.S3) }
+                on<TestAction.A3> { _, _ -> OverrideState(TestState.S2) }
+            }
+
+            inState<TestState.S2> {
+                on<TestAction.A2> { _, _ -> OverrideState(TestState.S3) }
             }
         }
         val parent = StateMachine(initialState = initialState) {
@@ -160,20 +163,16 @@ class StartStateMachineOnActionInStateTest {
                     },
                     actionMapper = {
                         actionMapperRecordings += it
-                        println("mapping $it")
                         it
                     },
                     stateMapper = { inputState, subState ->
                         stateMapperRecordings += pairOf(inputState, subState)
-                        println("Sub $subState")
-                        val ns = if (subState is TestState.S2)
-                            OverrideState(TestState.S2)
+                       if (subState is TestState.S3)
+                            OverrideState(TestState.S3)
                         else
                             MutateState<TestState.CounterState, TestState> {
                                 copy(counter = this.counter + 1)
                             }
-                        println("New $ns")
-                        ns
                     }
                 )
             }
@@ -212,7 +211,7 @@ class StartStateMachineOnActionInStateTest {
             // state mapper check
             assertEquals(listOf<Pair<TestState, TestState>>(
                 pairOf(initialState, TestState.S1),
-                pairOf(TestState.CounterState(1), TestState.S3)),
+                pairOf(TestState.CounterState(1), TestState.S2)),
                 stateMapperRecordings
             )
             // action mapper checks
@@ -227,12 +226,12 @@ class StartStateMachineOnActionInStateTest {
             // then also causes leaving the inState<CounterState> so sub child should be canceled
             //
             parent.dispatch(TestAction.A2)
-            assertEquals(TestState.S2, awaitItem())
+            assertEquals(TestState.S3, awaitItem())
             // State mapper checks
             assertEquals(listOf<Pair<TestState, TestState>>(
                 pairOf(initialState, TestState.S1),
-                pairOf(TestState.CounterState(1), TestState.S3),
-                pairOf(TestState.CounterState(1), TestState.S2)),
+                pairOf(TestState.CounterState(1), TestState.S2),
+                pairOf(TestState.CounterState(2), TestState.S3)),
                 stateMapperRecordings
             )
             // action mapper checks
@@ -245,7 +244,7 @@ class StartStateMachineOnActionInStateTest {
 
         }
     }
-    
+
 }
 
 private fun <A, B> pairOf(a: A, b: B): Pair<A, B> = a to b
