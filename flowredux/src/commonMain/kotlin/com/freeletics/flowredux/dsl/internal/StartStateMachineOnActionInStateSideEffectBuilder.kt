@@ -14,6 +14,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -36,7 +37,6 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
             actions.whileInState(isInState, getState) { inStateAction ->
                 channelFlow<Action<S, A>> {
                     val subStateMachinesMap = StateMachinesMap<SubStateMachineState, SubStateMachineAction, ActionThatTriggeredStartingStateMachine>()
-                    val subStateMachinesMapMutex = Mutex()
 
                     inStateAction
                         .collect { action ->
@@ -61,35 +61,33 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
 
                                             // Launch substatemachine
                                             val job = launch {
-                                                stateMachine.state.collect { subStateMachineState ->
-                                                    runOnlyIfInInputState(getState, isInState) { parentState ->
-                                                        send(
-                                                            ChangeStateAction(
-                                                                runReduceOnlyIf = isInState,
-                                                                changeState = stateMapper(parentState, subStateMachineState)
+                                                stateMachine.state
+                                                    .onCompletion { subStateMachinesMap.remove(stateMachine) }
+                                                    .collect { subStateMachineState ->
+                                                        runOnlyIfInInputState(getState, isInState) { parentState ->
+                                                            send(
+                                                                ChangeStateAction(
+                                                                    runReduceOnlyIf = isInState,
+                                                                    changeState = stateMapper(parentState, subStateMachineState)
+                                                                )
                                                             )
-                                                        )
+                                                        }
                                                     }
-                                                }
                                             }
-                                            subStateMachinesMapMutex.withLock {
-                                                subStateMachinesMap.add(
-                                                    actionThatStartedStateMachine = actionThatStartsStateMachine,
-                                                    stateMachine = stateMachine,
-                                                    job = job
-                                                )
-                                            }
+                                            subStateMachinesMap.cancelPreviousAndAddNew(
+                                                actionThatStartedStateMachine = actionThatStartsStateMachine,
+                                                stateMachine = stateMachine,
+                                                job = job
+                                            )
 
                                         } else {
                                             // a regular action that needs to be forwarded
                                             // to the active sub state machine
-                                            subStateMachinesMapMutex.withLock {
-                                                subStateMachinesMap.forEachStateMachine { stateMachine ->
-                                                    launch {
-                                                        stateMachine.dispatch(
-                                                            actionMapper(action.action as A)
-                                                        )
-                                                    }
+                                            subStateMachinesMap.forEachStateMachine { stateMachine ->
+                                                launch {
+                                                    stateMachine.dispatch(
+                                                        actionMapper(action.action as A)
+                                                    )
                                                 }
                                             }
                                         }
@@ -112,22 +110,39 @@ internal data class StateMachineAndJob<S : Any, A : Any>(
 @ExperimentalCoroutinesApi
 @FlowPreview
 internal class StateMachinesMap<S : Any, A : Any, ActionThatTriggeredStartingStateMachine : Any> {
-    private val stateMachinesAndJobsMap = LinkedHashMap<ActionThatTriggeredStartingStateMachine, MutableList<StateMachineAndJob<S, A>>>()
+    private val mutex = Mutex()
+    private val stateMachinesAndJobsMap = LinkedHashMap<ActionThatTriggeredStartingStateMachine, StateMachineAndJob<S, A>>()
 
-    fun add(actionThatStartedStateMachine: ActionThatTriggeredStartingStateMachine, stateMachine: FlowReduxStateMachine<S, A>, job: Job) {
-        var existingStateMachinesAndJobs: MutableList<StateMachineAndJob<S, A>>? = stateMachinesAndJobsMap[actionThatStartedStateMachine]
-        if (existingStateMachinesAndJobs == null) {
-            existingStateMachinesAndJobs = mutableListOf()
-            this.stateMachinesAndJobsMap[actionThatStartedStateMachine] = existingStateMachinesAndJobs
+    suspend fun cancelPreviousAndAddNew(actionThatStartedStateMachine: ActionThatTriggeredStartingStateMachine, stateMachine: FlowReduxStateMachine<S, A>, job: Job) {
+        mutex.withLock {
+            val existingStateMachinesAndJobs: StateMachineAndJob<S, A>? = stateMachinesAndJobsMap[actionThatStartedStateMachine]
+            existingStateMachinesAndJobs?.job?.cancel()
+
+            stateMachinesAndJobsMap[actionThatStartedStateMachine] = StateMachineAndJob(stateMachine = stateMachine, job = job)
         }
-
-        existingStateMachinesAndJobs.add(StateMachineAndJob(stateMachine = stateMachine, job = job))
     }
 
     suspend inline fun forEachStateMachine(crossinline block: suspend (FlowReduxStateMachine<S, A>) -> Unit) {
-        stateMachinesAndJobsMap.values.forEach { stateMachinesAnJobs ->
-            stateMachinesAnJobs.forEach {
-                block(it.stateMachine)
+        mutex.withLock {
+            stateMachinesAndJobsMap.values.forEach { stateMachineAndJob ->
+                block(stateMachineAndJob.stateMachine)
+            }
+        }
+    }
+
+    suspend fun remove(stateMachine: FlowReduxStateMachine<S, A>) {
+        // could be optimized for better runtime
+        mutex.withLock {
+            var key: ActionThatTriggeredStartingStateMachine? = null
+            for ((actionThatTriggeredStarting, stateMachineAndJob) in stateMachinesAndJobsMap) {
+                if (stateMachineAndJob.stateMachine === stateMachine) {
+                    key = actionThatTriggeredStarting
+                    break
+                }
+            }
+
+            if (key != null) {
+                stateMachinesAndJobsMap.remove(key)
             }
         }
     }
