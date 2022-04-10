@@ -5,7 +5,6 @@ package com.freeletics.flowredux.dsl.internal
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.ChangeState
-import com.freeletics.flowredux.dsl.ExecutionPolicy
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.flow.whileInState
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +14,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -36,7 +34,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
 
             actions.whileInState(isInState, getState) { inStateAction ->
                 channelFlow<Action<S, A>> {
-                    val subStateMachinesMap = StateMachinesMap<SubStateMachineState, SubStateMachineAction, ActionThatTriggeredStartingStateMachine>()
+                    val subStateMachinesMap = SubStateMachinesMap<SubStateMachineState, SubStateMachineAction, ActionThatTriggeredStartingStateMachine>()
 
                     inStateAction
                         .collect { action ->
@@ -98,51 +96,51 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
             }
         }
     }
-}
 
-@ExperimentalCoroutinesApi
-@FlowPreview
-internal data class StateMachineAndJob<S : Any, A : Any>(
-    val stateMachine: FlowReduxStateMachine<S, A>,
-    val job: Job,
-)
+    @ExperimentalCoroutinesApi
+    @FlowPreview
+    internal class SubStateMachinesMap<S : Any, A : Any, ActionThatTriggeredStartingStateMachine : Any> {
+        @ExperimentalCoroutinesApi
+        @FlowPreview
+        internal data class StateMachineAndJob<S : Any, A : Any>(
+            val stateMachine: FlowReduxStateMachine<S, A>,
+            val job: Job,
+        )
 
-@ExperimentalCoroutinesApi
-@FlowPreview
-internal class StateMachinesMap<S : Any, A : Any, ActionThatTriggeredStartingStateMachine : Any> {
-    private val mutex = Mutex()
-    private val stateMachinesAndJobsMap = LinkedHashMap<ActionThatTriggeredStartingStateMachine, StateMachineAndJob<S, A>>()
+        private val mutex = Mutex()
+        private val stateMachinesAndJobsMap = LinkedHashMap<ActionThatTriggeredStartingStateMachine, StateMachineAndJob<S, A>>()
 
-    suspend fun cancelPreviousAndAddNew(actionThatStartedStateMachine: ActionThatTriggeredStartingStateMachine, stateMachine: FlowReduxStateMachine<S, A>, job: Job) {
-        mutex.withLock {
-            val existingStateMachinesAndJobs: StateMachineAndJob<S, A>? = stateMachinesAndJobsMap[actionThatStartedStateMachine]
-            existingStateMachinesAndJobs?.job?.cancel()
+        suspend fun cancelPreviousAndAddNew(actionThatStartedStateMachine: ActionThatTriggeredStartingStateMachine, stateMachine: FlowReduxStateMachine<S, A>, job: Job) {
+            mutex.withLock {
+                val existingStateMachinesAndJobs: StateMachineAndJob<S, A>? = stateMachinesAndJobsMap[actionThatStartedStateMachine]
+                existingStateMachinesAndJobs?.job?.cancel()
 
-            stateMachinesAndJobsMap[actionThatStartedStateMachine] = StateMachineAndJob(stateMachine = stateMachine, job = job)
-        }
-    }
-
-    suspend inline fun forEachStateMachine(crossinline block: suspend (FlowReduxStateMachine<S, A>) -> Unit) {
-        mutex.withLock {
-            stateMachinesAndJobsMap.values.forEach { stateMachineAndJob ->
-                block(stateMachineAndJob.stateMachine)
+                stateMachinesAndJobsMap[actionThatStartedStateMachine] = StateMachineAndJob(stateMachine = stateMachine, job = job)
             }
         }
-    }
 
-    suspend fun remove(stateMachine: FlowReduxStateMachine<S, A>) {
-        // could be optimized for better runtime
-        mutex.withLock {
-            var key: ActionThatTriggeredStartingStateMachine? = null
-            for ((actionThatTriggeredStarting, stateMachineAndJob) in stateMachinesAndJobsMap) {
-                if (stateMachineAndJob.stateMachine === stateMachine) {
-                    key = actionThatTriggeredStarting
-                    break
+        suspend inline fun forEachStateMachine(crossinline block: suspend (FlowReduxStateMachine<S, A>) -> Unit) {
+            mutex.withLock {
+                stateMachinesAndJobsMap.values.forEach { stateMachineAndJob ->
+                    block(stateMachineAndJob.stateMachine)
                 }
             }
+        }
 
-            if (key != null) {
-                stateMachinesAndJobsMap.remove(key)
+        suspend fun remove(stateMachine: FlowReduxStateMachine<S, A>) {
+            // could be optimized for better runtime
+            mutex.withLock {
+                var key: ActionThatTriggeredStartingStateMachine? = null
+                for ((actionThatTriggeredStarting, stateMachineAndJob) in stateMachinesAndJobsMap) {
+                    if (stateMachineAndJob.stateMachine === stateMachine) {
+                        key = actionThatTriggeredStarting
+                        break
+                    }
+                }
+
+                if (key != null) {
+                    stateMachinesAndJobsMap.remove(key)
+                }
             }
         }
     }
