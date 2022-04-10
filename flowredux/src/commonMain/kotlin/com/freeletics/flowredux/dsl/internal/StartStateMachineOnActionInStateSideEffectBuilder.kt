@@ -28,7 +28,6 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
     private val stateMapper: (InputState, SubStateMachineState) -> ChangeState<S>,
     private val isInState: (S) -> Boolean,
     internal val subActionClass: KClass<out A>,
-    internal val executionPolicy: ExecutionPolicy,
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
@@ -131,9 +130,5 @@ internal class StateMachinesMap<S : Any, A : Any, ActionThatTriggeredStartingSta
                 block(it.stateMachine)
             }
         }
-    }
-
-    override fun toString(): String {
-        return "${stateMachinesAndJobsMap.size}-statemachines-${super.toString()}"
     }
 }

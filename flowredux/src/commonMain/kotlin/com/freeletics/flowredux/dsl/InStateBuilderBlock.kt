@@ -389,12 +389,10 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
 
     public inline fun <reified SubAction : A, SubStateMachineState : Any> onActionStartStateMachine(
         stateMachine: FlowReduxStateMachine<SubStateMachineState, A>,
-        executionPolicy: ExecutionPolicy = ExecutionPolicy.CANCEL_PREVIOUS,
         noinline stateMapper: (InputState, SubStateMachineState) -> ChangeState<S>,
     ) {
         onActionStartStateMachine(
             stateMachineFactory = { _: SubAction, _: InputState -> stateMachine },
-            executionPolicy = executionPolicy,
             actionMapper = { it },
             stateMapper = stateMapper
         )
@@ -402,12 +400,10 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
 
     public inline fun <reified SubAction : A, SubStateMachineState : Any> onActionStartStateMachine(
         noinline stateMachineFactory: (SubAction, InputState) -> FlowReduxStateMachine<SubStateMachineState, A>,
-        executionPolicy: ExecutionPolicy = ExecutionPolicy.CANCEL_PREVIOUS,
         noinline stateMapper: (InputState, SubStateMachineState) -> ChangeState<S>,
     ) {
         onActionStartStateMachine(
             stateMachineFactory = stateMachineFactory,
-            executionPolicy = executionPolicy,
             actionMapper = { it },
             stateMapper = stateMapper
         )
@@ -415,14 +411,12 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
 
     public inline fun <reified SubAction : A, SubStateMachineState : Any, SubStateMachineAction : Any> onActionStartStateMachine(
         noinline stateMachineFactory: (SubAction, InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
-        executionPolicy: ExecutionPolicy = ExecutionPolicy.CANCEL_PREVIOUS,
         noinline actionMapper: (A) -> SubStateMachineAction,
         noinline stateMapper: (InputState, SubStateMachineState) -> ChangeState<S>,
     ) {
         onActionStartStateMachine(
             actionClass = SubAction::class,
             stateMachineFactory = stateMachineFactory,
-            executionPolicy = executionPolicy,
             actionMapper = actionMapper,
             stateMapper = stateMapper
         )
@@ -431,7 +425,6 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     public fun <SubAction : A, SubStateMachineState : Any, SubStateMachineAction : Any> onActionStartStateMachine(
         actionClass: KClass<out SubAction>,
         stateMachineFactory: (SubAction, InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
-        executionPolicy: ExecutionPolicy,
         actionMapper: (A) -> SubStateMachineAction,
         stateMapper: (InputState, SubStateMachineState) -> ChangeState<S>,
     ) {
@@ -442,7 +435,6 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
             stateMapper = stateMapper,
             isInState = _isInState,
             subActionClass = actionClass,
-            executionPolicy = executionPolicy
         )
 
         _inStateSideEffectBuilders.add(builder)
