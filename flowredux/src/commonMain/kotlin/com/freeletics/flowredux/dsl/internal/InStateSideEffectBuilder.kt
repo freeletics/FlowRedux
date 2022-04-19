@@ -20,16 +20,18 @@ internal abstract class InStateSideEffectBuilder<InputState : S, S, A> {
         val currentState = getState()
         // only start if is in state condition is still true
         if (isInState(currentState)) {
-            try {
+            val inputState = try {
                 @Suppress("UNCHECKED_CAST")
-                val inputState = currentState as InputState
-                block(inputState)
+                currentState as InputState
             } catch (e: ClassCastException) {
                 // it is ok to to swallow the exception as if there is a typecast exception,
                 // then a state transition did happen between triggering this side effect (isInState condition)
                 // and actually executing this block. This is an expected behavior as it can happen in a
                 // concurrent state machine. Therefore just ignoring it is fine.
+                return
             }
+
+            block(inputState)
         }
     }
 }
