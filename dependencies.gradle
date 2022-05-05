@@ -22,7 +22,7 @@ ext.versions = [
         fragmentKtx            : '1.4.1',
         viewModelKtx           : '2.4.1',
 
-        material               : '1.5.0',
+        material               : '1.6.0',
         adapterDelegates       : '4.3.2',
         activity               : "1.4.0",
 
