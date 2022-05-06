@@ -23,6 +23,11 @@ object RetryLoadingFirstPage : Action()
 object LoadNextPage : Action()
 
 /**
+ * Mark a repository as favorite
+ */
+data class MarkRepositoryAsFavoriteAction(val id: String) : Action()
+
+/**
  * parent class for all states
  */
 sealed class PaginationState
@@ -49,7 +54,7 @@ sealed class ContainsContentPaginationState : PaginationState() {
 data class ShowContentPaginationState(
     override val items: List<GithubRepository>,
     internal override val currentPage: Int,
-    internal override val canLoadNextPage: Boolean
+    internal override val canLoadNextPage: Boolean,
 ) : ContainsContentPaginationState()
 
 /**
@@ -59,7 +64,7 @@ data class ShowContentPaginationState(
 data class ShowContentAndLoadingNextPagePaginationState(
     override val items: List<GithubRepository>,
     internal override val currentPage: Int,
-    internal override val canLoadNextPage: Boolean
+    internal override val canLoadNextPage: Boolean,
 ) : ContainsContentPaginationState()
 
 /**
@@ -68,7 +73,7 @@ data class ShowContentAndLoadingNextPagePaginationState(
 data class ShowContentAndLoadingNextPageErrorPaginationState(
     override val items: List<GithubRepository>,
     internal override val currentPage: Int,
-    internal override val canLoadNextPage: Boolean
+    internal override val canLoadNextPage: Boolean,
 ) : ContainsContentPaginationState()
 
 /**
@@ -79,7 +84,7 @@ data class ShowContentAndLoadingNextPageErrorPaginationState(
  * but uses traditional "callbacks". That way it is easier to use on iOS.
  */
 class InternalPaginationStateMachine(
-    private val githubApi: GithubApi
+    private val githubApi: GithubApi,
 ) : FlowReduxStateMachine<PaginationState, Action>(LoadFirstPagePaginationState) {
     init {
         spec {
@@ -105,12 +110,25 @@ class InternalPaginationStateMachine(
             inState<ShowContentAndLoadingNextPageErrorPaginationState> {
                 onEnter(::moveToContentStateAfter3Seconds)
             }
+
+            inState<ContainsContentPaginationState> {
+                onActionStartStateMachine<MarkRepositoryAsFavoriteAction, MarkAsFavoriteStateMachine>(
+                    stateMachineFactory = { action: MarkRepositoryAsFavoriteAction, _: ContainsContentPaginationState ->
+                        MarkAsFavoriteStateMachine(
+                            githubApi = githubApi,
+                            initialState = MarkAsFavoriteState(id = action.id, status = FavoriteStatus.MARKING_IN_PROGRESS)
+                        )
+                    }
+                ) { stateSnapshot: ContainsContentPaginationState, childState: MarkAsFavoriteState ->
+                    NoStateChange
+                }
+            }
         }
     }
 
     private suspend fun moveToLoadNextPageStateIfCanLoadNextPage(
         action: LoadNextPage,
-        stateSnapshot: ShowContentPaginationState
+        stateSnapshot: ShowContentPaginationState,
     ): ChangeState<PaginationState> {
         return if (!stateSnapshot.canLoadNextPage) {
             NoStateChange
@@ -129,7 +147,7 @@ class InternalPaginationStateMachine(
      * Loads the first page
      */
     private suspend fun loadFirstPage(
-        stateSnapshot: LoadFirstPagePaginationState
+        stateSnapshot: LoadFirstPagePaginationState,
     ): ChangeState<PaginationState> {
         val nextState = try {
             when (val pageResult: PageResult = githubApi.loadPage(page = 0)) {
@@ -160,7 +178,7 @@ class InternalPaginationStateMachine(
      * [ShowContentAndLoadingNextPageErrorPaginationState]
      */
     private suspend fun loadNextPage(
-        stateSnapshot: ShowContentAndLoadingNextPagePaginationState
+        stateSnapshot: ShowContentAndLoadingNextPagePaginationState,
     ): ChangeState<PaginationState> {
         val nextState = try {
             when (val pageResult = githubApi.loadPage(page = stateSnapshot.currentPage)) {
@@ -192,7 +210,7 @@ class InternalPaginationStateMachine(
     }
 
     private suspend fun moveToContentStateAfter3Seconds(
-        stateSnapshot: ShowContentAndLoadingNextPageErrorPaginationState
+        stateSnapshot: ShowContentAndLoadingNextPageErrorPaginationState,
     ): ChangeState<PaginationState> {
         delay(3000)
         return MutateState<ShowContentAndLoadingNextPageErrorPaginationState, PaginationState> {
@@ -211,7 +229,7 @@ class InternalPaginationStateMachine(
  */
 class PaginationStateMachine(
     githubApi: GithubApi,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
 ) {
     private val stateMachine = InternalPaginationStateMachine(githubApi = githubApi)
 

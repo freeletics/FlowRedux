@@ -31,6 +31,13 @@ class GithubApi {
             }
     }
 
+    suspend fun markAsFavorite(repoId : String) : Unit {
+        delay(2000) // simulate network effect
+        if (shouldFail()){
+            throw Exception("Faked network error")
+        }
+    }
+
     private fun min(a: Int, b: Int): Int = if (a < b) a else b
 }
 
