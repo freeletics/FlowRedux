@@ -110,6 +110,8 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
         private val mutex = Mutex()
         private val stateMachinesAndJobsMap = LinkedHashMap<ActionThatTriggeredStartingStateMachine, StateMachineAndJob<S, A>>()
 
+        suspend fun size(): Int = mutex.withLock { stateMachinesAndJobsMap.size }
+
         suspend fun cancelPreviousAndAddNew(actionThatStartedStateMachine: ActionThatTriggeredStartingStateMachine, stateMachine: FlowReduxStateMachine<S, A>, job: Job) {
             mutex.withLock {
                 val existingStateMachinesAndJobs: StateMachineAndJob<S, A>? = stateMachinesAndJobsMap[actionThatStartedStateMachine]
@@ -127,9 +129,9 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
             }
         }
 
-        suspend fun remove(stateMachine: FlowReduxStateMachine<S, A>) {
+        suspend fun remove(stateMachine: FlowReduxStateMachine<S, A>): StateMachineAndJob<S, A>? {
             // could be optimized for better runtime
-            mutex.withLock {
+            val result = mutex.withLock {
                 var key: ActionThatTriggeredStartingStateMachine? = null
                 for ((actionThatTriggeredStarting, stateMachineAndJob) in stateMachinesAndJobsMap) {
                     if (stateMachineAndJob.stateMachine === stateMachine) {
@@ -140,8 +142,11 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
 
                 if (key != null) {
                     stateMachinesAndJobsMap.remove(key)
-                }
+                } else
+                    null
             }
+
+            return result
         }
     }
 }
