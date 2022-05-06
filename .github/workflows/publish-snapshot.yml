@@ -24,7 +24,7 @@ jobs:
         run: ./.github/android-sdk.sh
 
       - name: Set version for branch
-        if: github.event_name != 'pull_request'
+        if: ${{ github.event_name != 'pull_request' && github.ref_name != 'main' }}
         run: |
           echo "ORG_GRADLE_PROJECT_VERSION_NAME=${{ github.ref_name }}-SNAPSHOT" >> $GITHUB_ENV
 
