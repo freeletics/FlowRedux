@@ -7,10 +7,12 @@ import com.freeletics.flowredux.suspendTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 
@@ -25,11 +27,9 @@ class SubStateMachinesMapTest {
         val s1 = StateMachine()
         assertEquals(0, s1.stateFlowStarted)
         assertEquals(0, s1.stateFlowCompleted)
-        val b1 = AwaitableBoolean()
+        val b1 = AwaitableBoolean { s1.stateFlowStarted >= 1 }
         val j1 = launch {
-            s1.state.collect {
-                b1.set(true)
-            }
+            s1.state.collect()
         }
 
         b1.awaitTrue()
@@ -40,8 +40,7 @@ class SubStateMachinesMapTest {
 
         val s2 = StateMachine()
         val j2 = launch {
-            s2.state.collect {
-            }
+            s2.state.collect()
         }
 
         val b2 = AwaitableBoolean { s1.stateFlowCompleted >= 1 }
@@ -63,11 +62,9 @@ class SubStateMachinesMapTest {
         val s1 = StateMachine()
         assertEquals(0, s1.stateFlowStarted)
         assertEquals(0, s1.stateFlowCompleted)
-        val b1 = AwaitableBoolean()
+        val b1 = AwaitableBoolean { s1.stateFlowStarted >= 1 }
         val j1 = launch {
-            s1.state.collect {
-                b1.set(true)
-            }
+            s1.state.collect()
         }
 
         b1.awaitTrue()
@@ -80,7 +77,7 @@ class SubStateMachinesMapTest {
         val b2 = AwaitableBoolean { s2.stateFlowStarted >= 1 }
 
         val j2 = launch {
-            s2.state.collect {}
+            s2.state.collect()
         }
 
         val a2 = TestAction.A4(2) // Different action
@@ -104,8 +101,43 @@ class SubStateMachinesMapTest {
     }
 
     @Test
-    fun `iterating over all statemachines work`() {
+    fun `iterating over all statemachines work`() = suspendTest {
+        val map = StartStateMachineOnActionInStateSideEffectBuilder.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
+        val a1 = TestAction.A4(1)
+        val s1 = StateMachine()
+        val j1 = launch {
+            s1.state.collect()
+        }
 
+        assertEquals(0, map.size())
+
+        map.cancelPreviousAndAddNew(a1, s1, j1)
+        assertEquals(1, map.size())
+
+        val a2 = TestAction.A4(2) // Different action
+        val s2 = StateMachine()
+        val j2 = launch {
+            s2.state.collect()
+        }
+
+        map.cancelPreviousAndAddNew(a2, s2, j2)
+        assertEquals(2, map.size())
+
+        var i = 0
+        map.forEachStateMachine { sm ->
+            when (i) {
+                0 -> assertSame(s1, sm)
+                1 -> assertSame(s2, sm)
+                else -> throw Exception("Unexpected loop value $i")
+            }
+            i++
+        }
+
+        assertEquals(2, i)
+
+        // Needed, otherwise suspendTest() will wait for all child jobs to complete
+        j1.cancel()
+        j2.cancel()
     }
 }
 
