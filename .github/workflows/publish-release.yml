@@ -7,13 +7,14 @@ on:
 
 jobs:
   publish:
+
     runs-on: macos-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install JDK 11
+      - name: Install JDK
         uses: actions/setup-java@v1
         with:
           java-version: 11
@@ -21,8 +22,12 @@ jobs:
       - name: Install Android SDK
         run: ./.github/android-sdk.sh
 
-      - name: Build release
-        run: ./gradlew assemble
+      # publish to local repository so that everything can be built in parallel
+      - name: Publish locally
+        run: ./gradlew publishToMavenLocal
+        env:
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.MAVEN_SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_SIGNING_PASSWORD }}
 
       - name: Upload release
         run: ./gradlew publish --no-daemon --no-parallel
