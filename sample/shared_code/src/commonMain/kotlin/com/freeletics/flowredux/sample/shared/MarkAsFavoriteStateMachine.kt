@@ -9,7 +9,7 @@ data class MarkAsFavoriteState(val id: String, val status: FavoriteStatus)
 class MarkAsFavoriteStateMachine(
     private val githubApi: GithubApi,
     initialState: MarkAsFavoriteState,
-) : FlowReduxStateMachine<MarkAsFavoriteState, Nothing>( // Action Type == Nothing because we dont have any Action to deal here
+) : FlowReduxStateMachine<MarkAsFavoriteState, Action>( // Action Type == Nothing because we dont have any Action to deal here
     initialState = initialState
 ) {
     init {

@@ -112,7 +112,7 @@ class InternalPaginationStateMachine(
             }
 
             inState<ContainsContentPaginationState> {
-                onActionStartStateMachine<MarkRepositoryAsFavoriteAction, MarkAsFavoriteStateMachine>(
+                onActionStartStateMachine<MarkRepositoryAsFavoriteAction, MarkAsFavoriteState>(
                     stateMachineFactory = { action: MarkRepositoryAsFavoriteAction, _: ContainsContentPaginationState ->
                         MarkAsFavoriteStateMachine(
                             githubApi = githubApi,
