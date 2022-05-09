@@ -11,9 +11,8 @@ import com.freeletics.flowredux.sample.shared.LoadNextPage
 import com.freeletics.flowredux.sample.shared.LoadingFirstPageError
 import com.freeletics.flowredux.sample.shared.PaginationState
 import com.freeletics.flowredux.sample.shared.RetryLoadingFirstPage
-import com.freeletics.flowredux.sample.shared.ShowContentAndLoadingNextPageErrorPaginationState
-import com.freeletics.flowredux.sample.shared.ShowContentAndLoadingNextPagePaginationState
 import com.freeletics.flowredux.sample.shared.ShowContentPaginationState
+import com.freeletics.flowredux.sample.shared.PageLoadingState
 import com.google.android.material.snackbar.Snackbar
 import timber.log.Timber
 
@@ -24,7 +23,7 @@ class TraditionalPopularRepositoriesActivity : ComponentActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var loading: View
     private lateinit var error: View
-    private lateinit var rootView : View
+    private lateinit var rootView: View
     private var snackbar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +59,6 @@ class TraditionalPopularRepositoriesActivity : ComponentActivity() {
 
     }
 
-
     private fun render(state: PaginationState) = when (state) {
         LoadFirstPagePaginationState -> {
             error.gone
@@ -69,27 +67,19 @@ class TraditionalPopularRepositoriesActivity : ComponentActivity() {
             snackbar?.dismiss()
         }
         is ShowContentPaginationState -> {
-            adapter.items = state.items
+            adapter.items = when (state.nextPageLoadingState) {
+                PageLoadingState.LOADING -> state.items + LoadingItem
+                else -> state.items
+            }
             error.gone
             recyclerView.visible
-            snackbar?.dismiss()
+            if (state.nextPageLoadingState == PageLoadingState.ERROR) {
+                snackbar = Snackbar.make(rootView, "An error occurred", Snackbar.LENGTH_LONG)
+                snackbar!!.show()
+            } else {
+                snackbar?.dismiss()
+            }
             loading.gone
-        }
-        is ShowContentAndLoadingNextPagePaginationState -> {
-            adapter.items = state.items + LoadingItem
-            recyclerView.smoothScrollToPosition(adapter.itemCount)
-            error.gone
-            recyclerView.visible
-            loading.gone
-            snackbar?.dismiss()
-        }
-        is ShowContentAndLoadingNextPageErrorPaginationState -> {
-            adapter.items = state.items
-            error.gone
-            recyclerView.visible
-            loading.gone
-            snackbar = Snackbar.make(rootView, "An error occurred", Snackbar.LENGTH_LONG)
-            snackbar!!.show()
         }
         is LoadingFirstPageError -> {
             error.visible
