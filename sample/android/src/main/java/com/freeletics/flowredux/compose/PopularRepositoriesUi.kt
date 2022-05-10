@@ -45,11 +45,11 @@ fun PopularRepositoriesUi(state: PaginationState?, dispatch: (Action) -> Unit) {
 }
 
 private fun ShowContentPaginationState.shouldShowLoadMoreIndicator(): Boolean = when (this.nextPageLoadingState) {
-    PageLoadingState.LOADING -> true
+    NextPageLoadingState.LOADING -> true
     else -> false
 }
 
 private fun ShowContentPaginationState.shouldShowErrorSnackbar(): Boolean = when (this.nextPageLoadingState) {
-    PageLoadingState.ERROR -> true
+    NextPageLoadingState.ERROR -> true
     else -> false
 }

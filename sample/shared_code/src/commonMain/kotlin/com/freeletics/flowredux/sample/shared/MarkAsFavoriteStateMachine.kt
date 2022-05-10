@@ -22,7 +22,8 @@ class MarkAsFavoriteStateMachine(
 
     private suspend fun markAsFavorite(stateSnapshot: MarkAsFavoriteState): ChangeState<MarkAsFavoriteState> {
         return try {
-            githubApi.markAsFavorite(stateSnapshot.id)
+            val shouldBeMarkedAsFavorite = stateSnapshot.status == FavoriteStatus.NOT_FAVORITE
+            githubApi.markAsFavorite(repoId = stateSnapshot.id, favorite = shouldBeMarkedAsFavorite)
             MutateState { copy(status = FavoriteStatus.FAVORITE) }
         } catch (e: Exception) {
             MutateState { copy(status = FavoriteStatus.FAILED_MARKING_AS_FAVORITE) }

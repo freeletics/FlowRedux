@@ -3,6 +3,16 @@ package com.freeletics.flowredux.sample.shared
 import kotlinx.coroutines.delay
 
 class GithubApi {
+
+    internal var githubData = (0..120).map {
+        GithubRepository(
+            id = "$it",
+            name = "Repository $it",
+            stargazersCount = it * 10,
+            favoriteStatus = FavoriteStatus.NOT_FAVORITE
+        )
+    }
+
     private val pageSize = 30
 
     // Used to simulate network errors
@@ -18,11 +28,11 @@ class GithubApi {
         val end = min(githubData.size, page * pageSize + pageSize)
 
         return (
-                if (start < githubData.size) githubData.subList(
-                    start,
-                    end
-                ) else emptyList<GithubRepository>()
-                ).run {
+            if (start < githubData.size) githubData.subList(
+                start,
+                end
+            ) else emptyList<GithubRepository>()
+            ).run {
                 if (isEmpty()) {
                     PageResult.NoNextPage
                 } else {
@@ -31,11 +41,13 @@ class GithubApi {
             }
     }
 
-    suspend fun markAsFavorite(repoId : String) : Unit {
+    suspend fun markAsFavorite(repoId: String, favorite: Boolean) {
         delay(2000) // simulate network effect
-        if (shouldFail()){
+        if (shouldFail()) {
             throw Exception("Faked network error")
         }
+
+        githubData.markAsFavorite(repoId, favorite)
     }
 
     private fun min(a: Int, b: Int): Int = if (a < b) a else b
@@ -44,4 +56,16 @@ class GithubApi {
 sealed class PageResult {
     internal object NoNextPage : PageResult()
     internal data class Page(val page: Int, val items: List<GithubRepository>) : PageResult()
+}
+
+fun List<GithubRepository>.markAsFavorite(repoId: String, favorite: Boolean): List<GithubRepository> {
+    return map {
+        if (it.id == repoId)
+            it.copy(favoriteStatus = if (favorite) {
+                FavoriteStatus.FAVORITE
+            } else {
+                FavoriteStatus.NOT_FAVORITE
+            })
+        else it
+    }
 }

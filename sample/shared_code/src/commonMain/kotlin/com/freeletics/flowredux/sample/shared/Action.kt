@@ -19,4 +19,4 @@ object LoadNextPage : Action()
 /**
  * Mark a repository as favorite
  */
-data class MarkRepositoryAsFavoriteAction(val id: String) : Action()
+data class ToggleFavoriteAction(val id: String) : Action()

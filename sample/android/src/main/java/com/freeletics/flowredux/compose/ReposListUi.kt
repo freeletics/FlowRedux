@@ -1,10 +1,12 @@
 package com.freeletics.flowredux.compose
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -15,8 +17,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.freeletics.flowredux.R
 import com.freeletics.flowredux.sample.shared.Action
+import com.freeletics.flowredux.sample.shared.FavoriteStatus
 import com.freeletics.flowredux.sample.shared.GithubRepository
 import com.freeletics.flowredux.sample.shared.LoadNextPage
+import com.freeletics.flowredux.sample.shared.ToggleFavoriteAction
 
 @Composable
 fun ReposListUi(repos: List<GithubRepository>, loadMore: Boolean, dispatch: (Action) -> Unit) {
@@ -24,7 +28,7 @@ fun ReposListUi(repos: List<GithubRepository>, loadMore: Boolean, dispatch: (Act
 
     LazyColumn(state = listState, modifier = Modifier.wrapContentSize()) {
         itemsIndexed(repos) { index, repo ->
-            GithubRepoUi(repo)
+            GithubRepoUi(repo, dispatch)
             if (index == repos.size - 1) { // user scrolls until the end of the list.
                 // identifying if user scrolled until the end can be done differently
                 dispatch(LoadNextPage)
@@ -46,7 +50,7 @@ fun ReposListUi(repos: List<GithubRepository>, loadMore: Boolean, dispatch: (Act
 }
 
 @Composable
-fun GithubRepoUi(repo: GithubRepository) {
+fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
     Row(
         modifier = Modifier
             .wrapContentHeight()
@@ -60,11 +64,26 @@ fun GithubRepoUi(repo: GithubRepository) {
                 .weight(1f)
                 .fillMaxWidth(), text = repo.name
         )
-        Image(
-            modifier = Modifier.wrapContentSize(),
-            painter = painterResource(R.drawable.ic_star_black_24dp),
-            contentDescription = "Stars icon"
-        )
+        when (repo.favoriteStatus) {
+            FavoriteStatus.FAVORITE, FavoriteStatus.NOT_FAVORITE ->
+                Image(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .clickable { dispatch(ToggleFavoriteAction(repo.id)) },
+                    painter = painterResource(
+                        if (repo.favoriteStatus == FavoriteStatus.FAVORITE)
+                            R.drawable.ic_star_yellow_24dp
+                        else
+                            R.drawable.ic_star_black_24dp),
+                    contentDescription = "Stars icon"
+                )
+
+            FavoriteStatus.MARKING_IN_PROGRESS -> LoadingUi(Modifier
+                .width(24.dp)
+                .height(24.dp)
+            )
+            FavoriteStatus.FAILED_MARKING_AS_FAVORITE -> Text("Error")
+        }
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             modifier = Modifier.width(50.dp),

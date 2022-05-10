@@ -32,24 +32,41 @@ class InternalPaginationStateMachine(
                 on(::moveToLoadNextPageStateIfCanLoadNextPage)
             }
 
-            inState<ShowContentPaginationState>(additionalIsInState = { it.canLoadNextPage && it.nextPageLoadingState == PageLoadingState.LOADING }) {
+            inState<ShowContentPaginationState>(additionalIsInState = { it.canLoadNextPage && it.nextPageLoadingState == NextPageLoadingState.LOADING }) {
                 onEnter(::loadNextPage)
             }
 
-            inState<ShowContentPaginationState>(additionalIsInState = { it.nextPageLoadingState == PageLoadingState.ERROR }) {
+            inState<ShowContentPaginationState>(additionalIsInState = { it.nextPageLoadingState == NextPageLoadingState.ERROR }) {
                 onEnter(::showPaginationErrorFor3SecsThenReset)
             }
 
             inState<ShowContentPaginationState> {
-                onActionStartStateMachine<MarkRepositoryAsFavoriteAction, MarkAsFavoriteState>(
-                    stateMachineFactory = { action: MarkRepositoryAsFavoriteAction, _: ShowContentPaginationState ->
+                onActionStartStateMachine<ToggleFavoriteAction, MarkAsFavoriteState>(
+                    stateMachineFactory = { action: ToggleFavoriteAction, _: ShowContentPaginationState ->
                         MarkAsFavoriteStateMachine(
                             githubApi = githubApi,
                             initialState = MarkAsFavoriteState(id = action.id, status = FavoriteStatus.MARKING_IN_PROGRESS)
                         )
                     }
                 ) { stateSnapshot: ShowContentPaginationState, childState: MarkAsFavoriteState ->
-                    NoStateChange
+                    MutateState<ShowContentPaginationState, ShowContentPaginationState> {
+                        copy(items = items.map { repoItem ->
+                            if (repoItem.id == childState.id) {
+                                repoItem.copy(
+                                    favoriteStatus = childState.status,
+                                    stargazersCount = repoItem.stargazersCount + (
+                                        when (childState.status) {
+                                            FavoriteStatus.FAVORITE -> 1
+                                            FavoriteStatus.NOT_FAVORITE -> -1
+                                            else -> 0
+                                        }
+                                    )
+                                )
+                            } else {
+                                repoItem
+                            }
+                        })
+                    }
                 }
             }
         }
@@ -64,7 +81,7 @@ class InternalPaginationStateMachine(
         } else {
             MutateState<ShowContentPaginationState, ShowContentPaginationState> {
                 copy(
-                    nextPageLoadingState = PageLoadingState.LOADING
+                    nextPageLoadingState = NextPageLoadingState.LOADING
                 )
             }
         }
@@ -83,7 +100,7 @@ class InternalPaginationStateMachine(
                         items = emptyList(),
                         canLoadNextPage = false,
                         currentPage = 1,
-                        nextPageLoadingState = PageLoadingState.IDLE
+                        nextPageLoadingState = NextPageLoadingState.IDLE
                     )
                 }
                 is PageResult.Page -> {
@@ -91,7 +108,7 @@ class InternalPaginationStateMachine(
                         items = pageResult.items,
                         canLoadNextPage = true,
                         currentPage = pageResult.page,
-                        nextPageLoadingState = PageLoadingState.IDLE
+                        nextPageLoadingState = NextPageLoadingState.IDLE
                     )
                 }
             }
@@ -101,7 +118,7 @@ class InternalPaginationStateMachine(
 
         return OverrideState(nextState)
     }
-    
+
     private suspend fun loadNextPage(
         stateSnapshot: ShowContentPaginationState,
     ): ChangeState<PaginationState> {
@@ -111,7 +128,7 @@ class InternalPaginationStateMachine(
                 PageResult.NoNextPage -> {
                     MutateState {
                         copy(
-                            nextPageLoadingState = PageLoadingState.IDLE,
+                            nextPageLoadingState = NextPageLoadingState.IDLE,
                             canLoadNextPage = false,
                         )
                     }
@@ -122,7 +139,7 @@ class InternalPaginationStateMachine(
                             items = items + pageResult.items,
                             canLoadNextPage = true,
                             currentPage = nextPageNumber,
-                            nextPageLoadingState = PageLoadingState.IDLE
+                            nextPageLoadingState = NextPageLoadingState.IDLE
                         )
                     }
                 }
@@ -131,7 +148,7 @@ class InternalPaginationStateMachine(
             t.printStackTrace()
             MutateState {
                 copy(
-                    nextPageLoadingState = PageLoadingState.ERROR
+                    nextPageLoadingState = NextPageLoadingState.ERROR
                 )
             }
         }
@@ -145,7 +162,7 @@ class InternalPaginationStateMachine(
         delay(3000)
         return MutateState<ShowContentPaginationState, ShowContentPaginationState> {
             copy(
-                nextPageLoadingState = PageLoadingState.IDLE
+                nextPageLoadingState = NextPageLoadingState.IDLE
             )
         }
     }

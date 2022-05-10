@@ -12,7 +12,7 @@ import com.freeletics.flowredux.sample.shared.LoadingFirstPageError
 import com.freeletics.flowredux.sample.shared.PaginationState
 import com.freeletics.flowredux.sample.shared.RetryLoadingFirstPage
 import com.freeletics.flowredux.sample.shared.ShowContentPaginationState
-import com.freeletics.flowredux.sample.shared.PageLoadingState
+import com.freeletics.flowredux.sample.shared.NextPageLoadingState
 import com.google.android.material.snackbar.Snackbar
 import timber.log.Timber
 
@@ -68,12 +68,12 @@ class TraditionalPopularRepositoriesActivity : ComponentActivity() {
         }
         is ShowContentPaginationState -> {
             adapter.items = when (state.nextPageLoadingState) {
-                PageLoadingState.LOADING -> state.items + LoadingItem
+                NextPageLoadingState.LOADING -> state.items + LoadingItem
                 else -> state.items
             }
             error.gone
             recyclerView.visible
-            if (state.nextPageLoadingState == PageLoadingState.ERROR) {
+            if (state.nextPageLoadingState == NextPageLoadingState.ERROR) {
                 snackbar = Snackbar.make(rootView, "An error occurred", Snackbar.LENGTH_LONG)
                 snackbar!!.show()
             } else {

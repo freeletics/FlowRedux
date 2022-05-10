@@ -18,7 +18,7 @@ data class LoadingFirstPageError(val cause: Throwable) : PaginationState()
 /**
  * Modeling state for Pull To Refresh and load next state
  */
-enum class PageLoadingState {
+enum class NextPageLoadingState {
     /**
      * Not doing pull to refresh
      */
@@ -40,7 +40,7 @@ enum class PageLoadingState {
  */
 data class ShowContentPaginationState(
     val items: List<GithubRepository>,
-    val nextPageLoadingState: PageLoadingState,
+    val nextPageLoadingState: NextPageLoadingState,
     internal val currentPage: Int,
     internal val canLoadNextPage: Boolean,
 ) : PaginationState()
