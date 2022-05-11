@@ -35,7 +35,7 @@ class TraditionalPopularRepositoriesActivity : ComponentActivity() {
         loading = findViewById(R.id.loading)
         error = findViewById(R.id.error)
 
-        adapter = PopularRepositoriesAdapter()
+        adapter = PopularRepositoriesAdapter(viewModel::dispatch)
         recyclerView.adapter = adapter
         viewModel.liveData.observe(this) {
             Timber.d("render $it")
@@ -91,12 +91,12 @@ class TraditionalPopularRepositoriesActivity : ComponentActivity() {
 
 }
 
-private val View.gone: Unit
+val View.gone: Unit
     get() {
         visibility = View.GONE
     }
 
-private val View.visible: Unit
+val View.visible: Unit
     get() {
         visibility = View.VISIBLE
     }
