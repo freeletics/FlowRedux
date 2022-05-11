@@ -9,3 +9,4 @@ data class GithubRepository(
     val stargazersCount: Int,
     val favoriteStatus: FavoriteStatus
 )
+    

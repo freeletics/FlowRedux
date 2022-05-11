@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +19,7 @@ import com.freeletics.flowredux.sample.shared.Action
 import com.freeletics.flowredux.sample.shared.FavoriteStatus
 import com.freeletics.flowredux.sample.shared.GithubRepository
 import com.freeletics.flowredux.sample.shared.LoadNextPage
+import com.freeletics.flowredux.sample.shared.RetryToggleFavoriteAction
 import com.freeletics.flowredux.sample.shared.ToggleFavoriteAction
 
 @Composable
@@ -69,7 +69,7 @@ fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
                 Image(
                     modifier = Modifier
                         .wrapContentSize()
-                        .clickable { dispatch(ToggleFavoriteAction(repo.id)) },
+                        .clickable(enabled = true) { dispatch(ToggleFavoriteAction(repo.id)) },
                     painter = painterResource(
                         if (repo.favoriteStatus == FavoriteStatus.FAVORITE)
                             R.drawable.ic_star_yellow_24dp
@@ -82,7 +82,15 @@ fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
                 .width(24.dp)
                 .height(24.dp)
             )
-            FavoriteStatus.FAILED_MARKING_AS_FAVORITE -> Text("Error")
+            FavoriteStatus.FAILED_MARKING_AS_FAVORITE -> Image(
+                modifier = Modifier
+                    .width(24.dp)
+                    .height(24.dp)
+                    .wrapContentSize()
+                    .clickable(enabled = true) { dispatch(RetryToggleFavoriteAction(repo.id)) },
+                painter = painterResource(R.drawable.ic_warning),
+                contentDescription = "Stars icon error"
+            )
         }
         Spacer(modifier = Modifier.width(8.dp))
         Text(

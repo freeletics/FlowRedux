@@ -46,8 +46,6 @@ class GithubApi {
         if (shouldFail()) {
             throw Exception("Faked network error")
         }
-
-        githubData.markAsFavorite(repoId, favorite)
     }
 
     private fun min(a: Int, b: Int): Int = if (a < b) a else b

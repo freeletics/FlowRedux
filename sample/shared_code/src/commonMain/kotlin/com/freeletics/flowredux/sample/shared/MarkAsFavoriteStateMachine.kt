@@ -3,30 +3,52 @@ package com.freeletics.flowredux.sample.shared
 import com.freeletics.flowredux.dsl.ChangeState
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.MutateState
-
-data class MarkAsFavoriteState(val id: String, val status: FavoriteStatus)
+import kotlinx.coroutines.delay
 
 class MarkAsFavoriteStateMachine(
     private val githubApi: GithubApi,
-    initialState: MarkAsFavoriteState,
-) : FlowReduxStateMachine<MarkAsFavoriteState, Action>( // Action Type == Nothing because we dont have any Action to deal here
-    initialState = initialState
+    repository: GithubRepository,
+) : FlowReduxStateMachine<GithubRepository, Action>(
+    initialState = repository.copy(favoriteStatus = FavoriteStatus.MARKING_IN_PROGRESS)
 ) {
+    private val favoriteStatusWhenStarting: FavoriteStatus = repository.favoriteStatus
+    
     init {
         spec {
-            inState<MarkAsFavoriteState>(additionalIsInState = { it.status == FavoriteStatus.MARKING_IN_PROGRESS }) {
+            inState<GithubRepository>(additionalIsInState = { it.favoriteStatus == FavoriteStatus.MARKING_IN_PROGRESS }) {
                 onEnter(::markAsFavorite)
+            }
+
+            inState<GithubRepository>(additionalIsInState = { it.favoriteStatus == FavoriteStatus.FAILED_MARKING_AS_FAVORITE }) {
+                onEnter(::resetErrorStateAfter3Seconds)
+                on(::resetErrorState)
             }
         }
     }
 
-    private suspend fun markAsFavorite(stateSnapshot: MarkAsFavoriteState): ChangeState<MarkAsFavoriteState> {
+    private suspend fun markAsFavorite(stateSnapshot: GithubRepository): ChangeState<GithubRepository> {
         return try {
-            val shouldBeMarkedAsFavorite = stateSnapshot.status == FavoriteStatus.NOT_FAVORITE
+            val shouldBeMarkedAsFavorite = favoriteStatusWhenStarting == FavoriteStatus.NOT_FAVORITE
             githubApi.markAsFavorite(repoId = stateSnapshot.id, favorite = shouldBeMarkedAsFavorite)
-            MutateState { copy(status = FavoriteStatus.FAVORITE) }
+            MutateState {
+                copy(
+                    favoriteStatus = if (shouldBeMarkedAsFavorite) FavoriteStatus.FAVORITE
+                    else FavoriteStatus.NOT_FAVORITE,
+                    stargazersCount = if (shouldBeMarkedAsFavorite) stargazersCount + 1
+                    else stargazersCount - 1
+                )
+            }
         } catch (e: Exception) {
-            MutateState { copy(status = FavoriteStatus.FAILED_MARKING_AS_FAVORITE) }
+            MutateState { copy(favoriteStatus = FavoriteStatus.FAILED_MARKING_AS_FAVORITE) }
         }
+    }
+
+    private suspend fun resetErrorStateAfter3Seconds(stateSnapshot: GithubRepository): ChangeState<GithubRepository> {
+        delay(3000)
+        return MutateState { copy(favoriteStatus = favoriteStatusWhenStarting) }
+    }
+
+    private suspend fun resetErrorState(action: RetryToggleFavoriteAction, stateSnapshot: GithubRepository): ChangeState<GithubRepository> {
+        return MutateState { copy(favoriteStatus = FavoriteStatus.MARKING_IN_PROGRESS) }
     }
 }

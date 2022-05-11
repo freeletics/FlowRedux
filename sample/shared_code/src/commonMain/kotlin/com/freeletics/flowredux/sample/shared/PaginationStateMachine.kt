@@ -41,27 +41,19 @@ class InternalPaginationStateMachine(
             }
 
             inState<ShowContentPaginationState> {
-                onActionStartStateMachine<ToggleFavoriteAction, MarkAsFavoriteState>(
-                    stateMachineFactory = { action: ToggleFavoriteAction, _: ShowContentPaginationState ->
+                onActionStartStateMachine(
+                    stateMachineFactory = { action: ToggleFavoriteAction, state: ShowContentPaginationState ->
+                        val repo = state.items.find { it.id == action.id }!!
                         MarkAsFavoriteStateMachine(
                             githubApi = githubApi,
-                            initialState = MarkAsFavoriteState(id = action.id, status = FavoriteStatus.MARKING_IN_PROGRESS)
+                            repository = repo
                         )
                     }
-                ) { stateSnapshot: ShowContentPaginationState, childState: MarkAsFavoriteState ->
+                ) { _: ShowContentPaginationState, childState: GithubRepository ->
                     MutateState<ShowContentPaginationState, ShowContentPaginationState> {
                         copy(items = items.map { repoItem ->
                             if (repoItem.id == childState.id) {
-                                repoItem.copy(
-                                    favoriteStatus = childState.status,
-                                    stargazersCount = repoItem.stargazersCount + (
-                                        when (childState.status) {
-                                            FavoriteStatus.FAVORITE -> 1
-                                            FavoriteStatus.NOT_FAVORITE -> -1
-                                            else -> 0
-                                        }
-                                    )
-                                )
+                                childState
                             } else {
                                 repoItem
                             }
