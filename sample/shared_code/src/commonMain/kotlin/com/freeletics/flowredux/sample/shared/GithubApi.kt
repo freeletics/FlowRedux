@@ -17,8 +17,7 @@ class GithubApi {
 
     // Used to simulate network errors
     private var counter = 0
-    private fun shouldFail(): Boolean =
-        counter++ % 4 == 0
+    private fun shouldFail(): Boolean = counter++ % 4 == 0
 
     suspend fun loadPage(page: Int): PageResult {
         delay(2000)

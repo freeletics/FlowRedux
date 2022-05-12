@@ -3,6 +3,7 @@ package com.freeletics.flowredux.sample.shared
 import com.freeletics.flowredux.dsl.ChangeState
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.MutateState
+import com.freeletics.flowredux.dsl.NoStateChange
 import kotlinx.coroutines.delay
 
 class MarkAsFavoriteStateMachine(
@@ -12,7 +13,7 @@ class MarkAsFavoriteStateMachine(
     initialState = repository.copy(favoriteStatus = FavoriteStatus.MARKING_IN_PROGRESS)
 ) {
     private val favoriteStatusWhenStarting: FavoriteStatus = repository.favoriteStatus
-    
+
     init {
         spec {
             inState<GithubRepository>(additionalIsInState = { it.favoriteStatus == FavoriteStatus.MARKING_IN_PROGRESS }) {
@@ -49,6 +50,12 @@ class MarkAsFavoriteStateMachine(
     }
 
     private suspend fun resetErrorState(action: RetryToggleFavoriteAction, stateSnapshot: GithubRepository): ChangeState<GithubRepository> {
-        return MutateState { copy(favoriteStatus = FavoriteStatus.MARKING_IN_PROGRESS) }
+        return if (action.id != stateSnapshot.id) {
+            // Since all active MarkAsFavoriteStateMachine receive this action
+            // we need to ignore those who are not meant for this state machine
+            NoStateChange
+        } else {
+            MutateState { copy(favoriteStatus = FavoriteStatus.MARKING_IN_PROGRESS) }
+        }
     }
 }
