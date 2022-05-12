@@ -51,8 +51,8 @@ private fun githubAdapterDelegate(dispatch: (Action) -> Unit) =
                 FavoriteStatus.NOT_FAVORITE,
                 FavoriteStatus.FAVORITE,
                 -> dispatch(ToggleFavoriteAction(item.id))
-                FavoriteStatus.FAILED_MARKING_AS_FAVORITE -> dispatch(RetryToggleFavoriteAction(item.id))
-                FavoriteStatus.MARKING_IN_PROGRESS -> {}
+                FavoriteStatus.OPERATION_FAILED -> dispatch(RetryToggleFavoriteAction(item.id))
+                FavoriteStatus.OPERATION_IN_PROGRESS -> {}
             }
         }
 
@@ -70,11 +70,11 @@ private fun githubAdapterDelegate(dispatch: (Action) -> Unit) =
                     starIcon.visible
                     starIcon.setImageResource(R.drawable.ic_star_black_24dp)
                 }
-                FavoriteStatus.MARKING_IN_PROGRESS -> {
+                FavoriteStatus.OPERATION_IN_PROGRESS -> {
                     starIcon.gone
                     progressBar.visible
                 }
-                FavoriteStatus.FAILED_MARKING_AS_FAVORITE -> {
+                FavoriteStatus.OPERATION_FAILED -> {
                     progressBar.gone
                     starIcon.visible
                     starIcon.setImageResource(R.drawable.ic_warning)

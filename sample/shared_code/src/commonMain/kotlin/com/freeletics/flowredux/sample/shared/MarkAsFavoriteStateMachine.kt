@@ -10,17 +10,17 @@ class MarkAsFavoriteStateMachine(
     private val githubApi: GithubApi,
     repository: GithubRepository,
 ) : FlowReduxStateMachine<GithubRepository, Action>(
-    initialState = repository.copy(favoriteStatus = FavoriteStatus.MARKING_IN_PROGRESS)
+    initialState = repository.copy(favoriteStatus = FavoriteStatus.OPERATION_IN_PROGRESS)
 ) {
     private val favoriteStatusWhenStarting: FavoriteStatus = repository.favoriteStatus
 
     init {
         spec {
-            inState<GithubRepository>(additionalIsInState = { it.favoriteStatus == FavoriteStatus.MARKING_IN_PROGRESS }) {
+            inState<GithubRepository>(additionalIsInState = { it.favoriteStatus == FavoriteStatus.OPERATION_IN_PROGRESS }) {
                 onEnter(::markAsFavorite)
             }
 
-            inState<GithubRepository>(additionalIsInState = { it.favoriteStatus == FavoriteStatus.FAILED_MARKING_AS_FAVORITE }) {
+            inState<GithubRepository>(additionalIsInState = { it.favoriteStatus == FavoriteStatus.OPERATION_FAILED }) {
                 onEnter(::resetErrorStateAfter3Seconds)
                 on(::resetErrorState)
             }
@@ -40,7 +40,7 @@ class MarkAsFavoriteStateMachine(
                 )
             }
         } catch (e: Exception) {
-            MutateState { copy(favoriteStatus = FavoriteStatus.FAILED_MARKING_AS_FAVORITE) }
+            MutateState { copy(favoriteStatus = FavoriteStatus.OPERATION_FAILED) }
         }
     }
 
@@ -55,7 +55,7 @@ class MarkAsFavoriteStateMachine(
             // we need to ignore those who are not meant for this state machine
             NoStateChange
         } else {
-            MutateState { copy(favoriteStatus = FavoriteStatus.MARKING_IN_PROGRESS) }
+            MutateState { copy(favoriteStatus = FavoriteStatus.OPERATION_IN_PROGRESS) }
         }
     }
 }

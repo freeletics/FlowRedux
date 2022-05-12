@@ -78,11 +78,11 @@ fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
                     contentDescription = "Stars icon"
                 )
 
-            FavoriteStatus.MARKING_IN_PROGRESS -> LoadingUi(Modifier
+            FavoriteStatus.OPERATION_IN_PROGRESS -> LoadingUi(Modifier
                 .width(24.dp)
                 .height(24.dp)
             )
-            FavoriteStatus.FAILED_MARKING_AS_FAVORITE -> Image(
+            FavoriteStatus.OPERATION_FAILED -> Image(
                 modifier = Modifier
                     .width(24.dp)
                     .height(24.dp)

@@ -2,7 +2,7 @@ package com.freeletics.flowredux.sample.shared
 
 enum class FavoriteStatus {
     NOT_FAVORITE,
-    MARKING_IN_PROGRESS,
-    FAILED_MARKING_AS_FAVORITE,
+    OPERATION_IN_PROGRESS,
+    OPERATION_FAILED,
     FAVORITE
 }
