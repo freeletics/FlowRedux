@@ -46,7 +46,7 @@ class InternalPaginationStateMachine(
                         val repo = state.items.find { it.id == action.id }!!
                         MarkAsFavoriteStateMachine(
                             githubApi = githubApi,
-                            repository =    repo
+                            repository = repo
                         )
                     }
                 ) { _: ShowContentPaginationState, childState: GithubRepository ->
