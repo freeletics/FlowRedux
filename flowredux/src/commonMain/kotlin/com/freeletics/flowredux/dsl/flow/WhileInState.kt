@@ -7,12 +7,13 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 internal fun <S, A> Flow<Action<S, A>>.whileInState(
     isInState: (S) -> Boolean,
     getState: GetState<S>,
-    transform: (Flow<Action<S, A>>) -> Flow<Action<S, A>>,
+    transform: suspend (Flow<Action<S, A>>) -> Flow<Action<S, A>>,
 ) = channelFlow {
     var currentChannel: Channel<Action<S, A>>? = null
 
@@ -29,7 +30,7 @@ internal fun <S, A> Flow<Action<S, A>>.whileInState(
                         .collect { send(it) }
                 }
             }
-            // send the action to the transform because the state machin is in state
+            // send the action to the transform because the state machine is in state
             currentChannel!!.send(value)
         } else {
             // closing the channel with an exception will cancel the FlowCollector that

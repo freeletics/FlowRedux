@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import com.freeletics.flowredux.R
 import com.freeletics.flowredux.sample.shared.Action
 import com.freeletics.flowredux.sample.shared.RetryLoadingFirstPage
@@ -31,7 +32,10 @@ fun ErrorUi(dispatch: (Action) -> Unit) {
                 painter = painterResource(R.drawable.ic_warning),
                 contentDescription = "Error"
             )
-            Text(stringResource(R.string.unexpected_error_retry))
+            Text(
+                textAlign = TextAlign.Center,
+                text = stringResource(R.string.unexpected_error_retry)
+            )
         }
 
     }

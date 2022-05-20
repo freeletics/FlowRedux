@@ -17,9 +17,10 @@ fun PopularRepositoriesUi(state: PaginationState?, dispatch: (Action) -> Unit) {
         Scaffold(scaffoldState = scaffoldState) {
             when (state) {
                 null, // null means state machine did not emit yet the first state --> in mean time show Loading
-                is LoadFirstPagePaginationState -> LoadingUi()
+                is LoadFirstPagePaginationState,
+                -> LoadingUi()
                 is LoadingFirstPageError -> ErrorUi(dispatch)
-                is ContainsContentPaginationState -> {
+                is ShowContentPaginationState -> {
                     val showLoadNextPageUi = state.shouldShowLoadMoreIndicator()
                     val showErrorSnackBar = state.shouldShowErrorSnackbar()
 
@@ -43,11 +44,12 @@ fun PopularRepositoriesUi(state: PaginationState?, dispatch: (Action) -> Unit) {
     }
 }
 
-private fun ContainsContentPaginationState.shouldShowLoadMoreIndicator(): Boolean = when (this) {
-    is ShowContentPaginationState -> false
-    is ShowContentAndLoadingNextPageErrorPaginationState -> false
-    is ShowContentAndLoadingNextPagePaginationState -> true
+private fun ShowContentPaginationState.shouldShowLoadMoreIndicator(): Boolean = when (this.nextPageLoadingState) {
+    NextPageLoadingState.LOADING -> true
+    else -> false
 }
 
-private fun ContainsContentPaginationState.shouldShowErrorSnackbar(): Boolean =
-    this is ShowContentAndLoadingNextPageErrorPaginationState
+private fun ShowContentPaginationState.shouldShowErrorSnackbar(): Boolean = when (this.nextPageLoadingState) {
+    NextPageLoadingState.ERROR -> true
+    else -> false
+}

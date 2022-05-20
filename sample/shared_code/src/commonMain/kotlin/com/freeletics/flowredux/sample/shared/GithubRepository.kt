@@ -6,5 +6,7 @@ package com.freeletics.flowredux.sample.shared
 data class GithubRepository(
     val id: String,
     val name: String,
-    val stargazersCount: Int
+    val stargazersCount: Int,
+    val favoriteStatus: FavoriteStatus
 )
+    
