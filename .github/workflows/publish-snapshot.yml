@@ -8,6 +8,7 @@ on:
 
 jobs:
   publish:
+    if: ${{ github.actor != 'dependabot[bot]' }}
 
     runs-on: macos-latest
 
