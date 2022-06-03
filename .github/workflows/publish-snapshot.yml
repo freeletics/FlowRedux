@@ -8,6 +8,7 @@ on:
 
 jobs:
   publish:
+    if: ${{ github.actor != 'dependabot[bot]' }}
 
     runs-on: macos-latest
 
@@ -26,12 +27,12 @@ jobs:
       - name: Set version for branch
         if: ${{ github.event_name != 'pull_request' && github.ref_name != 'main' }}
         run: |
-          echo "ORG_GRADLE_PROJECT_VERSION_NAME=${{ github.ref_name }}-SNAPSHOT" >> $GITHUB_ENV
+          echo "ORG_GRADLE_PROJECT_VERSION_NAME=${{ github.ref_name }}-SNAPSHOT" | sed 's#/#-#g' >> $GITHUB_ENV
 
       - name: Set version for pull request
         if: github.event_name == 'pull_request'
         run: |
-          echo "ORG_GRADLE_PROJECT_VERSION_NAME=pr${{ github.event.number }}-SNAPSHOT" >> $GITHUB_ENV
+          echo "ORG_GRADLE_PROJECT_VERSION_NAME=pr${{ github.event.number }}-SNAPSHOT" | sed 's#/#-#g' >> $GITHUB_ENV
 
       - name: Publish snapshot
         run: ./gradlew publish
