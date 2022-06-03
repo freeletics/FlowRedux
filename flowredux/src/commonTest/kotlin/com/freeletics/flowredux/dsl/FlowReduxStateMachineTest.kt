@@ -10,7 +10,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.fail
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class FlowReduxStateMachineTest {
 
     @Test

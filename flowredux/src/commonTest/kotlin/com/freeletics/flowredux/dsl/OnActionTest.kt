@@ -11,7 +11,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class OnActionTest {
 
     private val delay = 200L
@@ -22,17 +22,17 @@ class OnActionTest {
         var reachedBefore = false
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, _ ->
+                on<TestAction.A1> { _, state ->
                     reachedBefore = true
                     delay(delay)
                     // this should never be reached because state transition did happen in the meantime,
                     // therefore this whole block must be canceled
                     reached = true
-                    OverrideState(TestState.S1)
+                    state.override(TestState.S1)
                 }
 
-                on<TestAction.A2> { _, _ ->
-                    OverrideState(TestState.S2)
+                on<TestAction.A2> { _, state ->
+                    state.override(TestState.S2)
                 }
 
             }
@@ -57,14 +57,14 @@ class OnActionTest {
     fun `on action gets triggered and moves to next state`() = suspendTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, _ ->
-                    OverrideState(TestState.S1)
+                on<TestAction.A1> { _, state ->
+                    state.override(TestState.S1)
                 }
             }
 
             inState<TestState.S1> {
-                on<TestAction.A2> { _, _ ->
-                    OverrideState(TestState.S2)
+                on<TestAction.A2> { _, state ->
+                    state.override(TestState.S2)
                 }
             }
         }

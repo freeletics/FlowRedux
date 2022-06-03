@@ -9,19 +9,19 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class SubStateMachineTest {
 
     @Test
     fun `child statemachine emits initial state to parent state machine`() = suspendTest {
         val child = ChildStateMachine(initialState = TestState.S3) { }
-        val parentStateMachine = StateMachine {
+        val stateMachine = StateMachine {
             inState<TestState.Initial> {
-                stateMachine(child)
+                onEnterStartStateMachine(child)
             }
         }
 
-        parentStateMachine.state.test {
+        stateMachine.state.test {
             assertEquals(TestState.Initial, awaitItem()) // parent initial state
             assertEquals(TestState.S3, awaitItem()) // child initial state
         }
@@ -37,16 +37,16 @@ class SubStateMachineTest {
         val child = ChildStateMachine(initialState = TestState.S3) {
 
             inState<TestState.S3> {
-                on<TestAction.A1> { _, _ ->
+                on<TestAction.A1> { _, state ->
                     inS3onA1Action++
-                    OverrideState(TestState.S1)
+                    state.override(TestState.S1)
                 }
             }
 
             inState<TestState.S2> {
-                on<TestAction.A1> { _, _ ->
+                on<TestAction.A1> { _, state ->
                     inS2OnA1Action++
-                    OverrideState(TestState.S2)
+                    state.override(TestState.S2)
                 }
             }
         }
@@ -54,23 +54,23 @@ class SubStateMachineTest {
         val parent = StateMachine {
 
             inState<TestState.Initial> {
-                stateMachine(
+                onEnterStartStateMachine(
                     stateMachine = child,
                     actionMapper = { it }
-                ) { parentState, subStateMachineState ->
+                ) { state, subStateMachineState ->
                     receivedChildStateUpdates += subStateMachineState
-                    receivedChildStateUpdatesParentState += parentState
+                    receivedChildStateUpdatesParentState += state.snapshot
                     if (subStateMachineState == TestState.S3) {
-                        NoStateChange
+                        state.noChange()
                     } else {
-                        OverrideState(subStateMachineState)
+                        state.override(subStateMachineState)
                     }
                 }
             }
 
             inState<TestState.S1> {
-                on<TestAction.A1> { _, _ ->
-                    OverrideState(TestState.S2)
+                on<TestAction.A1> { _, state ->
+                    state.override(TestState.S2)
                 }
             }
         }
@@ -111,17 +111,17 @@ class SubStateMachineTest {
 
             val sm = StateMachine(initialState = TestState.GenericState("generic", 0)) {
                 inState<TestState.GenericState> {
-                    stateMachine(
+                    onEnterStartStateMachine(
                         stateMachineFactory = {
                             factoryInvocations++
                             child
                         },
                         actionMapper = { it },
-                        stateMapper = { _, _ -> NoStateChange }
+                        stateMapper = { state, _ -> state.noChange() }
                     )
 
-                    on<TestAction.A1> { _, snapshot ->
-                        OverrideState(snapshot.copy(anInt = snapshot.anInt + 1))
+                    on<TestAction.A1> { _, state ->
+                        state.override(state.snapshot.copy(anInt = state.snapshot.anInt + 1))
                     }
                 }
             }
@@ -161,23 +161,23 @@ class SubStateMachineTest {
 
             val sm = StateMachine(initialState = TestState.S1) {
                 inState<TestState.S1> {
-                    stateMachine(
+                    onEnterStartStateMachine(
                         stateMachineFactory = {
                             factoryInvocations++
                             child
                         },
                         actionMapper = { it },
-                        stateMapper = { _, _ -> NoStateChange }
+                        stateMapper = { state, _ -> state.noChange() }
                     )
 
-                    on<TestAction.A1> { _, _ ->
-                        OverrideState(TestState.S2)
+                    on<TestAction.A1> { _, state ->
+                        state.override(TestState.S2)
                     }
                 }
 
                 inState<TestState.S2> {
-                    on<TestAction.A2> { _, _ ->
-                        OverrideState(TestState.S1)
+                    on<TestAction.A2> { _, state ->
+                        state.override(TestState.S1)
                     }
                 }
             }
@@ -216,22 +216,22 @@ class SubStateMachineTest {
             var parentActionInvocations = 0
             val child = ChildStateMachine(initialState = TestState.S1) {
                 inState<TestState.S1> {
-                    on<TestAction.A1> { _, _ ->
+                    on<TestAction.A1> { _, state ->
                         childActionInvocations++
-                        NoStateChange
+                        state.noChange()
                     }
                 }
             }
 
             val sm = StateMachine(initialState = TestState.S1) {
                 inState<TestState.S1> {
-                    stateMachine(child)
-                    on<TestAction.A2> { _, _ -> OverrideState(TestState.S2) }
+                    onEnterStartStateMachine(child)
+                    on<TestAction.A2> { _, state -> state.override(TestState.S2) }
                 }
                 inState<TestState.S2> {
-                    on<TestAction.A1> { _, _ ->
+                    on<TestAction.A1> { _, state ->
                         parentActionInvocations++
-                        NoStateChange
+                        state.noChange()
                     }
                 }
             }
@@ -274,25 +274,25 @@ class SubStateMachineTest {
                 inState<TestState.S2> {
                     onEnter {
                         childOnEnterS2++
-                        NoStateChange
+                        it.noChange()
                     }
-                    on<TestAction.A2> { _, _ ->
+                    on<TestAction.A2> { _, state ->
                         childActionA2++
-                        OverrideState(TestState.S1)
+                        state.override(TestState.S1)
                     }
                 }
             }
 
             val sm = StateMachine(initialState = TestState.S1) {
                 inState<TestState.S1> {
-                    on<TestAction.A1> { _, _ -> OverrideState(TestState.S2) }
+                    on<TestAction.A1> { _, state -> state.override(TestState.S2) }
                 }
                 inState<TestState.S2> {
                     onEnterEffect { parentS2++ }
-                    stateMachine(
+                    onEnterStartStateMachine(
                         stateMachineFactory = { childFactory++; child },
                         actionMapper = { it },
-                        stateMapper = { _, childState -> OverrideState(childState) }
+                        stateMapper = { state, childState -> state.override(childState) }
                     )
                 }
             }

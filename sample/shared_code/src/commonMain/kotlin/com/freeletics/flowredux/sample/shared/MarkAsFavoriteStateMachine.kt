@@ -4,6 +4,7 @@ import com.freeletics.flowredux.dsl.ChangeState
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.MutateState
 import com.freeletics.flowredux.dsl.NoStateChange
+import com.freeletics.flowredux.dsl.State
 import kotlinx.coroutines.delay
 
 class MarkAsFavoriteStateMachine(
@@ -17,21 +18,21 @@ class MarkAsFavoriteStateMachine(
     init {
         spec {
             inState<GithubRepository>(additionalIsInState = { it.favoriteStatus == FavoriteStatus.OPERATION_IN_PROGRESS }) {
-                onEnter(::markAsFavorite)
+                onEnter { markAsFavorite(it) }
             }
 
             inState<GithubRepository>(additionalIsInState = { it.favoriteStatus == FavoriteStatus.OPERATION_FAILED }) {
-                onEnter(::resetErrorStateAfter3Seconds)
-                on(::resetErrorState)
+                onEnter { resetErrorStateAfter3Seconds(it) }
+                on<RetryToggleFavoriteAction> { action, state -> resetErrorState(action, state) }
             }
         }
     }
 
-    private suspend fun markAsFavorite(stateSnapshot: GithubRepository): ChangeState<GithubRepository> {
+    private suspend fun markAsFavorite(state: State<GithubRepository>): ChangeState<GithubRepository> {
         return try {
             val shouldBeMarkedAsFavorite = favoriteStatusWhenStarting == FavoriteStatus.NOT_FAVORITE
-            githubApi.markAsFavorite(repoId = stateSnapshot.id, favorite = shouldBeMarkedAsFavorite)
-            MutateState {
+            githubApi.markAsFavorite(repoId = state.snapshot.id, favorite = shouldBeMarkedAsFavorite)
+            state.mutate {
                 copy(
                     favoriteStatus = if (shouldBeMarkedAsFavorite) FavoriteStatus.FAVORITE
                     else FavoriteStatus.NOT_FAVORITE,
@@ -40,22 +41,22 @@ class MarkAsFavoriteStateMachine(
                 )
             }
         } catch (e: Exception) {
-            MutateState { copy(favoriteStatus = FavoriteStatus.OPERATION_FAILED) }
+            state.mutate { copy(favoriteStatus = FavoriteStatus.OPERATION_FAILED) }
         }
     }
 
-    private suspend fun resetErrorStateAfter3Seconds(stateSnapshot: GithubRepository): ChangeState<GithubRepository> {
+    private suspend fun resetErrorStateAfter3Seconds(state: State<GithubRepository>): ChangeState<GithubRepository> {
         delay(3000)
-        return MutateState { copy(favoriteStatus = favoriteStatusWhenStarting) }
+        return state.mutate { copy(favoriteStatus = favoriteStatusWhenStarting) }
     }
 
-    private suspend fun resetErrorState(action: RetryToggleFavoriteAction, stateSnapshot: GithubRepository): ChangeState<GithubRepository> {
-        return if (action.id != stateSnapshot.id) {
+    private fun resetErrorState(action: RetryToggleFavoriteAction, state: State<GithubRepository>): ChangeState<GithubRepository> {
+        return if (action.id != state.snapshot.id) {
             // Since all active MarkAsFavoriteStateMachine receive this action
             // we need to ignore those who are not meant for this state machine
-            NoStateChange
+            state.noChange()
         } else {
-            MutateState { copy(favoriteStatus = FavoriteStatus.OPERATION_IN_PROGRESS) }
+            state.mutate { copy(favoriteStatus = FavoriteStatus.OPERATION_IN_PROGRESS) }
         }
     }
 }

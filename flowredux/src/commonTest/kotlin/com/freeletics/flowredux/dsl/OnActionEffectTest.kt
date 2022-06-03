@@ -11,7 +11,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class OnActionEffectTest {
 
     private val delay = 200L
@@ -30,8 +30,8 @@ class OnActionEffectTest {
                     reached = true
                 }
 
-                on<TestAction.A2> { _, _ ->
-                    OverrideState(TestState.S2)
+                on<TestAction.A2> { _, state ->
+                    state.override(TestState.S2)
                 }
             }
 
@@ -60,9 +60,9 @@ class OnActionEffectTest {
                     effectTriggered = true
                 }
 
-                on<TestAction.A1> { _, _ ->
+                on<TestAction.A1> { _, state ->
                     delay(10) // give onActionEffect a bit of time before changing state
-                    OverrideState(TestState.S2)
+                    state.override(TestState.S2)
                 }
             }
         }
