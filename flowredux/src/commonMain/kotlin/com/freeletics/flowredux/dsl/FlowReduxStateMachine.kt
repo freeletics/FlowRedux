@@ -1,13 +1,19 @@
 package com.freeletics.flowredux.dsl
 
+import com.freeletics.flowredux.dsl.internal.Action
+import com.freeletics.flowredux.dsl.internal.ExternalWrappedAction
+import com.freeletics.flowredux.dsl.internal.InitialStateAction
+import com.freeletics.flowredux.dsl.internal.reducer
 import com.freeletics.flowredux.dsl.util.AtomicCounter
+import com.freeletics.flowredux.reduxStore
 import com.freeletics.mad.statemachine.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 
@@ -32,11 +38,24 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
             )
         }
 
+        val sideEffects = FlowReduxStoreBuilder<S, A>().apply(specBlock).generateSideEffects()
+
         outputState = inputActions
             .receiveAsFlow()
-            .reduxStore(initialStateSupplier, specBlock)
+            .map<A, Action<S, A>> { ExternalWrappedAction(it) }
             .onStart {
-                activeFlowCounter.incrementAndGet()
+                emit(InitialStateAction())
+            }
+            .reduxStore(initialStateSupplier, sideEffects, ::reducer)
+            .distinctUntilChanged { old, new -> old === new } // distinct until not the same object reference.
+            .onStart {
+                if (activeFlowCounter.incrementAndGet() > 1) {
+                    throw IllegalStateException(
+                        "Can not collect state more than once at the same time. Make sure the" +
+                            "previous collection is cancelled before starting a new one. " +
+                            "Collecting state in parallel would lead to subtle bugs."
+                    )
+                }
             }
             .onCompletion {
                 activeFlowCounter.decrementAndGet()
