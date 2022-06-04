@@ -92,7 +92,7 @@ class FlowReduxStateMachineTest {
     }
 
     @Test
-    fun `observing state multiple times in parallel`() = suspendTest {
+    fun `observing state multiple times in parallel throws exception`() = suspendTest {
         val sm = StateMachine {}
 
         var collectionStarted = false
