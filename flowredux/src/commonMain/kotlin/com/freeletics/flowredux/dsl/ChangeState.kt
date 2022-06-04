@@ -57,7 +57,10 @@ public object NoStateChange : ChangeState<Nothing>()
 //TODO rename after removing deprecated NoStateChange
 internal object InternalNoStateChange : ChangeState<Nothing>()
 
-internal fun <S> ChangeState<S>.reduce(state: S): S {
+/**
+ * Transforms the given [state] according to [ChangeState] and returns the new [S].
+ */
+public fun <S> ChangeState<S>.reduce(state: S): S {
     return when (val change = this) {
         is @Suppress("deprecation") OverrideState -> change.newState
         is InternalOverrideState -> change.newState
