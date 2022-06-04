@@ -8,7 +8,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.fail
-import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class FlowReduxStateMachineTest {
@@ -87,5 +89,44 @@ class FlowReduxStateMachineTest {
                     "Flow before dispatching any action."
 
         assertEquals(expectedMsg, exception.message)
+    }
+
+    @Test
+    fun `observing state multiple times in parallel throws exception`() = suspendTest {
+        val sm = StateMachine {}
+
+        var collectionStarted = false
+        val job = launch {
+            sm.state.collect {
+                collectionStarted = true
+            }
+        }
+
+        while (!collectionStarted) {
+            delay(1)
+        }
+
+        val exception = assertFailsWith<IllegalStateException> {
+            sm.state.collect {  }
+        }
+
+
+        val expectedMsg =
+            "Can not collect state more than once at the same time. Make sure the" +
+                "previous collection is cancelled before starting a new one. " +
+                "Collecting state in parallel would lead to subtle bugs."
+
+        assertEquals(expectedMsg, exception.message)
+
+        job.cancel()
+    }
+
+    @Test
+    fun `observing state multiple times in sequence`() = suspendTest {
+        val sm = StateMachine {}
+
+        // each call will collect the first item and then stop collecting
+        sm.state.first()
+        sm.state.first()
     }
 }
