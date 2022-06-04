@@ -2,8 +2,9 @@ package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
+import com.freeletics.flowredux.dsl.ChangeState
 import com.freeletics.flowredux.dsl.ExecutionPolicy
-import com.freeletics.flowredux.dsl.CollectFlowHandler
+import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.flatMapWithExecutionPolicy
 import com.freeletics.flowredux.dsl.flow.mapToIsInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,7 +30,7 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     private val flow: Flow<T>,
     private val executionPolicy: ExecutionPolicy,
-    private val handler: CollectFlowHandler<T, InputState, S>
+    private val handler: suspend (item: T, state: State<InputState>) -> ChangeState<S>,
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
@@ -55,7 +56,7 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     ): Flow<Action<S, A>> = flow {
 
         runOnlyIfInInputState(getState, isInState) { inputState ->
-            val changeState = handler.handle(value, inputState)
+            val changeState = handler(value, State(inputState))
             emit(
                 ChangeStateAction<S, A>(
                     changeState = changeState,

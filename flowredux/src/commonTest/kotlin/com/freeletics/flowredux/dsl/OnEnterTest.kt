@@ -11,7 +11,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class OnEnterTest {
 
     private val delay = 200L
@@ -28,11 +28,11 @@ class OnEnterTest {
                     // this should never be reached because state transition did happen in the meantime,
                     // therefore this whole block must be canceled
                     reached = true
-                    OverrideState(TestState.S1)
+                    it.override(TestState.S1)
                 }
 
-                on<TestAction.A2> { _, _ ->
-                    OverrideState(TestState.S2)
+                on<TestAction.A2> { _, state ->
+                    state.override(TestState.S2)
                 }
             }
         }
@@ -58,19 +58,19 @@ class OnEnterTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
-                    OverrideState(TestState.GenericState("from initial", 0))
+                    it.override(TestState.GenericState("from initial", 0))
                 }
             }
 
             inState<TestState.GenericState> {
                 onEnter {
                     genericStateEntered++
-                    OverrideState(TestState.GenericState("onEnter", 0))
+                    it.override(TestState.GenericState("onEnter", 0))
                 }
 
-                on<TestAction.A1> { _, _ ->
+                on<TestAction.A1> { _, state ->
                     a1Received++
-                    OverrideState(TestState.GenericState("onA1", a1Received))
+                    state.override(TestState.GenericState("onA1", a1Received))
                 }
             }
         }

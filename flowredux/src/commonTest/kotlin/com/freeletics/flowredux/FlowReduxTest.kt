@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class FlowReduxTest {
 
     @Test

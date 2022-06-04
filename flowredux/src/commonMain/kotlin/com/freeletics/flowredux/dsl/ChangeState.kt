@@ -21,12 +21,17 @@ public sealed class ChangeState<out S>
 /**
  * Sets a new state by directly override any previous state
  */
+@Deprecated("call override() on State instead", level = DeprecationLevel.WARNING)
 public data class OverrideState<S>(internal val newState: S) : ChangeState<S>()
+
+//TODO rename after removing deprecated OverrideState
+internal data class InternalOverrideState<S>(internal val newState: S) : ChangeState<S>()
 
 /**
  * Use this function if you want to "mutate" the current state by copying the old state and modify some properties in
  * the copy of the new state. A common use case is to call .copy() on your state defined as data class.
  */
+@Deprecated("call mutate() on State instead", level = DeprecationLevel.WARNING)
 public class MutateState<InputState : S, S>(
     internal val reducer: InputState.() -> S
 ) : ChangeState<S>() {
@@ -35,16 +40,30 @@ public class MutateState<InputState : S, S>(
         reducer(state as InputState)
 }
 
+internal class UnsafeMutateState<InputState, S>(
+    internal val reducer: InputState.() -> S
+) : ChangeState<S>() {
+    @Suppress("UNCHECKED_CAST")
+    internal fun reduceImpl(state: S): S =
+        reducer(state as InputState)
+}
 
 /**
  * No change, this is semantically equivalent to use [OverrideState] and pass in the previous state
  */
+@Deprecated("call noChange() on State instead", level = DeprecationLevel.WARNING)
 public object NoStateChange : ChangeState<Nothing>()
+
+//TODO rename after removing deprecated NoStateChange
+internal object InternalNoStateChange : ChangeState<Nothing>()
 
 internal fun <S> ChangeState<S>.reduce(state: S): S {
     return when (val change = this) {
-        is OverrideState -> change.newState
-        is NoStateChange -> state
-        is MutateState<*, S> -> change.reduceImpl(state)
+        is @Suppress("deprecation") OverrideState -> change.newState
+        is InternalOverrideState -> change.newState
+        is @Suppress("deprecation") NoStateChange -> state
+        is InternalNoStateChange -> state
+        is @Suppress("deprecation") MutateState<*, S> -> change.reduceImpl(state)
+        is UnsafeMutateState<*, S> -> change.reduceImpl(state)
     }
 }

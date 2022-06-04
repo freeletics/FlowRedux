@@ -12,7 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class CollectWhileInStateTest {
 
     @Test
@@ -28,9 +28,9 @@ class CollectWhileInStateTest {
                     emit(2)
                     delay(10)
                     emit(3)
-                }) { v, _ ->
+                }) { v, state ->
                     recordedValues.add(v)
-                    return@collectWhileInState OverrideState(TestState.S1)
+                    return@collectWhileInState state.override(TestState.S1)
                 }
             }
         }
@@ -60,9 +60,9 @@ class CollectWhileInStateTest {
                             emit(3)
                         }
                     }
-                }) { v, _ ->
+                }) { v, state ->
                     recordedValues.add(v)
-                    OverrideState(TestState.S1)
+                    state.override(TestState.S1)
                 }
             }
         }
@@ -80,20 +80,20 @@ class CollectWhileInStateTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                collectWhileInState(flowOf(1)) { _, _ ->
-                    OverrideState(TestState.S1)
+                collectWhileInState(flowOf(1)) { _, state ->
+                    state.override(TestState.S1)
                 }
             }
 
             inState<TestState.S1> {
-                on<TestAction.A1> { _, _ ->
-                    OverrideState(TestState.S2)
+                on<TestAction.A1> { _, state ->
+                    state.override(TestState.S2)
                 }
             }
 
             inState<TestState.S2> {
-                on<TestAction.A2> { _, _ ->
-                    OverrideState(TestState.S1)
+                on<TestAction.A2> { _, state ->
+                    state.override(TestState.S1)
                 }
             }
         }
@@ -121,7 +121,7 @@ class CollectWhileInStateTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
-                    OverrideState(TestState.GenericState("", 0))
+                    it.override(TestState.GenericState("", 0))
                 }
             }
             inState<TestState.GenericState> {
@@ -131,8 +131,8 @@ class CollectWhileInStateTest {
                             emit(1 + 10 * state.anInt)
                         }
                     }
-                }) { value, _ ->
-                    MutateState<TestState.GenericState, TestState> {
+                }) { value, state ->
+                    state.override {
                         if (value < 10000) {
                             TestState.GenericState(aString = aString + value, anInt = value)
                         } else {

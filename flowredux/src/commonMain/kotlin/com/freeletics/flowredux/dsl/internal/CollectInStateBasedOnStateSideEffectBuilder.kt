@@ -2,9 +2,9 @@ package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
+import com.freeletics.flowredux.dsl.ChangeState
 import com.freeletics.flowredux.dsl.ExecutionPolicy
-import com.freeletics.flowredux.dsl.CollectFlowHandler
-import com.freeletics.flowredux.dsl.FlowBuilder
+import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.flatMapWithExecutionPolicy
 import com.freeletics.flowredux.dsl.flow.whileInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,9 +23,9 @@ import kotlinx.coroutines.flow.mapNotNull
 @ExperimentalCoroutinesApi
 internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
-    private val flowBuilder: FlowBuilder<InputState, T>,
+    private val flowBuilder: (Flow<InputState>) -> Flow<T>,
     private val executionPolicy: ExecutionPolicy,
-    private val handler: CollectFlowHandler<T, InputState, S>
+    private val handler: suspend (item: T, state: State<InputState>) -> ChangeState<S>
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
@@ -46,16 +46,16 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
         actions: Flow<Action<S, A>>,
         getState: GetState<S>
     ): Flow<InputState> {
-        // after every state change there is a guaranteed action emission so we use this 
+        // after every state change there is a guaranteed action emission so we use this
         // to get the current state
         return actions.mapNotNull { getState() as? InputState }
             // an action emission does not guarantee that the state changed so we need to filter
-            // out multiple emissions of identical state objects    
+            // out multiple emissions of identical state objects
             .distinctUntilChanged()
     }
 
     private fun Flow<InputState>.transformWithFlowBuilder(): Flow<T> {
-        return flowBuilder.build(this)
+        return flowBuilder(this)
     }
 
     private suspend fun setStateFlow(
@@ -64,7 +64,7 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
     ): Flow<Action<S, A>> = flow {
 
         runOnlyIfInInputState(getState, isInState) { inputState ->
-            val changeState = handler.handle(value, inputState)
+            val changeState = handler(value, State(inputState))
             emit(
                 ChangeStateAction<S, A>(
                     changeState = changeState,

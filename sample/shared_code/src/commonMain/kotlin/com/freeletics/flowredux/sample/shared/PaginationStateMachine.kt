@@ -1,6 +1,8 @@
 package com.freeletics.flowredux.sample.shared
 
-import com.freeletics.flowredux.dsl.*
+import com.freeletics.flowredux.dsl.ChangeState
+import com.freeletics.flowredux.dsl.FlowReduxStateMachine
+import com.freeletics.flowredux.dsl.State
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -19,25 +21,27 @@ class InternalPaginationStateMachine(
         spec {
 
             inState<LoadFirstPagePaginationState> {
-                onEnter(::loadFirstPage)
+                onEnter { loadFirstPage(it) }
             }
 
             inState<LoadingFirstPageError> {
-                on<RetryLoadingFirstPage> { _, _ ->
-                    OverrideState(LoadFirstPagePaginationState)
+                on<RetryLoadingFirstPage> { _, state ->
+                    state.override(LoadFirstPagePaginationState)
                 }
             }
 
             inState<ShowContentPaginationState> {
-                on(::moveToLoadNextPageStateIfCanLoadNextPage)
+                on<LoadNextPage> { _, state ->
+                    moveToLoadNextPageStateIfCanLoadNextPage(state)
+                }
             }
 
             inState<ShowContentPaginationState>(additionalIsInState = { it.canLoadNextPage && it.nextPageLoadingState == NextPageLoadingState.LOADING }) {
-                onEnter(::loadNextPage)
+                onEnter { loadNextPage(it) }
             }
 
             inState<ShowContentPaginationState>(additionalIsInState = { it.nextPageLoadingState == NextPageLoadingState.ERROR }) {
-                onEnter(::showPaginationErrorFor3SecsThenReset)
+                onEnter { showPaginationErrorFor3SecsThenReset(it) }
             }
 
             inState<ShowContentPaginationState> {
@@ -49,8 +53,8 @@ class InternalPaginationStateMachine(
                             repository = repo
                         )
                     }
-                ) { _: ShowContentPaginationState, childState: GithubRepository ->
-                    MutateState<ShowContentPaginationState, ShowContentPaginationState> {
+                ) { inputState: State<ShowContentPaginationState>, childState: GithubRepository ->
+                    inputState.mutate {
                         copy(items = items.map { repoItem ->
                             if (repoItem.id == childState.id) {
                                 childState
@@ -64,14 +68,13 @@ class InternalPaginationStateMachine(
         }
     }
 
-    private suspend fun moveToLoadNextPageStateIfCanLoadNextPage(
-        action: LoadNextPage,
-        stateSnapshot: ShowContentPaginationState,
+    private fun moveToLoadNextPageStateIfCanLoadNextPage(
+        state: State<ShowContentPaginationState>,
     ): ChangeState<PaginationState> {
-        return if (!stateSnapshot.canLoadNextPage) {
-            NoStateChange
+        return if (!state.snapshot.canLoadNextPage) {
+            state.noChange()
         } else {
-            MutateState<ShowContentPaginationState, ShowContentPaginationState> {
+            state.mutate {
                 copy(
                     nextPageLoadingState = NextPageLoadingState.LOADING
                 )
@@ -83,7 +86,7 @@ class InternalPaginationStateMachine(
      * Loads the first page
      */
     private suspend fun loadFirstPage(
-        stateSnapshot: LoadFirstPagePaginationState,
+        state: State<LoadFirstPagePaginationState>
     ): ChangeState<PaginationState> {
         val nextState = try {
             when (val pageResult: PageResult = githubApi.loadPage(page = 0)) {
@@ -108,17 +111,17 @@ class InternalPaginationStateMachine(
             LoadingFirstPageError(t)
         }
 
-        return OverrideState(nextState)
+        return state.override(nextState)
     }
 
     private suspend fun loadNextPage(
-        stateSnapshot: ShowContentPaginationState,
+        state: State<ShowContentPaginationState>,
     ): ChangeState<PaginationState> {
-        val nextPageNumber = stateSnapshot.currentPage + 1
+        val nextPageNumber = state.snapshot.currentPage + 1
         val nextState: ChangeState<ShowContentPaginationState> = try {
             when (val pageResult = githubApi.loadPage(page = nextPageNumber)) {
                 PageResult.NoNextPage -> {
-                    MutateState {
+                    state.mutate {
                         copy(
                             nextPageLoadingState = NextPageLoadingState.IDLE,
                             canLoadNextPage = false,
@@ -126,7 +129,7 @@ class InternalPaginationStateMachine(
                     }
                 }
                 is PageResult.Page -> {
-                    MutateState {
+                    state.mutate {
                         copy(
                             items = items + pageResult.items,
                             canLoadNextPage = true,
@@ -138,7 +141,7 @@ class InternalPaginationStateMachine(
             }
         } catch (t: Throwable) {
             t.printStackTrace()
-            MutateState {
+            state.mutate {
                 copy(
                     nextPageLoadingState = NextPageLoadingState.ERROR
                 )
@@ -149,10 +152,10 @@ class InternalPaginationStateMachine(
     }
 
     private suspend fun showPaginationErrorFor3SecsThenReset(
-        stateSnapshot: ShowContentPaginationState,
+        state: State<ShowContentPaginationState>,
     ): ChangeState<PaginationState> {
         delay(3000)
-        return MutateState<ShowContentPaginationState, ShowContentPaginationState> {
+        return state.mutate {
             copy(
                 nextPageLoadingState = NextPageLoadingState.IDLE
             )
@@ -184,4 +187,3 @@ class PaginationStateMachine(
         }
     }
 }
-

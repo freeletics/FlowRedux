@@ -11,7 +11,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class, ExperimentalTime::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class CollectWhileInStateEffectTest {
 
     @Test
@@ -38,8 +38,8 @@ class CollectWhileInStateEffectTest {
                 collectWhileInState(flow {
                     delay(delayMs / 2)
                     emit(Unit)
-                }) { _, _ ->
-                    OverrideState(TestState.S1)
+                }) { _, state ->
+                    state.override(TestState.S1)
                 }
             }
         }
@@ -70,8 +70,8 @@ class CollectWhileInStateEffectTest {
                                 emit(Unit)
                             }
                         }
-                    }) { _, _ ->
-                        OverrideState(TestState.S1)
+                    }) { _, state ->
+                        state.override(TestState.S1)
                     }
 
                     collectWhileInStateEffect({
