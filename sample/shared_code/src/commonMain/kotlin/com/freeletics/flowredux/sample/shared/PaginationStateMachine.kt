@@ -1,6 +1,8 @@
 package com.freeletics.flowredux.sample.shared
 
-import com.freeletics.flowredux.dsl.*
+import com.freeletics.flowredux.dsl.ChangeState
+import com.freeletics.flowredux.dsl.FlowReduxStateMachine
+import com.freeletics.flowredux.dsl.State
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

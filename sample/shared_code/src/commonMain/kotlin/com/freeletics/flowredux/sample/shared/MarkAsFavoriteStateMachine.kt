@@ -2,8 +2,6 @@ package com.freeletics.flowredux.sample.shared
 
 import com.freeletics.flowredux.dsl.ChangeState
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
-import com.freeletics.flowredux.dsl.MutateState
-import com.freeletics.flowredux.dsl.NoStateChange
 import com.freeletics.flowredux.dsl.State
 import kotlinx.coroutines.delay
 
