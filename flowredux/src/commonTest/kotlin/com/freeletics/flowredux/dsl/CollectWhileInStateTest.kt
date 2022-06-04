@@ -132,7 +132,7 @@ class CollectWhileInStateTest {
                         }
                     }
                 }) { value, state ->
-                    state.mutate {
+                    state.override {
                         if (value < 10000) {
                             TestState.GenericState(aString = aString + value, anInt = value)
                         } else {

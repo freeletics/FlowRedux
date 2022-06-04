@@ -15,13 +15,26 @@ public class State<InputState : Any>(
      * Use this function if you want to "mutate" the current state by copying the old state
      * and modify some properties in the copy of the new state. A common use case is to call
      * .copy() on your state defined as data class.
+     *
+     * [snapshot] should never be accessed within [reducer].
      */
-    public fun <S : Any> mutate(reducer: InputState.() -> S): ChangeState<S> {
+    public fun mutate(reducer: InputState.() -> InputState): ChangeState<InputState> {
         return UnsafeMutateState(reducer)
     }
 
     /**
-     * Sets a new state by directly override any previous state
+     * Use this function if you want to override the previous state with another state based on
+     * the current state.
+     *
+     * [snapshot] should never be accessed within [reducer].
+     */
+    public fun <S : Any> override(reducer: InputState.() -> S): ChangeState<S> {
+        return UnsafeMutateState(reducer)
+    }
+
+    /**
+     * Sets a new state by directly override any previous state. If the new state requires values
+     * from the current state prefer using the `override` function that has a `reducer` parameter.
      */
     public fun <S : Any> override(newState: S): ChangeState<S> {
         return InternalOverrideState(newState)
