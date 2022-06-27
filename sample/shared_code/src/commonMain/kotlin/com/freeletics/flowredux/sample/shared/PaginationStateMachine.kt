@@ -26,7 +26,7 @@ class InternalPaginationStateMachine(
 
             inState<LoadingFirstPageError> {
                 on<RetryLoadingFirstPage> { _, state ->
-                    state.override(LoadFirstPagePaginationState)
+                    state.override { LoadFirstPagePaginationState }
                 }
             }
 
@@ -111,7 +111,7 @@ class InternalPaginationStateMachine(
             LoadingFirstPageError(t)
         }
 
-        return state.override(nextState)
+        return state.override { nextState }
     }
 
     private suspend fun loadNextPage(

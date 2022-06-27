@@ -9,7 +9,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class OnEnterEffectTest {
@@ -31,7 +30,7 @@ class OnEnterEffectTest {
                 }
 
                 on<TestAction.A2> { _, state ->
-                    state.override(TestState.S2)
+                    state.override { TestState.S2 }
                 }
             }
         }
@@ -57,7 +56,7 @@ class OnEnterEffectTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
-                    it.override(TestState.GenericState("from initial", 0))
+                    it.override { TestState.GenericState("from initial", 0) }
                 }
             }
 
@@ -68,7 +67,7 @@ class OnEnterEffectTest {
 
                 on<TestAction.A1> { _, state ->
                     a1Received++
-                    state.override(TestState.GenericState("onA1", a1Received))
+                    state.override { TestState.GenericState("onA1", a1Received) }
                 }
             }
         }

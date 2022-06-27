@@ -10,7 +10,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.fail
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class CustomIsInStateDslTest {
@@ -27,13 +26,13 @@ class CustomIsInStateDslTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> { _, state ->
-                    state.override(gs1)
+                    state.override { gs1 }
                 }
             }
             inStateWithCondition(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
                 on<TestAction.A1> { _, state ->
                     counter1++
-                    state.override(gs2)
+                    state.override { gs2 }
                 }
             }
 
@@ -41,7 +40,7 @@ class CustomIsInStateDslTest {
                 on<TestAction.A1> { _, state ->
                     delay(20) // wait for some time to see if not other state above triggers
                     counter2++
-                    state.override(TestState.S1)
+                    state.override { TestState.S1 }
                 }
             }
         }
@@ -71,7 +70,7 @@ class CustomIsInStateDslTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> { _, state ->
-                    state.override(gs1)
+                    state.override { gs1 }
                 }
             }
             inStateWithCondition(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
@@ -81,14 +80,14 @@ class CustomIsInStateDslTest {
                     reached = true
                     fail("This should never be reached")
                 }) { value, state ->
-                    state.override(TestState.GenericState(value.toString(), value))
+                    state.override { TestState.GenericState(value.toString(), value) }
                 }
             }
 
             inStateWithCondition(isInState = { it is TestState.GenericState && it.anInt == 2 }) {
                 onEnter {
                     delay(50) // Wait until collectWhileInState succeeded
-                    return@onEnter it.override(TestState.S1)
+                    return@onEnter it.override { TestState.S1 }
                 }
             }
         }
