@@ -1,7 +1,7 @@
 package com.freeletics.flowredux.dsl
 
 /**
- * Allows to create [ChangeState] objects to change the state as a result of DSL
+ * Allows to create [ChangedState] objects to change the state as a result of DSL
  * methods like [InStateBuilderBlock.on] or  [InStateBuilderBlock.onEnter].
  *
  * The [snapshot] property can be used to access the current state at the time the action
@@ -19,7 +19,7 @@ public class State<InputState : Any>(
      * [snapshot] should never be accessed within [reducer]. Use the `this` of the lambda which
      * is guaranteed to be the current state at the time of execution instead.
      */
-    public fun mutate(reducer: InputState.() -> InputState): ChangeState<InputState> {
+    public fun mutate(reducer: InputState.() -> InputState): ChangedState<InputState> {
         return UnsafeMutateState(reducer)
     }
 
@@ -30,14 +30,14 @@ public class State<InputState : Any>(
      * [snapshot] should never be accessed within [reducer]. Use the `this` of the lambda which
      * is guaranteed to be the current state at the time of execution instead.
      */
-    public fun <S : Any> override(reducer: InputState.() -> S): ChangeState<S> {
+    public fun <S : Any> override(reducer: InputState.() -> S): ChangedState<S> {
         return UnsafeMutateState(reducer)
     }
 
     /**
      * No change, this is semantically equivalent to use [override] or [mutate] and return `this`.
      */
-    public fun <S : Any> noChange(): ChangeState<S> {
+    public fun <S : Any> noChange(): ChangedState<S> {
         return NoStateChange
     }
 }

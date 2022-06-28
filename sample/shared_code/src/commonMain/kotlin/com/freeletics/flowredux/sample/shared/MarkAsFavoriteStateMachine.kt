@@ -1,6 +1,6 @@
 package com.freeletics.flowredux.sample.shared
 
-import com.freeletics.flowredux.dsl.ChangeState
+import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.State
 import kotlinx.coroutines.delay
@@ -26,7 +26,7 @@ class MarkAsFavoriteStateMachine(
         }
     }
 
-    private suspend fun markAsFavorite(state: State<GithubRepository>): ChangeState<GithubRepository> {
+    private suspend fun markAsFavorite(state: State<GithubRepository>): ChangedState<GithubRepository> {
         return try {
             val shouldBeMarkedAsFavorite = favoriteStatusWhenStarting == FavoriteStatus.NOT_FAVORITE
             githubApi.markAsFavorite(repoId = state.snapshot.id, favorite = shouldBeMarkedAsFavorite)
@@ -43,12 +43,12 @@ class MarkAsFavoriteStateMachine(
         }
     }
 
-    private suspend fun resetErrorStateAfter3Seconds(state: State<GithubRepository>): ChangeState<GithubRepository> {
+    private suspend fun resetErrorStateAfter3Seconds(state: State<GithubRepository>): ChangedState<GithubRepository> {
         delay(3000)
         return state.mutate { copy(favoriteStatus = favoriteStatusWhenStarting) }
     }
 
-    private fun resetErrorState(action: RetryToggleFavoriteAction, state: State<GithubRepository>): ChangeState<GithubRepository> {
+    private fun resetErrorState(action: RetryToggleFavoriteAction, state: State<GithubRepository>): ChangedState<GithubRepository> {
         return if (action.id != state.snapshot.id) {
             // Since all active MarkAsFavoriteStateMachine receive this action
             // we need to ignore those who are not meant for this state machine

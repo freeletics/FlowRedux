@@ -38,7 +38,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      */
     public inline fun <reified SubAction : A> on(
         executionPolicy: ExecutionPolicy = ExecutionPolicy.CANCEL_PREVIOUS,
-        noinline handler: suspend (action: SubAction, state: State<InputState>) -> ChangeState<S>,
+        noinline handler: suspend (action: SubAction, state: State<InputState>) -> ChangedState<S>,
     ) {
         on(SubAction::class, executionPolicy, handler)
     }
@@ -54,7 +54,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     public fun <SubAction : A> on(
         actionClass: KClass<SubAction>,
         executionPolicy: ExecutionPolicy,
-        handler: suspend (action: SubAction, state: State<InputState>) -> ChangeState<S>,
+        handler: suspend (action: SubAction, state: State<InputState>) -> ChangedState<S>,
     ) {
         val builder = OnActionInStateSideEffectBuilder<InputState, S, A>(
             executionPolicy = executionPolicy,
@@ -116,7 +116,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      * An ongoing [handler] is cancelled when leaving this state.
      */
     public fun onEnter(
-        handler: suspend (state: State<InputState>) -> ChangeState<S>,
+        handler: suspend (state: State<InputState>) -> ChangedState<S>,
     ) {
         _inStateSideEffectBuilders.add(
             OnEnterInStateSideEffectBuilder(
@@ -156,7 +156,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     public fun <T> collectWhileInState(
         flow: Flow<T>,
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
-        handler: suspend (item: T, state: State<InputState>) -> ChangeState<S>,
+        handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
     ) {
         _inStateSideEffectBuilders.add(
             CollectInStateBuilder(
@@ -182,7 +182,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     public fun <T> collectWhileInState(
         flowBuilder: (state: Flow<InputState>) -> Flow<T>,
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
-        handler: suspend (item: T, state: State<InputState>) -> ChangeState<S>,
+        handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
     ) {
         _inStateSideEffectBuilders.add(
             CollectInStateBasedOnStateBuilder(
@@ -240,7 +240,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
 
     public fun <SubStateMachineState : Any> onEnterStartStateMachine(
         stateMachine: FlowReduxStateMachine<SubStateMachineState, A>,
-        stateMapper: (State<InputState>, SubStateMachineState) -> ChangeState<S> = { _, subState ->
+        stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
         }
@@ -254,7 +254,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
 
     public fun <SubStateMachineState : Any> onEnterStartStateMachine(
         stateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, A>,
-        stateMapper: (State<InputState>, SubStateMachineState) -> ChangeState<S> = { _, subState ->
+        stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
         }
@@ -269,7 +269,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     public fun <SubStateMachineState : Any, SubStateMachineAction : Any> onEnterStartStateMachine(
         stateMachine: FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
         actionMapper: (A) -> SubStateMachineAction,
-        stateMapper: (State<InputState>, SubStateMachineState) -> ChangeState<S> = { _, subState ->
+        stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
         }
@@ -284,7 +284,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     public fun <SubStateMachineState : Any, SubStateMachineAction : Any> onEnterStartStateMachine(
         stateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
         actionMapper: (A) -> SubStateMachineAction,
-        stateMapper: (State<InputState>, SubStateMachineState) -> ChangeState<S> = { _, subState ->
+        stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
         }
@@ -301,7 +301,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
 
     public inline fun <reified SubAction : A, SubStateMachineState : Any> onActionStartStateMachine(
         stateMachine: FlowReduxStateMachine<SubStateMachineState, A>,
-        noinline stateMapper: (State<InputState>, SubStateMachineState) -> ChangeState<S>,
+        noinline stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
     ) {
         onActionStartStateMachine(
             stateMachineFactory = { _: SubAction, _: InputState -> stateMachine },
@@ -312,7 +312,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
 
     public inline fun <reified SubAction : A, SubStateMachineState : Any> onActionStartStateMachine(
         noinline stateMachineFactory: (SubAction, InputState) -> FlowReduxStateMachine<SubStateMachineState, A>,
-        noinline stateMapper: (State<InputState>, SubStateMachineState) -> ChangeState<S>,
+        noinline stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
     ) {
         onActionStartStateMachine(
             stateMachineFactory = stateMachineFactory,
@@ -324,7 +324,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     public inline fun <reified SubAction : A, SubStateMachineState : Any, SubStateMachineAction : Any> onActionStartStateMachine(
         noinline stateMachineFactory: (SubAction, InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
         noinline actionMapper: (A) -> SubStateMachineAction,
-        noinline stateMapper: (State<InputState>, SubStateMachineState) -> ChangeState<S>,
+        noinline stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
     ) {
         onActionStartStateMachine(
             actionClass = SubAction::class,
@@ -338,7 +338,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         actionClass: KClass<out SubAction>,
         stateMachineFactory: (SubAction, InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
         actionMapper: (A) -> SubStateMachineAction,
-        stateMapper: (State<InputState>, SubStateMachineState) -> ChangeState<S>,
+        stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
     ) {
 
         val builder = StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachineState, SubStateMachineAction, InputState, SubAction, S, A>(
