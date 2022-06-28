@@ -4,7 +4,7 @@ ext.versions = [
         targetSdk              : 31,
         minSdk                 : 21,
         dokka                  : '1.6.10',
-        coroutines             : '1.6.2',
+        coroutines             : '1.6.3',
         kotlin                 : '1.6.10',
         rxJava                 : '2.2.21',
         rxAndroid              : '2.1.1',
@@ -40,7 +40,7 @@ ext.libraries = [
         coroutinesNativeMT: "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}",
         rxJava            : "io.reactivex.rxjava2:rxjava:$versions.rxJava",
         rxAndroid         : "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid",
-        flMadStateMachine : "com.freeletics.mad:state-machine:0.3.1",
+        flMadStateMachine : "com.freeletics.mad:state-machine:0.5.0",
 ]
 
 ext.compose = [
