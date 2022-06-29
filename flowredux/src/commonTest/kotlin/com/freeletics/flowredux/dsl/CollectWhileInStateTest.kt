@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class CollectWhileInStateTest {
@@ -30,7 +29,7 @@ class CollectWhileInStateTest {
                     emit(3)
                 }) { v, state ->
                     recordedValues.add(v)
-                    return@collectWhileInState state.override(TestState.S1)
+                    return@collectWhileInState state.override { TestState.S1 }
                 }
             }
         }
@@ -62,7 +61,7 @@ class CollectWhileInStateTest {
                     }
                 }) { v, state ->
                     recordedValues.add(v)
-                    state.override(TestState.S1)
+                    state.override { TestState.S1 }
                 }
             }
         }
@@ -81,19 +80,19 @@ class CollectWhileInStateTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 collectWhileInState(flowOf(1)) { _, state ->
-                    state.override(TestState.S1)
+                    state.override { TestState.S1 }
                 }
             }
 
             inState<TestState.S1> {
                 on<TestAction.A1> { _, state ->
-                    state.override(TestState.S2)
+                    state.override { TestState.S2 }
                 }
             }
 
             inState<TestState.S2> {
                 on<TestAction.A2> { _, state ->
-                    state.override(TestState.S1)
+                    state.override { TestState.S1 }
                 }
             }
         }
@@ -121,7 +120,7 @@ class CollectWhileInStateTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
-                    it.override(TestState.GenericState("", 0))
+                    it.override { TestState.GenericState("", 0) }
                 }
             }
             inState<TestState.GenericState> {

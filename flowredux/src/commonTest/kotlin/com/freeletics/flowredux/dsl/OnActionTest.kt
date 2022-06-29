@@ -9,7 +9,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class OnActionTest {
@@ -28,11 +27,11 @@ class OnActionTest {
                     // this should never be reached because state transition did happen in the meantime,
                     // therefore this whole block must be canceled
                     reached = true
-                    state.override(TestState.S1)
+                    state.override { TestState.S1 }
                 }
 
                 on<TestAction.A2> { _, state ->
-                    state.override(TestState.S2)
+                    state.override { TestState.S2 }
                 }
 
             }
@@ -58,13 +57,13 @@ class OnActionTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> { _, state ->
-                    state.override(TestState.S1)
+                    state.override { TestState.S1 }
                 }
             }
 
             inState<TestState.S1> {
                 on<TestAction.A2> { _, state ->
-                    state.override(TestState.S2)
+                    state.override { TestState.S2 }
                 }
             }
         }

@@ -1,13 +1,13 @@
 package com.freeletics.flowredux.dsl.internal
 
-import com.freeletics.flowredux.dsl.ChangeState
+import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.reduce
 
 internal sealed class Action<S, A>
 
 internal data class ChangeStateAction<S, A>(
     internal val runReduceOnlyIf: (S) -> Boolean,
-    internal val changeState: ChangeState<S>
+    internal val changedState: ChangedState<S>
 ) : Action<S, A>() {
     override fun toString(): String {
         return "SetStateAction"
@@ -34,7 +34,7 @@ internal fun <S : Any, A> reducer(state: S, action: Action<S, A>): S =
     when (action) {
         is ChangeStateAction<S, A> ->
             if (action.runReduceOnlyIf(state))
-                action.changeState.reduce(state)
+                action.changedState.reduce(state)
             else state
         is ExternalWrappedAction<S, A> -> state
         is InitialStateAction<S, A> -> state

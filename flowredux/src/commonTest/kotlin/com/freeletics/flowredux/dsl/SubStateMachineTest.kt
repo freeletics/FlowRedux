@@ -7,7 +7,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class SubStateMachineTest {
@@ -39,14 +38,14 @@ class SubStateMachineTest {
             inState<TestState.S3> {
                 on<TestAction.A1> { _, state ->
                     inS3onA1Action++
-                    state.override(TestState.S1)
+                    state.override { TestState.S1 }
                 }
             }
 
             inState<TestState.S2> {
                 on<TestAction.A1> { _, state ->
                     inS2OnA1Action++
-                    state.override(TestState.S2)
+                    state.override { TestState.S2 }
                 }
             }
         }
@@ -63,14 +62,14 @@ class SubStateMachineTest {
                     if (subStateMachineState == TestState.S3) {
                         state.noChange()
                     } else {
-                        state.override(subStateMachineState)
+                        state.override { subStateMachineState }
                     }
                 }
             }
 
             inState<TestState.S1> {
                 on<TestAction.A1> { _, state ->
-                    state.override(TestState.S2)
+                    state.override { TestState.S2 }
                 }
             }
         }
@@ -121,7 +120,7 @@ class SubStateMachineTest {
                     )
 
                     on<TestAction.A1> { _, state ->
-                        state.override(state.snapshot.copy(anInt = state.snapshot.anInt + 1))
+                        state.override { state.snapshot.copy(anInt = state.snapshot.anInt + 1) }
                     }
                 }
             }
@@ -171,13 +170,13 @@ class SubStateMachineTest {
                     )
 
                     on<TestAction.A1> { _, state ->
-                        state.override(TestState.S2)
+                        state.override { TestState.S2 }
                     }
                 }
 
                 inState<TestState.S2> {
                     on<TestAction.A2> { _, state ->
-                        state.override(TestState.S1)
+                        state.override { TestState.S1 }
                     }
                 }
             }
@@ -226,7 +225,7 @@ class SubStateMachineTest {
             val sm = StateMachine(initialState = TestState.S1) {
                 inState<TestState.S1> {
                     onEnterStartStateMachine(child)
-                    on<TestAction.A2> { _, state -> state.override(TestState.S2) }
+                    on<TestAction.A2> { _, state -> state.override { TestState.S2 } }
                 }
                 inState<TestState.S2> {
                     on<TestAction.A1> { _, state ->
@@ -278,21 +277,21 @@ class SubStateMachineTest {
                     }
                     on<TestAction.A2> { _, state ->
                         childActionA2++
-                        state.override(TestState.S1)
+                        state.override { TestState.S1 }
                     }
                 }
             }
 
             val sm = StateMachine(initialState = TestState.S1) {
                 inState<TestState.S1> {
-                    on<TestAction.A1> { _, state -> state.override(TestState.S2) }
+                    on<TestAction.A1> { _, state -> state.override { TestState.S2 } }
                 }
                 inState<TestState.S2> {
                     onEnterEffect { parentS2++ }
                     onEnterStartStateMachine(
                         stateMachineFactory = { childFactory++; child },
                         actionMapper = { it },
-                        stateMapper = { state, childState -> state.override(childState) }
+                        stateMapper = { state, childState -> state.override { childState } }
                     )
                 }
             }
