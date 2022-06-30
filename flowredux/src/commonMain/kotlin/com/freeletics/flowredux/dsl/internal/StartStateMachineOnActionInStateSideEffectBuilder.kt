@@ -4,7 +4,7 @@ package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
-import com.freeletics.flowredux.dsl.ChangeState
+import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.whileInState
@@ -25,7 +25,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
 (
     private val subStateMachineFactory: (action: ActionThatTriggeredStartingStateMachine, state: InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
     private val actionMapper: (A) -> SubStateMachineAction,
-    private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangeState<S>,
+    private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
     private val isInState: (S) -> Boolean,
     internal val subActionClass: KClass<out A>,
 ) : InStateSideEffectBuilder<InputState, S, A>() {
@@ -67,7 +67,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                                             send(
                                                                 ChangeStateAction(
                                                                     runReduceOnlyIf = isInState,
-                                                                    changeState = stateMapper(State(parentState), subStateMachineState)
+                                                                    changedState = stateMapper(State(parentState), subStateMachineState)
                                                                 )
                                                             )
                                                         }

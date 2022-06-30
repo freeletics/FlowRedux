@@ -47,7 +47,7 @@ class MyStateMachine : FlowReduxStateMachine<State, Action>(LoadingState){
                     // observes the given flow as long as state is ContentState.
                     // Once state is changed to another state the flow will automatically
                     // stop emitting.
-                    MutateState<ContentState, State> { 
+                    MutateState<ContentState, State> {
                         copy( items = this.items + Item("New item $value"))
                     }
                 }
@@ -103,14 +103,14 @@ There are two artifacts that you can include as dependency:
 
 ### Multiplatform
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux:0.12.0'
-implementation 'com.freeletics.flowredux:compose:0.12.0'
+implementation 'com.freeletics.flowredux:flowredux:0.13.0'
+implementation 'com.freeletics.flowredux:compose:0.13.0'
 ```
 
 ### JVM / Android only
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux-jvm:0.12.0'
-implementation 'com.freeletics.flowredux:compose:0.12.0'
+implementation 'com.freeletics.flowredux:flowredux-jvm:0.13.0'
+implementation 'com.freeletics.flowredux:compose:0.13.0'
 ```
 
 ### JavaScript

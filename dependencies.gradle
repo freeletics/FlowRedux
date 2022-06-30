@@ -4,7 +4,7 @@ ext.versions = [
         targetSdk              : 31,
         minSdk                 : 21,
         dokka                  : '1.6.10',
-        coroutines             : '1.6.2',
+        coroutines             : '1.6.3',
         kotlin                 : '1.7.0',
         rxJava                 : '2.2.21',
         rxAndroid              : '2.1.1',
@@ -19,13 +19,13 @@ ext.versions = [
         supportConstraintLayout: '2.1.4',
         androidArch            : '2.2.0',
 
-        lifecycle              : '2.4.1',
+        lifecycle              : '2.5.0',
         fragmentKtx            : '1.4.1',
         viewModelKtx           : '2.4.1',
 
         material               : '1.6.1',
         adapterDelegates       : '4.3.2',
-        activity               : "1.4.0",
+        activity               : "1.5.0",
 
         junit                  : '4.13.2',
         turbine                : '0.7.0',
@@ -41,7 +41,7 @@ ext.libraries = [
         coroutinesNativeMT: "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}",
         rxJava            : "io.reactivex.rxjava2:rxjava:$versions.rxJava",
         rxAndroid         : "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid",
-        flMadStateMachine : "com.freeletics.mad:state-machine:0.3.1",
+        flMadStateMachine : "com.freeletics.mad:state-machine:0.6.0",
 ]
 
 ext.compose = [

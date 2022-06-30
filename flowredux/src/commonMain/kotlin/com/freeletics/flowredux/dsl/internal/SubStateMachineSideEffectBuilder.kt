@@ -2,7 +2,7 @@ package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.SideEffect
-import com.freeletics.flowredux.dsl.ChangeState
+import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.mapToIsInState
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 internal class SubStateMachineSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, S : Any, A>(
     private val subStateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
     private val actionMapper: (A) -> SubStateMachineAction,
-    private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangeState<S>,
+    private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
     private val isInState: (S) -> Boolean
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
@@ -84,7 +84,7 @@ internal class SubStateMachineSideEffectBuilder<SubStateMachineState : Any, SubS
                                 runOnlyIfInInputState(getState, isInState) { inputState ->
                                     changeStateAction = ChangeStateAction<S, A>(
                                         runReduceOnlyIf = isInState,
-                                        changeState = stateMapper(
+                                        changedState = stateMapper(
                                             State(inputState),
                                             subStateMachineState
                                         )

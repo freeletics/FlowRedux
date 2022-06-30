@@ -9,7 +9,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class OnEnterTest {
@@ -28,11 +27,11 @@ class OnEnterTest {
                     // this should never be reached because state transition did happen in the meantime,
                     // therefore this whole block must be canceled
                     reached = true
-                    it.override(TestState.S1)
+                    it.override { TestState.S1 }
                 }
 
                 on<TestAction.A2> { _, state ->
-                    state.override(TestState.S2)
+                    state.override { TestState.S2 }
                 }
             }
         }
@@ -58,19 +57,19 @@ class OnEnterTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
-                    it.override(TestState.GenericState("from initial", 0))
+                    it.override { TestState.GenericState("from initial", 0) }
                 }
             }
 
             inState<TestState.GenericState> {
                 onEnter {
                     genericStateEntered++
-                    it.override(TestState.GenericState("onEnter", 0))
+                    it.override { TestState.GenericState("onEnter", 0) }
                 }
 
                 on<TestAction.A1> { _, state ->
                     a1Received++
-                    state.override(TestState.GenericState("onA1", a1Received))
+                    state.override { TestState.GenericState("onA1", a1Received) }
                 }
             }
         }

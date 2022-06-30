@@ -2,7 +2,7 @@ package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
-import com.freeletics.flowredux.dsl.ChangeState
+import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.ExecutionPolicy
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.flatMapWithExecutionPolicy
@@ -30,7 +30,7 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     private val flow: Flow<T>,
     private val executionPolicy: ExecutionPolicy,
-    private val handler: suspend (item: T, state: State<InputState>) -> ChangeState<S>,
+    private val handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
@@ -59,7 +59,7 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
             val changeState = handler(value, State(inputState))
             emit(
                 ChangeStateAction<S, A>(
-                    changeState = changeState,
+                    changedState = changeState,
                     runReduceOnlyIf = { state -> isInState(state) }
                 )
             )

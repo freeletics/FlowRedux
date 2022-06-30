@@ -19,7 +19,7 @@ class StartStateMachineOnActionInStateTest {
             inState<TestState.Initial> {
                 onActionStartStateMachine<TestAction.A1, TestState>(child) { inputState, childState ->
                     childStateChanged++
-                    inputState.override(childState)
+                    inputState.override { childState }
                 }
             }
         }
@@ -41,7 +41,7 @@ class StartStateMachineOnActionInStateTest {
             inState<TestState.Initial> {
                 onActionStartStateMachine<TestAction.A1, TestState>(child) { inputState, _ ->
                     childStateChanged++
-                    inputState.override(TestState.S1)
+                    inputState.override { TestState.S1 }
                 }
             }
         }
@@ -71,13 +71,13 @@ class StartStateMachineOnActionInStateTest {
             inState<TestState.S3> {
                 on<TestAction.A2> { _, state ->
                     childS3A2Handeld++
-                    state.override(TestState.S1) // Doesn't really matter which state, parent ignores it anyway
+                    state.override { TestState.S1 } // Doesn't really matter which state, parent ignores it anyway
                 }
             }
             inState<TestState.S1> {
                 on<TestAction.A2> { _, state ->
                     childS1A2Handled++
-                    state.override(TestState.S3)
+                    state.override { TestState.S3 }
                 }
             }
         }
@@ -91,7 +91,7 @@ class StartStateMachineOnActionInStateTest {
                 }
 
                 on<TestAction.A3> { _, state ->
-                    state.override(TestState.S3)
+                    state.override { TestState.S3 }
                 }
             }
         }
@@ -145,16 +145,16 @@ class StartStateMachineOnActionInStateTest {
 
         val child = StateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
-                on<TestAction.A3> { _, state -> state.override(TestState.S2) }
+                on<TestAction.A3> { _, state -> state.override { TestState.S2 } }
             }
 
             inState<TestState.S2> {
-                on<TestAction.A2> { _, state -> state.override(TestState.S3) }
+                on<TestAction.A2> { _, state -> state.override { TestState.S3 } }
             }
         }
         val parent = StateMachine(initialState = initialState) {
             inState<TestState.S3> {
-                on<TestAction.A1> { _, state -> state.override(TestState.CounterState(10)) }
+                on<TestAction.A1> { _, state -> state.override { TestState.CounterState(10) } }
             }
             inState<TestState.CounterState> {
                 onActionStartStateMachine<TestAction.A4, TestState, TestAction>(
@@ -169,7 +169,7 @@ class StartStateMachineOnActionInStateTest {
                     stateMapper = { inputState, subState ->
                         stateMapperRecordings += pairOf(inputState.snapshot, subState)
                         if (subState is TestState.S3)
-                            inputState.override(TestState.S3)
+                            inputState.override { TestState.S3 }
                         else
                             inputState.mutate {
                                 copy(counter = this.counter + 1)
