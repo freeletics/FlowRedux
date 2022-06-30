@@ -21,7 +21,7 @@ ext.versions = [
 
         lifecycle              : '2.5.0',
         fragmentKtx            : '1.4.1',
-        viewModelKtx           : '2.4.1',
+        viewModelKtx           : '2.5.0',
 
         material               : '1.6.1',
         adapterDelegates       : '4.3.2',
