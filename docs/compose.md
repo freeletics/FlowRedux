@@ -54,7 +54,7 @@ fun MyUi(){
   val state : State<AddressBookState> = stateMachine.rememberState() // this returns Compose State
   LazyColumn {
       items(state.contacts) { contact : Contact ->
-         ContactUi(contact, dispatchAction)
+         ContactUi(contact)
       }
     }
 }
