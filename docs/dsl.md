@@ -7,9 +7,33 @@ Furthermore, this document is meant to be read from top to bottom.
 To do that we will stick with a simple example of loading a list of items from a web service. 
 As you read this section and more concepts of the DSL will be introduced we will extend this example with more features.
 
-For now to get started, let's define the `States` our state machine has. As said before we load a list of items from a
-web service and display that list. While loading the list we show a loading indicator on the screen and if an error
-occurs we show an error message on the screen with a retry button.
+## FlowReduxStateMachine
+The base class in FlowRedux is `FlowReduxStateMachine`.
+It has a very simple public API:
+
+```kotlin
+class FlowReduxStateMachine<State, Action>{
+    val state : Flow<State>
+    suspend fun dispatch(action : Action)
+}
+```
+
+Every `FlowReduxStateMachine` works on a `State` class. 
+How you model your state is up to you and depends on what your program and business logic actually wants to solve.
+You can simply collect the `state : Flow<State>` (from Kotlin coroutines library) by calling `.collect()` on it. 
+Whenever the state of the state machine changes, observers will get the update through this `Flow`.
+
+We also need a way "input" something to our state machine like a user has clicked on a button in the UI and something should happen in your state machine.
+"Inputs" are called `Actions` in FlowRedux. 
+An example could be `data LoginSubmittedAction(val username : String, val password : String)`.
+Again, how you model your Actions is up  to you. 
+There are no constraints or limitations from FlowRedux.
+
+
+That should be enough information to get started with our example app based on FlowRedux. 
+For now to get started, let's define the `States` our state machine has. 
+As said before we load a list of items from a web server (via http) and display that list. 
+While loading the list we show a loading indicator on the screen and if an error occurs we show an error message on the screen with a retry button.
 
 This gives us the following states:
 
@@ -36,6 +60,10 @@ sealed interface Action {
     object RetryLoadingAction : Action
 }
 ```
+
+This is how the UI should looks like showing the 3 states mentioned above:
+
+![Sample UI](/images/lce.gif)
 
 ## Initial State
 
@@ -287,21 +315,28 @@ and `state : State<T>` which gives us access to the current state and let us to 
 - **The execution of the `on { ... }` is canceled as soon as state condition specified in the surrounding `inState` block
   doesn't hold anymore (i.e. state has been changes by something else).**
 
+So far this is how our result look like: 
+![Image title](/images/lce.gif)
+
+
 ### collectWhileInState()
 
 This one is useful if you want to collect a `Flow` (from Kotlin Coroutines) only while being exactly in that state. 
 To give a concrete example how this is useful let's extend our `ItemListStateMachine` example. 
 Let's say whenever our state machine is in `Error` state we want
 to retry loading the items after 3 seconds in `Error` state or anytime before the 3 seconds have elapsed if the user clicks the retry button. 
-Furthermore the 3 seconds countdown timer should be displayed in our UI as well:
+Furthermore the 3 seconds countdown timer should be displayed in our UI as well.
+This is how the UI should look like:
+
+![Automatically Retry](/images/error-countdown.gif)
 
 To implement this let's first extend our `Error` state:
 
 ```kotlin
 data class Error(
     val cause: Throwable,
-    val countdown: Int    // This value is decreased from 3 then 2 then 1 and represents the countdown value.
-) : State()
+    val countdown: Int // This value is decreased from 3 then 2 then 1 and represents the countdown value.
+) : ListState
 ```
 
 Now let's add some countdown capabilities to our state machine by using `collectWhileInState()`:
@@ -516,7 +551,7 @@ using `inState<>` on a base class.
 spec {
     inState<ListState> {
         // on, onEnter, collectWhileInState for all states because
-        // ListState is the base class these would never get cancelled
+        // ListState is the base class, thus these never get cancelled
     }
 
     inState<Loading> {
@@ -526,6 +561,8 @@ spec {
     inState<ShowContent> {
         // on, onEnter, collectWhileInState specific to ShowContent state
     }
+
+    ...
 }
 ```
 
@@ -811,6 +848,10 @@ sealed interface FavoriteStatus {
 
 You may wonder why we need `FavoriteStatus` and why it is not just a `Boolean` to reflect marked as favorite or not? 
 Remember: we also need to talk to a server (via http) whenever the user wants to mark an `Item` as favorite or unmark it.
+The UI looks like this:
+
+![Item state favorite](/images/item-favorite-state.gif)
+
 
 Let's for now ignore the `ItemListStateMachine` and only focus on our new requirements: marking an `Item` as favorite (or unmark it) plus the communication with our backend server to store that information. 
 We could add this new requirements with  our DSL to `ItemListStateMachine` somehow or we extract that into a small stand alone state machine.
@@ -881,6 +922,11 @@ class FavoriteStatusStateMachine(
 
 All that `FavoriteStatusStateMachine` does is making an http request to the backend and in case of error reset back to the previous state after showing an error state for 3 seconds. 
 
+This is how the UI should looks like:
+
+![Sample UI](/images/favorite-state-list.gif)
+
+
 Now let's connect this with our `ItemListStateMachine` by using `onActionStartStateMachine()`.
 
 ```kotlin
@@ -940,8 +986,12 @@ class ItemListStateMachine(
 }
 ```
 
-`onActionStartStateMachine()` takes 3 parameters. Multiple overloads exists, and in our case the one with only 2 parameters was enough. Nevertheless, let's explain all 3 parameters of `onActionStartStateMachine()`:
+First, let's take a look at `onActionStartStateMachine()` public API. 
+It has 3 parameters.
+Multiple overloads exists, and in our case the one with only 2 parameters is enough. 
+Nevertheless, let's explain all 3 parameters of `onActionStartStateMachine()`:
 
 1. `stateMachineFactory: (Action, State) -> FlowReduxStateMachine`: Inside this block you create a state machine. In our case we create a `FavoriteStatusStateMachine`. You have access to the current state of the `ItemListStateMachine` and the `Action` that has triggered `onActionStartStateMachine()`
 2. `stateMapper: (State<T>, StateOfNewStateMachine) -> ChangedState<T>`: we need to have a way to combine the state of the newly started state machine with the one of the "current" state machine. In our case we need to combine `ItemListStateMachine`'s state with  `FavoriteStatusStateMachine`'s state. That is exactly what `stateMapper` is good for. The difference is that `ItemListStateMachine` provides a `State<T>` to the `stateMapper` (first parameter) whereas `FavoriteStatusStateMachine` provides the current `FavoriteState` (not `State<FavoriteState>`). The reason is that at the end we need to get a compatible state for `ItemListStateMachine` and that is what we need to do through the already known `State<T>.override()` or `State<T>.mutate()` methods.
 3. `actionMapper: (Action) -> OtherStateMachineAction`: We didn't need this in our example above because `FavoriteStatusStateMachine` is not dealing with any Action. In theory, however, we need to "forward" actions from `ItemListStateMachine` to  `FavoriteStatusStateMachine`. But since the actions of the 2 state machines could be of different types, we would need to map an action type of `ItemListStateMachine` to another action type of `FavoriteStatusStateMachine`. Again, this is not needed here in this example, but in theory could be needed in other use cases.
+
