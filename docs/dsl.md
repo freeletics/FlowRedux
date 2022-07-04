@@ -995,3 +995,269 @@ Nevertheless, let's explain all 3 parameters of `onActionStartStateMachine()`:
 2. `stateMapper: (State<T>, StateOfNewStateMachine) -> ChangedState<T>`: we need to have a way to combine the state of the newly started state machine with the one of the "current" state machine. In our case we need to combine `ItemListStateMachine`'s state with  `FavoriteStatusStateMachine`'s state. That is exactly what `stateMapper` is good for. The difference is that `ItemListStateMachine` provides a `State<T>` to the `stateMapper` (first parameter) whereas `FavoriteStatusStateMachine` provides the current `FavoriteState` (not `State<FavoriteState>`). The reason is that at the end we need to get a compatible state for `ItemListStateMachine` and that is what we need to do through the already known `State<T>.override()` or `State<T>.mutate()` methods.
 3. `actionMapper: (Action) -> OtherStateMachineAction`: We didn't need this in our example above because `FavoriteStatusStateMachine` is not dealing with any Action. In theory, however, we need to "forward" actions from `ItemListStateMachine` to  `FavoriteStatusStateMachine`. But since the actions of the 2 state machines could be of different types, we would need to map an action type of `ItemListStateMachine` to another action type of `FavoriteStatusStateMachine`. Again, this is not needed here in this example, but in theory could be needed in other use cases.
 
+You may wonder what the lifecycle of the state machine started from `onActionStartStateMachine()` looks like:
+- the state machine start (in our case `FavoriteStatusStateMachine`) will be kept as long alive as the surrounding `inState<State>` holds true. This works just like the other DSL primitives work (like `on<Action>`). In our example a `FavoriteStatusStateMachine` is canceled when `ItemListStateMachine` transitions away from `ShowContent` state.
+- Every time an `Action` that is handled by `onActionStartStateMachine()` is dispatched, then the `stateMachineFactory` is invoked and a new state machine gets started. Important is that actions are distinguished by it's `.equals()` method. In our example `ToggleFavoriteItemAction(itemId = 1)` and `ToggleFavoriteItemAction(itemId = 2)` are two different Action because `ToggleFavoriteItemAction.equals()` also takes `itemId` into account. Therefore, with 2 instances of `FavoriteStatusStateMachine` are started, one for itemId = 1 and one for itemId = 2.
+-  if the `.equals()` same `ToggleFavoriteItemAction(itemId = 1)` gets dispatched, then the previous started state machine gets canceled and a new one starts (with the latest `action` as trigger). There is always only 1 state machine for the same `action` as trigger running.
+
+
+## Make DSL even more readable with custom DSL additions
+In the previous section we have introduced `onActionStartStateMachine()` but it is quite a bit of code in our otherwise nicely readable `spec { }` block:
+
+```kotlin
+spec {
+    inState<Loading> {
+        onEnter { loadItemsAndMoveToContentOrError(it) }
+    }
+
+    inState<Error> {
+        on<RetryLoadingAction> { action, state ->
+            state.override { Loading }
+        }
+
+        collectWhileInState(timerThatEmitsEverySecond()) { value, state  ->
+            decrementCountdownAndMoveToLoading(value, state)
+        }                
+    }
+
+    inState<ShowContent> {
+
+        // Quite a bit of unreadable code 
+        onActionStartStateMachine(
+            stateMachineFactory = { 
+                action: ToggleFavoriteItemAction, stateSnapshot : ShowContent ->
+                val item : Item = stateSnapshot.items.find { it == action.itemId}
+                // create and return a new FavoriteStatusStateMachine instance
+                FavoriteStatusStateMachine(item, httpClient)
+            },
+
+            stateMapper = {
+                itemListState : State<ShowContent>, favoriteStatus :FavoriteStatus ->
+
+                itemListState.mutate {
+                    val itemToReplace : Item = this.items.find { it == favoriteStatus.itemId }
+                    val updatedItem : Item = itemToReplace.copy(favoriteStatus = favoriteStatus)
+
+                    // Create a copy of ShowContent state with the updated item
+                    this.copy(items = this.items.copyAndReplace(itemToReplace, updatedItem) )
+                }
+            }
+        )
+    }
+}
+```
+
+We can do better than this, right?
+How?
+Which Kotlin extension functions and receivers. 
+The receiver type is `InStateBuilderBlock` is what `inState<S>` is operating in.
+
+```kotlin
+spec {
+    inState<Loading> {
+        onEnter { loadItemsAndMoveToContentOrError(it) }
+    }
+
+    inState<Error> {
+        on<RetryLoadingAction> { action, state ->
+            state.override { Loading }
+        }
+
+        collectWhileInState(timerThatEmitsEverySecond()) { value, state  ->
+            decrementCountdownAndMoveToLoading(value, state)
+        }                
+    }
+
+    inState<ShowContent> {
+        onToggleFavoriteActionStartStateToggleFavoriteStateMachine()
+    }
+}
+
+
+private fun InStateBuilderBlock.onToggleFavoriteActionStartStateToggleFavoriteStateMachine(){
+    onActionStartStateMachine(
+        stateMachineFactory = { 
+            action: ToggleFavoriteItemAction, stateSnapshot : ShowContent ->
+            val item : Item = stateSnapshot.items.find { it == action.itemId}
+            // create and return a new FavoriteStatusStateMachine instance
+            FavoriteStatusStateMachine(item, httpClient)
+        },
+
+        stateMapper = {
+            itemListState : State<ShowContent>, favoriteStatus :FavoriteStatus ->
+
+            itemListState.mutate {
+                val itemToReplace : Item = this.items.find { it == favoriteStatus.itemId }
+                val updatedItem : Item = itemToReplace.copy(favoriteStatus = favoriteStatus)
+
+                // Create a copy of ShowContent state with the updated item
+                this.copy(items = this.items.copyAndReplace(itemToReplace, updatedItem) )
+            }
+        }
+    )
+} 
+```
+
+## onEnterStartStateMachine()
+
+Similar to `onActionStartStateMachine()` FlowRedux provides a primitive to start a state machine `onEnter{ ... }`
+
+The syntax looks quite similar to `onActionStartStateMachine()`:
+
+```kotlin
+spec {
+
+    inState<MyState>{
+        onEnterStartStateMachine(
+            stateMachineFactory = { stateSnapshot : MyState  -> SomeFlowReduxStateMachine() },
+            stateMapper = { state : State<MyState>, someOtherStateMachineState : S -> 
+                state.override { ... }
+            }
+        )
+    }
+}
+```
+
+
+## Testing
+You may wonder what is the best way to test a `FlowReduxStateMachine`? 
+There are two strategies we want to discuss here in this section:
+1. functional integration tests: test the whole state machine as a whole.
+2. Unit tests to test only a certain handler such as `onEnter {}`, ´on<Action>` and so on.
+
+
+### Functional integration tests with Turbine
+This is our recommended way for testing `FlowReduxStateMachine`. 
+For this we need [Turbine](https://github.com/cashapp/turbine).
+Turbine is a library that makes testing `Flow` from Kotlin coroutine much easier.
+
+Let's say we want to test our `ItemListStateMachine`.
+With turbine we can do that step by ste quite easily:
+
+```kotlin
+import kotlinx.coroutines.test.runTest
+
+@Test
+fun `state machine starts with Loading state`() = runTest {
+    val statemachine = ItemListStateMachine(HttpClient())
+    statemachine.state.test {
+        // awaitItem() from Turbine waits until next state is emitted.
+        // FlowReduxStateMachine emits initial state immediately.
+        assertEquals(Loading, awaitItem()) 
+    }
+}
+
+@Test
+fun `move from Loading to ShowContent state on successful http response`() = runTest {
+    val items : List<Item> =  generatesomeFakeItems()
+    val httpClient = FakeHttpClient(successresponse = items)
+    val statemachine = ItemListStateMachine(httpClient)
+    statemachine.state.test {
+        assertEquals(Loading, awaitItem()) // initial state
+        assertEquals(ShowContent(items), awaitItem()) // loading successful --> ShowContent state
+    }
+}
+
+@Test
+fun `move from Loading to Error state on error http response`() = runTest {
+    val exception = IOExpcetion("fake exception")
+    val httpClient = FakeHttpClient(error = exception)
+    val statemachine = ItemListStateMachine(httpClient)
+    statemachine.state.test {
+        assertEquals(Loading, awaitItem()) // initial state
+        assertEquals(Error(cause = exception, countdown = 3), awaitItem()) 
+    }
+}
+```
+
+We can apply this pattern all the time, but isn't it a bit annoying to always start our state machine from initial state and have to go thorough all the state transitions until we reach the state we want to test?
+Well, one nice side effect of using state machines is that you can jump to a certain state right from the beginning. 
+To be able to do that we need to pass the initial  state as constructor parameter like this:
+
+```kotlin
+class ItemListStateMachine(
+    private val httpClient: HttpClient,
+    initialState : ListState = Loading // now constructor parameter
+) : ListState, Action>(initialState) { ... }
+```
+
+Now let's write a test that checks that pressing the retry button works:
+
+```kotlin
+@Test
+fun `from Error state to Loading if RetryLoadingAction is dispatched`() = runTest {
+    val initialState = Error(cause = IOException("fake"), countdown = 3)
+    val statemachine = ItemListStateMachine(httpClient, initialState)
+
+    statemachine.state.test {
+        assertEquals(initialState, awaitItem())
+        // now we dispatch the retry action
+        statemachine.dispatch(RetryLoadingAction)
+
+        // next state should then be Loading
+        assertEquals(Loading, awaitItem())
+    }
+}
+
+@Test `once Error countdown is 0 move to Loading state`(){
+    val cause = IOException("fake")
+    val initialState = Error(cause = cause, countdown = 3)
+    val statemachine = ItemListStateMachine(httpClient, initialState)
+
+    statemachine.state.test {
+        assertEquals(initialState, awaitItem())
+        assertEquals(Error(cause, 2))
+        assertEquals(Error(cause, 1))
+        assertEquals(Error(cause, 0))
+        assertEquals(Loading, awaitItem())
+    }
+}
+```
+
+## Unit testing handlers
+Another way how you can test your state machines is on unit test level, but it requires that you logic is extracted into functions.
+
+For example, let's say we want to unit test `loadItemsAndMoveToContentOrError()`
+
+```kotlin
+spec {
+    inState<Loading> {
+        onEnter { loadItemsAndMoveToContentOrError(it) }
+    }
+}
+
+suspend fun loadItemsAndMoveToContentOrError(state: State<Loading>): ChangedState<State> {
+    return try {
+        val items = httpClient.loadItems()
+        state.override { ShowContent(items) } 
+    } catch (t: Throwable) {
+        state.override { Error(cause = t, countdown = 3) } 
+    }
+}
+´´´
+
+We can do that as such:
+
+```kotlin
+@Test 
+fun `on http success move to ShowContent state`() = runTest{
+    val items : List<Item> =  generatesomeFakeItems()
+    val httpClient = FakeHttpClient(successresponse = items)
+    val statemachine = ItemListStateMachine(httpclient)
+
+    val startState = State(Loading) // Create a FlowRedux State object
+    val changedState : ChangedState<ListState> = statemachine.loadItemsAndMoveToContentOrError(startState)
+
+    val result : ListState = changedState.reduce(startState) // FlowRedux API: you must call reduce
+
+    val expected = ShowContent(items)
+    assertEquals(expected, result)
+}
+```
+
+With FlowRedux you can write unit tests, but there is a bit of overhead:
+1. You need to wrap the actual state into FlowRedux `State` class.
+2. To get from a `ChangedState` to the actual value you need to call `.reduce()` on it.
+
+What we basically have to do here is what FlowRedux does internally. 
+In the  future we may provide a more convinient way to write this kind of unit tests with less overhead. 
