@@ -1260,4 +1260,4 @@ With FlowRedux you can write unit tests, but there is a bit of overhead:
 2. To get from a `ChangedState` to the actual value you need to call `.reduce()` on it.
 
 What we basically have to do here is what FlowRedux does internally. 
-In the  future we may provide a more convinient way to write this kind of unit tests with less overhead. 
+In the  future we may provide a more convenient way to write this kind of unit tests with less overhead.
