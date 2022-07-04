@@ -63,7 +63,8 @@ sealed interface Action {
 
 This is how the UI should looks like showing the 3 states mentioned above:
 
-![Sample UI](/images/lce.gif)
+
+Sample UI](images/lce.gif)
 
 ## Initial State
 
@@ -316,7 +317,7 @@ and `state : State<T>` which gives us access to the current state and let us to 
   doesn't hold anymore (i.e. state has been changes by something else).**
 
 So far this is how our result look like: 
-![Image title](/images/lce.gif)
+![Image title](images/lce.gif)
 
 
 ### collectWhileInState()
@@ -850,7 +851,7 @@ You may wonder why we need `FavoriteStatus` and why it is not just a `Boolean` t
 Remember: we also need to talk to a server (via http) whenever the user wants to mark an `Item` as favorite or unmark it.
 The UI looks like this:
 
-![Item state favorite](/images/item-favorite-state.gif)
+![Item state favorite](images/item-favorite-state.gif)
 
 
 Let's for now ignore the `ItemListStateMachine` and only focus on our new requirements: marking an `Item` as favorite (or unmark it) plus the communication with our backend server to store that information. 
@@ -924,7 +925,7 @@ All that `FavoriteStatusStateMachine` does is making an http request to the back
 
 This is how the UI should looks like:
 
-![Sample UI](/images/favorite-state-list.gif)
+![Sample UI](images/favorite-state-list.gif)
 
 
 Now let's connect this with our `ItemListStateMachine` by using `onActionStartStateMachine()`.
