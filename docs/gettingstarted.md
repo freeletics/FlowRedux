@@ -63,7 +63,7 @@ sealed interface Action {
 
 This is how the UI should looks like showing the 3 states mentioned above:
 
-![Sample UI](/images/lce.gif)
+![Sample UI](images/lce.gif)
 
 ## Initial State
 
@@ -258,7 +258,7 @@ We will cover testing and best practices in a [dedicated section](/testing).
 
 We will dive deeper on `State.override()` and `State.mutate()` as we continue with our `ItemListStateMachine` example. 
 
-### on`<Action>`
+## on`<Action>`
 
 How do we deal with external user input like clicks in FlowRedux? 
 This is what `Action` is for. 
@@ -316,10 +316,10 @@ and `state : State<T>` which gives us access to the current state and let us to 
   doesn't hold anymore (i.e. state has been changes by something else).**
 
 So far this is how our result look like: 
-![Image title](/images/lce.gif)
+![Image title](images/lce.gif)
 
 
-### collectWhileInState()
+## collectWhileInState()
 
 This one is useful if you want to collect a `Flow` (from Kotlin Coroutines) only while being exactly in that state. 
 To give a concrete example how this is useful let's extend our `ItemListStateMachine` example. 
@@ -328,7 +328,7 @@ to retry loading the items after 3 seconds in `Error` state or anytime before th
 Furthermore the 3 seconds countdown timer should be displayed in our UI as well.
 This is how the UI should look like:
 
-![Automatically Retry](/images/error-countdown.gif)
+![Automatically Retry](images/error-countdown.gif)
 
 To implement this let's first extend our `Error` state:
 
@@ -704,7 +704,7 @@ What we are aiming for with FlowRedux and it's DSL is to get a readable overview
 If you take a look at the example from above, however, you will notice that it isn't easy
 to read and get bloated with implementation details.
 
-### Extract logic to functions
+## Extract logic to functions
 
 We recommend keeping the DSL `spec { ... }` block really short, expressive, readable and maintainable. 
 Therefore, instead of having implementation details in your DSL we recommend to extract that to functions instead. 
@@ -850,7 +850,7 @@ You may wonder why we need `FavoriteStatus` and why it is not just a `Boolean` t
 Remember: we also need to talk to a server (via http) whenever the user wants to mark an `Item` as favorite or unmark it.
 The UI looks like this:
 
-![Item state favorite](/images/item-favorite-state.gif)
+![Item state favorite](images/item-favorite-state.gif)
 
 
 Let's for now ignore the `ItemListStateMachine` and only focus on our new requirements: marking an `Item` as favorite (or unmark it) plus the communication with our backend server to store that information. 
@@ -924,7 +924,7 @@ All that `FavoriteStatusStateMachine` does is making an http request to the back
 
 This is how the UI should looks like:
 
-![Sample UI](/images/favorite-state-list.gif)
+![Sample UI](images/favorite-state-list.gif)
 
 
 Now let's connect this with our `ItemListStateMachine` by using `onActionStartStateMachine()`.
@@ -1001,7 +1001,7 @@ You may wonder what the lifecycle of the state machine started from `onActionSta
 -  if the `.equals()` same `ToggleFavoriteItemAction(itemId = 1)` gets dispatched, then the previous started state machine gets canceled and a new one starts (with the latest `action` as trigger). There is always only 1 state machine for the same `action` as trigger running.
 
 
-## Make DSL even more readable with custom DSL additions
+### Make DSL even more readable with custom DSL additions
 In the previous section we have introduced `onActionStartStateMachine()` but it is quite a bit of code in our otherwise nicely readable `spec { }` block:
 
 ```kotlin
@@ -1098,7 +1098,7 @@ private fun InStateBuilderBlock.onToggleFavoriteActionStartStateToggleFavoriteSt
 } 
 ```
 
-## onEnterStartStateMachine()
+### onEnterStartStateMachine()
 
 Similar to `onActionStartStateMachine()` FlowRedux provides a primitive to start a state machine `onEnter{ ... }`
 
@@ -1214,7 +1214,7 @@ fun `from Error state to Loading if RetryLoadingAction is dispatched`() = runTes
 }
 ```
 
-## Unit testing handlers
+### Unit testing handlers
 Another way how you can test your state machines is on unit test level, but it requires that you logic is extracted into functions.
 
 For example, let's say we want to unit test `loadItemsAndMoveToContentOrError()`

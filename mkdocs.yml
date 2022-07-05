@@ -15,6 +15,10 @@ theme:
   palette:
     primary: 'black'
     accent: 'white'
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - toc.integrate
 
 extra_css:
   - 'css/app.css'
@@ -36,9 +40,11 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tilde
   - tables
+  
 
-# nav:
-#   - 'Overview': index.md
-#   - 'DSL': dsl.md
-#   - 'Multiplatform': multiplatform.md
-#   - 'Contributing': contributing.md
+nav:
+   - 'Overview': index.md
+   - 'Getting Started': gettingstarted.md
+   - 'Multiplatform': multiplatform.md
+   - 'Compose': compose.md
+   - 'Contributing': contributing.md
