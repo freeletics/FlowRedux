@@ -5,6 +5,7 @@ repo_url: https://github.com/freeletics/FlowRedux
 site_description: "Kotlin Multiplatform library to create state machines"
 site_author: Freeletics
 remote_branch: gh-pages
+edit_uri: edit/main/docs/
 
 copyright: 'Copyright &copy; 2020 Freeletics.'
 
