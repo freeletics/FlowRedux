@@ -22,13 +22,13 @@ class FlowReduxStateMachine<State, Action>{
 ```
 
 Every `FlowReduxStateMachine` works on a `State` class. 
-How you model your state is up to you and depends on what your program and business logic actually wants to solve.
-You can simply collect the `state : Flow<State>` (from Kotlin coroutines library) by calling `.collect()` on it. 
-Whenever the state of the state machine changes, observers will get the update through this `Flow`.
+How you model your state is up to you and depends on what your app and business logic actually has as requirements.
+You can collect the `state : Flow<State>` (from Kotlin coroutines library) by calling `.collect()` on it. 
+Whenever the state of the state machine changes, observers get the updated state via this `Flow`.
 
-We also need a way "input" something to our state machine like a user has clicked on a button in the UI and something should happen in your state machine.
+We also need a way to "input" something to our state machine like a user has clicked on a button in the UI.
 "Inputs" are called `Actions` in FlowRedux. 
-An example could be `data LoginSubmittedAction(val username : String, val password : String)`.
+An example is `data LoginSubmittedAction(val username : String, val password : String)`.
 Again, how you model your Actions is up  to you. 
 There are no constraints or limitations from FlowRedux.
 
