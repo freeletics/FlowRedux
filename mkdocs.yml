@@ -17,8 +17,6 @@ theme:
     primary: 'black'
     accent: 'white'
   features:
-    - navigation.tabs
-    - navigation.tabs.sticky
     - toc.integrate
 
 extra_css:
@@ -49,4 +47,6 @@ nav:
    - 'Multiplatform': multiplatform.md
    - 'Compose': compose.md
    - 'Contributing': contributing.md
-   - 'JavaDocs': javadoc/
+   - 'JavaDocs':
+       - 'DSL': javadoc/dsl
+       - 'Compose': javadoc/compose
