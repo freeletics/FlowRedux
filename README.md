@@ -76,7 +76,7 @@ launch { // Launch a coroutine
 In an Android Application you could use it with AndroidX `ViewModel` like that:
 
 ```kotlin
-class MyViewModel @Inject constructor(private val stateMachine : StateMachine) : ViewModel() {
+class MyViewModel @Inject constructor(private val stateMachine : MyStateMachine) : ViewModel() {
     val state = MutableLiveData<State>()
 
     init {
