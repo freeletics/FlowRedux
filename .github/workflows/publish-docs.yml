@@ -36,8 +36,11 @@ jobs:
       - name: Copy docs
         run: |
           cp README.md docs/index.md
-          mkdir -p docs/Javadoc/flowredux
-          cp -R flowredux/build/dokka/gfm/. docs/Javadoc/flowredux/
+          mkdir -p docs/javadoc/dsl
+          cp -R flowredux/build/dokka/gfm/. docs/javadoc/dsl
+          mkdir -p docs/javadoc/compose
+          cp -R compose/build/dokka/gfm/. docs/javadoc/compose
+
 
       - name: Deploy MkDocs
         run: |
