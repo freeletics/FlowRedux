@@ -1,11 +1,14 @@
 # Getting started
 
 FlowRedux provides a convenient DSL to describe your state machine.
-This page introduces you the DSL that you can use. 
-Furthermore, this document is meant to be read from top to bottom.
+This page introduces and explains step by step the FlowRedux DSL. 
 
-To do that we will stick with a simple example of loading a list of items from a web service. 
-As you read this section and more concepts of the DSL will be introduced we will extend this example with more features.
+We will build an example app.
+We load a list of items from a web service. 
+As we introduce more concepts of the DSL we will extend this example with more features.
+
+This page is meant to be read from top to bottom.
+
 
 ## FlowReduxStateMachine
 The base class in FlowRedux is `FlowReduxStateMachine`.
