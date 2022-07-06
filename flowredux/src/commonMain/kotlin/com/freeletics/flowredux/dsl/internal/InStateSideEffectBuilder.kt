@@ -2,11 +2,13 @@ package com.freeletics.flowredux.dsl.internal
 
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.SideEffect
+import com.freeletics.flowredux.dsl.FlowReduxDsl
 
 /**
  * It's just not an Interface to not expose internal class `Action` to the public.
  * Thus it's an internal abstract class but you can think of it as an internal interface.
  */
+@FlowReduxDsl
 internal abstract class InStateSideEffectBuilder<InputState : S, S, A> {
 
     internal abstract fun generateSideEffect(): SideEffect<S, Action<S, A>>

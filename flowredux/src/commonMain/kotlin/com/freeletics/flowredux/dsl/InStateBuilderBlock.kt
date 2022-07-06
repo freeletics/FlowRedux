@@ -8,15 +8,15 @@ import com.freeletics.flowredux.dsl.internal.InStateSideEffectBuilder
 import com.freeletics.flowredux.dsl.internal.OnActionInStateSideEffectBuilder
 import com.freeletics.flowredux.dsl.internal.OnEnterInStateSideEffectBuilder
 import com.freeletics.flowredux.dsl.internal.StartStateMachineOnActionInStateSideEffectBuilder
-import com.freeletics.flowredux.dsl.internal.SubStateMachineSideEffectBuilder
+import com.freeletics.flowredux.dsl.internal.StartStatemachineOnEnterSideEffectBuilder
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 
-// TODO @DslMarker
 @FlowPreview
 @ExperimentalCoroutinesApi
+@FlowReduxDsl
 public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     private val _isInState: (S) -> Boolean,
 ) {
@@ -290,7 +290,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         }
     ) {
         _inStateSideEffectBuilders.add(
-            SubStateMachineSideEffectBuilder(
+            StartStatemachineOnEnterSideEffectBuilder(
                 subStateMachineFactory = stateMachineFactory,
                 actionMapper = actionMapper,
                 stateMapper = stateMapper,

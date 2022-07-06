@@ -5,6 +5,7 @@ package com.freeletics.flowredux.dsl.internal
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.ChangedState
+import com.freeletics.flowredux.dsl.FlowReduxDsl
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.whileInState
@@ -21,6 +22,7 @@ import kotlinx.coroutines.sync.withLock
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@FlowReduxDsl
 internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, ActionThatTriggeredStartingStateMachine : A, S : Any, A : Any>
 (
     private val subStateMachineFactory: (action: ActionThatTriggeredStartingStateMachine, state: InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,

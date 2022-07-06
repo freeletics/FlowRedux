@@ -3,6 +3,7 @@ package com.freeletics.flowredux.dsl.internal
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.ChangedState
+import com.freeletics.flowredux.dsl.FlowReduxDsl
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.mapToIsInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.flow
  */
 @FlowPreview
 @ExperimentalCoroutinesApi
+@FlowReduxDsl
 internal class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     private val handler: suspend (state: State<InputState>) -> ChangedState<S>,
