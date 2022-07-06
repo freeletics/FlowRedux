@@ -34,7 +34,7 @@ There are no constraints or limitations from FlowRedux.
 
 
 That should be enough information to get started with our example app based on FlowRedux. 
-For now to get started, let's define the `States` our state machine has. 
+Let's define the `States` our state machine has. 
 As said before we load a list of items from a web server (via http) and display that list. 
 While loading the list we show a loading indicator on the screen and if an error occurs we show an error message on the screen with a retry button.
 
