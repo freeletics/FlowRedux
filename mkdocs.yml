@@ -49,4 +49,4 @@ nav:
    - 'Multiplatform': multiplatform.md
    - 'Compose': compose.md
    - 'Contributing': contributing.md
-   - 'JavaDocs': docs/Javadoc/flowredux/
+   - 'JavaDocs': javadoc/
