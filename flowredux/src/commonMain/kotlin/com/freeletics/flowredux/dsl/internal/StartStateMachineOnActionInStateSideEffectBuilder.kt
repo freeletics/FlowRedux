@@ -5,6 +5,7 @@ package com.freeletics.flowredux.dsl.internal
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.dsl.ChangedState
+import com.freeletics.flowredux.dsl.FlowReduxDsl
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.whileInState
