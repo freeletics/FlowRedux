@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.flow
  */
 @FlowPreview
 @ExperimentalCoroutinesApi
-@FlowReduxDsl
 internal class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     private val handler: suspend (state: State<InputState>) -> ChangedState<S>,

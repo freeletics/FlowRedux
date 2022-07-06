@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.flow
  */
 @ExperimentalCoroutinesApi
 @FlowPreview
-@FlowReduxDsl
 internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
     private val flow: Flow<T>,

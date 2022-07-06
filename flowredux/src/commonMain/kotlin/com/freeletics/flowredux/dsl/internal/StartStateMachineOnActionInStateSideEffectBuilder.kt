@@ -22,7 +22,6 @@ import kotlinx.coroutines.sync.withLock
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-@FlowReduxDsl
 internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, ActionThatTriggeredStartingStateMachine : A, S : Any, A : Any>
 (
     private val subStateMachineFactory: (action: ActionThatTriggeredStartingStateMachine, state: InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
