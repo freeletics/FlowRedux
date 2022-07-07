@@ -3,8 +3,8 @@
 FlowRedux provides a convenient DSL to describe your state machine.
 This page introduces and explains step by step the FlowRedux DSL. 
 
-We will build an example app.
-We load a list of items from a web service. 
+Let's build an example app using FlowRedux:
+This app loads a list of items from a web service. 
 As we introduce more concepts of the DSL we will extend this example with more features.
 
 This page is meant to be read from top to bottom.
@@ -164,10 +164,10 @@ Let's talk about `onEnter`:
 - **`onEnter { ... }` is executed exactly once when the surrounding `inState<T>` condition is met**. 
   It will only executed the next time when the state machine transitions out of the current state and back to it again.
 - **The execution of the `onEnter { ... }` is canceled as soon as state condition specified in the surrounding `inState`
-doesn't hold anymore i.e. state has been changes by some other block of the DSL else.
+doesn't hold anymore** i.e. state has been changes by some other block of the DSL else.
 Recall that FlowRedux is a multi-threaded asynchronous state machine. We will talk about that later.
 
-The key takeaway here is that with `onEnter { ... }` you can do some work and then move on to another state by calling `State.override()` or `State.mutate()`
+The key takeaway here is that with `onEnter { ... }` you can do some work whenever your state machine is entering this state and then move on to another state by calling `State.override()` or `State.mutate()`
 
 To be able to fully understand the code snipped from above, let's take a look at `State<T>` and `ChangedState<T>`.
 
@@ -199,6 +199,7 @@ class State<T> {
 
 Please note that `override()` and `mutate()` are just syntactic sugar of the same thing.
 The reason why both exist is to clearly hint to other software engineers (i.e. pull request reviews) that you either want to move to an entirely new state or just change a few properties of the current state but overall want to stay in the same type of state.
+
  - use `override()` to explicitly want to **transition to an entirely new state** 
  - use `mutate()` if you want to change just some properties of the current state but stay in the same state class.
 
