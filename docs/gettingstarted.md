@@ -28,13 +28,13 @@ Whenever the state of the state machine changes, observers get the updated state
 
 We also need a way to "input" something to our state machine like a user has clicked on a button in the UI.
 "Inputs" are called `Actions` in FlowRedux. 
-An example is `data LoginSubmittedAction(val username : String, val password : String)`.
-Again, how you model your Actions is up  to you. 
+An example is `data class LoginSubmittedAction(val username : String, val password : String)`.
+Again, how you model your Actions is up to you. 
 There are no constraints or limitations from FlowRedux.
 
 
 That should be enough information to get started with our example app based on FlowRedux. 
-Let's define the `States` our state machine has. 
+Let's define the `States`for our state machine. 
 As said before we load a list of items from a web server (via http) and display that list. 
 While loading the list we show a loading indicator on the screen and if an error occurs we show an error message on the screen with a retry button.
 
@@ -54,7 +54,7 @@ sealed interface ListState {
 }
 ```
 
-If the state machine reaches `Error`  state then we display an error message in our UI but also a button a user of our app can click to retry loading the items.
+If the state machine reaches the `Error` state then we display an error message in our UI but also a button the users of our app can click to retry loading the items.
 
 This gives us the following `Actions`:
 
@@ -64,7 +64,7 @@ sealed interface Action {
 }
 ```
 
-This is how the UI should looks like showing the 3 states mentioned above:
+This is how the UI looks like:
 
 ![Sample UI](images/lce.gif)
 
@@ -72,7 +72,7 @@ This is how the UI should looks like showing the 3 states mentioned above:
 
 Every `FlowReduxStateMachine` needs an initial state. 
 This specifies in which state the state machine starts. 
-In our example we start with the `Loading`.
+In our example we start with the `Loading` state.
 
 ```kotlin
 class ItemListStateMachine(
@@ -88,16 +88,13 @@ class ItemListStateMachine(
 }
 ```
 
-Please note the constructor parameter of `FlowReduxStateMachine(initialState = ...)`. 
-This is how you define the initial state of your state machine. 
-Next, we already see that we need an `init {...}` block containing a `spec { ... }` block
-inside. 
-The `spec { ... }` block is actually where we write our state machine specification by using our DSL.
+In FlowRedux we need an `init {...}` block containing a `spec { ... }` block inside. 
+The `spec { ... }` block is actually where we write our state machine specification with the DSL.
 
 
 ## inState`<State>`
 
-The first concept we learn is `inState`
+The first concept of the DSL we learn is `inState`:
 
 ```kotlin
 class ItemListStateMachine(
@@ -114,8 +111,7 @@ class ItemListStateMachine(
 }
 ```
 
-Please note that `inState` itself doesn't do anything. 
-All we did so far with `inState<Loading>` is set an "entry point".
+`inState<Loading>` is just an "entry point".
 Next let's discuss what an `inState` block can contain as triggers to actually "do something":
 
 1. `onEnter`: Triggers whenever we enter that state
