@@ -1201,7 +1201,7 @@ fun `from Error state to Loading if RetryLoadingAction is dispatched`() = runTes
     }
 }
 
-@Test `once Error countdown is 0 move to Loading state`(){
+@Test `once Error countdown is 0 move to Loading state`() = runTest {
     val cause = IOException("fake")
     val initialState = Error(cause = cause, countdown = 3)
     val statemachine = ItemListStateMachine(httpClient, initialState)
