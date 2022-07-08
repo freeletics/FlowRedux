@@ -15,7 +15,7 @@ The base class in FlowRedux is `FlowReduxStateMachine`.
 It has a very simple public API:
 
 ```kotlin
-class FlowReduxStateMachine<State, Action>{
+class FlowReduxStateMachine<State, Action> {
     val state : Flow<State>
     suspend fun dispatch(action : Action)
 }
@@ -78,7 +78,7 @@ In our example we start with the `Loading` state.
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : ListState, Action>(initialState = Loading) {
+) : <ListState, Action>(initialState = Loading) {
 
     init {
         spec {
@@ -100,7 +100,7 @@ The first concept of the DSL we learn is `inState`:
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : ListState, Action>(initialState = Loading) {
+) : <ListState, Action>(initialState = Loading) {
 
     init {
         spec {
@@ -132,7 +132,7 @@ Let's specify that with the DSL in our state machine:
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : ListState, Action>(initialState = Loading) {
+) : <ListState, Action>(initialState = Loading) {
 
     init {
         spec {
@@ -272,7 +272,7 @@ Let's extend our `ItemListStateMachine` to react on such an action:
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : ListState, Action>(initialState = Loading) {
+) : <ListState, Action>(initialState = Loading) {
 
     init {
         spec {
@@ -317,6 +317,7 @@ and `state : State<T>` which gives us access to the current state and let us to 
   doesn't hold anymore (i.e. state has been changes by something else).**
 
 So far this is how our result look like: 
+
 ![Image title](images/lce.gif)
 
 
@@ -345,7 +346,7 @@ Now let's add some countdown capabilities to our state machine by using `collect
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : ListState, Action>(initialState = Loading) {
+) : <ListState, Action>(initialState = Loading) {
 
     init {
         spec {
@@ -479,7 +480,7 @@ Given the state from above, what we  can do now with our DSL is the following:
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : ListState, Action>(
+) : <ListState, Action>(
     initialState = State(
         loading = true,
         items = emptyList(),
@@ -535,7 +536,7 @@ class ItemListStateMachine(
 }
 ```
 
-Instead of `inState<State> { ... }` we can use `inStateWithCondition` instead. 
+Instead of `inState<State> { ... }` use `inStateWithCondition`  . 
 It takes a lambda as parameter that looks like `(State) -> Boolean` so that. 
 If that lambda returns `true` it means we are in that state, otherwise not (returning false). 
 The rest still remains the same. 
@@ -615,23 +616,23 @@ There are three options to choose from:
 - `CANCEL_PREVIOUS`: **This is the default one automatically applied unless specified otherwise.** It would cancel any previous execution and just run the latest one. In the example mentioned it means the previous still running `BarAction` handler gets canceled and a new one with the laster `BarAction` starts.
 - `UNORDERED`: Choosing this causes all the blocks to continue running but there are no guarantees in which order. For example:
 
-```kotlin
-spec {
-    inState<FooState> {
-        on<BarAction>(executionPolicy = FlapMapPolicy.UNORDERED) { _, state : State<FooState> ->
-            delay(randomInt()) // wait for some random time
-            state.override { OtherState }
+    ```kotlin
+    spec {
+        inState<FooState> {
+            on<BarAction>(executionPolicy = FlapMapPolicy.UNORDERED) { _, state : State<FooState> ->
+                delay(randomInt()) // wait for some random time
+                state.override { OtherState }
+            }
         }
     }
-}
-```
+    ```
 
-Let's assume that we trigger two times `BarAction`. 
-We use random amount of seconds for waiting. 
-Since we use `UNORDERED` as policy `on<BarAction>` the handler block gets executed 2 times without canceling the previous one (that is the difference  to `CANCEL_PREVIOUS`). 
-Moreover, `UNORDERED` doesn't make any promise on order of execution of the block (see `ORDERED` if you need promises on order). 
-If `on<BarAction>` gets executed two times it will run in parallel and the the second execution
-could complete before the first execution (because using a random time of waiting).
+    Let's assume that we trigger two times `BarAction`. 
+    We use random amount of seconds for waiting. 
+    Since we use `UNORDERED` as policy `on<BarAction>` the handler block gets executed 2 times without canceling the previous one (that is the difference  to `CANCEL_PREVIOUS`). 
+    Moreover, `UNORDERED` doesn't make any promise on order of execution of the block (see `ORDERED` if you need promises on order). 
+    If `on<BarAction>` gets executed two times it will run in parallel and the the second execution
+    could complete before the first execution (because using a random time of waiting).
 
 - `ORDERED`: In contrast to `UNORDERED` and `CANCEL_PREVIOUS`, `ORDERED` will not run `on<BarAction>` in parallel and will not cancel any previous execution. Instead, `ORDERED` will preserve the order.
 
@@ -650,7 +651,7 @@ Let' take a look at our example state machine:
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : ListState, Action>(initialState = Loading) {
+) : <ListState, Action>(initialState = Loading) {
 
     init {
         spec {
@@ -1179,7 +1180,7 @@ To be able to do that we need to pass the initial  state as constructor paramete
 class ItemListStateMachine(
     private val httpClient: HttpClient,
     initialState : ListState = Loading // now constructor parameter
-) : ListState, Action>(initialState) { ... }
+) : <ListState, Action>(initialState) { ... }
 ```
 
 Now let's write a test that checks that pressing the retry button works:
