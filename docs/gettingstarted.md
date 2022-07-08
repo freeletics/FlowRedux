@@ -1236,7 +1236,7 @@ suspend fun loadItemsAndMoveToContentOrError(state: State<Loading>): ChangedStat
         state.override { Error(cause = t, countdown = 3) } 
     }
 }
-´´´
+```
 
 We can do that as such:
 
