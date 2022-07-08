@@ -3,6 +3,7 @@ package com.freeletics.flowredux.dsl.internal
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.dsl.ChangedState
+import com.freeletics.flowredux.dsl.FlowReduxDsl
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.mapToIsInState
@@ -15,8 +16,7 @@ import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 @FlowPreview
-// TODO find better name: i.e. DelegateToStateMachineSideEffectBuilder?
-internal class SubStateMachineSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, S : Any, A>(
+internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, S : Any, A>(
     private val subStateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
     private val actionMapper: (A) -> SubStateMachineAction,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,

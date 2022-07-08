@@ -9,45 +9,45 @@ Building async. running Kotlin Multiplatform state machine made easy with a DSL 
 Full documentation and best practices can be found here: https://freeletics.github.io/FlowRedux/
 
 ```kotlin
-sealed class State
+sealed interface State
 
-object LoadingState : State()
-data class ContentState(val items : List<Item>) : State()
-data class ErrorState(val error : Throwable) : State()
-
-
-sealed class Action
-object RetryLoadingAction : Action()
+object Loading : State
+data class ContentState(val items : List<Item>) : State
+data class Error(val error : Throwable) : State
 
 
-class MyStateMachine : FlowReduxStateMachine<State, Action>(LoadingState){
+sealed interface Action
+object RetryLoadingAction : Action
+
+
+class MyStateMachine : FlowReduxStateMachine<State, Action>(initialState = Loading){
     init {
         spec {
-            inState<LoadingState> {
-                onEnter { stateSnapshot : LoadingState ->
-                    // executes this block whenever we enter LoadingState
+            inState<Loading> {
+                onEnter { state : State<Loading> ->
+                    // executes this block whenever we enter Loading state
                     try {
                         val items = loadItems() // suspending function / coroutine to load items
-                        OverrideState( ContentState(items) ) // Transition to ContentState
+                        state.override { ContentState(items) } // Transition to ContentState
                     } catch (t : Throwable) {
-                        OverrideState( ErrorState(t) ) // Transition to ErrorState
+                        state.override { Error(t) } // Transition to Error state
                     }
                 }
             }
 
-            inState<ErrorState> {
-                on<RetryLoadingAction> { action : RetryLoadingAction, stateSnapshot : ErrorState ->
-                    // executes this block whenever ErrorState is current state and RetryLoadingAction is emitted
-                    OverrideState( LoadingState ) // Transition to LoadingState which loads list again
+            inState<Error> {
+                on<RetryLoadingAction> { action : RetryLoadingAction, state : State<Error> ->
+                    // executes this block whenever Error state is current state and RetryLoadingAction is emitted
+                    state.override { Loading } // Transition to Loading state which loads list again
                  }
             }
 
             inState<ContentState> {
-                collectWhileInState( flowOf(1,2,3) ) { value : Int, stateSnapshot : ContentState ->
+                collectWhileInState( flowOf(1,2,3) ) { value : Int, state : State<ContentState> ->
                     // observes the given flow as long as state is ContentState.
                     // Once state is changed to another state the flow will automatically
                     // stop emitting.
-                    MutateState<ContentState, State> {
+                    state.mutate {
                         copy( items = this.items + Item("New item $value"))
                     }
                 }
@@ -69,14 +69,14 @@ launch {  // Launch a coroutine
 
 // emit an Action
 launch { // Launch a coroutine
-    statemachine.dispatch(Action)
+    statemachine.dispatch(action)
 }
 ```
 
 In an Android Application you could use it with AndroidX `ViewModel` like that:
 
 ```kotlin
-class MyViewModel @Inject constructor(private val stateMachine : StateMachine) : ViewModel() {
+class MyViewModel @Inject constructor(private val stateMachine : MyStateMachine) : ViewModel() {
     val state = MutableLiveData<State>()
 
     init {
@@ -96,28 +96,27 @@ class MyViewModel @Inject constructor(private val stateMachine : StateMachine) :
 ```
 
 ## Dependencies
-There are two artifacts that you can include as dependency:
+There are two artifacts that you can include as dependencis:
 
 1. `flowredux`: this is the core library and includes the DSL.
 2. `compose`: contains some convenient extensions to work with `FlowReduxStateMachine` in [Jetpack Compose](https://developer.android.com/jetpack/compose).
 
-### Multiplatform
-```groovy
-implementation 'com.freeletics.flowredux:flowredux:0.13.0'
-implementation 'com.freeletics.flowredux:compose:0.13.0'
-```
-
 ### JVM / Android only
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux-jvm:0.13.0'
-implementation 'com.freeletics.flowredux:compose:0.13.0'
+implementation 'com.freeletics.flowredux:flowredux-jvm:1.0.0'
+implementation 'com.freeletics.flowredux:compose:1.0.0'
+```
+
+### Multiplatform
+```groovy
+implementation 'com.freeletics.flowredux:flowredux:1.0.0'
 ```
 
 ### JavaScript
-No javascript version release yet but its on our TODO list.
+No javascript version released yet but it is on our roadmap.
 
 #### Snapshot
-Latest snapshot (directly published from master branch from CI on each change):
+Latest snapshot (directly published from `main` branch from CI on each change):
 
 ```groovy
 allprojects {
@@ -132,7 +131,8 @@ allprojects {
 }
 ```
 
-Then just use `-SNAPSHOT`suffix as version like
+Then just use `-SNAPSHOT`suffix as version name like
+
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux:0.12.1-SNAPSHOT'
+implementation 'com.freeletics.flowredux:flowredux:1.0.1-SNAPSHOT'
 ```

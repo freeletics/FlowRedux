@@ -9,6 +9,7 @@ import kotlinx.coroutines.FlowPreview
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@FlowReduxDsl
 public class FlowReduxStoreBuilder<S : Any, A : Any> {
 
     private val builderBlocks: MutableList<InStateBuilderBlock<*, S, A>> = ArrayList()
