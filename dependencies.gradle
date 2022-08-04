@@ -1,7 +1,7 @@
 ext.versions = [
         agp                    : '7.2.1',
-        compileSdk             : 31,
-        targetSdk              : 31,
+        compileSdk             : 32,
+        targetSdk              : 32,
         minSdk                 : 21,
         dokka                  : '1.6.10',
         coroutines             : '1.6.4',
