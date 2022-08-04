@@ -1,5 +1,5 @@
 ext.versions = [
-        agp                    : '7.2.1',
+        agp                    : '7.2.2',
         compileSdk             : 32,
         targetSdk              : 32,
         minSdk                 : 21,
