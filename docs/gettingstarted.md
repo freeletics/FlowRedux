@@ -120,7 +120,7 @@ Next let's discuss what an `inState` block can contain as triggers to actually "
    calling `FlowReduxStateMachine.dispatch(action)`.
 3. `collectWhileInState( flow )`: You can subscribe to any arbitrary `Flow` while your state machine is in that state.
 
-Additionally `onEnterStartStateMachine()` and `onActionStartStateMachine()` can be placed inside an `inState{ ... }` block, but we will talk about this advanced concepts that are useful for composing business logic later.
+Additionally `onEnterStartStateMachine()` and `onActionStartStateMachine()` can be placed inside an `inState{ ... }` block, but we will talk about these advanced concepts that are useful for composing business logic later.
 
 Let's take a more closer look at 3 basic elements `onEnter`, `on<Action>` and `collectWhileInState`  as we build our state machine. 
 
