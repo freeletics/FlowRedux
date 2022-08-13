@@ -1,35 +1,28 @@
 {
   "name": "shared_code",
-  "version": "1.0",
+  "version": "1.0.0",
   "homepage": "Link to a Kotlin/Native module homepage",
   "source": {
-    "git": "Not Published",
-    "tag": "Cocoapods/shared_code/1.0"
+    "http": ""
   },
   "authors": "",
   "license": "",
   "summary": "Some description for a Kotlin/Native module",
-  "static_framework": true,
   "vendored_frameworks": "build/cocoapods/framework/shared_code.framework",
   "libraries": "c++",
-  "module_name": "shared_code_umbrella",
+  "platforms": {
+    "ios": "12.2"
+  },
   "pod_target_xcconfig": {
-    "KOTLIN_TARGET[sdk=iphonesimulator*]": "ios_x64",
-    "KOTLIN_TARGET[sdk=iphoneos*]": "ios_arm",
-    "KOTLIN_TARGET[sdk=macosx*]": "macos_x64"
+    "KOTLIN_PROJECT_PATH": ":sample:shared_code",
+    "PRODUCT_MODULE_NAME": "shared_code"
   },
   "script_phases": [
     {
-      "name": "Build SharedCode",
+      "name": "Build shared_code",
       "execution_position": "before_compile",
       "shell_path": "/bin/sh",
-      "script": "                set -ev\n                REPO_ROOT=\"$PODS_TARGET_SRCROOT\"\n                \"$REPO_ROOT/../../gradlew\" -p \"$REPO_ROOT\" :sample:shared_code:syncFramework                     -Pkotlin.native.cocoapods.target=$KOTLIN_TARGET                     -Pkotlin.native.cocoapods.configuration=$CONFIGURATION                     -Pkotlin.native.cocoapods.cflags=\"$OTHER_CFLAGS\"                     -Pkotlin.native.cocoapods.paths.headers=\"$HEADER_SEARCH_PATHS\"                     -Pkotlin.native.cocoapods.paths.frameworks=\"$FRAMEWORK_SEARCH_PATHS\"\n"
+      "script": "                if [ \"YES\" = \"$COCOAPODS_SKIP_KOTLIN_BUILD\" ]; then\n                  echo \"Skipping Gradle build task invocation due to COCOAPODS_SKIP_KOTLIN_BUILD environment variable set to \"YES\"\"\n                  exit 0\n                fi\n                set -ev\n                REPO_ROOT=\"$PODS_TARGET_SRCROOT\"\n                \"$REPO_ROOT/../../gradlew\" -p \"$REPO_ROOT\" $KOTLIN_PROJECT_PATH:syncFramework                     -Pkotlin.native.cocoapods.platform=$PLATFORM_NAME                     -Pkotlin.native.cocoapods.archs=\"$ARCHS\"                     -Pkotlin.native.cocoapods.configuration=\"$CONFIGURATION\"\n"
     }
-  ],
-  "platforms": {
-    "osx": null,
-    "ios": null,
-    "tvos": null,
-    "watchos": null
-  }
+  ]
 }

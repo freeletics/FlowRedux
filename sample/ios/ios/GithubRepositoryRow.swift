@@ -10,8 +10,8 @@ import SwiftUI
 import shared_code
 
 struct GithubRepositoryRow: View {
-    var repo : GithubRepository
-    
+    let repo: GithubRepository
+
     var body: some View {
         Text(repo.name)
         // TODO add star count
@@ -21,7 +21,7 @@ struct GithubRepositoryRow: View {
 struct GithubRepositoryRow_Previews: PreviewProvider {
     static var previews: some View {
         GithubRepositoryRow(
-            repo: GithubRepository(id: "some_id", name: "Github Repo name", stargazersCount: 23)
+            repo: GithubRepository(id: "some_id", name: "Github Repo name", stargazersCount: 23, favoriteStatus: FavoriteStatus.notFavorite)
         )
     }
 }
