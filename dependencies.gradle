@@ -20,7 +20,7 @@ ext.versions = [
         androidArch            : '2.2.0',
 
         lifecycle              : '2.5.0',
-        fragmentKtx            : '1.5.1',
+        fragmentKtx            : '1.5.2',
         viewModelKtx           : '2.5.0',
 
         material               : '1.6.1',
