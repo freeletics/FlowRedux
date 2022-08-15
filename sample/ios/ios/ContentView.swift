@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import AFNetworking
 import shared_code
 import os.log
 

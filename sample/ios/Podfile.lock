@@ -1,43 +1,16 @@
 PODS:
-  - AFNetworking (2.7.0):
-    - AFNetworking/NSURLConnection (= 2.7.0)
-    - AFNetworking/NSURLSession (= 2.7.0)
-    - AFNetworking/Reachability (= 2.7.0)
-    - AFNetworking/Security (= 2.7.0)
-    - AFNetworking/Serialization (= 2.7.0)
-    - AFNetworking/UIKit (= 2.7.0)
-  - AFNetworking/NSURLConnection (2.7.0):
-    - AFNetworking/Reachability
-    - AFNetworking/Security
-    - AFNetworking/Serialization
-  - AFNetworking/NSURLSession (2.7.0):
-    - AFNetworking/Reachability
-    - AFNetworking/Security
-    - AFNetworking/Serialization
-  - AFNetworking/Reachability (2.7.0)
-  - AFNetworking/Security (2.7.0)
-  - AFNetworking/Serialization (2.7.0)
-  - AFNetworking/UIKit (2.7.0):
-    - AFNetworking/NSURLConnection
-    - AFNetworking/NSURLSession
   - shared_code (1.0.0)
 
 DEPENDENCIES:
-  - AFNetworking (~> 2.6)
   - shared_code (from `../shared_code`)
-
-SPEC REPOS:
-  trunk:
-    - AFNetworking
 
 EXTERNAL SOURCES:
   shared_code:
     :path: "../shared_code"
 
 SPEC CHECKSUMS:
-  AFNetworking: 8dd5f9b9691e09186393069a12cc3b5ed7c8b511
   shared_code: 209da94cdbf6b439f268e2619585ef737e3bc5de
 
-PODFILE CHECKSUM: 78c340054372d2a8b96bf3fcb95676fe5728c220
+PODFILE CHECKSUM: b0859f84bbab141212dad46e873c33bc31d50acc
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3

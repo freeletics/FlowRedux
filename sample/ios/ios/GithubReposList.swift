@@ -16,7 +16,7 @@ struct GithubReposList: View {
     var body: some View {
         List {
             ForEach(contentState.items) { repo in
-                Text("\(repo.name)")
+                GithubRepositoryRow(repo: repo)
             }
 
             switch contentState.nextPageLoadingState {
@@ -51,7 +51,7 @@ struct GithubReposList_Previews: PreviewProvider {
         .previewLayout(.fixed(width: 300, height: 70))
     }
 }
-
 */
+
 extension GithubRepository: Identifiable {
 }
