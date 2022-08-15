@@ -18,16 +18,14 @@ struct ContentView: View {
     )
 
     var body: some View {
-
-        NSLog("rendering \(state)")
-
+        
         return ZStack {
             if state is LoadFirstPagePaginationState {
                 LoadingIndicatorView()
             } else if let state = state as? ShowContentPaginationState {
                 GithubReposList(
                     contentState: state,
-                    endOfListReached: triggerLoadNextPage
+                    dispatchAction: dispatchAction
                 )
             } else if state is LoadingFirstPageError {
                 // TODO extract standalone widget?
@@ -39,12 +37,13 @@ struct ContentView: View {
 
     }
 
-    private func triggerLoadNextPage() {
-        self.stateMachine.dispatch(action: LoadNextPage())
-    }
-
     private func triggerReloadFirstPage() {
         self.stateMachine.dispatch(action: RetryLoadingFirstPage())
+    }
+    
+    
+    private func dispatchAction(action : Action){
+        self.stateMachine.dispatch(action: action)
     }
 
     private func startStateMachine() {
@@ -53,7 +52,7 @@ struct ContentView: View {
             self.state = paginationState
         })
     }
-
+    
 }
 
 struct ContentView_Previews: PreviewProvider {

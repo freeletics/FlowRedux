@@ -11,12 +11,12 @@ import shared_code
 
 struct GithubReposList: View {
     let contentState: ShowContentPaginationState
-    let endOfListReached: () -> Void
+    let dispatchAction: (Action) -> Void
 
     var body: some View {
         List {
             ForEach(contentState.items) { repo in
-                GithubRepositoryRow(repo: repo)
+                GithubRepositoryRow(repo: repo, dispatchAction: dispatchAction)
             }
 
             switch contentState.nextPageLoadingState {
@@ -35,7 +35,7 @@ struct GithubReposList: View {
                 // Work around to get notified when we have reached the end of the list by showing an invisible rect
                 Rectangle()
                     .size(width: 0, height: 0)
-                    .onAppear(perform: endOfListReached)
+                    .onAppear(perform: { dispatchAction( LoadNextPage() ) })
             default:
                 fatalError("Unhandled case: \(contentState.nextPageLoadingState)")
 

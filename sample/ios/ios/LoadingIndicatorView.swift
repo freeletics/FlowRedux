@@ -11,7 +11,9 @@ import SwiftUI
 enum IndicatorStyle : CGFloat{
     case big = 100
     case small = 25
+    case verySmall = 10
 }
+
 
 struct LoadingIndicatorView: View {
     @State private var spinCircle = false

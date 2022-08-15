@@ -11,17 +11,58 @@ import shared_code
 
 struct GithubRepositoryRow: View {
     let repo: GithubRepository
+    let dispatchAction: (Action) -> Void
+
 
     var body: some View {
-        Text(repo.name)
-        // TODO add star count
+        HStack {
+            Text(repo.name)
+                .frame(width: .infinity)
+            
+            Spacer()
+
+            Text("\(repo.stargazersCount)")
+            
+            Spacer()
+
+            
+            switch repo.favoriteStatus {
+            case .notFavorite:
+                Image(systemName: "star")
+                    .onTapGesture {
+                        dispatchAction(ToggleFavoriteAction(id: repo.id))
+                    }
+        
+            case .favorite:
+                Image(systemName: "star.fill")
+                    .onTapGesture {
+                        dispatchAction(ToggleFavoriteAction(id: repo.id))
+                    }
+                
+            case .operationFailed:
+                Image(systemName: "exclamationmark.circle")
+                    .onTapGesture {
+                        dispatchAction(RetryToggleFavoriteAction(id: repo.id))
+                    }
+                
+                
+            case .operationInProgress:
+                LoadingIndicatorView(style: .verySmall)
+
+            default:
+                fatalError("Unhandled case: \(repo.favoriteStatus)")
+            }
+        }
     }
 }
 
 struct GithubRepositoryRow_Previews: PreviewProvider {
     static var previews: some View {
         GithubRepositoryRow(
-            repo: GithubRepository(id: "some_id", name: "Github Repo name", stargazersCount: 23, favoriteStatus: FavoriteStatus.notFavorite)
+            repo: GithubRepository(id: "some_id", name: "Github Repo name", stargazersCount: 23, favoriteStatus: FavoriteStatus.notFavorite),
+            dispatchAction: { action in
+                
+            }
         )
     }
 }
