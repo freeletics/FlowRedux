@@ -6,65 +6,46 @@ apply plugin: 'co.touchlab.kotlinxcodesync'
 version = "1.0.0"
 
 kotlin {
-    targets {
-        jvm()
-        final def iOSTarget = System.getenv('SDK_NAME')?.startsWith("iphoneos")   \
-                                ? presets.iosArm64 : presets.iosX64
+    jvm()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
 
-        fromPreset(iOSTarget, 'iOS') {
-            binaries {
-                framework('shared_code')
+    cocoapods {
+        summary = "Some description for a Kotlin/Native module"
+        homepage = "Link to a Kotlin/Native module homepage"
+        name = "shared_code"
+        ios.deploymentTarget = "12.2"
+        podfile = project.file("../ios/Podfile")
+        frameworkName = "shared_code"
+    }
+
+    sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlinx.coroutines.FlowPreview")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }
 
-//        fromPreset(presets.android, 'android')
-
-    }
-/*
-    js {
-        compileKotlinJs {
-            kotlinOptions.metaInfo = true
-            kotlinOptions.sourceMap = true
-            kotlinOptions.moduleKind = "commonjs"
-            kotlinOptions.main = "call"
-        }
-    }
-*/
-
-    cocoapods {
-        // Configure fields required by CocoaPods.
-        summary = "Some description for a Kotlin/Native module"
-        homepage = "Link to a Kotlin/Native module homepage"
-    }
-
-
-    sourceSets {
-        commonMain.dependencies {
-            // Kotlin
-            implementation libraries.kotlinStdlibCommon
-            api project(':flowredux')
+        commonMain {
+            dependencies {
+                // Kotlin
+                implementation libraries.kotlinStdlibCommon
+                api project(':flowredux')
+            }
         }
 
-        androidMain.dependencies {
-            // Kotlin
-            implementation libraries.kotlinStdlib
+        iosX64Main {}
+        iosArm64Main {}
+        iosSimulatorArm64Main {}
+
+        iOSMain {
+            dependsOn(commonMain)
+            iosX64Main.dependsOn(iOSMain)
+            iosArm64Main.dependsOn(iOSMain)
+            iosSimulatorArm64Main.dependsOn(iOSMain)
         }
-
-
-        iOSMain.dependencies {
-        }
-
-        /*
-        jvmMain.dependencies {
-            // Kotlin
-            implementation libraries.kotlinStdlib
-        }
-
-        jsMain.dependencies {
-            api libraries.kotlinStdlibJs
-        }
-
-         */
     }
 }
 

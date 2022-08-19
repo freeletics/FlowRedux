@@ -7,30 +7,26 @@
 //
 
 import SwiftUI
-import AFNetworking
 import shared_code
 import os.log
 
 struct ContentView: View {
-    @State private var state : PaginationState = LoadFirstPagePaginationState()
-    private let stateMachine : PaginationStateMachine = PaginationStateMachine(
+    @State private var state: PaginationState = LoadFirstPagePaginationState()
+    private let stateMachine: PaginationStateMachine = PaginationStateMachine(
         githubApi: GithubApi(),
         scope: NsQueueCoroutineScope()
     )
-    
-    var body: some View {
 
-        NSLog("rendering \(state)")
+    var body: some View {
         
         return ZStack {
             if state is LoadFirstPagePaginationState {
                 LoadingIndicatorView()
-            } else if state is ContainsContentPaginationState {
-                
-                GithubReposList(contentState: $state,
-                                endOfListReached: triggerLoadNextPage
+            } else if let state = state as? ShowContentPaginationState {
+                GithubReposList(
+                    contentState: state,
+                    dispatchAction: dispatchAction
                 )
-                
             } else if state is LoadingFirstPageError {
                 // TODO extract standalone widget?
                 Button(action: triggerReloadFirstPage) {
@@ -38,30 +34,31 @@ struct ContentView: View {
                 }
             }
         }.onAppear(perform: startStateMachine)
-        
+
     }
-    
-    private func triggerLoadNextPage(){
-        self.stateMachine.dispatch(action: LoadNextPage())
-    }
-    
-    private func triggerReloadFirstPage(){
+
+    private func triggerReloadFirstPage() {
         self.stateMachine.dispatch(action: RetryLoadingFirstPage())
     }
     
-    private func startStateMachine(){
+    
+    private func dispatchAction(action : Action){
+        self.stateMachine.dispatch(action: action)
+    }
+
+    private func startStateMachine() {
         self.stateMachine.start(stateChangeListener: { (paginationState: PaginationState) -> Void in
-                NSLog("Swift UI \(paginationState) to render")
-                self.state = paginationState
+            NSLog("Swift UI \(paginationState) to render")
+            self.state = paginationState
         })
     }
-       
+    
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-      ContentView()
+        ContentView()
     }
 }
 
-extension String: Error {}
+extension String: Error { }
