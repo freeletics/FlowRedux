@@ -1,49 +1,40 @@
-apply plugin: 'com.android.library'
-apply plugin: 'org.jetbrains.dokka'
-apply plugin: 'kotlin-android'
-apply plugin: 'com.vanniktech.maven.publish'
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.publish)
+}
 
 android {
-    compileSdkVersion versions.compileSdk
+    namespace = "com.freeletics.flowredux.compose"
+    compileSdkVersion libs.versions.android.compile.get().toInteger()
 
     defaultConfig {
-        targetSdkVersion versions.targetSdk
-        minSdkVersion versions.minSdk
-        versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+        minSdkVersion libs.versions.android.min.get().toInteger()
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.toVersion(libs.versions.java.get())
+        targetCompatibility JavaVersion.toVersion(libs.versions.java.get())
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = libs.versions.java.get()
         allWarningsAsErrors = true
         freeCompilerArgs += "-Xexplicit-api=strict"
     }
 
     buildFeatures {
         compose true
+        buildConfig false
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion versions.composeCompiler
+        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
     }
 }
 
 dependencies {
-    implementation compose.runtime
+    implementation libs.androidx.compose.runtime
     implementation project(':flowredux')
 }

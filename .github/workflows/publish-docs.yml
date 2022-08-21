@@ -31,15 +31,15 @@ jobs:
         run: pip install mkdocs-material
 
       - name: Build docs
-        run: ./gradlew dokkaGfm
+        run: ./gradlew dokkaHtml
 
       - name: Copy docs
         run: |
           cp README.md docs/index.md
-          mkdir -p docs/javadoc/dsl
-          cp -R flowredux/build/dokka/gfm/. docs/javadoc/dsl
-          mkdir -p docs/javadoc/compose
-          cp -R compose/build/dokka/gfm/. docs/javadoc/compose
+          mkdir -p docs/API/dsl
+          cp -R flowredux/build/dokka/html/. docs/API/dsl
+          mkdir -p docs/API/compose
+          cp -R compose/build/dokka/html/. docs/API/compose
 
 
       - name: Deploy MkDocs

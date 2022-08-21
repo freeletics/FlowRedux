@@ -1,1 +1,27 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+    }
+
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == 'co.touchlab.kotlinxcodesync') {
+                useModule("co.touchlab:kotlinxcodesync:${requested.version}")
+            }
+        }
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        google()
+    }
+
+    // https://youtrack.jetbrains.com/issue/KT-51379
+    // repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+}
+
 include ':flowredux', ':sample:android', ':sample:shared_code', ':compose'

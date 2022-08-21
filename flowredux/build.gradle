@@ -1,8 +1,12 @@
-apply plugin: 'org.jetbrains.dokka'
-apply plugin: 'org.jetbrains.kotlin.multiplatform'
-apply plugin: 'com.vanniktech.maven.publish'
+plugins {
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.publish)
+}
 
 kotlin {
+    explicitApi = 'strict'
+
     /*
     js {
         nodejs()
@@ -14,7 +18,7 @@ kotlin {
     iosArm64()
     iosX64()
     iosSimulatorArm64()
-//    linuxX64()
+    linuxX64()
     macosX64()
     macosArm64()
     mingwX64()
@@ -29,30 +33,17 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api libraries.kotlinStdlibCommon
-                api libraries.coroutines
-                api libraries.flMadStateMachine
+                api libs.coroutines.core
+                api libs.mad.statemachine
             }
         }
 
         commonTest {
             dependencies {
-                implementation testLibraries.kotlinTest
-                implementation testLibraries.kotlinTestAnnotations
-                implementation testLibraries.turbine
-            }
-        }
-
-        jvmMain {
-            dependencies {
-                implementation libraries.kotlinStdlibJdk8
-            }
-        }
-
-        jvmTest {
-            dependencies {
-                implementation testLibraries.kotlinTestJunit
-                implementation testLibraries.coroutinesTest
+                implementation libs.kotlin.test
+                implementation libs.kotlin.test.annotations
+                implementation libs.turbine
+                implementation libs.coroutines.test
             }
         }
 
@@ -60,24 +51,25 @@ kotlin {
             dependsOn commonMain
         }
         nativeTest {
+            dependsOn commonTest
         }
 
         configure([
-                targets.iosArm32,
-                targets.iosArm64,
-                targets.iosX64,
-                targets.iosSimulatorArm64,
-//                targets.linuxX64,
-                targets.macosX64,
-                targets.macosArm64,
-                targets.mingwX64,
-                targets.tvosArm64,
-                targets.tvosX64,
-                targets.tvosSimulatorArm64,
-                targets.watchosArm32,
-                targets.watchosArm64,
-                targets.watchosX86,
-                targets.watchosSimulatorArm64,
+            targets.iosArm32,
+            targets.iosArm64,
+            targets.iosX64,
+            targets.iosSimulatorArm64,
+            targets.linuxX64,
+            targets.macosX64,
+            targets.macosArm64,
+            targets.mingwX64,
+            targets.tvosArm64,
+            targets.tvosX64,
+            targets.tvosSimulatorArm64,
+            targets.watchosArm32,
+            targets.watchosArm64,
+            targets.watchosX86,
+            targets.watchosSimulatorArm64,
         ]) {
             compilations.main.source(sourceSets.nativeMain)
             compilations.test.source(sourceSets.nativeTest)
@@ -88,7 +80,6 @@ kotlin {
         compilations.all {
             kotlinOptions {
                 allWarningsAsErrors = true
-                freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn"]
             }
         }
     }
@@ -96,7 +87,7 @@ kotlin {
     targets.jvm {
         compilations.all {
             kotlinOptions {
-                jvmTarget = "1.8"
+                jvmTarget = JavaVersion.toVersion(libs.versions.java.get())
             }
         }
     }

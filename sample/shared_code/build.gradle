@@ -1,7 +1,8 @@
-// apply plugin: 'com.android.library'
-apply plugin: 'kotlin-multiplatform'
-apply plugin: 'org.jetbrains.kotlin.native.cocoapods'
-apply plugin: 'co.touchlab.kotlinxcodesync'
+plugins {
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.cocoapods)
+    alias(libs.plugins.codesync)
+}
 
 version = "1.0.0"
 
@@ -30,15 +31,9 @@ kotlin {
 
         commonMain {
             dependencies {
-                // Kotlin
-                implementation libraries.kotlinStdlibCommon
                 api project(':flowredux')
             }
         }
-
-        iosX64Main {}
-        iosArm64Main {}
-        iosSimulatorArm64Main {}
 
         iOSMain {
             dependsOn(commonMain)
@@ -51,7 +46,7 @@ kotlin {
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = libs.versions.java.get()
     }
 }
 

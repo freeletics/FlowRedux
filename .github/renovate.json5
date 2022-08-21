@@ -1,0 +1,42 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [
+    "config:base",
+    ":disableRateLimiting"
+  ],
+  automerge: false,
+  platformAutomerge: true,
+  platformCommit: true,
+  assignAutomerge: true,
+  rebaseWhen: "conflict",
+  prBodyTemplate: "{{{header}}}{{{table}}}{{{notes}}}{{{changelogs}}}{{{controls}}}{{{footer}}}",
+  prBodyColumns: ["Package", "Change", "Age"],
+  prFooter: "🔕 Ignore: Close this PR and you won't be reminded about these updates again.",
+  ignoreDeps: [
+  ],
+  packageRules: [
+    //
+    //
+    // CUSTOM CHANGELOGS
+    //
+    //
+    {
+      matchPackagePatterns: [
+          "^androidx.test"
+      ],
+      prBodyNotes: "[Changelog](https://developer.android.com/jetpack/androidx/releases/test)"
+    },
+    {
+      matchPackagePatterns: [
+        "^androidx"
+      ],
+      prBodyNotes: "[Changelog]({{{homepage}}})"
+    },
+    {
+      matchPackageNames: [
+        "gradle"
+      ],
+      prBodyNotes: "[Changelog](https://docs.gradle.org/{{{newVersion}}}/release-notes.html)"
+    }
+  ]
+}

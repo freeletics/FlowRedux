@@ -1,4 +1,4 @@
 package com.freeletics.flowredux.dsl
 
 @DslMarker
-annotation class FlowReduxDsl
+public annotation class FlowReduxDsl
