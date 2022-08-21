@@ -1,7 +1,9 @@
 plugins {
+    alias(libs.plugins.binarycompatibility)
+    alias(libs.plugins.dependency.analysis)
+
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.android) apply false
-    alias(libs.plugins.kotlin.kapt) apply false
     alias(libs.plugins.kotlin.cocoapods) apply false
     alias(libs.plugins.android.app) apply false
     alias(libs.plugins.android.library) apply false
@@ -12,4 +14,35 @@ apply plugin: com.vanniktech.maven.publish.MavenPublishRootPlugin
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+dependencyAnalysis {
+    issues {
+        all {
+            ignoreKtx(true)
+
+            onAny {
+                severity('fail')
+            }
+        }
+    }
+
+    dependencies {
+        bundle("androidx-compose-ui") {
+            primary("androidx.compose.ui:ui")
+            includeGroup("androidx.compose.ui")
+        }
+        bundle("androidx-compose-foundation") {
+            primary("androidx.compose.foundation:foundation")
+            includeGroup("androidx.compose.foundation")
+        }
+    }
+}
+
+apiValidation {
+    ignoredProjects += ['android', 'shared_code']
+
+    nonPublicMarkers += [
+        "androidx.annotation.VisibleForTesting",
+    ]
 }

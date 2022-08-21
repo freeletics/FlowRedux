@@ -1,10 +1,10 @@
 plugins {
     alias(libs.plugins.android.app)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
+    namespace = "com.freeletics.flowredux"
     compileSdkVersion libs.versions.android.compile.get().toInteger()
 
     defaultConfig {
@@ -39,15 +39,19 @@ dependencies {
     implementation libs.androidx.appcompat
     implementation libs.androidx.recyclerview
     implementation libs.androidx.constraintlayout
+    implementation libs.androidx.lifecycle
     implementation libs.androidx.viewmodel
     implementation libs.androidx.livedata
-    implementation libs.androidx.fragment
-    implementation libs.adapterdelegates
-    implementation libs.material
+    implementation libs.androidx.activity
     implementation libs.androidx.activity.compose
     implementation libs.androidx.compose.runtime
     implementation libs.androidx.compose.ui
+    implementation libs.androidx.compose.foundation
     implementation libs.androidx.compose.material
+    implementation libs.adapterdelegates
+    implementation libs.adapterdelegates.dsl
+    implementation libs.coroutines.core
+    implementation libs.material
     implementation libs.timber
 
     implementation project(':sample:shared_code')
