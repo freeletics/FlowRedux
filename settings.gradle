@@ -4,6 +4,14 @@ pluginManagement {
         google()
         gradlePluginPortal()
     }
+
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == 'co.touchlab.kotlinxcodesync') {
+                useModule("co.touchlab:kotlinxcodesync:${requested.version}")
+            }
+        }
+    }
 }
 
 dependencyResolutionManagement {
@@ -16,4 +24,4 @@ dependencyResolutionManagement {
     // repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
 }
 
-include ':flowredux', ':compose'
+include ':flowredux', ':sample:android', ':sample:shared_code', ':compose'

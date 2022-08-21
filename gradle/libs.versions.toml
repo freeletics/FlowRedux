@@ -27,7 +27,7 @@ turbine = "0.7.0"
 
 publish = "0.21.0"
 dokka = "1.6.10"
-codesync = "0.2.0"
+codesync = "0.2"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -58,7 +58,7 @@ mad-statemachine = { module = "com.freeletics.mad:state-machine", version.ref = 
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 [plugins]
-android-app = { id = "com.android.library", version.ref = "android-gradle" }
+android-app = { id = "com.android.application", version.ref = "android-gradle" }
 android-library = { id = "com.android.library", version.ref = "android-gradle" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -67,5 +67,5 @@ kotlin-cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref =
 publish = { id = "com.vanniktech.maven.publish", version.ref = "publish" }
 publish-root = { id = "com.vanniktech.maven.publish.root", version.ref = "publish" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-codesync = { id = "co.touchlab:kotlinxcodesync", version.ref = "codesync" }
+codesync = { id = "co.touchlab.kotlinxcodesync", version.ref = "codesync" }
 
