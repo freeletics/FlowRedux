@@ -35,6 +35,7 @@ android {
 }
 
 dependencies {
-    implementation libs.androidx.compose.runtime
-    implementation project(':flowredux')
+    api project(':flowredux')
+    api libs.androidx.compose.runtime
+    implementation libs.coroutines.core
 }
