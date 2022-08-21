@@ -120,7 +120,7 @@ Next let's discuss what an `inState` block can contain as triggers to actually "
    calling `FlowReduxStateMachine.dispatch(action)`.
 3. `collectWhileInState( flow )`: You can subscribe to any arbitrary `Flow` while your state machine is in that state.
 
-Additionally `onEnterStartStateMachine()` and `onActionStartStateMachine()` can be placed inside an `inState{ ... }` block, but we will talk about this advanced concepts that are useful for composing business logic later.
+Additionally `onEnterStartStateMachine()` and `onActionStartStateMachine()` can be placed inside an `inState{ ... }` block, but we will talk about these advanced concepts that are useful for composing business logic later.
 
 Let's take a more closer look at 3 basic elements `onEnter`, `on<Action>` and `collectWhileInState`  as we build our state machine. 
 
@@ -265,7 +265,7 @@ How do we deal with external user input like clicks in FlowRedux?
 This is what `Action` is for. 
 With the DSL of FlowRedux you can specify what should be done when a certain `Action` (triggered by the user) happened. 
 
-In our example we want to retry loading if we are in `Error` state. In the `Error´ state our UI shows a error text and a button the user can click on to retry loading the list of items. 
+In our example we want to retry loading if we are in `Error` state. In the `Error` state our UI shows a error text and a button the user can click on to retry loading the list of items. 
 Clicking on that button dispatches a `RetryLoadingAction` to our state machine. 
 Let's extend our `ItemListStateMachine` to react on such an action:
 
@@ -1125,7 +1125,7 @@ spec {
 You may wonder what is the best way to test a `FlowReduxStateMachine`? 
 There are two strategies we want to discuss here in this section:
 1. functional integration tests: test the whole state machine as a whole.
-2. Unit tests to test only a certain handler such as `onEnter {}`, ´on<Action>` and so on.
+2. Unit tests to test only a certain handler such as `onEnter {}`, `on<Action>` and so on.
 
 
 ### Functional integration tests with Turbine
@@ -1258,8 +1258,9 @@ fun `on http success move to ShowContent state`() = runTest{
 ```
 
 With FlowRedux you can write unit tests, but there is a bit of overhead:
+
 1. You need to wrap the actual state into FlowRedux `State` class.
 2. To get from a `ChangedState` to the actual value you need to call `.reduce()` on it.
 
 What we basically have to do here is what FlowRedux does internally. 
-In the  future we may provide a more convenient way to write this kind of unit tests with less overhead.
+In the future we may provide a more convenient way to write this kind of unit tests with less overhead.

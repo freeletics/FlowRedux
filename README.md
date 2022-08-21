@@ -115,7 +115,7 @@ implementation 'com.freeletics.flowredux:flowredux:1.0.0'
 ### JavaScript
 No javascript version released yet but it is on our roadmap.
 
-#### Snapshot
+### Snapshot
 Latest snapshot (directly published from `main` branch from CI on each change):
 
 ```groovy

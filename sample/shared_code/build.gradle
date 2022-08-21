@@ -7,28 +7,39 @@ plugins {
 version = "1.0.0"
 
 kotlin {
-    targets {
-        jvm()
-        final def iOSTarget = System.getenv('SDK_NAME')?.startsWith("iphoneos")   \
-                                ? presets.iosArm64 : presets.iosX64
-
-        fromPreset(iOSTarget, 'iOS') {
-            binaries {
-                framework('shared_code')
-            }
-        }
-    }
+    jvm()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
 
     cocoapods {
-        // Configure fields required by CocoaPods.
         summary = "Some description for a Kotlin/Native module"
         homepage = "Link to a Kotlin/Native module homepage"
+        name = "shared_code"
+        ios.deploymentTarget = "12.2"
+        podfile = project.file("../ios/Podfile")
+        frameworkName = "shared_code"
     }
 
-
     sourceSets {
-        commonMain.dependencies {
-            api project(':flowredux')
+        all {
+            languageSettings {
+                optIn("kotlinx.coroutines.FlowPreview")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+            }
+        }
+
+        commonMain {
+            dependencies {
+                api project(':flowredux')
+            }
+        }
+
+        iOSMain {
+            dependsOn(commonMain)
+            iosX64Main.dependsOn(iOSMain)
+            iosArm64Main.dependsOn(iOSMain)
+            iosSimulatorArm64Main.dependsOn(iOSMain)
         }
     }
 }
