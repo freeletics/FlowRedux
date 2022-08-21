@@ -1,22 +1,16 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+plugins {
+    alias(libs.plugins.android.app)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
+}
 
 android {
-    compileSdkVersion versions.compileSdk
+    compileSdkVersion libs.versions.android.compile.get().toInteger()
+
     defaultConfig {
         applicationId "com.freeletics.flowredux"
-        targetSdkVersion versions.targetSdk
-        minSdkVersion versions.minSdk
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "com.freeletics.rxredux.SampleAppRunner"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+        minSdkVersion libs.versions.android.min.get().toInteger()
+        targetSdkVersion libs.versions.android.target.get().toInteger()
     }
 
     buildFeatures {
@@ -24,74 +18,39 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion versions.composeCompiler
+        kotlinCompilerExtensionVersion libs.versions.androidx.compose.compiler.get()
     }
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.toVersion(libs.versions.java.get())
+        targetCompatibility JavaVersion.toVersion(libs.versions.java.get())
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
-
-    testOptions {
-        animationsDisabled = true
+        jvmTarget = libs.versions.java.get()
     }
 
     lintOptions {
        abortOnError false
     }
-
-    packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/LICENSE.md'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/license.txt'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/notice.txt'
-        exclude 'META-INF/ASL2.0'
-        exclude 'META-INF/library.kotlin_module'
-        exclude 'META-INF/LICENSE-notice.md'
-        exclude 'META-INF/kotlinx-coroutines-core.kotlin_module'
-        exclude 'META-INF/ktor-client-serialization.kotlin_module'
-        exclude 'META-INF/ktor-http.kotlin_module'
-        exclude 'META-INF/ktor-utils.kotlin_module'
-        exclude 'META-INF/kotlinx-serialization-runtime.kotlin_module'
-        exclude 'META-INF/ktor-io.kotlin_module'
-        exclude 'META-INF/ktor-http-cio.kotlin_module'
-        exclude 'META-INF/ktor-client-json.kotlin_module'
-        exclude 'META-INF/ktor-client-core.kotlin_module'
-        exclude 'META-INF/ktor-client-logging.kotlin_module'
-    }
 }
 
 dependencies {
-    implementation libraries.kotlinStdlib
-    implementation supportLibraries.appCompat
-    implementation supportLibraries.recyclerView
-    implementation supportLibraries.constraintLayout
-    implementation supportLibraries.viewModelKtx
-    implementation supportLibraries.livedata
-    implementation supportLibraries.fragmentKtx
-    implementation supportLibraries.adapterDelegates
-    implementation supportLibraries.material
-    implementation libraries.rxJava
-    implementation libraries.rxAndroid
-    implementation libraries.timber
-    implementation compose.runtime
-    implementation compose.ui
-    implementation compose.activity
-    implementation compose.material
+    implementation libs.androidx.apppompat
+    implementation libs.androidx.recyclerview
+    implementation libs.androidx.constraintlayout
+    implementation libs.androidx.viewmodel
+    implementation libs.androidx.livedata
+    implementation libs.androidx.fragment
+    implementation libs.adapterdelegates
+    implementation libs.material
+    implementation libs.androidx.activity.compose
+    implementation libs.androidx.compose.runtime
+    implementation libs.androidx.compose.ui
+    implementation libs.androidx.compose.material
+    implementation libs.timber
 
     implementation project(':sample:shared_code')
     implementation project(':flowredux')
     implementation project(':compose')
-
-    testImplementation testLibraries.junit
-
-    androidTestImplementation testLibraries.junit
 }

@@ -1,7 +1,8 @@
-// apply plugin: 'com.android.library'
-apply plugin: 'kotlin-multiplatform'
-apply plugin: 'org.jetbrains.kotlin.native.cocoapods'
-apply plugin: 'co.touchlab.kotlinxcodesync'
+plugins {
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.cocoapods)
+    alias(libs.plugins.codesync)
+}
 
 version = "1.0.0"
 
@@ -16,20 +17,7 @@ kotlin {
                 framework('shared_code')
             }
         }
-
-//        fromPreset(presets.android, 'android')
-
     }
-/*
-    js {
-        compileKotlinJs {
-            kotlinOptions.metaInfo = true
-            kotlinOptions.sourceMap = true
-            kotlinOptions.moduleKind = "commonjs"
-            kotlinOptions.main = "call"
-        }
-    }
-*/
 
     cocoapods {
         // Configure fields required by CocoaPods.
@@ -40,37 +28,14 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            // Kotlin
-            implementation libraries.kotlinStdlibCommon
             api project(':flowredux')
         }
-
-        androidMain.dependencies {
-            // Kotlin
-            implementation libraries.kotlinStdlib
-        }
-
-
-        iOSMain.dependencies {
-        }
-
-        /*
-        jvmMain.dependencies {
-            // Kotlin
-            implementation libraries.kotlinStdlib
-        }
-
-        jsMain.dependencies {
-            api libraries.kotlinStdlibJs
-        }
-
-         */
     }
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = libs.versions.java.get()
     }
 }
 

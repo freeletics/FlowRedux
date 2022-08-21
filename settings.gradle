@@ -1,1 +1,19 @@
-include ':flowredux', ':sample:android', ':sample:shared_code', ':compose'
+pluginManagement {
+    repositories {
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        google()
+    }
+
+    // https://youtrack.jetbrains.com/issue/KT-51379
+    // repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+}
+
+include ':flowredux', ':compose'

@@ -9,7 +9,7 @@ package com.freeletics.flowredux.dsl
  * never be used within [mutate] or to create an object that is passed to [override]
  */
 public class State<InputState : Any>(
-    val snapshot: InputState
+    public val snapshot: InputState
 ) {
     /**
      * Use this function if you want to "mutate" the current state by copying the old state

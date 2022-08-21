@@ -47,6 +47,6 @@ nav:
    - 'Multiplatform': multiplatform.md
    - 'Compose': compose.md
    - 'Contributing': contributing.md
-   - 'JavaDocs':
-       - 'DSL': javadoc/dsl
-       - 'Compose': javadoc/compose
+   - 'API':
+       - 'DSL': API/dsl
+       - 'Compose': API/compose
