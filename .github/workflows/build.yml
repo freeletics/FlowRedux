@@ -31,7 +31,7 @@ jobs:
 
       - name: Upload flowredux test report artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: flowredux-test-report
           path: /home/runner/work/FlowRedux/FlowRedux/flowredux/build/reports/tests/allTests/
