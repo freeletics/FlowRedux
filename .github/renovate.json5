@@ -8,7 +8,7 @@
   platformAutomerge: true,
   platformCommit: true,
   assignAutomerge: true,
-  rebaseWhen: "conflict",
+  rebaseWhen: "conflicted",
   prBodyTemplate: "{{{header}}}{{{table}}}{{{notes}}}{{{changelogs}}}{{{controls}}}{{{footer}}}",
   prBodyColumns: ["Package", "Change", "Age"],
   prFooter: "🔕 Ignore: Close this PR and you won't be reminded about these updates again.",
