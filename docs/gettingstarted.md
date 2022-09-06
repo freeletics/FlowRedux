@@ -78,7 +78,7 @@ In our example we start with the `Loading` state.
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : <ListState, Action>(initialState = Loading) {
+) : FlowReduxStateMachine<ListState, Action>(initialState = Loading) {
 
     init {
         spec {
@@ -100,7 +100,7 @@ The first concept of the DSL we learn is `inState`:
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : <ListState, Action>(initialState = Loading) {
+) : FlowReduxStateMachine<ListState, Action>(initialState = Loading) {
 
     init {
         spec {
@@ -132,7 +132,7 @@ Let's specify that with the DSL in our state machine:
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : <ListState, Action>(initialState = Loading) {
+) : FlowReduxStateMachine<ListState, Action>(initialState = Loading) {
 
     init {
         spec {
@@ -272,7 +272,7 @@ Let's extend our `ItemListStateMachine` to react on such an action:
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : <ListState, Action>(initialState = Loading) {
+) : FlowReduxStateMachine<ListState, Action>(initialState = Loading) {
 
     init {
         spec {
@@ -346,7 +346,7 @@ Now let's add some countdown capabilities to our state machine by using `collect
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : <ListState, Action>(initialState = Loading) {
+) : FlowReduxStateMachine<ListState, Action>(initialState = Loading) {
 
     init {
         spec {
@@ -427,7 +427,7 @@ For example cancelation etc. works just the same way as described in the section
 
 Usage:
 ```kotlin
-class ItemListStateMachine : ListState, Action>(initialState = Loading) {
+class ItemListStateMachine : FlowReduxStateMachine<ListState, Action>(initialState = Loading) {
 
     init {
         spec {
@@ -480,7 +480,7 @@ Given the state from above, what we  can do now with our DSL is the following:
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : <ListState, Action>(
+) : FlowReduxStateMachine<ListState, Action>(
     initialState = State(
         loading = true,
         items = emptyList(),
@@ -651,7 +651,7 @@ Let' take a look at our example state machine:
 ```kotlin
 class ItemListStateMachine(
     private val httpClient: HttpClient
-) : <ListState, Action>(initialState = Loading) {
+) : FlowReduxStateMachine<ListState, Action>(initialState = Loading) {
 
     init {
         spec {
