@@ -31,11 +31,9 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
     public constructor(initialState: S) : this(initialStateSupplier = { initialState })
 
     protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
-        if (::outputState.isInitialized) {
-            throw IllegalStateException(
-                "State machine spec has already been set. " +
+        check(!::outputState.isInitialized) {
+            "State machine spec has already been set. " +
                     "It's only allowed to call spec {...} once."
-            )
         }
 
         val sideEffects = FlowReduxStoreBuilder<S, A>().apply(specBlock).generateSideEffects()
@@ -49,12 +47,10 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
             .reduxStore(initialStateSupplier, sideEffects, ::reducer)
             .distinctUntilChanged { old, new -> old === new } // distinct until not the same object reference.
             .onStart {
-                if (activeFlowCounter.incrementAndGet() > 1) {
-                    throw IllegalStateException(
-                        "Can not collect state more than once at the same time. Make sure the" +
+                check(activeFlowCounter.incrementAndGet() <= 1) {
+                    "Can not collect state more than once at the same time. Make sure the" +
                             "previous collection is cancelled before starting a new one. " +
                             "Collecting state in parallel would lead to subtle bugs."
-                    )
                 }
             }
             .onCompletion {
@@ -70,20 +66,17 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
 
     override suspend fun dispatch(action: A) {
         checkSpecBlockSet()
-        if (activeFlowCounter.get() <= 0) {
-            throw IllegalStateException(
-                "Cannot dispatch action $action because state Flow of this " +
+        check(activeFlowCounter.get() > 0) {
+            "Cannot dispatch action $action because state Flow of this " +
                     "FlowReduxStateMachine is not collected yet. " +
                     "Start collecting the state Flow before dispatching any action."
-            )
         }
         inputActions.send(action)
     }
 
     private fun checkSpecBlockSet() {
-        if (!::outputState.isInitialized) {
-            throw IllegalStateException(
-                """
+        check(::outputState.isInitialized) {
+            """
                     No state machine specs are defined. Did you call spec { ... } in init {...}?
                     Example usage:
 
@@ -99,7 +92,6 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
                         }
                     }
                 """.trimIndent()
-            )
         }
     }
 }
