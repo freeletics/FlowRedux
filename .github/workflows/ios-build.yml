@@ -60,17 +60,12 @@ jobs:
           key: ${{ runner.os }}-konan-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-konan-
-      - name: Cache Pods
-        uses: actions/cache@v3.0.8
-        with:
-          path: ${{ github.workspace }}/iosApp/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
 
-      - name: Install Pod
-        run: pod install
-        working-directory: sample/ios
+      - name: Install Cocoapods
+        run: |
+          ./gradlew shared:podGenIOS --parallel
+          cd sample/ios
+          pod install
 
       - name: Build
         uses: sersoft-gmbh/xcodebuild-action@v2.0.0
