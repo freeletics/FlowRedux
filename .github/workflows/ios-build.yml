@@ -63,7 +63,7 @@ jobs:
 
       - name: Install Cocoapods
         run: |
-          ./gradlew shared:podGenIOS --parallel
+          ./gradlew :sample:shared_code:podGenIOS --parallel
           cd sample/ios
           pod install
 
