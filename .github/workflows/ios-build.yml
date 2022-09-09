@@ -2,7 +2,7 @@ name: iOS Build CI
 
 on:
   push:
-    branches: [ master, test-ci ]
+    branches: [ master ]
     paths-ignore: [ '**.md', '**.MD' ]
   pull_request:
     branches: [ master ]
