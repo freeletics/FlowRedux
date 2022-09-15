@@ -27,12 +27,7 @@ jobs:
       - name: Install Android SDK
         run: ./.github/android-sdk.sh
 
+      - uses: gradle/gradle-build-action@v2
+
       - name: Build with Gradle
         run: ./gradlew build --stacktrace
-
-      - name: Upload flowredux test report artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: flowredux-test-report
-          path: /home/runner/work/FlowRedux/FlowRedux/flowredux/build/reports/tests/allTests/
