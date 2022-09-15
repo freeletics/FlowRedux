@@ -1,0 +1,79 @@
+name: iOS Build CI
+
+on:
+  push:
+    branches: [ master ]
+    paths-ignore: [ '**.md', '**.MD' ]
+  pull_request:
+    branches: [ master ]
+    paths-ignore: [ '**.md', '**.MD' ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build default scheme using any available iPhone simulator
+    runs-on: macos-12
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1.4.1
+        with:
+          xcode-version: 'latest-stable'
+
+      - name: Prepare and open Simulator
+        run: |
+          xcrun simctl create iphone-12-pro "iPhone 12 Pro"
+          xcrun simctl boot iphone-12-pro
+          open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
+      - name: Cache gradle, wrapper and buildSrc
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Cache konan
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.konan/cache
+            ~/.konan/dependencies
+            ~/.konan/kotlin-native-macos*
+            ~/.konan/kotlin-native-mingw*
+            ~/.konan/kotlin-native-windows*
+            ~/.konan/kotlin-native-linux*
+            ~/.konan/kotlin-native-prebuilt-macos*
+            ~/.konan/kotlin-native-prebuilt-mingw*
+            ~/.konan/kotlin-native-prebuilt-windows*
+            ~/.konan/kotlin-native-prebuilt-linux*
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
+
+      - name: Install Cocoapods
+        run: |
+          ./gradlew :sample:shared_code:podGenIOS --parallel
+          cd sample/ios
+          pod install
+
+      - name: Build
+        uses: sersoft-gmbh/xcodebuild-action@v2.0.0
+        with:
+          workspace: sample/ios/ios.xcworkspace
+          scheme: ios
+          action: build
+          sdk: iphonesimulator
+          destination: platform=iOS Simulator,name=iphone-12-pro
+          configuration: Debug
+          build-settings: CODE_SIGNING_REQUIRED=NO
