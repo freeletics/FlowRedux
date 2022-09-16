@@ -26,7 +26,7 @@ mad = "0.7.2"
 turbine = "0.7.0"
 
 publish = "0.22.0"
-dokka = "1.6.10"
+dokka = "1.7.10"
 codesync = "0.2"
 binarycompatibility = "0.11.1"
 dependency-analysis = "1.13.1"
