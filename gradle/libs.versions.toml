@@ -17,7 +17,7 @@ androidx-lifecycle = "2.5.1"
 androidx-fragment = "1.5.2"
 androidx-recyclerview = "1.2.1"
 
-material = "1.6.1"
+material = "1.7.0"
 adapterdelegates = "4.3.2"
 timber = "5.0.1"
 
