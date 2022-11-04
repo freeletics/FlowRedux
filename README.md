@@ -103,13 +103,13 @@ There are two artifacts that you can include as dependencis:
 
 ### JVM / Android only
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux-jvm:1.0.0'
-implementation 'com.freeletics.flowredux:compose:1.0.0'
+implementation 'com.freeletics.flowredux:flowredux-jvm:1.0.1'
+implementation 'com.freeletics.flowredux:compose:1.0.1'
 ```
 
 ### Multiplatform
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux:1.0.0'
+implementation 'com.freeletics.flowredux:flowredux:1.0.1'
 ```
 
 ### JavaScript
