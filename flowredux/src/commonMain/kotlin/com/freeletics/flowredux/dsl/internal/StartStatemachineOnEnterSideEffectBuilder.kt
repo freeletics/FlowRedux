@@ -56,9 +56,7 @@ internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : 
                                         // safety net:
                                         // if sub statemachine is null then flow got canceled but
                                         // somehow this code still executes
-                                            subStateMachine?.dispatch(
-                                                it
-                                            )
+                                            subStateMachine?.dispatch(it)
                                         }
                                     }
                                 }
