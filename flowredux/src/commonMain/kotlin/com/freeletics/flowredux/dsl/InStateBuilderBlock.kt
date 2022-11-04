@@ -268,7 +268,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
 
     public fun <SubStateMachineState : Any, SubStateMachineAction : Any> onEnterStartStateMachine(
         stateMachine: FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
-        actionMapper: (A) -> SubStateMachineAction,
+        actionMapper: (A) -> SubStateMachineAction?,
         stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
@@ -283,7 +283,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
 
     public fun <SubStateMachineState : Any, SubStateMachineAction : Any> onEnterStartStateMachine(
         stateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
-        actionMapper: (A) -> SubStateMachineAction,
+        actionMapper: (A) -> SubStateMachineAction?,
         stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
