@@ -25,7 +25,7 @@ import kotlinx.coroutines.sync.withLock
 internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, ActionThatTriggeredStartingStateMachine : A, S : Any, A : Any>
 (
     private val subStateMachineFactory: (action: ActionThatTriggeredStartingStateMachine, state: InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
-    private val actionMapper: (A) -> SubStateMachineAction,
+    private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
     private val isInState: (S) -> Boolean,
     internal val subActionClass: KClass<out A>,
@@ -85,9 +85,9 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                             // to the active sub state machine
                                             subStateMachinesMap.forEachStateMachine { stateMachine ->
                                                 launch {
-                                                    stateMachine.dispatch(
-                                                        actionMapper(action.action as A)
-                                                    )
+                                                    actionMapper(action.action as A)?.let {
+                                                        stateMachine.dispatch(it)
+                                                    }
                                                 }
                                             }
                                         }

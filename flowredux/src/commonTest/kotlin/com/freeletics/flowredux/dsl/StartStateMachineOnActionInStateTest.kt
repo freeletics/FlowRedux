@@ -303,6 +303,75 @@ class StartStateMachineOnActionInStateTest {
         }
     }
 
+    @Test
+    fun `actions are only dispatched to sub statemachine if they are not mapped to null`() = suspendTest {
+        var childActionInvocations = 0
+        var parentActionInvocations = 0
+        val child = StateMachine(initialState = TestState.S1) {
+            inState<TestState> {
+                on<TestAction> { _, state ->
+                    childActionInvocations++
+                    state.noChange()
+                }
+            }
+        }
+
+        val parent = StateMachine(initialState = TestState.S1) {
+            inState<TestState.S1> {
+                onActionStartStateMachine<TestAction.A4, TestState, TestAction>(
+                    stateMachineFactory = { _, _ ->
+                        child
+                    },
+                    actionMapper = {
+                        when (it) {
+                            TestAction.A1 -> it
+                            TestAction.A2 -> null
+                            TestAction.A3 -> null
+                            is TestAction.A4 -> null
+                        }
+                    }
+                ) { inputState, childState ->
+                    inputState.override { childState }
+                }
+
+                on<TestAction> { _, state ->
+                    parentActionInvocations++
+                    state.noChange()
+                }
+            }
+        }
+
+        parent.state.test {
+            // initial state
+            assertEquals(TestState.S1, awaitItem())
+
+            //
+            // dispatch action to start child state machine and check factory
+            //
+            parent.dispatch(TestAction.A4(1))
+            assertEquals(child.stateFlowStarted, 1)
+            assertEquals(child.stateFlowCompleted, 0)
+
+            // dispatch mapped A1 action
+            parent.dispatch(TestAction.A1)
+            delay(10) // give child a bit of time before continuing
+            assertEquals(childActionInvocations, 1)
+            assertEquals(parentActionInvocations, 2)
+
+            // dispatch unmapped A2 action
+            parent.dispatch(TestAction.A2)
+            delay(10) // give child a bit of time before continuing
+            assertEquals(childActionInvocations, 1)
+            assertEquals(parentActionInvocations, 3)
+
+            // dispatch unmapped A3 action
+            parent.dispatch(TestAction.A3)
+            delay(10) // give child a bit of time before continuing
+            // assert that child state machine was not triggered after first two initial actions
+            assertEquals(childActionInvocations, 1)
+            assertEquals(parentActionInvocations, 4)
+        }
+    }
 }
 
 private fun <A, B> pairOf(a: A, b: B): Pair<A, B> = a to b

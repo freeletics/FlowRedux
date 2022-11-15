@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 @FlowPreview
 internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, S : Any, A>(
     private val subStateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
-    private val actionMapper: (A) -> SubStateMachineAction,
+    private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
     private val isInState: (S) -> Boolean
 ) : InStateSideEffectBuilder<InputState, S, A>() {
@@ -52,10 +52,12 @@ internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : 
                                 // dispatch the incoming actions to the statemachine
                                 coroutineScope {
                                     launch {
+                                        actionMapper(action.action)?.let {
                                         // safety net:
                                         // if sub statemachine is null then flow got canceled but
                                         // somehow this code still executes
-                                        subStateMachine?.dispatch(actionMapper(action.action))
+                                            subStateMachine?.dispatch(it)
+                                        }
                                     }
                                 }
                             }
