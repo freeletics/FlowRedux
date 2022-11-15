@@ -304,7 +304,7 @@ class StartStateMachineOnActionInStateTest {
     }
 
     @Test
-    fun `actions are only dispatched to sub statemachine if they are mapped`() = suspendTest {
+    fun `actions are only dispatched to sub statemachine if they are not mapped to null`() = suspendTest {
         var childActionInvocations = 0
         var parentActionInvocations = 0
         val child = StateMachine(initialState = TestState.S1) {
