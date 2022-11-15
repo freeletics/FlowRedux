@@ -29,7 +29,7 @@ publish = "0.22.0"
 dokka = "1.7.20"
 codesync = "0.2"
 binarycompatibility = "0.12.1"
-dependency-analysis = "1.13.1"
+dependency-analysis = "1.14.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
