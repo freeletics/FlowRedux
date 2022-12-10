@@ -52,12 +52,12 @@ class StartStateMachineOnActionInStateTest {
 
         parentStateMachine.state.test {
             assertEquals(TestState.Initial, awaitItem()) // parent initial state
-            assertEquals(child.stateFlowStarted, 0)
-            assertEquals(child.stateFlowCompleted, 0)
+            assertEquals(0, child.stateFlowStarted)
+            assertEquals(0, child.stateFlowCompleted)
             parentStateMachine.dispatch(TestAction.A1)
             assertEquals(TestState.S1, awaitItem()) // child initial state causes state transition
-            assertEquals(child.stateFlowStarted, 1)
-            assertEquals(child.stateFlowCompleted, 1)
+            assertEquals(1, child.stateFlowStarted)
+            assertEquals(1, child.stateFlowCompleted)
             assertEquals(1, childStateChanged)
             expectNoEvents()
         }
@@ -185,7 +185,7 @@ class StartStateMachineOnActionInStateTest {
             //
             assertEquals(TestState.CounterState(0), awaitItem()) // initial state
             assertEquals(emptyList(), factoryParamsRecordings) // factory should not have been invoked
-            assertEquals(child.stateFlowStarted, 0)
+            assertEquals(0, child.stateFlowStarted)
 
             //
             // Dispatch action to start child state machine and check factory
@@ -196,8 +196,8 @@ class StartStateMachineOnActionInStateTest {
                 listOf<Pair<TestAction, TestState>>(
                     pairOf(TestAction.A4(1), initialState)
                 ), factoryParamsRecordings)
-            assertEquals(child.stateFlowStarted, 1)
-            assertEquals(child.stateFlowCompleted, 0)
+            assertEquals(1, child.stateFlowStarted)
+            assertEquals(0, child.stateFlowCompleted)
             assertEquals(emptyList(), actionMapperRecordings)
             assertEquals(listOf<Pair<TestState, TestState>>(
                 pairOf(initialState, TestState.S1)),
@@ -219,8 +219,8 @@ class StartStateMachineOnActionInStateTest {
             assertEquals(listOf<TestAction>(TestAction.A3), actionMapperRecordings)
             // factory checks
             assertEquals(1, factoryParamsRecordings.size) // factory not invoked
-            assertEquals(child.stateFlowStarted, 1)
-            assertEquals(child.stateFlowCompleted, 0)
+            assertEquals(1, child.stateFlowStarted)
+            assertEquals(0, child.stateFlowCompleted)
 
             //
             // Dispatch another action that is forwarded to child state machine which
@@ -240,8 +240,8 @@ class StartStateMachineOnActionInStateTest {
             // factory checks
             assertEquals(1, factoryParamsRecordings.size) // factory not invoked
             // child should be canceled because inState condition does not hold anymore
-            assertEquals(child.stateFlowStarted, 1)
-            assertEquals(child.stateFlowCompleted, 1)
+            assertEquals(1, child.stateFlowStarted)
+            assertEquals(1, child.stateFlowCompleted)
 
             //
             // Clear up stuff for validation of next re-entrance and child state machine starts
@@ -260,8 +260,8 @@ class StartStateMachineOnActionInStateTest {
             // factory checks
             assertEquals(emptyList(), factoryParamsRecordings) // factory not invoked
             // child should not have changed since before
-            assertEquals(child.stateFlowStarted, 1)
-            assertEquals(child.stateFlowCompleted, 1)
+            assertEquals(1, child.stateFlowStarted)
+            assertEquals(1, child.stateFlowCompleted)
 
             //
             // Dispatch action to start child state machine
@@ -273,8 +273,8 @@ class StartStateMachineOnActionInStateTest {
                 listOf<Pair<TestAction, TestState>>(
                     pairOf(TestAction.A4(2), TestState.CounterState(10))
                 ), factoryParamsRecordings)
-            assertEquals(child.stateFlowStarted, 2)
-            assertEquals(child.stateFlowCompleted, 1)
+            assertEquals(2, child.stateFlowStarted)
+            assertEquals(1, child.stateFlowCompleted)
             // check action mapper (not changed since last check)
             assertEquals(emptyList(), actionMapperRecordings)
             // check state mapper
@@ -298,8 +298,8 @@ class StartStateMachineOnActionInStateTest {
             assertEquals(listOf<TestAction>(TestAction.A3), actionMapperRecordings)
             // factory checks
             assertEquals(1, factoryParamsRecordings.size) // factory not invoked
-            assertEquals(child.stateFlowStarted, 2)
-            assertEquals(child.stateFlowCompleted, 1)
+            assertEquals(2, child.stateFlowStarted)
+            assertEquals(1, child.stateFlowCompleted)
         }
     }
 
@@ -350,8 +350,8 @@ class StartStateMachineOnActionInStateTest {
             // dispatch action to start child state machine and check factory
             //
             parent.dispatch(TestAction.A4(1))
-            assertEquals(child.stateFlowStarted, 1)
-            assertEquals(child.stateFlowCompleted, 0)
+            assertEquals(1, child.stateFlowStarted)
+            assertEquals(0, child.stateFlowCompleted)
 
             // dispatch mapped A1 action
             parent.dispatch(TestAction.A1)

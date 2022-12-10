@@ -38,7 +38,7 @@ class CollectWhileInStateTest {
             values.emit(2)
             values.emit(3)
             recordedValues.consumeAsFlow().test {
-                assertEquals(awaitItem(), 1)
+                assertEquals(1, awaitItem())
             }
         }
     }
@@ -65,7 +65,7 @@ class CollectWhileInStateTest {
             values.emit(2)
             values.emit(3)
             recordedValues.consumeAsFlow().test {
-                assertEquals(awaitItem(), 1)
+                assertEquals(1, awaitItem())
             }
         }
     }

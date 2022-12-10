@@ -245,7 +245,7 @@ class SubStateMachineTest {
             for (i in 1..3) {
                 sm.dispatch(TestAction.A1)
                 assertEquals(Unit, parentActionInvocations.awaitItem())
-                assertEquals(Unit, childActionInvocations.awaitItem()) // still 1, no change
+                assertTrue(childActionInvocations.isEmpty) // no further emissions
             }
         }
     }
