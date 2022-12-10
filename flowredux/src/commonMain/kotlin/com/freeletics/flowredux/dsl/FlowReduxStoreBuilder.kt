@@ -28,8 +28,8 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
      * Define what happens if the store is in a certain state.
      * "In a certain state" condition is true if state is instance of the type specified as generic function parameter.
      */
-    @JvmSynthetic
-    public fun <SubState : S> inState(
+    @PublishedApi
+    internal fun <SubState : S> inState(
         subStateClass: KClass<SubState>,
         block: InStateBuilderBlock<SubState, S, A>.() -> Unit
     ) {
@@ -60,7 +60,8 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
      * and additionally can specify and ADDITIONAL condition that also must be true in addition to the check that
      * the type as specified as generic fun parameter is an instance of the current state.
      */
-    public fun <SubState : S> inState(
+    @PublishedApi
+    internal  fun <SubState : S> inState(
         subStateClass: KClass<SubState>,
         additionalIsInState: (SubState) -> Boolean,
         block: InStateBuilderBlock<SubState, S, A>.() -> Unit
