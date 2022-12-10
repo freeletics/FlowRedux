@@ -1,29 +1,31 @@
 package com.freeletics.flowredux.dsl
 
+import app.cash.turbine.awaitComplete
+import app.cash.turbine.awaitItem
 import app.cash.turbine.test
-import com.freeletics.flowredux.suspendTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class OnEnterTest {
 
-    private val delay = 200L
-
     @Test
-    fun `onEnter block stops when moved to another state`() = suspendTest {
-        var reached = false;
-        var blockEntered = false
+    fun `onEnter block stops when moved to another state`() = runTest {
+        val signal = Channel<Unit>()
+        val blockEntered = Channel<Boolean>(Channel.UNLIMITED)
+
+        var reached = false
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
-                    blockEntered = true
-                    delay(delay)
+                    blockEntered.send(true)
+                    signal.awaitComplete()
                     // this should never be reached because state transition did happen in the meantime,
                     // therefore this whole block must be canceled
                     reached = true
@@ -38,19 +40,17 @@ class OnEnterTest {
 
         sm.state.test {
             assertEquals(TestState.Initial, awaitItem())
-            delay(delay / 2)
+            assertTrue(blockEntered.awaitItem())
             sm.dispatchAsync(TestAction.A2)
             assertEquals(TestState.S2, awaitItem())
-            delay(delay)
-            expectNoEvents()
+            signal.close()
         }
 
-        assertTrue(blockEntered)
         assertFalse(reached)
     }
 
     @Test
-    fun `on entering the same state doesnt trigger onEnter again`() = suspendTest {
+    fun `on entering the same state does not trigger onEnter again`() = runTest {
         var genericStateEntered = 0
         var a1Received = 0
 

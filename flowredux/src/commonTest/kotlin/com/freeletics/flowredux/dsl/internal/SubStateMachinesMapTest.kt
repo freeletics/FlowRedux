@@ -3,7 +3,6 @@ package com.freeletics.flowredux.dsl.internal
 import com.freeletics.flowredux.dsl.StateMachine
 import com.freeletics.flowredux.dsl.TestAction
 import com.freeletics.flowredux.dsl.TestState
-import com.freeletics.flowredux.suspendTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -14,12 +13,13 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class SubStateMachinesMapTest {
 
     @Test
-    fun `adding new state machine works and cancels previous one`() = suspendTest {
+    fun `adding new state machine works and cancels previous one`() = runTest {
         val map = StartStateMachineOnActionInStateSideEffectBuilder.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
 
         val actionThatTriggered = TestAction.A4(1)
@@ -50,11 +50,11 @@ class SubStateMachinesMapTest {
         b2.awaitTrue()
         assertEquals(1, s1.stateFlowCompleted)
 
-        j2.cancel() // Needed, otherwise suspendTest() will wait for all child jobs to complete
+        j2.cancel() // Needed, otherwise runTest() will wait for all child jobs to complete
     }
 
     @Test
-    fun `adding state machine doesnt cancel previous if ActionThatTriggered is not equal to original one`() = suspendTest {
+    fun `adding state machine does not cancel previous if ActionThatTriggered is not equal to original one`() = runTest {
         val map = StartStateMachineOnActionInStateSideEffectBuilder.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
 
         val a1 = TestAction.A4(1)
@@ -94,13 +94,13 @@ class SubStateMachinesMapTest {
         assertEquals(1, s2.stateFlowStarted)
         assertEquals(0, s2.stateFlowCompleted)
 
-        // Needed, otherwise suspendTest() will wait for all child jobs to complete
+        // Needed, otherwise runTest() will wait for all child jobs to complete
         j1.cancel()
         j2.cancel()
     }
 
     @Test
-    fun `iterating over all statemachines work`() = suspendTest {
+    fun `iterating over all state machines work`() = runTest {
         val map = StartStateMachineOnActionInStateSideEffectBuilder.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
         val a1 = TestAction.A4(1)
         val s1 = StateMachine()
@@ -134,7 +134,7 @@ class SubStateMachinesMapTest {
 
         assertEquals(2, i)
 
-        // Needed, otherwise suspendTest() will wait for all child jobs to complete
+        // Needed, otherwise runTest() will wait for all child jobs to complete
         j1.cancel()
         j2.cancel()
     }
@@ -145,8 +145,6 @@ class SubStateMachinesMapTest {
 private class AwaitableBoolean(
     private var value: () -> Boolean,
 ) {
-
-    constructor() : this({ false })
 
     suspend fun awaitTrue(timeOutMillis: Long = 200) {
         withTimeout(timeOutMillis) {

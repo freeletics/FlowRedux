@@ -9,13 +9,13 @@ Pod::Spec.new do |spec|
     spec.vendored_frameworks      = 'build/cocoapods/framework/shared_code.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target = '12.2'
-                
-                
+
+
     spec.pod_target_xcconfig = {
         'KOTLIN_PROJECT_PATH' => ':sample:shared_code',
         'PRODUCT_MODULE_NAME' => 'shared_code',
     }
-                
+
     spec.script_phases = [
         {
             :name => 'Build shared_code',
@@ -35,5 +35,5 @@ Pod::Spec.new do |spec|
             SCRIPT
         }
     ]
-                
+
 end

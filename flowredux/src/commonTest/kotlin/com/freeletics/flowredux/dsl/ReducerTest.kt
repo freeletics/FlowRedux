@@ -13,7 +13,7 @@ class ReducerTest {
     }
 
     @Test
-    fun `run SelfReducableAction on returning True`() {
+    fun `run SelfReducibleAction on returning True`() {
         val action =
             ChangeStateAction<TestState, Any>(
                 changedState = UnsafeMutateState<TestState, TestState> { TestState.B },
@@ -30,7 +30,7 @@ class ReducerTest {
     }
 
     @Test
-    fun `dont run SelfReducableAction on returning False`() {
+    fun `do not run SelfReducibleAction on returning False`() {
         val action =
             ChangeStateAction<TestState, Any>(
                 changedState = UnsafeMutateState<TestState, TestState> { TestState.B },

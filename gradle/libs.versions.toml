@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.7.10"
+kotlin = "1.7.20"
 coroutines = "1.6.4"
 
 java = "1.8"
@@ -10,7 +10,7 @@ android-target = "33"
 android-compile = "33"
 androidx-activity = "1.6.1"
 androidx-appcompat = "1.5.1"
-androidx-compose-compiler = "1.3.0"
+androidx-compose-compiler = "1.3.2"
 androidx-compose-runtime = "1.3.2"
 androidx-compose-ui = "1.3.2"
 androidx-compose-foundation = "1.3.1"
@@ -26,7 +26,7 @@ timber = "5.0.1"
 
 mad = "0.9.1"
 
-turbine = "0.7.0"
+turbine = "0.12.1"
 
 publish = "0.22.0"
 dokka = "1.7.20"
@@ -61,7 +61,7 @@ adapterdelegates-dsl = { module = "com.hannesdorfmann:adapterdelegates4-kotlin-d
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 mad-statemachine = { module = "com.freeletics.mad:state-machine", version.ref = "mad" }
-        
+
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 [plugins]
