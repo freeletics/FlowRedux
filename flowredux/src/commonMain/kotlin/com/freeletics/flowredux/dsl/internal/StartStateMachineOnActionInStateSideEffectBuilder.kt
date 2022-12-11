@@ -9,6 +9,7 @@ import com.freeletics.flowredux.dsl.FlowReduxDsl
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.whileInState
+import com.freeletics.mad.statemachine.StateMachine
 import kotlinx.coroutines.flow.Flow
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -104,7 +105,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
         @ExperimentalCoroutinesApi
         @FlowPreview
         internal data class StateMachineAndJob<S : Any, A : Any>(
-            val stateMachine: FlowReduxStateMachine<S, A>,
+            val stateMachine: StateMachine<S, A>,
             val job: Job,
         )
 
@@ -113,7 +114,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
 
         suspend fun size(): Int = mutex.withLock { stateMachinesAndJobsMap.size }
 
-        suspend fun cancelPreviousAndAddNew(actionThatStartedStateMachine: ActionThatTriggeredStartingStateMachine, stateMachine: FlowReduxStateMachine<S, A>, job: Job) {
+        suspend fun cancelPreviousAndAddNew(actionThatStartedStateMachine: ActionThatTriggeredStartingStateMachine, stateMachine: StateMachine<S, A>, job: Job) {
             mutex.withLock {
                 val existingStateMachinesAndJobs: StateMachineAndJob<S, A>? = stateMachinesAndJobsMap[actionThatStartedStateMachine]
                 existingStateMachinesAndJobs?.job?.cancel()
@@ -122,7 +123,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
             }
         }
 
-        suspend inline fun forEachStateMachine(crossinline block: suspend (FlowReduxStateMachine<S, A>) -> Unit) {
+        suspend inline fun forEachStateMachine(crossinline block: suspend (StateMachine<S, A>) -> Unit) {
             mutex.withLock {
                 stateMachinesAndJobsMap.values.forEach { stateMachineAndJob ->
                     block(stateMachineAndJob.stateMachine)
@@ -130,7 +131,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
             }
         }
 
-        suspend fun remove(stateMachine: FlowReduxStateMachine<S, A>): StateMachineAndJob<S, A>? {
+        suspend fun remove(stateMachine: StateMachine<S, A>): StateMachineAndJob<S, A>? {
             // could be optimized for better runtime
             val result = mutex.withLock {
                 var key: ActionThatTriggeredStartingStateMachine? = null
