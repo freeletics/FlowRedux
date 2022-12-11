@@ -52,7 +52,8 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      * determine the behavior when a new [SubAction] is dispatched while the previous [handler]
      * execution is still ongoing.
      */
-    public fun <SubAction : A> on(
+    @PublishedApi
+    internal fun <SubAction : A> on(
         actionClass: KClass<SubAction>,
         executionPolicy: ExecutionPolicy,
         handler: suspend (action: SubAction, state: State<InputState>) -> ChangedState<S>,
@@ -94,7 +95,8 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
      *  triggering analytics.
      *  This is the "effect counterpart" to handling actions that you would do with [on].
      */
-    public fun <SubAction : A> onActionEffect(
+    @PublishedApi
+    internal fun <SubAction : A> onActionEffect(
         actionClass: KClass<SubAction>,
         executionPolicy: ExecutionPolicy,
         handler: suspend (action: SubAction, stateSnapshot: InputState) -> Unit,
@@ -335,7 +337,8 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         )
     }
 
-    public fun <SubAction : A, SubStateMachineState : Any, SubStateMachineAction : Any> onActionStartStateMachine(
+    @PublishedApi
+    internal fun <SubAction : A, SubStateMachineState : Any, SubStateMachineAction : Any> onActionStartStateMachine(
         actionClass: KClass<out SubAction>,
         stateMachineFactory: (SubAction, InputState) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
         actionMapper: (A) -> SubStateMachineAction?,

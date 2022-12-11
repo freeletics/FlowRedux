@@ -4,7 +4,7 @@ package com.freeletics.flowredux.dsl
  * Represents a state transition. Instances of this a created through the [State.mutate],
  * [State.override] and [State.noChange] methods.
  *
- * [ChangedState] doesnt allow you to directly access any property.
+ * [ChangedState] does not allow you to directly access any property.
  * Then you may wonder how do you write unit test for one of your functions that return a [ChangedState]?
  * You need to call [ChangedState.reduce] to get the actual result of the change state.
  */
