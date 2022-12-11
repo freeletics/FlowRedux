@@ -8,6 +8,7 @@ import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.mapToIsInState
 import com.freeletics.flowredux.dsl.flow.whileInState
+import com.freeletics.mad.statemachine.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.coroutineScope
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 @ExperimentalCoroutinesApi
 @FlowPreview
 internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, S : Any, A>(
-    private val subStateMachineFactory: (InputState) -> FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>,
+    private val subStateMachineFactory: (InputState) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
     private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
     private val isInState: (S) -> Boolean
@@ -42,7 +43,7 @@ internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : 
                 } else {
                     // create sub statemachine via factory.
                     // Cleanup of instantiated sub statemachine reference is happening in .onComplete {...}
-                    var subStateMachine: FlowReduxStateMachine<SubStateMachineState, SubStateMachineAction>? =
+                    var subStateMachine: StateMachine<SubStateMachineState, SubStateMachineAction>? =
                         subStateMachineFactory(stateOnEntering)
 
                     // build the to be returned flow

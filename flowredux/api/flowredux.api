@@ -46,12 +46,12 @@ public final class com/freeletics/flowredux/dsl/InStateBuilderBlock {
 	public final fun onActionStartStateMachine (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V
 	public final fun onEnter (Lkotlin/jvm/functions/Function2;)V
 	public final fun onEnterEffect (Lkotlin/jvm/functions/Function2;)V
-	public final fun onEnterStartStateMachine (Lcom/freeletics/flowredux/dsl/FlowReduxStateMachine;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V
-	public final fun onEnterStartStateMachine (Lcom/freeletics/flowredux/dsl/FlowReduxStateMachine;Lkotlin/jvm/functions/Function2;)V
+	public final fun onEnterStartStateMachine (Lcom/freeletics/mad/statemachine/StateMachine;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V
+	public final fun onEnterStartStateMachine (Lcom/freeletics/mad/statemachine/StateMachine;Lkotlin/jvm/functions/Function2;)V
 	public final fun onEnterStartStateMachine (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V
 	public final fun onEnterStartStateMachine (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V
-	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux/dsl/InStateBuilderBlock;Lcom/freeletics/flowredux/dsl/FlowReduxStateMachine;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
-	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux/dsl/InStateBuilderBlock;Lcom/freeletics/flowredux/dsl/FlowReduxStateMachine;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux/dsl/InStateBuilderBlock;Lcom/freeletics/mad/statemachine/StateMachine;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux/dsl/InStateBuilderBlock;Lcom/freeletics/mad/statemachine/StateMachine;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
 	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux/dsl/InStateBuilderBlock;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
 	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux/dsl/InStateBuilderBlock;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
 }
