@@ -1,43 +1,32 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
-import com.freeletics.flowredux.suspendTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flow
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class CollectWhileInStateEffectTest {
 
     @Test
-    fun `collectWhileInStateEffect stops after having moved to next state`() = suspendTest {
-
-        val recordedValues = mutableListOf<Int>()
-
-        val delayMs = 20L
+    fun `collectWhileInStateEffect stops after having moved to next state`() = runTest {
+        val stateChange = MutableSharedFlow<Unit>()
+        val values = MutableSharedFlow<Int>()
+        val recordedValues = Channel<Int>(Channel.UNLIMITED)
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                val flow = flow {
-                    emit(1)
-                    delay(delayMs)
-                    emit(2)
-                    delay(delayMs)
-                    emit(3)
+                collectWhileInStateEffect(values) { v, _ ->
+                    recordedValues.send(v)
                 }
 
-                collectWhileInStateEffect(flow) { v, _ ->
-                    recordedValues.add(v)
-                }
-
-                collectWhileInState(flow {
-                    delay(delayMs / 2)
-                    emit(Unit)
-                }) { _, state ->
+                collectWhileInState(stateChange) { _, state ->
                     state.override { TestState.S1 }
                 }
             }
@@ -45,56 +34,53 @@ class CollectWhileInStateEffectTest {
 
         sm.state.test {
             assertEquals(TestState.Initial, awaitItem())
+            values.emit(1)
+            stateChange.emit(Unit)
             assertEquals(TestState.S1, awaitItem())
+
+            values.emit(2)
+            values.emit(3)
+            recordedValues.consumeAsFlow().test {
+                assertEquals(1, awaitItem())
+            }
         }
-        delay(delayMs * 3) // wait until all flow emission could in theory be happened
-        assertEquals(listOf(1), recordedValues) // 2,3 is not emitted
     }
 
 
     @Test
-    fun `collectWhileInStateEffect with flowBuilder stops after having moved to next state`() =
-        suspendTest {
+    fun `collectWhileInStateEffect with flowBuilder stops after having moved to next state`() = runTest {
+        val stateChange = MutableSharedFlow<Unit>()
+        val values = MutableSharedFlow<Int>()
+        val recordedValues = Channel<Int>(Channel.UNLIMITED)
 
-            val delayMs = 20L
-
-            val recordedValues = mutableListOf<Int>()
-
-            val sm = StateMachine {
-                inState<TestState.Initial> {
-                    collectWhileInState({
-                        it.flatMapConcat {
-                            flow {
-                                delay(delayMs / 2)
-                                emit(Unit)
-                            }
-                        }
-                    }) { _, state ->
-                        state.override { TestState.S1 }
+        val sm = StateMachine {
+            inState<TestState.Initial> {
+                collectWhileInState({
+                    it.flatMapConcat {
+                        stateChange
                     }
-
-                    collectWhileInStateEffect({
-                        it.flatMapConcat {
-                            flow {
-                                emit(1)
-                                delay(delayMs)
-                                emit(2)
-                                delay(delayMs)
-                                emit(3)
-                            }
-                        }
-                    }) { v, _ ->
-                        recordedValues.add(v)
-                    }
+                }) { _, state ->
+                    state.override { TestState.S1 }
                 }
 
+                collectWhileInStateEffect({ it.flatMapConcat { values } }) { v, _ ->
+                    recordedValues.send(v)
+                }
             }
 
-            sm.state.test {
-                assertEquals(TestState.Initial, awaitItem())
-                assertEquals(TestState.S1, awaitItem())
-            }
-            delay(delayMs * 3)
-            assertEquals(listOf(1), recordedValues) // 2,3 is not emitted
         }
+
+        sm.state.test {
+            assertEquals(TestState.Initial, awaitItem())
+            values.emit(1)
+            stateChange.emit(Unit)
+            assertEquals(TestState.S1, awaitItem())
+
+            values.emit(2)
+            values.emit(3)
+            recordedValues.consumeAsFlow().test {
+                assertEquals(1, awaitItem())
+            }
+        }
+    }
 }

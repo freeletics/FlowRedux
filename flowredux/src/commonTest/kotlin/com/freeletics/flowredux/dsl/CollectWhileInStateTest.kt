@@ -1,66 +1,30 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
-import com.freeletics.flowredux.suspendTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class CollectWhileInStateTest {
 
     @Test
-    fun `collectWhileInState stops after having moved to next state`() = suspendTest {
-
-        val recordedValues = mutableListOf<Int>()
-
-        val sm = StateMachine {
-            inState<TestState.Initial> {
-                collectWhileInState(flow {
-                    emit(1)
-                    delay(10)
-                    emit(2)
-                    delay(10)
-                    emit(3)
-                }) { v, state ->
-                    recordedValues.add(v)
-                    return@collectWhileInState state.override { TestState.S1 }
-                }
-            }
-        }
-
-        sm.state.test {
-            assertEquals(TestState.Initial, awaitItem())
-            assertEquals(TestState.S1, awaitItem())
-        }
-        assertEquals(listOf(1), recordedValues) // 2,3 is not emitted
-    }
-
-
-    @Test
-    fun `collectWhileInState with flowBuilder stops after having moved to next state`() = suspendTest {
-
-        val recordedValues = mutableListOf<Int>()
+    fun `collectWhileInState stops after having moved to next state`() = runTest {
+        val values = MutableSharedFlow<Int>()
+        val recordedValues = Channel<Int>(Channel.UNLIMITED)
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                collectWhileInState({
-                    it.flatMapConcat {
-                        flow {
-                            emit(1)
-                            delay(10)
-                            emit(2)
-                            delay(10)
-                            emit(3)
-                        }
-                    }
-                }) { v, state ->
-                    recordedValues.add(v)
+                collectWhileInState(values) { v, state ->
+                    recordedValues.send(v)
                     state.override { TestState.S1 }
                 }
             }
@@ -68,15 +32,47 @@ class CollectWhileInStateTest {
 
         sm.state.test {
             assertEquals(TestState.Initial, awaitItem())
+            values.emit(1)
             assertEquals(TestState.S1, awaitItem())
+
+            values.emit(2)
+            values.emit(3)
+            recordedValues.consumeAsFlow().test {
+                assertEquals(1, awaitItem())
+            }
         }
-        assertEquals(listOf(1), recordedValues) // 2,3 is not emitted
+    }
+
+    @Test
+    fun `collectWhileInState with flowBuilder stops after having moved to next state`() = runTest {
+        val values = MutableSharedFlow<Int>()
+        val recordedValues = Channel<Int>(Channel.UNLIMITED)
+
+        val sm = StateMachine {
+            inState<TestState.Initial> {
+                collectWhileInState({ it.flatMapConcat { values } }) { v, state ->
+                    recordedValues.send(v)
+                    state.override { TestState.S1 }
+                }
+            }
+        }
+
+        sm.state.test {
+            assertEquals(TestState.Initial, awaitItem())
+            values.emit(1)
+            assertEquals(TestState.S1, awaitItem())
+
+            values.emit(2)
+            values.emit(3)
+            recordedValues.consumeAsFlow().test {
+                assertEquals(1, awaitItem())
+            }
+        }
     }
 
 
     @Test
-    fun `move from collectWhileInState to next state with action`() = suspendTest {
-
+    fun `move from collectWhileInState to next state with action`() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 collectWhileInState(flowOf(1)) { _, state ->
@@ -116,7 +112,7 @@ class CollectWhileInStateTest {
     }
 
     @Test
-    fun `collectWhileInState flowBuilder receives any GenericState state update`() = suspendTest {
+    fun `collectWhileInState flowBuilder receives any GenericState state update`() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {

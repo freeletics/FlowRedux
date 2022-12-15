@@ -1,18 +1,21 @@
 package com.freeletics.flowredux.dsl
 
+import app.cash.turbine.awaitItem
 import app.cash.turbine.test
-import com.freeletics.flowredux.suspendTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class SubStateMachineTest {
 
     @Test
-    fun `child statemachine emits initial state to parent state machine`() = suspendTest {
+    fun `child state machine emits initial state to parent state machine`() = runTest {
         val child = ChildStateMachine(initialState = TestState.S3) { }
         val stateMachine = StateMachine {
             inState<TestState.Initial> {
@@ -27,7 +30,7 @@ class SubStateMachineTest {
     }
 
     @Test
-    fun `delegate to child sub statemachine while in state`() = suspendTest {
+    fun `delegate to child sub state machine while in state`() = runTest {
         var inS3onA1Action = 0
         var inS2OnA1Action = 0
         val receivedChildStateUpdates = mutableListOf<TestState>()
@@ -92,63 +95,61 @@ class SubStateMachineTest {
     }
 
     @Test
-    fun `sub statemachine doesnt restart if state parent state is still the same`() =
-        suspendTest {
-            var factoryInvocations = 0
-            var childEntersInitialState = 0
+    fun `sub state machine does not restart if state parent state is still the same`() = runTest {
+        val factoryInvocations = Channel<Unit>(Channel.UNLIMITED)
+        val childEntersInitialState = Channel<Unit>(Channel.UNLIMITED)
 
-            val child = ChildStateMachine {
-                inState<TestState.Initial> {
-                    onEnterEffect {
-                        childEntersInitialState++
-                    }
+        val child = ChildStateMachine {
+            inState<TestState.Initial> {
+                onEnterEffect {
+                    childEntersInitialState.send(Unit)
                 }
-            }
-
-            val sm = StateMachine(initialState = TestState.GenericState("generic", 0)) {
-                inState<TestState.GenericState> {
-                    onEnterStartStateMachine(
-                        stateMachineFactory = {
-                            factoryInvocations++
-                            child
-                        },
-                        actionMapper = { it },
-                        stateMapper = { state, _ -> state.noChange() }
-                    )
-
-                    on<TestAction.A1> { _, state ->
-                        state.override { state.snapshot.copy(anInt = state.snapshot.anInt + 1) }
-                    }
-                }
-            }
-
-            sm.state.test {
-                assertEquals(TestState.GenericState("generic", 0), awaitItem())
-                assertEquals(1, factoryInvocations)
-                assertEquals(1, childEntersInitialState)
-
-                sm.dispatchAsync(TestAction.A1)
-                assertEquals(TestState.GenericState("generic", 1), awaitItem())
-                assertEquals(1, factoryInvocations)
-                assertEquals(1, childEntersInitialState)
-
-                sm.dispatchAsync(TestAction.A1)
-                assertEquals(TestState.GenericState("generic", 2), awaitItem())
-                assertEquals(1, factoryInvocations)
-                assertEquals(1, childEntersInitialState)
             }
         }
 
+        val sm = StateMachine(initialState = TestState.GenericState("generic", 0)) {
+            inState<TestState.GenericState> {
+                onEnterStartStateMachine(
+                    stateMachineFactory = {
+                        check(factoryInvocations.trySendBlocking(Unit).isSuccess)
+                        child
+                    },
+                    actionMapper = { it },
+                    stateMapper = { state, _ -> state.noChange() }
+                )
+
+                on<TestAction.A1> { _, state ->
+                    state.override { state.snapshot.copy(anInt = state.snapshot.anInt + 1) }
+                }
+            }
+        }
+
+        sm.state.test {
+            assertEquals(TestState.GenericState("generic", 0), awaitItem())
+            assertEquals(Unit, factoryInvocations.awaitItem())
+            assertEquals(Unit, childEntersInitialState.awaitItem())
+
+            sm.dispatchAsync(TestAction.A1)
+            assertEquals(TestState.GenericState("generic", 1), awaitItem())
+            assertTrue(factoryInvocations.isEmpty)
+            assertTrue(childEntersInitialState.isEmpty)
+
+            sm.dispatchAsync(TestAction.A1)
+            assertEquals(TestState.GenericState("generic", 2), awaitItem())
+            assertTrue(factoryInvocations.isEmpty)
+            assertTrue(childEntersInitialState.isEmpty)
+        }
+    }
+
     @Test
-    fun `sub statemachine factory is called every time parent state is entered`() =
-        suspendTest {
-            var factoryInvocations = 0
-            var childEntersInitialState = 0
+    fun `sub state machine factory is called every time parent state is entered`() = runTest {
+        val factoryInvocations = Channel<Unit>(Channel.UNLIMITED)
+        val childEntersInitialState = Channel<Unit>(Channel.UNLIMITED)
 
             val child = ChildStateMachine {
                 inState<TestState.Initial> {
                     onEnterEffect {
-                        childEntersInitialState++
+                        childEntersInitialState.send(Unit)
                     }
                 }
             }
@@ -157,7 +158,7 @@ class SubStateMachineTest {
                 inState<TestState.S1> {
                     onEnterStartStateMachine(
                         stateMachineFactory = {
-                            factoryInvocations++
+                            check(factoryInvocations.trySendBlocking(Unit).isSuccess)
                             child
                         },
                         actionMapper = { it },
@@ -178,202 +179,192 @@ class SubStateMachineTest {
 
             sm.state.test {
                 assertEquals(TestState.S1, awaitItem())
-                assertEquals(1, factoryInvocations)
-                assertEquals(1, childEntersInitialState)
+                assertEquals(Unit, factoryInvocations.awaitItem())
+                assertEquals(Unit, childEntersInitialState.awaitItem())
 
                 sm.dispatchAsync(TestAction.A1)
 
                 assertEquals(TestState.S2, awaitItem())
-                assertEquals(1, factoryInvocations)
-                assertEquals(1, childEntersInitialState)
+                assertTrue(factoryInvocations.isEmpty)
+                assertTrue(childEntersInitialState.isEmpty)
 
                 sm.dispatchAsync(TestAction.A2)
 
                 assertEquals(TestState.S1, awaitItem())
-                delay(200)
-                assertEquals(2, factoryInvocations)
-                assertEquals(2, childEntersInitialState)
+                assertEquals(Unit, factoryInvocations.awaitItem())
+                assertEquals(Unit, childEntersInitialState.awaitItem())
 
                 sm.dispatchAsync(TestAction.A1)
 
                 assertEquals(TestState.S2, awaitItem())
-                assertEquals(2, factoryInvocations)
-                assertEquals(2, childEntersInitialState)
+                assertTrue(factoryInvocations.isEmpty)
+                assertTrue(childEntersInitialState.isEmpty)
             }
         }
 
     @Test
-    fun `actions are only dispatched to sub statemachine while parent statemachine is in state`() =
-        suspendTest {
-            var childActionInvocations = 0
-            var parentActionInvocations = 0
-            val child = ChildStateMachine(initialState = TestState.S1) {
-                inState<TestState.S1> {
-                    on<TestAction.A1> { _, state ->
-                        childActionInvocations++
-                        state.noChange()
-                    }
+    fun `actions are only dispatched to sub state machine while parent state machine is in state`() = runTest {
+        val childActionInvocations = Channel<Unit>(Channel.UNLIMITED)
+        val parentActionInvocations = Channel<Unit>(Channel.UNLIMITED)
+        val child = ChildStateMachine(initialState = TestState.S1) {
+            inState<TestState.S1> {
+                on<TestAction.A1> { _, state ->
+                    childActionInvocations.send(Unit)
+                    state.noChange()
                 }
             }
+        }
 
-            val sm = StateMachine(initialState = TestState.S1) {
-                inState<TestState.S1> {
-                    onEnterStartStateMachine(child)
-                    on<TestAction.A2> { _, state -> state.override { TestState.S2 } }
-                }
-                inState<TestState.S2> {
-                    on<TestAction.A1> { _, state ->
-                        parentActionInvocations++
-                        state.noChange()
-                    }
+        val sm = StateMachine(initialState = TestState.S1) {
+            inState<TestState.S1> {
+                onEnterStartStateMachine(child)
+                on<TestAction.A2> { _, state -> state.override { TestState.S2 } }
+            }
+            inState<TestState.S2> {
+                on<TestAction.A1> { _, state ->
+                    parentActionInvocations.send(Unit)
+                    state.noChange()
                 }
             }
+        }
 
-            sm.state.test {
-                // initial state
-                assertEquals(TestState.S1, awaitItem())
+        sm.state.test {
+            // initial state
+            assertEquals(TestState.S1, awaitItem())
 
-                // dispatch action to child statemachine
+            // dispatch action to child state machine
+            sm.dispatch(TestAction.A1)
+            assertEquals(Unit, childActionInvocations.awaitItem())
+
+            // transition parent to other state
+            sm.dispatch(TestAction.A2)
+            assertEquals(TestState.S2, awaitItem())
+
+            // dispatch A1 action which is part of child definition but should not be
+            //  handled by child because parent not in state where delegation to child happens
+            for (i in 1..3) {
                 sm.dispatch(TestAction.A1)
-                delay(10) // give child a bit of time before continuing
-                assertEquals(childActionInvocations, 1)
+                assertEquals(Unit, parentActionInvocations.awaitItem())
+                assertTrue(childActionInvocations.isEmpty) // no further emissions
+            }
+        }
+    }
 
-                // transition parent to other state
-                sm.dispatch(TestAction.A2)
-                assertEquals(TestState.S2, awaitItem())
-
-                // dispatch A1 action which is part of child definition but should not be
-                //  handled by child because parent not in state where delegation to child happens
-                for (i in 1..3) {
-                    sm.dispatch(TestAction.A1)
-                    delay(10)
-                    assertEquals(parentActionInvocations, i)
-                    assertEquals(childActionInvocations, 1) // still 1, no change
+    @Test
+    fun `actions are only dispatched to sub state machine if they are mapped`() = runTest {
+        val childActionInvocations = Channel<Unit>(Channel.UNLIMITED)
+        val parentActionInvocations = Channel<Unit>(Channel.UNLIMITED)
+        val child = ChildStateMachine(initialState = TestState.S1) {
+            inState<TestState> {
+                on<TestAction> { _, state ->
+                    childActionInvocations.send(Unit)
+                    state.noChange()
                 }
             }
         }
 
-    @Test
-    fun `actions are only dispatched to sub statemachine if they are mapped`() =
-        suspendTest {
-            var childActionInvocations = 0
-            var parentActionInvocations = 0
-            val child = ChildStateMachine(initialState = TestState.S1) {
-                inState<TestState> {
-                    on<TestAction> { _, state ->
-                        childActionInvocations++
-                        state.noChange()
-                    }
-                }
-            }
-
-            val sm = StateMachine(initialState = TestState.S1) {
-                inState<TestState.S1> {
-                    onEnterStartStateMachine(
-                        stateMachine = child,
-                        actionMapper = {
-                            when (it) {
-                                TestAction.A1 -> it
-                                TestAction.A2 -> it
-                                TestAction.A3 -> null
-                                is TestAction.A4 -> null
-                            }
+        val sm = StateMachine(initialState = TestState.S1) {
+            inState<TestState.S1> {
+                onEnterStartStateMachine(
+                    stateMachine = child,
+                    actionMapper = {
+                        when (it) {
+                            TestAction.A1 -> it
+                            TestAction.A2 -> it
+                            TestAction.A3 -> null
+                            is TestAction.A4 -> null
                         }
-                    )
-                    on<TestAction> { _, state ->
-                        parentActionInvocations++
-                        state.noChange()
                     }
+                )
+                on<TestAction> { _, state ->
+                    parentActionInvocations.send(Unit)
+                    state.noChange()
                 }
             }
-
-            sm.state.test {
-                // initial state
-                assertEquals(TestState.S1, awaitItem())
-
-                // dispatch mapped A1 action
-                sm.dispatch(TestAction.A1)
-                delay(10) // give child a bit of time before continuing
-                assertEquals(childActionInvocations, 1)
-                assertEquals(parentActionInvocations, 1)
-
-                // dispatch mapped A2 action
-                sm.dispatch(TestAction.A2)
-                delay(10) // give child a bit of time before continuing
-                assertEquals(childActionInvocations, 2)
-                assertEquals(parentActionInvocations, 2)
-
-                // dispatch unmapped A3 action
-                sm.dispatch(TestAction.A3)
-                delay(10) // give child a bit of time before continuing
-                // assert that child state machine was not triggered after first two initial actions
-                assertEquals(childActionInvocations, 2)
-                assertEquals(parentActionInvocations, 3)
-
-                // dispatch unmapped A4 action
-                sm.dispatch(TestAction.A4(0))
-                delay(10) // give child a bit of time before continuing
-                // assert that child state machine was not triggered after first two initial actions
-                assertEquals(childActionInvocations, 2)
-                assertEquals(parentActionInvocations, 4)
-            }
         }
+
+        sm.state.test {
+            // initial state
+            assertEquals(TestState.S1, awaitItem())
+
+            // dispatch mapped A1 action
+            sm.dispatch(TestAction.A1)
+            assertEquals(Unit, childActionInvocations.awaitItem())
+            assertEquals(Unit, parentActionInvocations.awaitItem())
+
+            // dispatch mapped A2 action
+            sm.dispatch(TestAction.A2)
+            assertEquals(Unit, childActionInvocations.awaitItem())
+            assertEquals(Unit, parentActionInvocations.awaitItem())
+
+            // dispatch unmapped A3 action
+            sm.dispatch(TestAction.A3)
+            // assert that child state machine was not triggered after first two initial actions
+            assertTrue(childActionInvocations.isEmpty)
+            assertEquals(Unit, parentActionInvocations.awaitItem())
+
+            // dispatch unmapped A4 action
+            sm.dispatch(TestAction.A4(0))
+            // assert that child state machine was not triggered after first two initial actions
+            assertTrue(childActionInvocations.isEmpty)
+            assertEquals(Unit, parentActionInvocations.awaitItem())
+        }
+    }
 
     @Test
-    fun `reentering state so that substatemachine triggers works with same child instate`() =
-        suspendTest {
-            var childOnEnterS2 = 0
-            var childActionA2 = 0
-            var parentS2 = 0
-            var childFactory = 0
+    fun `reentering state so that sub state machine triggers works with same child instate`() = runTest {
+        var childOnEnterS2 = 0
+        var childActionA2 = 0
+        var parentS2 = 0
+        var childFactory = 0
 
-            val child = ChildStateMachine(initialState = TestState.S2) {
-                inState<TestState.S2> {
-                    onEnter {
-                        childOnEnterS2++
-                        it.noChange()
-                    }
-                    on<TestAction.A2> { _, state ->
-                        childActionA2++
-                        state.override { TestState.S1 }
-                    }
+        val child = ChildStateMachine(initialState = TestState.S2) {
+            inState<TestState.S2> {
+                onEnter {
+                    childOnEnterS2++
+                    it.noChange()
                 }
-            }
-
-            val sm = StateMachine(initialState = TestState.S1) {
-                inState<TestState.S1> {
-                    on<TestAction.A1> { _, state -> state.override { TestState.S2 } }
-                }
-                inState<TestState.S2> {
-                    onEnterEffect { parentS2++ }
-                    onEnterStartStateMachine(
-                        stateMachineFactory = { childFactory++; child },
-                        actionMapper = { it },
-                        stateMapper = { state, childState -> state.override { childState } }
-                    )
-                }
-            }
-
-            sm.state.test {
-                // initial state
-                assertEquals(TestState.S1, awaitItem())
-
-                for (i in 1..3) {
-                    // move to S2
-                    sm.dispatch(TestAction.A1)
-                    assertEquals(TestState.S2, awaitItem())
-                    assertEquals(i, parentS2)
-                    assertEquals(i, childOnEnterS2)
-                    assertEquals(i, childFactory)
-
-                    // dispatch action to child and move back to S1
-                    sm.dispatch(TestAction.A2)
-                    assertEquals(TestState.S1, awaitItem())
-                    assertEquals(i, childActionA2)
-                    assertEquals(i, childOnEnterS2)
+                on<TestAction.A2> { _, state ->
+                    childActionA2++
+                    state.override { TestState.S1 }
                 }
             }
         }
+
+        val sm = StateMachine(initialState = TestState.S1) {
+            inState<TestState.S1> {
+                on<TestAction.A1> { _, state -> state.override { TestState.S2 } }
+            }
+            inState<TestState.S2> {
+                onEnterEffect { parentS2++ }
+                onEnterStartStateMachine(
+                    stateMachineFactory = { childFactory++; child },
+                    actionMapper = { it },
+                    stateMapper = { state, childState -> state.override { childState } }
+                )
+            }
+        }
+
+        sm.state.test {
+            // initial state
+            assertEquals(TestState.S1, awaitItem())
+
+            for (i in 1..3) {
+                // move to S2
+                sm.dispatch(TestAction.A1)
+                assertEquals(TestState.S2, awaitItem())
+                assertEquals(i, parentS2)
+                assertEquals(i, childOnEnterS2)
+                assertEquals(i, childFactory)
+
+                // dispatch action to child and move back to S1
+                sm.dispatch(TestAction.A2)
+                assertEquals(TestState.S1, awaitItem())
+                assertEquals(i, childActionA2)
+                assertEquals(i, childOnEnterS2)
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)

@@ -1,29 +1,31 @@
 package com.freeletics.flowredux.dsl
 
+import app.cash.turbine.awaitComplete
+import app.cash.turbine.awaitItem
 import app.cash.turbine.test
-import com.freeletics.flowredux.suspendTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class OnActionTest {
 
-    private val delay = 200L
-
     @Test
-    fun `action block stops when moved to another state`() = suspendTest {
-        var reached = false;
-        var reachedBefore = false
+    fun `action block stops when moved to another state`() = runTest {
+        val signal = Channel<Unit>()
+        val blockEntered = Channel<Boolean>()
+
+        var reached = false
         val sm = StateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> { _, state ->
-                    reachedBefore = true
-                    delay(delay)
+                    blockEntered.send(true)
+                    signal.awaitComplete()
                     // this should never be reached because state transition did happen in the meantime,
                     // therefore this whole block must be canceled
                     reached = true
@@ -41,19 +43,17 @@ class OnActionTest {
         sm.state.test {
             assertEquals(TestState.Initial, awaitItem())
             sm.dispatchAsync(TestAction.A1)
-            delay(delay/2)
+            assertTrue(blockEntered.awaitItem())
             sm.dispatchAsync(TestAction.A2)
             assertEquals(TestState.S2, awaitItem())
-            delay(delay)
-            expectNoEvents()
+            signal.close()
         }
 
-        assertTrue(reachedBefore)
         assertFalse(reached)
     }
 
     @Test
-    fun `on action gets triggered and moves to next state`() = suspendTest {
+    fun `on action gets triggered and moves to next state`() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> { _, state ->

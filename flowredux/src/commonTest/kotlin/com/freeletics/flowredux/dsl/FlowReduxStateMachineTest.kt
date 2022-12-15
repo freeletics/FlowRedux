@@ -1,7 +1,6 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
-import com.freeletics.flowredux.suspendTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlin.test.Test
@@ -11,12 +10,13 @@ import kotlin.test.fail
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class FlowReduxStateMachineTest {
 
     @Test
-    fun `empty statemachine just emits initial state`() = suspendTest {
+    fun `empty state machine just emits initial state`() = runTest {
         val sm = StateMachine { }
         sm.state.test {
             assertEquals(TestState.Initial, awaitItem())
@@ -76,15 +76,16 @@ class FlowReduxStateMachineTest {
     }
 
     @Test
-    fun `dispatching without any state flow collector throws exception`() = suspendTest {
+    fun `dispatching without any state flow collector throws exception`() = runTest {
         val sm = StateMachine {}
 
+        val action = TestAction.A1
         val exception = assertFailsWith<IllegalStateException> {
-            sm.dispatch(TestAction.A1)
+            sm.dispatch(action)
         }
 
         val expectedMsg =
-            "Cannot dispatch action ${TestAction.A1} because state Flow of this " +
+            "Cannot dispatch action $action because state Flow of this " +
                     "FlowReduxStateMachine is not collected yet. Start collecting the state " +
                     "Flow before dispatching any action."
 
@@ -92,7 +93,7 @@ class FlowReduxStateMachineTest {
     }
 
     @Test
-    fun `observing state multiple times in parallel throws exception`() = suspendTest {
+    fun `observing state multiple times in parallel throws exception`() = runTest {
         val sm = StateMachine {}
 
         var collectionStarted = false
@@ -122,7 +123,7 @@ class FlowReduxStateMachineTest {
     }
 
     @Test
-    fun `observing state multiple times in sequence`() = suspendTest {
+    fun `observing state multiple times in sequence`() = runTest {
         val sm = StateMachine {}
 
         // each call will collect the first item and then stop collecting
