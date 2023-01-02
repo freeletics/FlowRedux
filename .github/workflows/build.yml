@@ -1,6 +1,10 @@
 name: Build
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
 
 jobs:
   build:
@@ -30,4 +34,4 @@ jobs:
       - uses: gradle/gradle-build-action@v2
 
       - name: Build with Gradle
-        run: ./gradlew build --stacktrace
+        run: ./gradlew build buildHealth --stacktrace

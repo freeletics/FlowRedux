@@ -4,11 +4,17 @@ on:
   push:
     branches:
       - main
+  # TODO: replace with on push tag https://github.com/actions/deploy-pages/issues/76
+  workflow_run:
+    workflows: [Publish Release]
+    types:
+      - completed
 
 jobs:
   publish:
 
     runs-on: ubuntu-latest
+    if: github.repository == 'freeletics/flowredux'
 
     permissions:
       contents: read
@@ -22,6 +28,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Install JDK
         uses: actions/setup-java@v3
@@ -46,6 +54,8 @@ jobs:
       - name: Copy docs
         run: |
           cp README.md docs/index.md
+          sed -i '/^\[\!\[GitHub release/d' docs/index.md
+          sed -i "s/<latest-version>/$(git describe --tags --abbrev=0)/" docs/index.md
           mkdir -p docs/API/dsl
           cp -R flowredux/build/dokka/html/. docs/API/dsl
           mkdir -p docs/API/compose
