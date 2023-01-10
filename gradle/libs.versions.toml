@@ -31,6 +31,7 @@ turbine = "0.12.1"
 publish = "0.23.1"
 dokka = "1.7.20"
 codesync = "0.2"
+ktlint = "11.0.0"
 binarycompatibility = "0.12.1"
 dependency-analysis = "1.18.0"
 
@@ -70,6 +71,7 @@ android-library = { id = "com.android.library", version.ref = "android-gradle" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 publish = { id = "com.vanniktech.maven.publish", version.ref = "publish" }
 publish-root = { id = "com.vanniktech.maven.publish.root", version.ref = "publish" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

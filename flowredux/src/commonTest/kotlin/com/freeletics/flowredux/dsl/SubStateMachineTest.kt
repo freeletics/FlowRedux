@@ -2,11 +2,11 @@ package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.awaitItem
 import app.cash.turbine.test
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.test.runTest
@@ -146,61 +146,61 @@ class SubStateMachineTest {
         val factoryInvocations = Channel<Unit>(Channel.UNLIMITED)
         val childEntersInitialState = Channel<Unit>(Channel.UNLIMITED)
 
-            val child = ChildStateMachine {
-                inState<TestState.Initial> {
-                    onEnterEffect {
-                        childEntersInitialState.send(Unit)
-                    }
+        val child = ChildStateMachine {
+            inState<TestState.Initial> {
+                onEnterEffect {
+                    childEntersInitialState.send(Unit)
                 }
-            }
-
-            val sm = StateMachine(initialState = TestState.S1) {
-                inState<TestState.S1> {
-                    onEnterStartStateMachine(
-                        stateMachineFactory = {
-                            check(factoryInvocations.trySendBlocking(Unit).isSuccess)
-                            child
-                        },
-                        actionMapper = { it },
-                        stateMapper = { state, _ -> state.noChange() }
-                    )
-
-                    on<TestAction.A1> { _, state ->
-                        state.override { TestState.S2 }
-                    }
-                }
-
-                inState<TestState.S2> {
-                    on<TestAction.A2> { _, state ->
-                        state.override { TestState.S1 }
-                    }
-                }
-            }
-
-            sm.state.test {
-                assertEquals(TestState.S1, awaitItem())
-                assertEquals(Unit, factoryInvocations.awaitItem())
-                assertEquals(Unit, childEntersInitialState.awaitItem())
-
-                sm.dispatchAsync(TestAction.A1)
-
-                assertEquals(TestState.S2, awaitItem())
-                assertTrue(factoryInvocations.isEmpty)
-                assertTrue(childEntersInitialState.isEmpty)
-
-                sm.dispatchAsync(TestAction.A2)
-
-                assertEquals(TestState.S1, awaitItem())
-                assertEquals(Unit, factoryInvocations.awaitItem())
-                assertEquals(Unit, childEntersInitialState.awaitItem())
-
-                sm.dispatchAsync(TestAction.A1)
-
-                assertEquals(TestState.S2, awaitItem())
-                assertTrue(factoryInvocations.isEmpty)
-                assertTrue(childEntersInitialState.isEmpty)
             }
         }
+
+        val sm = StateMachine(initialState = TestState.S1) {
+            inState<TestState.S1> {
+                onEnterStartStateMachine(
+                    stateMachineFactory = {
+                        check(factoryInvocations.trySendBlocking(Unit).isSuccess)
+                        child
+                    },
+                    actionMapper = { it },
+                    stateMapper = { state, _ -> state.noChange() }
+                )
+
+                on<TestAction.A1> { _, state ->
+                    state.override { TestState.S2 }
+                }
+            }
+
+            inState<TestState.S2> {
+                on<TestAction.A2> { _, state ->
+                    state.override { TestState.S1 }
+                }
+            }
+        }
+
+        sm.state.test {
+            assertEquals(TestState.S1, awaitItem())
+            assertEquals(Unit, factoryInvocations.awaitItem())
+            assertEquals(Unit, childEntersInitialState.awaitItem())
+
+            sm.dispatchAsync(TestAction.A1)
+
+            assertEquals(TestState.S2, awaitItem())
+            assertTrue(factoryInvocations.isEmpty)
+            assertTrue(childEntersInitialState.isEmpty)
+
+            sm.dispatchAsync(TestAction.A2)
+
+            assertEquals(TestState.S1, awaitItem())
+            assertEquals(Unit, factoryInvocations.awaitItem())
+            assertEquals(Unit, childEntersInitialState.awaitItem())
+
+            sm.dispatchAsync(TestAction.A1)
+
+            assertEquals(TestState.S2, awaitItem())
+            assertTrue(factoryInvocations.isEmpty)
+            assertTrue(childEntersInitialState.isEmpty)
+        }
+    }
 
     @Test
     fun `actions are only dispatched to sub state machine while parent state machine is in state`() = runTest {

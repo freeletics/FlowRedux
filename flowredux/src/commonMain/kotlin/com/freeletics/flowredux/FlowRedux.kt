@@ -13,15 +13,15 @@ import kotlinx.coroutines.flow.merge
 
 @ExperimentalCoroutinesApi
 fun <A, S> Flow<A>.reduxStore(
-        initialState: S,
-        sideEffects: Iterable<SideEffect<S, A>>,
-        logger: FlowReduxLogger? = null,
-        reducer: Reducer<S, A>
+ initialState: S,
+ sideEffects: Iterable<SideEffect<S, A>>,
+ logger: FlowReduxLogger? = null,
+ reducer: Reducer<S, A>
 ): Flow<S> = reduxStore(
-        initialStateSupplier = { initialState },
-        sideEffects = sideEffects,
-        logger = logger,
-        reducer = reducer
+ initialStateSupplier = { initialState },
+ sideEffects = sideEffects,
+ logger = logger,
+ reducer = reducer
 )
  */
 

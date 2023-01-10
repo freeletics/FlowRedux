@@ -55,13 +55,15 @@ class InternalPaginationStateMachine(
                     }
                 ) { inputState: State<ShowContentPaginationState>, childState: GithubRepository ->
                     inputState.mutate {
-                        copy(items = items.map { repoItem ->
-                            if (repoItem.id == childState.id) {
-                                childState
-                            } else {
-                                repoItem
+                        copy(
+                            items = items.map { repoItem ->
+                                if (repoItem.id == childState.id) {
+                                    childState
+                                } else {
+                                    repoItem
+                                }
                             }
-                        })
+                        )
                     }
                 }
             }

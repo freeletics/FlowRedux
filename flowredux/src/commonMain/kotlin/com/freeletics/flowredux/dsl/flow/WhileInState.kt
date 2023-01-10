@@ -7,7 +7,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 internal fun <S, A> Flow<Action<S, A>>.whileInState(

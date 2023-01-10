@@ -2,14 +2,14 @@ package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.awaitComplete
 import app.cash.turbine.test
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.flow
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.fail
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -79,12 +79,14 @@ class CustomIsInStateDslTest {
                 }
             }
             inStateWithCondition(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
-                collectWhileInState(flow {
-                    emit(2)
-                    signal1.awaitComplete()
-                    reached = true
-                    fail("This should never be reached")
-                }) { value, state ->
+                collectWhileInState(
+                    flow {
+                        emit(2)
+                        signal1.awaitComplete()
+                        reached = true
+                        fail("This should never be reached")
+                    }
+                ) { value, state ->
                     state.override { TestState.GenericState(value.toString(), value) }
                 }
             }

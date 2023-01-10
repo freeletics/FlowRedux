@@ -1,14 +1,14 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -46,7 +46,6 @@ class CollectWhileInStateEffectTest {
         }
     }
 
-
     @Test
     fun `collectWhileInStateEffect with flowBuilder stops after having moved to next state`() = runTest {
         val stateChange = MutableSharedFlow<Unit>()
@@ -67,7 +66,6 @@ class CollectWhileInStateEffectTest {
                     recordedValues.send(v)
                 }
             }
-
         }
 
         sm.state.test {

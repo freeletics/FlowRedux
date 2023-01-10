@@ -4,7 +4,7 @@ sealed class TestAction {
     object A1 : TestAction()
     object A2 : TestAction()
     object A3 : TestAction()
-    data class A4(val i : Int) : TestAction()
+    data class A4(val i: Int) : TestAction()
 }
 
 sealed class TestState {
@@ -13,7 +13,7 @@ sealed class TestState {
     object S2 : TestState()
     object S3 : TestState()
 
-    data class GenericState(val aString : String, val anInt : Int) : TestState()
+    data class GenericState(val aString: String, val anInt: Int) : TestState()
 
-    data class CounterState(val counter : Int) : TestState()
+    data class CounterState(val counter: Int) : TestState()
 }

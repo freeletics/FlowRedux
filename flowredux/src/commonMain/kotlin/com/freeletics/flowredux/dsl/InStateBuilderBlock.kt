@@ -233,12 +233,14 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
         handler: suspend (item: T, state: InputState) -> Unit,
     ) {
-        collectWhileInState(flowBuilder = flowBuilder,
+        collectWhileInState(
+            flowBuilder = flowBuilder,
             executionPolicy = executionPolicy,
             handler = { value: T, state: State<InputState> ->
                 handler(value, state.snapshot)
                 NoStateChange
-            })
+            }
+        )
     }
 
     public fun <SubStateMachineState : Any> onEnterStartStateMachine(

@@ -62,7 +62,8 @@ fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
             modifier = Modifier
                 .wrapContentHeight()
                 .weight(1f)
-                .fillMaxWidth(), text = repo.name
+                .fillMaxWidth(),
+            text = repo.name
         )
         when (repo.favoriteStatus) {
             FavoriteStatus.FAVORITE, FavoriteStatus.NOT_FAVORITE ->
@@ -74,13 +75,15 @@ fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
                         if (repo.favoriteStatus == FavoriteStatus.FAVORITE)
                             R.drawable.ic_star_yellow_24dp
                         else
-                            R.drawable.ic_star_black_24dp),
+                            R.drawable.ic_star_black_24dp
+                    ),
                     contentDescription = "Stars icon"
                 )
 
-            FavoriteStatus.OPERATION_IN_PROGRESS -> LoadingUi(Modifier
-                .width(24.dp)
-                .height(24.dp)
+            FavoriteStatus.OPERATION_IN_PROGRESS -> LoadingUi(
+                Modifier
+                    .width(24.dp)
+                    .height(24.dp)
             )
             FavoriteStatus.OPERATION_FAILED -> Image(
                 modifier = Modifier
@@ -97,7 +100,6 @@ fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
             modifier = Modifier.width(50.dp),
             text = repo.stargazersCount.toString()
         )
-
     }
 }
 

@@ -2,7 +2,6 @@ package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.dsl.internal.Action
-import kotlin.jvm.JvmSynthetic
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -61,7 +60,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
      * the type as specified as generic fun parameter is an instance of the current state.
      */
     @PublishedApi
-    internal  fun <SubState : S> inState(
+    internal fun <SubState : S> inState(
         subStateClass: KClass<SubState>,
         additionalIsInState: (SubState) -> Boolean,
         block: InStateBuilderBlock<SubState, S, A>.() -> Unit

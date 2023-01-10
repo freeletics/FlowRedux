@@ -3,17 +3,17 @@ package com.freeletics.flowredux.dsl.internal
 import com.freeletics.flowredux.dsl.StateMachine
 import com.freeletics.flowredux.dsl.TestAction
 import com.freeletics.flowredux.dsl.TestState
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertSame
-import kotlin.test.assertTrue
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class SubStateMachinesMapTest {

@@ -32,12 +32,12 @@ class GithubApi {
                 end
             ) else emptyList<GithubRepository>()
             ).run {
-                if (isEmpty()) {
-                    PageResult.NoNextPage
-                } else {
-                    PageResult.Page(page = page, items = this)
-                }
+            if (isEmpty()) {
+                PageResult.NoNextPage
+            } else {
+                PageResult.Page(page = page, items = this)
             }
+        }
     }
 
     suspend fun markAsFavorite(repoId: String, favorite: Boolean) {
@@ -58,11 +58,13 @@ sealed class PageResult {
 fun List<GithubRepository>.markAsFavorite(repoId: String, favorite: Boolean): List<GithubRepository> {
     return map {
         if (it.id == repoId)
-            it.copy(favoriteStatus = if (favorite) {
-                FavoriteStatus.FAVORITE
-            } else {
-                FavoriteStatus.NOT_FAVORITE
-            })
+            it.copy(
+                favoriteStatus = if (favorite) {
+                    FavoriteStatus.FAVORITE
+                } else {
+                    FavoriteStatus.NOT_FAVORITE
+                }
+            )
         else it
     }
 }

@@ -4,8 +4,6 @@ import androidx.compose.runtime.*
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 /**
@@ -78,5 +76,6 @@ public fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberStateAndDispat
                     stateMachine.dispatch(action)
                 }
             }
-        })
+        }
+    )
 }
