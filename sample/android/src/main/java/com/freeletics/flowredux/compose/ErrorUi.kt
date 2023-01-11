@@ -37,6 +37,5 @@ fun ErrorUi(dispatch: (Action) -> Unit) {
                 text = stringResource(R.string.unexpected_error_retry)
             )
         }
-
     }
 }

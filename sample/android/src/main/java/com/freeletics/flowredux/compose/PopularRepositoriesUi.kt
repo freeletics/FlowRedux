@@ -39,7 +39,6 @@ fun PopularRepositoriesUi(state: PaginationState?, dispatch: (Action) -> Unit) {
                     }
                 }
             }
-
         }
     }
 }

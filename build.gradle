@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.cocoapods) apply false
     alias(libs.plugins.android.app) apply false
     alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.dokka) apply false
     alias(libs.plugins.publish) apply false
 }
@@ -44,4 +45,23 @@ apiValidation {
     nonPublicMarkers += [
         "androidx.annotation.VisibleForTesting",
     ]
+}
+
+subprojects {
+    apply plugin: "org.jlleitschuh.gradle.ktlint"
+
+    // Optionally configure plugin
+    ktlint {
+        android = true
+        enableExperimentalRules = false
+        reporters {
+            reporter "plain"
+            reporter "checkstyle"
+            reporter "sarif"
+        }
+        filter {
+            exclude("**/generated/**")
+            include("**/kotlin/**")
+        }
+    }
 }

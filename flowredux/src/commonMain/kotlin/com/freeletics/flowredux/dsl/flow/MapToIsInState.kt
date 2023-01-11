@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 internal fun <S, A> Flow<Action<S, A>>.mapToIsInState(
     isInState: (S) -> Boolean,
     getState: GetState<S>,
-) : Flow<Boolean> {
+): Flow<Boolean> {
     return map { isInState(getState()) }
         .distinctUntilChanged()
 }

@@ -2,18 +2,17 @@
 
 package com.freeletics.flowredux.dsl.internal
 
-import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.GetState
+import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.dsl.ChangedState
-import com.freeletics.flowredux.dsl.FlowReduxDsl
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.whileInState
 import com.freeletics.mad.statemachine.StateMachine
-import kotlinx.coroutines.flow.Flow
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
@@ -23,7 +22,10 @@ import kotlinx.coroutines.sync.withLock
 @FlowPreview
 @ExperimentalCoroutinesApi
 internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, ActionThatTriggeredStartingStateMachine : A, S : Any, A : Any>(
-    private val subStateMachineFactory: (action: ActionThatTriggeredStartingStateMachine, state: InputState) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
+    private val subStateMachineFactory: (
+        action: ActionThatTriggeredStartingStateMachine,
+        state: InputState
+    ) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
     private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
     private val isInState: (S) -> Boolean,
@@ -78,7 +80,6 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                                 stateMachine = stateMachine,
                                                 job = job
                                             )
-
                                         } else {
                                             // a regular action that needs to be forwarded
                                             // to the active sub state machine
@@ -113,7 +114,11 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
 
         suspend fun size(): Int = mutex.withLock { stateMachinesAndJobsMap.size }
 
-        suspend fun cancelPreviousAndAddNew(actionThatStartedStateMachine: ActionThatTriggeredStartingStateMachine, stateMachine: StateMachine<S, A>, job: Job) {
+        suspend fun cancelPreviousAndAddNew(
+            actionThatStartedStateMachine: ActionThatTriggeredStartingStateMachine,
+            stateMachine: StateMachine<S, A>,
+            job: Job
+        ) {
             mutex.withLock {
                 val existingStateMachinesAndJobs: StateMachineAndJob<S, A>? = stateMachinesAndJobsMap[actionThatStartedStateMachine]
                 existingStateMachinesAndJobs?.job?.cancel()
@@ -122,7 +127,9 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
             }
         }
 
-        suspend inline fun forEachStateMachine(crossinline block: suspend (StateMachine<S, A>) -> Unit) {
+        suspend inline fun forEachStateMachine(
+            crossinline block: suspend (StateMachine<S, A>) -> Unit
+        ) {
             mutex.withLock {
                 stateMachinesAndJobsMap.values.forEach { stateMachineAndJob ->
                     block(stateMachineAndJob.stateMachine)

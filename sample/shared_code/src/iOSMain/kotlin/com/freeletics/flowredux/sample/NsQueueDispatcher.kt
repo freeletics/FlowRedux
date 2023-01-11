@@ -1,8 +1,8 @@
 package com.freeletics.flowredux.sample
 
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.*
 import platform.darwin.*
-import kotlin.coroutines.CoroutineContext
 
 @OptIn(InternalCoroutinesApi::class)
 val applicationNsQueueDispatcher: CoroutineDispatcher = NsQueueDispatcher(dispatch_get_main_queue())
@@ -16,7 +16,10 @@ internal class NsQueueDispatcher(private val dispatchQueue: dispatch_queue_t) : 
         }
     }
 
-    override fun scheduleResumeAfterDelay(timeMillis: Long, continuation: CancellableContinuation<Unit>) {
+    override fun scheduleResumeAfterDelay(
+        timeMillis: Long,
+        continuation: CancellableContinuation<Unit>
+    ) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, timeMillis * 1_000_000), dispatchQueue) {
             try {
                 with(continuation) {

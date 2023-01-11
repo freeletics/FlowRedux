@@ -9,10 +9,10 @@ import com.freeletics.flowredux.R
 import com.freeletics.flowredux.sample.shared.LoadFirstPagePaginationState
 import com.freeletics.flowredux.sample.shared.LoadNextPage
 import com.freeletics.flowredux.sample.shared.LoadingFirstPageError
+import com.freeletics.flowredux.sample.shared.NextPageLoadingState
 import com.freeletics.flowredux.sample.shared.PaginationState
 import com.freeletics.flowredux.sample.shared.RetryLoadingFirstPage
 import com.freeletics.flowredux.sample.shared.ShowContentPaginationState
-import com.freeletics.flowredux.sample.shared.NextPageLoadingState
 import com.google.android.material.snackbar.Snackbar
 import timber.log.Timber
 
@@ -56,7 +56,6 @@ class TraditionalPopularRepositoriesActivity : ComponentActivity() {
         }
 
         recyclerView.addOnScrollListener(endOfListReached)
-
     }
 
     private fun render(state: PaginationState) = when (state) {
@@ -88,7 +87,6 @@ class TraditionalPopularRepositoriesActivity : ComponentActivity() {
             snackbar?.dismiss()
         }
     }
-
 }
 
 val View.gone: Unit
@@ -100,5 +98,3 @@ val View.visible: Unit
     get() {
         visibility = View.VISIBLE
     }
-
-

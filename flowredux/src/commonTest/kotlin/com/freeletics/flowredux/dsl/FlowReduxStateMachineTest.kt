@@ -1,12 +1,12 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.fail
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -58,19 +58,19 @@ class FlowReduxStateMachineTest {
         } catch (e: IllegalStateException) {
             val expected =
                 "No state machine specs are defined. Did you call spec { ... } in init {...}?\n" +
-                        "Example usage:\n" +
-                        "\n" +
-                        "class MyStateMachine : FlowReduxStateMachine<State, Action>(InitialState) {\n" +
-                        "\n" +
-                        "    init{\n" +
-                        "        spec {\n" +
-                        "            inState<FooState> {\n" +
-                        "                on<BarAction> { ... }\n" +
-                        "            }\n" +
-                        "            ...\n" +
-                        "        }\n" +
-                        "    }\n" +
-                        "}"
+                    "Example usage:\n" +
+                    "\n" +
+                    "class MyStateMachine : FlowReduxStateMachine<State, Action>(InitialState) {\n" +
+                    "\n" +
+                    "    init{\n" +
+                    "        spec {\n" +
+                    "            inState<FooState> {\n" +
+                    "                on<BarAction> { ... }\n" +
+                    "            }\n" +
+                    "            ...\n" +
+                    "        }\n" +
+                    "    }\n" +
+                    "}"
             assertEquals(expected, e.message)
         }
     }
@@ -86,8 +86,8 @@ class FlowReduxStateMachineTest {
 
         val expectedMsg =
             "Cannot dispatch action $action because state Flow of this " +
-                    "FlowReduxStateMachine is not collected yet. Start collecting the state " +
-                    "Flow before dispatching any action."
+                "FlowReduxStateMachine is not collected yet. Start collecting the state " +
+                "Flow before dispatching any action."
 
         assertEquals(expectedMsg, exception.message)
     }
@@ -108,9 +108,8 @@ class FlowReduxStateMachineTest {
         }
 
         val exception = assertFailsWith<IllegalStateException> {
-            sm.state.collect {  }
+            sm.state.collect { }
         }
-
 
         val expectedMsg =
             "Can not collect state more than once at the same time. Make sure the" +
