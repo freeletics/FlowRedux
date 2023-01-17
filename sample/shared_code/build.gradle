@@ -18,7 +18,9 @@ kotlin {
         name = "shared_code"
         ios.deploymentTarget = "12.2"
         podfile = project.file("../ios/Podfile")
-        frameworkName = "shared_code"
+        framework {
+            baseName = "shared_code"
+        }
     }
 
     sourceSets {
