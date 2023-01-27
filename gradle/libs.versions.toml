@@ -31,7 +31,7 @@ turbine = "0.12.1"
 publish = "0.23.2"
 dokka = "1.7.20"
 codesync = "0.2"
-ktlint = "11.0.0"
+ktlint = "11.1.0"
 binarycompatibility = "0.12.1"
 dependency-analysis = "1.18.0"
 
