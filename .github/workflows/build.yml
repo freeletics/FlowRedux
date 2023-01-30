@@ -1,6 +1,10 @@
 name: Build
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
 
 jobs:
   build:
@@ -33,4 +37,4 @@ jobs:
         run: ./gradlew ktlintCheck
 
       - name: Build with Gradle
-        run: ./gradlew build --stacktrace
+        run: ./gradlew build buildHealth --stacktrace
