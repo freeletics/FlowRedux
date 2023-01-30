@@ -28,7 +28,7 @@ mad = "0.10.1"
 
 turbine = "0.12.1"
 
-publish = "0.23.2"
+publish = "0.24.0"
 dokka = "1.7.20"
 codesync = "0.2"
 ktlint = "11.1.0"
