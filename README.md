@@ -99,7 +99,7 @@ There are two artifacts that you can include as dependencis:
 1. `flowredux`: this is the core library and includes the DSL.
 2. `compose`: contains some convenient extensions to work with `FlowReduxStateMachine` in [Jetpack Compose](https://developer.android.com/jetpack/compose).
 
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/gabrielittner/renderer?logo=github&sort=semver)](https://github.com/freeletics/flowredux/releases)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/freeletics/flowredux?logo=github&sort=semver)](https://github.com/freeletics/flowredux/releases)
 
 ### JVM / Android only
 ```groovy
