@@ -1,7 +1,5 @@
 # FlowRedux
 
-[![Download](https://maven-badges.herokuapp.com/maven-central/com.freeletics.flowredux/flowredux/badge.svg) ](https://maven-badges.herokuapp.com/maven-central/com.freeletics.flowredux/flowredux)
-
 Building async. running Kotlin Multiplatform state machine made easy with a DSL and coroutines.
 
 ## Usage
@@ -101,7 +99,7 @@ There are two artifacts that you can include as dependencis:
 1. `flowredux`: this is the core library and includes the DSL.
 2. `compose`: contains some convenient extensions to work with `FlowReduxStateMachine` in [Jetpack Compose](https://developer.android.com/jetpack/compose).
 
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/gabrielittner/renderer?logo=github&sort=semver)](https://github.com/gabrielittner/renderer/releases)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/gabrielittner/renderer?logo=github&sort=semver)](https://github.com/freeletics/flowredux/releases)
 
 ### JVM / Android only
 ```groovy
