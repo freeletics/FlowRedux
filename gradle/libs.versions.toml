@@ -25,7 +25,7 @@ material = "1.8.0"
 adapterdelegates = "4.3.2"
 timber = "5.0.1"
 
-mad = "0.10.1"
+mad = "0.11.0"
 
 turbine = "0.12.1"
 
