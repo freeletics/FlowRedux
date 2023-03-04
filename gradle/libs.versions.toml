@@ -30,7 +30,7 @@ mad = "0.12.0"
 turbine = "0.12.1"
 
 publish = "0.24.0"
-dokka = "1.7.20"
+dokka = "1.8.10"
 codesync = "0.2"
 ktlint = "11.1.0"
 binarycompatibility = "0.13.0"
