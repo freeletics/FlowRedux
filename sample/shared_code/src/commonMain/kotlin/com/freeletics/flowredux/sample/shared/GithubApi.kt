@@ -9,7 +9,7 @@ class GithubApi {
             id = "$it",
             name = "Repository $it",
             stargazersCount = it * 10,
-            favoriteStatus = FavoriteStatus.NOT_FAVORITE
+            favoriteStatus = FavoriteStatus.NOT_FAVORITE,
         )
     }
 
@@ -21,16 +21,21 @@ class GithubApi {
 
     suspend fun loadPage(page: Int): PageResult {
         delay(2000)
-        if (shouldFail())
+        if (shouldFail()) {
             throw Exception("Faked network error")
+        }
         val start = page * pageSize
         val end = min(githubData.size, page * pageSize + pageSize)
 
         return (
-            if (start < githubData.size) githubData.subList(
-                start,
-                end
-            ) else emptyList<GithubRepository>()
+            if (start < githubData.size) {
+                githubData.subList(
+                    start,
+                    end,
+                )
+            } else {
+                emptyList<GithubRepository>()
+            }
             ).run {
             if (isEmpty()) {
                 PageResult.NoNextPage
@@ -57,14 +62,16 @@ sealed class PageResult {
 
 fun List<GithubRepository>.markAsFavorite(repoId: String, favorite: Boolean): List<GithubRepository> {
     return map {
-        if (it.id == repoId)
+        if (it.id == repoId) {
             it.copy(
                 favoriteStatus = if (favorite) {
                     FavoriteStatus.FAVORITE
                 } else {
                     FavoriteStatus.NOT_FAVORITE
-                }
+                },
             )
-        else it
+        } else {
+            it
+        }
     }
 }

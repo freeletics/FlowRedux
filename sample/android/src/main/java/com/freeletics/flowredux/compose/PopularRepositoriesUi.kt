@@ -7,7 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.stringResource
 import com.freeletics.flowredux.R
-import com.freeletics.flowredux.sample.shared.*
+import com.freeletics.flowredux.sample.shared.Action
+import com.freeletics.flowredux.sample.shared.LoadFirstPagePaginationState
+import com.freeletics.flowredux.sample.shared.LoadingFirstPageError
+import com.freeletics.flowredux.sample.shared.NextPageLoadingState
+import com.freeletics.flowredux.sample.shared.PaginationState
+import com.freeletics.flowredux.sample.shared.ShowContentPaginationState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -32,7 +37,7 @@ fun PopularRepositoriesUi(state: PaginationState?, dispatch: (Action) -> Unit) {
                             launch {
                                 scaffoldState.snackbarHostState.showSnackbar(
                                     errorMessage,
-                                    duration = SnackbarDuration.Indefinite // Will be dismissed by changing state
+                                    duration = SnackbarDuration.Indefinite, // Will be dismissed by changing state
                                 )
                             }
                         }

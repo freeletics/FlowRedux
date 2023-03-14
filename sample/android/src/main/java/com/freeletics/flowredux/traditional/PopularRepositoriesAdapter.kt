@@ -36,7 +36,7 @@ class PopularRepositoriesAdapter(dispatch: (Action) -> Unit) : AsyncListDifferDe
         }
     },
     githubAdapterDelegate(dispatch),
-    loadingAdapterDelegate()
+    loadingAdapterDelegate(),
 )
 
 private fun githubAdapterDelegate(dispatch: (Action) -> Unit) =

@@ -69,5 +69,5 @@ public enum class ExecutionPolicy {
      *
      * (uses flatMapConcat under the hood)
      */
-    ORDERED
+    ORDERED,
 }

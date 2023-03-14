@@ -34,7 +34,7 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
         if (::outputState.isInitialized) {
             throw IllegalStateException(
                 "State machine spec has already been set. " +
-                    "It's only allowed to call spec {...} once."
+                    "It's only allowed to call spec {...} once.",
             )
         }
 
@@ -53,7 +53,7 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
                     throw IllegalStateException(
                         "Can not collect state more than once at the same time. Make sure the" +
                             "previous collection is cancelled before starting a new one. " +
-                            "Collecting state in parallel would lead to subtle bugs."
+                            "Collecting state in parallel would lead to subtle bugs.",
                     )
                 }
             }
@@ -74,7 +74,7 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
             throw IllegalStateException(
                 "Cannot dispatch action $action because state Flow of this " +
                     "FlowReduxStateMachine is not collected yet. " +
-                    "Start collecting the state Flow before dispatching any action."
+                    "Start collecting the state Flow before dispatching any action.",
             )
         }
         inputActions.send(action)
@@ -98,7 +98,7 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
                             }
                         }
                     }
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
     }

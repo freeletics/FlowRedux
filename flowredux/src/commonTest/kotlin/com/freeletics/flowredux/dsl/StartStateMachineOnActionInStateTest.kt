@@ -164,13 +164,14 @@ class StartStateMachineOnActionInStateTest {
                     },
                     stateMapper = { inputState, subState ->
                         stateMapperRecordings += pairOf(inputState.snapshot, subState)
-                        if (subState is TestState.S3)
+                        if (subState is TestState.S3) {
                             inputState.override { TestState.S3 }
-                        else
+                        } else {
                             inputState.mutate {
                                 copy(counter = this.counter + 1)
                             }
-                    }
+                        }
+                    },
                 )
             }
         }
@@ -190,18 +191,18 @@ class StartStateMachineOnActionInStateTest {
             assertEquals(TestState.CounterState(1), awaitItem()) // initial emission of child
             assertEquals( // factory should have been invoked
                 listOf<Pair<TestAction, TestState>>(
-                    pairOf(TestAction.A4(1), initialState)
+                    pairOf(TestAction.A4(1), initialState),
                 ),
-                factoryParamsRecordings
+                factoryParamsRecordings,
             )
             assertEquals(1, child.stateFlowStarted)
             assertEquals(0, child.stateFlowCompleted)
             assertEquals(emptyList(), actionMapperRecordings)
             assertEquals(
                 listOf<Pair<TestState, TestState>>(
-                    pairOf(initialState, TestState.S1)
+                    pairOf(initialState, TestState.S1),
                 ),
-                stateMapperRecordings
+                stateMapperRecordings,
             )
 
             //
@@ -213,9 +214,9 @@ class StartStateMachineOnActionInStateTest {
             assertEquals(
                 listOf<Pair<TestState, TestState>>(
                     pairOf(initialState, TestState.S1),
-                    pairOf(TestState.CounterState(1), TestState.S2)
+                    pairOf(TestState.CounterState(1), TestState.S2),
                 ),
-                stateMapperRecordings
+                stateMapperRecordings,
             )
             // action mapper checks
             assertEquals(listOf<TestAction>(TestAction.A3), actionMapperRecordings)
@@ -235,9 +236,9 @@ class StartStateMachineOnActionInStateTest {
                 listOf<Pair<TestState, TestState>>(
                     pairOf(initialState, TestState.S1),
                     pairOf(TestState.CounterState(1), TestState.S2),
-                    pairOf(TestState.CounterState(2), TestState.S3)
+                    pairOf(TestState.CounterState(2), TestState.S3),
                 ),
-                stateMapperRecordings
+                stateMapperRecordings,
             )
             // action mapper checks
             assertEquals(listOf(TestAction.A3, TestAction.A2), actionMapperRecordings)
@@ -275,9 +276,9 @@ class StartStateMachineOnActionInStateTest {
             // check factory
             assertEquals( // factory should have been invoked
                 listOf<Pair<TestAction, TestState>>(
-                    pairOf(TestAction.A4(2), TestState.CounterState(10))
+                    pairOf(TestAction.A4(2), TestState.CounterState(10)),
                 ),
-                factoryParamsRecordings
+                factoryParamsRecordings,
             )
             assertEquals(2, child.stateFlowStarted)
             assertEquals(1, child.stateFlowCompleted)
@@ -286,9 +287,9 @@ class StartStateMachineOnActionInStateTest {
             // check state mapper
             assertEquals(
                 listOf<Pair<TestState, TestState>>(
-                    pairOf(TestState.CounterState(10), TestState.S1)
+                    pairOf(TestState.CounterState(10), TestState.S1),
                 ),
-                stateMapperRecordings
+                stateMapperRecordings,
             )
 
             //
@@ -300,9 +301,9 @@ class StartStateMachineOnActionInStateTest {
             assertEquals(
                 listOf<Pair<TestState, TestState>>(
                     pairOf(TestState.CounterState(10), TestState.S1),
-                    pairOf(TestState.CounterState(11), TestState.S2)
+                    pairOf(TestState.CounterState(11), TestState.S2),
                 ),
-                stateMapperRecordings
+                stateMapperRecordings,
             )
             // action mapper checks
             assertEquals(listOf<TestAction>(TestAction.A3), actionMapperRecordings)
@@ -340,7 +341,7 @@ class StartStateMachineOnActionInStateTest {
                             TestAction.A3 -> null
                             is TestAction.A4 -> null
                         }
-                    }
+                    },
                 ) { inputState, childState ->
                     inputState.override { childState }
                 }

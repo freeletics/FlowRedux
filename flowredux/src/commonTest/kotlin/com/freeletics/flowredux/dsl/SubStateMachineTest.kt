@@ -56,7 +56,7 @@ class SubStateMachineTest {
             inState<TestState.Initial> {
                 onEnterStartStateMachine(
                     stateMachine = child,
-                    actionMapper = { it }
+                    actionMapper = { it },
                 ) { state, subStateMachineState ->
                     receivedChildStateUpdates += subStateMachineState
                     receivedChildStateUpdatesParentState += state.snapshot
@@ -89,7 +89,7 @@ class SubStateMachineTest {
             assertEquals(listOf(TestState.S3, TestState.S1), receivedChildStateUpdates)
             assertEquals(
                 listOf<TestState>(TestState.Initial, TestState.Initial),
-                receivedChildStateUpdatesParentState
+                receivedChildStateUpdatesParentState,
             )
         }
     }
@@ -115,7 +115,7 @@ class SubStateMachineTest {
                         child
                     },
                     actionMapper = { it },
-                    stateMapper = { state, _ -> state.noChange() }
+                    stateMapper = { state, _ -> state.noChange() },
                 )
 
                 on<TestAction.A1> { _, state ->
@@ -162,7 +162,7 @@ class SubStateMachineTest {
                         child
                     },
                     actionMapper = { it },
-                    stateMapper = { state, _ -> state.noChange() }
+                    stateMapper = { state, _ -> state.noChange() },
                 )
 
                 on<TestAction.A1> { _, state ->
@@ -274,7 +274,7 @@ class SubStateMachineTest {
                             TestAction.A3 -> null
                             is TestAction.A4 -> null
                         }
-                    }
+                    },
                 )
                 on<TestAction> { _, state ->
                     parentActionInvocations.send(Unit)
@@ -340,7 +340,7 @@ class SubStateMachineTest {
                 onEnterStartStateMachine(
                     stateMachineFactory = { childFactory++; child },
                     actionMapper = { it },
-                    stateMapper = { state, childState -> state.override { childState } }
+                    stateMapper = { state, childState -> state.override { childState } },
                 )
             }
         }
@@ -370,7 +370,7 @@ class SubStateMachineTest {
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 private fun ChildStateMachine(
     initialState: TestState = TestState.Initial,
-    builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit
+    builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit,
 ): FlowReduxStateMachine<TestState, TestAction> {
     return object : FlowReduxStateMachine<TestState, TestAction>(initialState) {
 

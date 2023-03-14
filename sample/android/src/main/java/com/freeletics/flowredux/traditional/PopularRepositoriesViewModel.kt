@@ -14,7 +14,7 @@ class PopularRepositoriesViewModel : ViewModel() {
 
     private val stateMachine = PaginationStateMachine(
         githubApi = GithubApi(),
-        scope = viewModelScope
+        scope = viewModelScope,
     ).also {
         it.start(::onStateChanged)
     }

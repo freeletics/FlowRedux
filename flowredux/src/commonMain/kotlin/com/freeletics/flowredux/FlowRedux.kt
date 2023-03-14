@@ -32,9 +32,8 @@ fun <A, S> Flow<A>.reduxStore(
 internal fun <A, S> Flow<A>.reduxStore(
     initialStateSupplier: () -> S,
     sideEffects: Iterable<SideEffect<S, A>>,
-    reducer: Reducer<S, A>
+    reducer: Reducer<S, A>,
 ): Flow<S> = flow {
-
     var currentState: S = initialStateSupplier()
     val getState: GetState<S> = { currentState }
 

@@ -1,6 +1,10 @@
 package com.freeletics.flowredux.compose
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -43,7 +47,7 @@ public fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberState(): State
  */
 public data class StateAndDispatch<S : Any, A : Any>(
     public val state: State<S?>,
-    public val dispatchAction: (A) -> Unit
+    public val dispatchAction: (A) -> Unit,
 )
 
 /**
@@ -76,6 +80,6 @@ public fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberStateAndDispat
                     stateMachine.dispatch(action)
                 }
             }
-        }
+        },
     )
 }

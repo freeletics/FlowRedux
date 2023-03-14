@@ -14,9 +14,8 @@ internal abstract class InStateSideEffectBuilder<InputState : S, S, A> {
     internal suspend inline fun runOnlyIfInInputState(
         getState: GetState<S>,
         isInState: (S) -> Boolean,
-        crossinline block: suspend (InputState) -> Unit
+        crossinline block: suspend (InputState) -> Unit,
     ) {
-
         val currentState = getState()
         // only start if is in state condition is still true
         if (isInState(currentState)) {

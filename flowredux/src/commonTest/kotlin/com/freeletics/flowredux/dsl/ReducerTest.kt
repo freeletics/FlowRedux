@@ -17,13 +17,13 @@ class ReducerTest {
         val action =
             ChangeStateAction<TestState, Any>(
                 changedState = UnsafeMutateState<TestState, TestState> { TestState.B },
-                runReduceOnlyIf = { true }
+                runReduceOnlyIf = { true },
             )
 
         val expected = TestState.B
         val actual = reducer(
             TestState.A,
-            action
+            action,
         )
 
         assertEquals(expected, actual)
@@ -34,13 +34,13 @@ class ReducerTest {
         val action =
             ChangeStateAction<TestState, Any>(
                 changedState = UnsafeMutateState<TestState, TestState> { TestState.B },
-                runReduceOnlyIf = { false }
+                runReduceOnlyIf = { false },
             )
 
         val expected = TestState.A
         val actual = reducer(
             TestState.A,
-            action
+            action,
         )
 
         assertEquals(expected, actual)

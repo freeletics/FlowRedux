@@ -32,16 +32,16 @@ private val DarkThemeColors = darkColors(
     secondary = Red300,
     onSecondary = Color.Black,
     error = Red200,
-    onBackground = Color.White
+    onBackground = Color.White,
 )
 
 @Composable
 fun SampleTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     MaterialTheme(
         colors = if (darkTheme) DarkThemeColors else LightThemeColors,
-        content = content
+        content = content,
     )
 }

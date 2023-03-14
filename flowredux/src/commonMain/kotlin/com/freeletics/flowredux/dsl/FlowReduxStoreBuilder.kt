@@ -18,7 +18,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
      * "In a certain state" condition is true if state is instance of the type specified as generic function parameter.
      */
     public inline fun <reified SubState : S> inState(
-        noinline block: InStateBuilderBlock<SubState, S, A>.() -> Unit
+        noinline block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
         inState(SubState::class, block)
     }
@@ -30,14 +30,13 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
     @PublishedApi
     internal fun <SubState : S> inState(
         subStateClass: KClass<SubState>,
-        block: InStateBuilderBlock<SubState, S, A>.() -> Unit
+        block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
-
         // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
         //  or is this actaully a feature :)
         val builder = InStateBuilderBlock<SubState, S, A>(_isInState = { state ->
             subStateClass.isInstance(state)
-        })
+        },)
         block(builder)
         builderBlocks.add(builder)
     }
@@ -49,7 +48,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
      */
     public inline fun <reified SubState : S> inState(
         noinline additionalIsInState: (SubState) -> Boolean,
-        noinline block: InStateBuilderBlock<SubState, S, A>.() -> Unit
+        noinline block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
         inState(SubState::class, additionalIsInState, block)
     }
@@ -63,15 +62,14 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
     internal fun <SubState : S> inState(
         subStateClass: KClass<SubState>,
         additionalIsInState: (SubState) -> Boolean,
-        block: InStateBuilderBlock<SubState, S, A>.() -> Unit
+        block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
-
         // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
         //  or is this actaully a feature :)
         val builder = InStateBuilderBlock<SubState, S, A>(_isInState = { state ->
             @Suppress("UNCHECKED_CAST")
             subStateClass.isInstance(state) && additionalIsInState(state as SubState)
-        })
+        },)
         block(builder)
         builderBlocks.add(builder)
     }
@@ -82,7 +80,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
      */
     public fun inStateWithCondition(
         isInState: (S) -> Boolean,
-        block: InStateBuilderBlock<S, S, A>.() -> Unit
+        block: InStateBuilderBlock<S, S, A>.() -> Unit,
     ) {
         // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
         val builder = InStateBuilderBlock<S, S, A>(_isInState = isInState)

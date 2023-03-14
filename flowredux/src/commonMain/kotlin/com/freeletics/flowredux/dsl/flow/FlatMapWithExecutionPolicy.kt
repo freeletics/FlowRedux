@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.flatMapMerge
 @ExperimentalCoroutinesApi
 internal fun <T, R> Flow<T>.flatMapWithExecutionPolicy(
     executionPolicy: ExecutionPolicy,
-    transform: suspend (value: T) -> Flow<R>
+    transform: suspend (value: T) -> Flow<R>,
 ): Flow<R> =
     when (executionPolicy) {
         ExecutionPolicy.CANCEL_PREVIOUS -> this.flatMapLatest(transform)

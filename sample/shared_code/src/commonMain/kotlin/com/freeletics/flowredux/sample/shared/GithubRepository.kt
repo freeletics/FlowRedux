@@ -7,5 +7,5 @@ data class GithubRepository(
     val id: String,
     val name: String,
     val stargazersCount: Int,
-    val favoriteStatus: FavoriteStatus
+    val favoriteStatus: FavoriteStatus,
 )

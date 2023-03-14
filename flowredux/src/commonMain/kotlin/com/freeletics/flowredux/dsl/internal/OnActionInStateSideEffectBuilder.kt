@@ -22,7 +22,7 @@ internal class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any
     private val isInState: (S) -> Boolean,
     internal val subActionClass: KClass<out A>,
     internal val executionPolicy: ExecutionPolicy,
-    internal val handler: suspend (action: A, state: State<InputState>) -> ChangedState<S>
+    internal val handler: suspend (action: A, state: State<InputState>) -> ChangedState<S>,
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
@@ -43,7 +43,7 @@ internal class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any
                     .flatMapWithExecutionPolicy(executionPolicy) { action ->
                         onActionSideEffectFactory(
                             action = action,
-                            getState = getState
+                            getState = getState,
                         )
                     }
             }
@@ -52,21 +52,20 @@ internal class OnActionInStateSideEffectBuilder<InputState : S, S : Any, A : Any
 
     private fun onActionSideEffectFactory(
         action: A,
-        getState: GetState<S>
+        getState: GetState<S>,
     ): Flow<Action<S, A>> =
         flow {
-
             runOnlyIfInInputState(getState, isInState) { inputState ->
                 val changeState = handler(
                     action,
-                    State(inputState)
+                    State(inputState),
                 )
 
                 emit(
                     ChangeStateAction<S, A>(
                         changedState = changeState,
-                        runReduceOnlyIf = { state -> isInState(state) }
-                    )
+                        runReduceOnlyIf = { state -> isInState(state) },
+                    ),
                 )
             }
         }

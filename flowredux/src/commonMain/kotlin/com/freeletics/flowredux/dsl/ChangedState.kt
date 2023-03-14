@@ -11,7 +11,7 @@ package com.freeletics.flowredux.dsl
 public sealed class ChangedState<out S>
 
 internal class UnsafeMutateState<InputState, S>(
-    internal val reducer: InputState.() -> S
+    internal val reducer: InputState.() -> S,
 ) : ChangedState<S>() {
     @Suppress("UNCHECKED_CAST")
     internal fun reduceImpl(state: S): S =

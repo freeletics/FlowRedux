@@ -38,16 +38,15 @@ internal class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>
     }
 
     private suspend fun setStateFlow(
-        getState: GetState<S>
+        getState: GetState<S>,
     ): Flow<Action<S, A>> = flow {
-
         runOnlyIfInInputState(getState, isInState) { inputState ->
             val changeState = handler(State(inputState))
             emit(
                 ChangeStateAction<S, A>(
                     changedState = changeState,
-                    runReduceOnlyIf = { state -> isInState(state) }
-                )
+                    runReduceOnlyIf = { state -> isInState(state) },
+                ),
             )
         }
     }
