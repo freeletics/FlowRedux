@@ -12,10 +12,8 @@ import com.freeletics.flowredux.dsl.internal.StartStatemachineOnEnterSideEffectB
 import com.freeletics.mad.statemachine.StateMachine
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 
-@FlowPreview
 @ExperimentalCoroutinesApi
 @FlowReduxDsl
 public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(

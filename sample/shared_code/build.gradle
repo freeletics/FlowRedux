@@ -26,7 +26,6 @@ kotlin {
     sourceSets {
         all {
             languageSettings {
-                optIn("kotlinx.coroutines.FlowPreview")
                 optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             }
         }

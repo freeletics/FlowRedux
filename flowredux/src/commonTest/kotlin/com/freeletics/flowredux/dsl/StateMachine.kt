@@ -2,14 +2,13 @@ package com.freeletics.flowredux.dsl
 
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class StateMachine constructor(
     initialState: TestState = TestState.Initial,
     specBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit = {},

@@ -8,7 +8,6 @@ import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.flatMapWithExecutionPolicy
 import com.freeletics.flowredux.dsl.flow.whileInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
@@ -19,7 +18,6 @@ import kotlinx.coroutines.flow.mapNotNull
  * the given state. We use is instance of check to check if a new state has been reached and Flow<T>
  * is closed.
  */
-@FlowPreview
 @ExperimentalCoroutinesApi
 internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val isInState: (S) -> Boolean,
