@@ -25,7 +25,7 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
     private val isInState: (S) -> Boolean,
     private val flowBuilder: (Flow<InputState>) -> Flow<T>,
     private val executionPolicy: ExecutionPolicy,
-    private val handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>
+    private val handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
@@ -43,7 +43,7 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
     @Suppress("unchecked_cast")
     private fun flowOfCurrentState(
         actions: Flow<Action<S, A>>,
-        getState: GetState<S>
+        getState: GetState<S>,
     ): Flow<InputState> {
         // after every state change there is a guaranteed action emission so we use this
         // to get the current state
@@ -59,16 +59,15 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
 
     private suspend fun setStateFlow(
         value: T,
-        getState: GetState<S>
+        getState: GetState<S>,
     ): Flow<Action<S, A>> = flow {
-
         runOnlyIfInInputState(getState, isInState) { inputState ->
             val changeState = handler(value, State(inputState))
             emit(
                 ChangeStateAction<S, A>(
                     changedState = changeState,
-                    runReduceOnlyIf = { state -> isInState(state) }
-                )
+                    runReduceOnlyIf = { state -> isInState(state) },
+                ),
             )
         }
     }

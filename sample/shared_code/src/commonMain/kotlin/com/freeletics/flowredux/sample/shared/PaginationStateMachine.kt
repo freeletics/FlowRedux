@@ -50,9 +50,9 @@ class InternalPaginationStateMachine(
                         val repo = state.items.find { it.id == action.id }!!
                         MarkAsFavoriteStateMachine(
                             githubApi = githubApi,
-                            repository = repo
+                            repository = repo,
                         )
-                    }
+                    },
                 ) { inputState: State<ShowContentPaginationState>, childState: GithubRepository ->
                     inputState.mutate {
                         copy(
@@ -62,7 +62,7 @@ class InternalPaginationStateMachine(
                                 } else {
                                     repoItem
                                 }
-                            }
+                            },
                         )
                     }
                 }
@@ -78,7 +78,7 @@ class InternalPaginationStateMachine(
         } else {
             state.mutate {
                 copy(
-                    nextPageLoadingState = NextPageLoadingState.LOADING
+                    nextPageLoadingState = NextPageLoadingState.LOADING,
                 )
             }
         }
@@ -88,7 +88,7 @@ class InternalPaginationStateMachine(
      * Loads the first page
      */
     private suspend fun loadFirstPage(
-        state: State<LoadFirstPagePaginationState>
+        state: State<LoadFirstPagePaginationState>,
     ): ChangedState<PaginationState> {
         val nextState = try {
             when (val pageResult: PageResult = githubApi.loadPage(page = 0)) {
@@ -97,7 +97,7 @@ class InternalPaginationStateMachine(
                         items = emptyList(),
                         canLoadNextPage = false,
                         currentPage = 1,
-                        nextPageLoadingState = NextPageLoadingState.IDLE
+                        nextPageLoadingState = NextPageLoadingState.IDLE,
                     )
                 }
                 is PageResult.Page -> {
@@ -105,7 +105,7 @@ class InternalPaginationStateMachine(
                         items = pageResult.items,
                         canLoadNextPage = true,
                         currentPage = pageResult.page,
-                        nextPageLoadingState = NextPageLoadingState.IDLE
+                        nextPageLoadingState = NextPageLoadingState.IDLE,
                     )
                 }
             }
@@ -136,7 +136,7 @@ class InternalPaginationStateMachine(
                             items = items + pageResult.items,
                             canLoadNextPage = true,
                             currentPage = nextPageNumber,
-                            nextPageLoadingState = NextPageLoadingState.IDLE
+                            nextPageLoadingState = NextPageLoadingState.IDLE,
                         )
                     }
                 }
@@ -145,7 +145,7 @@ class InternalPaginationStateMachine(
             t.printStackTrace()
             state.mutate {
                 copy(
-                    nextPageLoadingState = NextPageLoadingState.ERROR
+                    nextPageLoadingState = NextPageLoadingState.ERROR,
                 )
             }
         }
@@ -159,7 +159,7 @@ class InternalPaginationStateMachine(
         delay(3000)
         return state.mutate {
             copy(
-                nextPageLoadingState = NextPageLoadingState.IDLE
+                nextPageLoadingState = NextPageLoadingState.IDLE,
             )
         }
     }

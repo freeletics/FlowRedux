@@ -24,7 +24,7 @@ import kotlinx.coroutines.sync.withLock
 internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, ActionThatTriggeredStartingStateMachine : A, S : Any, A : Any>(
     private val subStateMachineFactory: (
         action: ActionThatTriggeredStartingStateMachine,
-        state: InputState
+        state: InputState,
     ) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
     private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
@@ -57,7 +57,8 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                                 action.action as ActionThatTriggeredStartingStateMachine
 
                                             val stateMachine = subStateMachineFactory(
-                                                actionThatStartsStateMachine, currentState
+                                                actionThatStartsStateMachine,
+                                                currentState,
                                             )
 
                                             // Launch substatemachine
@@ -69,8 +70,8 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                                             send(
                                                                 ChangeStateAction(
                                                                     runReduceOnlyIf = isInState,
-                                                                    changedState = stateMapper(State(parentState), subStateMachineState)
-                                                                )
+                                                                    changedState = stateMapper(State(parentState), subStateMachineState),
+                                                                ),
                                                             )
                                                         }
                                                     }
@@ -78,7 +79,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                             subStateMachinesMap.cancelPreviousAndAddNew(
                                                 actionThatStartedStateMachine = actionThatStartsStateMachine,
                                                 stateMachine = stateMachine,
-                                                job = job
+                                                job = job,
                                             )
                                         } else {
                                             // a regular action that needs to be forwarded
@@ -117,7 +118,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
         suspend fun cancelPreviousAndAddNew(
             actionThatStartedStateMachine: ActionThatTriggeredStartingStateMachine,
             stateMachine: StateMachine<S, A>,
-            job: Job
+            job: Job,
         ) {
             mutex.withLock {
                 val existingStateMachinesAndJobs: StateMachineAndJob<S, A>? = stateMachinesAndJobsMap[actionThatStartedStateMachine]
@@ -128,7 +129,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
         }
 
         suspend inline fun forEachStateMachine(
-            crossinline block: suspend (StateMachine<S, A>) -> Unit
+            crossinline block: suspend (StateMachine<S, A>) -> Unit,
         ) {
             mutex.withLock {
                 stateMachinesAndJobsMap.values.forEach { stateMachineAndJob ->
@@ -150,8 +151,9 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
 
                 if (key != null) {
                     stateMachinesAndJobsMap.remove(key)
-                } else
+                } else {
                     null
+                }
             }
 
             return result

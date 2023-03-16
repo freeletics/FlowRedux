@@ -10,7 +10,12 @@ import com.freeletics.mad.statemachine.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
@@ -19,7 +24,7 @@ internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : 
     private val subStateMachineFactory: (InputState) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
     private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
-    private val isInState: (S) -> Boolean
+    private val isInState: (S) -> Boolean,
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
     override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
@@ -31,7 +36,7 @@ internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : 
     @Suppress("UNCHECKED_CAST")
     private fun dispatchActionsToSubStateMachineAndCollectSubStateMachineState(
         upstreamActions: Flow<Action<S, A>>,
-        getState: GetState<S>
+        getState: GetState<S>,
     ): Flow<Action<S, A>> {
         return upstreamActions
             .whileInState(isInState, getState) { actions: Flow<Action<S, A>> ->
@@ -87,8 +92,8 @@ internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : 
                                         runReduceOnlyIf = isInState,
                                         changedState = stateMapper(
                                             State(inputState),
-                                            subStateMachineState
-                                        )
+                                            subStateMachineState,
+                                        ),
                                     )
                                 }
 

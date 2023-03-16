@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.cocoapods)
-    alias(libs.plugins.codesync)
+    //alias(libs.plugins.codesync)
 }
 
 version = "1.0.0"
@@ -12,16 +12,16 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
-    cocoapods {
-        summary = "Some description for a Kotlin/Native module"
-        homepage = "Link to a Kotlin/Native module homepage"
-        name = "shared_code"
-        ios.deploymentTarget = "12.2"
-        podfile = project.file("../ios/Podfile")
-        framework {
-            baseName = "shared_code"
-        }
-    }
+//    cocoapods {
+//        summary = "Some description for a Kotlin/Native module"
+//        homepage = "Link to a Kotlin/Native module homepage"
+//        name = "shared_code"
+//        ios.deploymentTarget = "12.2"
+//        podfile = project.file("../ios/Podfile")
+//        framework {
+//            baseName = "shared_code"
+//        }
+//    }
 
     sourceSets {
         all {
@@ -52,7 +52,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     }
 }
 
-xcodeSync {
-    projectPath = "../ios/ios.xcodeproj"
-    target = "iosApp"
-}
+//xcodeSync {
+//    projectPath = "../ios/ios.xcodeproj"
+//    target = "iosApp"
+//}

@@ -9,7 +9,7 @@ class MarkAsFavoriteStateMachine(
     private val githubApi: GithubApi,
     repository: GithubRepository,
 ) : FlowReduxStateMachine<GithubRepository, Action>(
-    initialState = repository.copy(favoriteStatus = FavoriteStatus.OPERATION_IN_PROGRESS)
+    initialState = repository.copy(favoriteStatus = FavoriteStatus.OPERATION_IN_PROGRESS),
 ) {
     private val favoriteStatusWhenStarting: FavoriteStatus = repository.favoriteStatus
 
@@ -32,10 +32,16 @@ class MarkAsFavoriteStateMachine(
             githubApi.markAsFavorite(repoId = state.snapshot.id, favorite = shouldBeMarkedAsFavorite)
             state.mutate {
                 copy(
-                    favoriteStatus = if (shouldBeMarkedAsFavorite) FavoriteStatus.FAVORITE
-                    else FavoriteStatus.NOT_FAVORITE,
-                    stargazersCount = if (shouldBeMarkedAsFavorite) stargazersCount + 1
-                    else stargazersCount - 1
+                    favoriteStatus = if (shouldBeMarkedAsFavorite) {
+                        FavoriteStatus.FAVORITE
+                    } else {
+                        FavoriteStatus.NOT_FAVORITE
+                    },
+                    stargazersCount = if (shouldBeMarkedAsFavorite) {
+                        stargazersCount + 1
+                    } else {
+                        stargazersCount - 1
+                    },
                 )
             }
         } catch (e: Exception) {

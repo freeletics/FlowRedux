@@ -15,8 +15,8 @@ class MainActivity : ComponentActivity() {
             startActivity(
                 Intent(
                     this@MainActivity,
-                    TraditionalPopularRepositoriesActivity::class.java
-                )
+                    TraditionalPopularRepositoriesActivity::class.java,
+                ),
             )
         }
 

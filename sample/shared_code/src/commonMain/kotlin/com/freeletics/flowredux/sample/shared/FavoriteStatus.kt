@@ -21,5 +21,5 @@ enum class FavoriteStatus {
     /**
      * Marked as favorites
      */
-    FAVORITE
+    FAVORITE,
 }

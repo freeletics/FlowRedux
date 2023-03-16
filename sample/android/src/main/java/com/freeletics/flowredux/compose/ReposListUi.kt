@@ -2,7 +2,15 @@ package com.freeletics.flowredux.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -55,15 +63,14 @@ fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
-
         Text(
             modifier = Modifier
                 .wrapContentHeight()
                 .weight(1f)
                 .fillMaxWidth(),
-            text = repo.name
+            text = repo.name,
         )
         when (repo.favoriteStatus) {
             FavoriteStatus.FAVORITE, FavoriteStatus.NOT_FAVORITE ->
@@ -72,18 +79,19 @@ fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
                         .wrapContentSize()
                         .clickable(enabled = true) { dispatch(ToggleFavoriteAction(repo.id)) },
                     painter = painterResource(
-                        if (repo.favoriteStatus == FavoriteStatus.FAVORITE)
+                        if (repo.favoriteStatus == FavoriteStatus.FAVORITE) {
                             R.drawable.ic_star_yellow_24dp
-                        else
+                        } else {
                             R.drawable.ic_star_black_24dp
+                        },
                     ),
-                    contentDescription = "Stars icon"
+                    contentDescription = "Stars icon",
                 )
 
             FavoriteStatus.OPERATION_IN_PROGRESS -> LoadingUi(
                 Modifier
                     .width(24.dp)
-                    .height(24.dp)
+                    .height(24.dp),
             )
             FavoriteStatus.OPERATION_FAILED -> Image(
                 modifier = Modifier
@@ -92,13 +100,13 @@ fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
                     .wrapContentSize()
                     .clickable(enabled = true) { dispatch(RetryToggleFavoriteAction(repo.id)) },
                 painter = painterResource(R.drawable.ic_warning),
-                contentDescription = "Stars icon error"
+                contentDescription = "Stars icon error",
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             modifier = Modifier.width(50.dp),
-            text = repo.stargazersCount.toString()
+            text = repo.stargazersCount.toString(),
         )
     }
 }
@@ -109,12 +117,12 @@ fun LoadNextPageUi() {
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
         CircularProgressIndicator(
             modifier = Modifier
                 .wrapContentSize()
-                .align(Alignment.Center)
+                .align(Alignment.Center),
         )
     }
 }

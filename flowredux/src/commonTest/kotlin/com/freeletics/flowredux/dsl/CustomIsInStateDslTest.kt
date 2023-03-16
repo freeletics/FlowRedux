@@ -85,7 +85,7 @@ class CustomIsInStateDslTest {
                         signal1.awaitComplete()
                         reached = true
                         fail("This should never be reached")
-                    }
+                    },
                 ) { value, state ->
                     state.override { TestState.GenericState(value.toString(), value) }
                 }

@@ -20,7 +20,6 @@ import com.freeletics.flowredux.sample.shared.RetryLoadingFirstPage
 @Composable
 fun ErrorUi(dispatch: (Action) -> Unit) {
     Box(Modifier.fillMaxSize()) {
-
         Column(
             modifier = Modifier
                 .align(Alignment.Center)
@@ -30,11 +29,11 @@ fun ErrorUi(dispatch: (Action) -> Unit) {
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_warning),
-                contentDescription = "Error"
+                contentDescription = "Error",
             )
             Text(
                 textAlign = TextAlign.Center,
-                text = stringResource(R.string.unexpected_error_retry)
+                text = stringResource(R.string.unexpected_error_retry),
             )
         }
     }

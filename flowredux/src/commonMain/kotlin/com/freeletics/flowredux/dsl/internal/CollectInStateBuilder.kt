@@ -51,16 +51,15 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
 
     private suspend fun setStateFlow(
         value: T,
-        getState: GetState<S>
+        getState: GetState<S>,
     ): Flow<Action<S, A>> = flow {
-
         runOnlyIfInInputState(getState, isInState) { inputState ->
             val changeState = handler(value, State(inputState))
             emit(
                 ChangeStateAction<S, A>(
                     changedState = changeState,
-                    runReduceOnlyIf = { state -> isInState(state) }
-                )
+                    runReduceOnlyIf = { state -> isInState(state) },
+                ),
             )
         }
     }

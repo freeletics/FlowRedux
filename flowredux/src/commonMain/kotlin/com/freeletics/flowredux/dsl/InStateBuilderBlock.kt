@@ -65,7 +65,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
             handler = { action, state ->
                 @Suppress("UNCHECKED_CAST")
                 handler(action as SubAction, state)
-            }
+            },
         )
 
         _inStateSideEffectBuilders.add(builder)
@@ -107,7 +107,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
             handler = { action: SubAction, state: State<InputState> ->
                 handler(action, state.snapshot)
                 NoStateChange
-            }
+            },
         )
     }
 
@@ -124,8 +124,8 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         _inStateSideEffectBuilders.add(
             OnEnterInStateSideEffectBuilder(
                 isInState = _isInState,
-                handler = handler
-            )
+                handler = handler,
+            ),
         )
     }
 
@@ -166,8 +166,8 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
                 isInState = _isInState,
                 flow = flow,
                 executionPolicy = executionPolicy,
-                handler = handler
-            )
+                handler = handler,
+            ),
         )
     }
 
@@ -192,8 +192,8 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
                 isInState = _isInState,
                 flowBuilder = flowBuilder,
                 executionPolicy = executionPolicy,
-                handler = handler
-            )
+                handler = handler,
+            ),
         )
     }
 
@@ -216,7 +216,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
             handler = { value: T, state: State<InputState> ->
                 handler(value, state.snapshot)
                 NoStateChange
-            }
+            },
         )
     }
 
@@ -239,7 +239,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
             handler = { value: T, state: State<InputState> ->
                 handler(value, state.snapshot)
                 NoStateChange
-            }
+            },
         )
     }
 
@@ -248,7 +248,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
-        }
+        },
     ) {
         onEnterStartStateMachine(
             stateMachineFactory = { stateMachine },
@@ -262,7 +262,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
-        }
+        },
     ) {
         onEnterStartStateMachine(
             stateMachineFactory = stateMachineFactory,
@@ -277,7 +277,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
-        }
+        },
     ) {
         onEnterStartStateMachine(
             stateMachineFactory = { stateMachine },
@@ -292,15 +292,15 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
-        }
+        },
     ) {
         _inStateSideEffectBuilders.add(
             StartStatemachineOnEnterSideEffectBuilder(
                 subStateMachineFactory = stateMachineFactory,
                 actionMapper = actionMapper,
                 stateMapper = stateMapper,
-                isInState = _isInState
-            )
+                isInState = _isInState,
+            ),
         )
     }
 
@@ -311,7 +311,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         onActionStartStateMachine(
             stateMachineFactory = { _: SubAction, _: InputState -> stateMachine },
             actionMapper = { it },
-            stateMapper = stateMapper
+            stateMapper = stateMapper,
         )
     }
 
@@ -322,7 +322,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         onActionStartStateMachine(
             stateMachineFactory = stateMachineFactory,
             actionMapper = { it },
-            stateMapper = stateMapper
+            stateMapper = stateMapper,
         )
     }
 
@@ -335,7 +335,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
             actionClass = SubAction::class,
             stateMachineFactory = stateMachineFactory,
             actionMapper = actionMapper,
-            stateMapper = stateMapper
+            stateMapper = stateMapper,
         )
     }
 

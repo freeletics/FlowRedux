@@ -125,7 +125,7 @@ class CollectWhileInStateTest {
                             emit(1 + 10 * state.anInt)
                         }
                     }
-                }) { value, state ->
+                },) { value, state ->
                     state.override {
                         if (value < 10000) {
                             TestState.GenericState(aString = aString + value, anInt = value)
