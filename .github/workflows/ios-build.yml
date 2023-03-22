@@ -61,7 +61,7 @@ jobs:
       - name: Build
         uses: sersoft-gmbh/xcodebuild-action@v2.0.1
         with:
-          workspace: sample/ios/ios.xcworkspace
+          workspace: sample/ios/ios.xcodeproj
           scheme: ios
           action: build
           sdk: iphonesimulator
