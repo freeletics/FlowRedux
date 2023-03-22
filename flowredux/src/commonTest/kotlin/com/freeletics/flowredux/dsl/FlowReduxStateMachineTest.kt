@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.runTest
 class FlowReduxStateMachineTest {
 
     @Test
-    fun `empty state machine just emits initial state`() = runTest {
+    fun emptyStateMachineJustEmitsInitialState() = runTest {
         val sm = StateMachine { }
         sm.state.test {
             assertEquals(TestState.Initial, awaitItem())
@@ -23,7 +23,7 @@ class FlowReduxStateMachineTest {
     }
 
     @Test
-    fun `calling spec block twice throws exception`() {
+    fun callingSpecBlockTwiceThrowsException() {
         val sm = object : FlowReduxStateMachine<Any, Any>(Any()) {
 
             init {
@@ -46,7 +46,7 @@ class FlowReduxStateMachineTest {
     }
 
     @Test
-    fun `no spec block set throws exception`() {
+    fun noSpecBlockSetThrowsException() {
         val sm = object : FlowReduxStateMachine<Any, Any>(Any()) {}
 
         try {
@@ -73,7 +73,7 @@ class FlowReduxStateMachineTest {
     }
 
     @Test
-    fun `dispatching without any state flow collector throws exception`() = runTest {
+    fun dispatchingWithoutAnyStateFlowCollectorThrowsException() = runTest {
         val sm = StateMachine {}
 
         val action = TestAction.A1
@@ -90,7 +90,7 @@ class FlowReduxStateMachineTest {
     }
 
     @Test
-    fun `observing state multiple times in parallel throws exception`() = runTest {
+    fun observingStateMultipleTimesInParallelThrowsException() = runTest {
         val sm = StateMachine {}
 
         var collectionStarted = false
@@ -119,7 +119,7 @@ class FlowReduxStateMachineTest {
     }
 
     @Test
-    fun `observing state multiple times in sequence`() = runTest {
+    fun observingStateMultipleTimesInSequence() = runTest {
         val sm = StateMachine {}
 
         // each call will collect the first item and then stop collecting

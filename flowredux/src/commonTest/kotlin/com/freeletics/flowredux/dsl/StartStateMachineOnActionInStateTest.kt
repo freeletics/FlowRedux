@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.runTest
 class StartStateMachineOnActionInStateTest {
 
     @Test
-    fun `child state machine emits initial state to parent state machine`() = runTest {
+    fun childStateMachineEmitsInitialStateToParentStateMachine() = runTest {
         var childStateChanged = 0
         val child = StateMachine(initialState = TestState.S3)
         val parentStateMachine = StateMachine {
@@ -36,7 +36,7 @@ class StartStateMachineOnActionInStateTest {
     }
 
     @Test
-    fun `child state machine stops after leaving While In State`() = runTest {
+    fun childStateMachineStopsAfterLeavingWhileInState() = runTest {
         var childStateChanged = 0
         val child = StateMachine(initialState = TestState.S3)
         val parentStateMachine = StateMachine {
@@ -62,7 +62,7 @@ class StartStateMachineOnActionInStateTest {
     }
 
     @Test
-    fun `actions are forwarded to the sub state machine and sub state is propagated back ONLY while in state`() = runTest {
+    fun actionsAreForwardedToTheSubStateMachineAndSubStateIsPropagatedBackONLYWhileInState() = runTest {
         var childStateChanged = 0
         var childS3A2Handled = 0
         var childS1A2Handled = 0
@@ -132,7 +132,7 @@ class StartStateMachineOnActionInStateTest {
     }
 
     @Test
-    fun `sub state machine factory is invoked on re-enter and action and state mapper are invoked`() = runTest {
+    fun subStateMachineFactoryIsInvokedOnReEnterAndActionAndStateMapperAreInvoked() = runTest {
         val actionMapperRecordings = mutableListOf<TestAction>()
         val factoryParamsRecordings = mutableListOf<Pair<TestAction, TestState>>()
         val stateMapperRecordings = mutableListOf<Pair<TestState, TestState>>()
@@ -314,7 +314,7 @@ class StartStateMachineOnActionInStateTest {
     }
 
     @Test
-    fun `actions are only dispatched to sub statemachine if they are not mapped to null`() = runTest {
+    fun actionsAreOnlyDispatchedToSubStatemachineIfTheyAreNotMappedToNull() = runTest {
         val childActionInvocations = Channel<Unit>(Channel.UNLIMITED)
         val parentActionInvocations = Channel<Unit>(Channel.UNLIMITED)
 

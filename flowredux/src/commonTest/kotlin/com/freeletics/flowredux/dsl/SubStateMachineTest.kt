@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.runTest
 class SubStateMachineTest {
 
     @Test
-    fun `child state machine emits initial state to parent state machine`() = runTest {
+    fun childStateMachineEmitsInitialStateToParentStateMachine() = runTest {
         val child = ChildStateMachine(initialState = TestState.S3) { }
         val stateMachine = StateMachine {
             inState<TestState.Initial> {
@@ -29,7 +29,7 @@ class SubStateMachineTest {
     }
 
     @Test
-    fun `delegate to child sub state machine while in state`() = runTest {
+    fun delegateToChildSubStateMachineWhileInState() = runTest {
         var inS3onA1Action = 0
         var inS2OnA1Action = 0
         val receivedChildStateUpdates = mutableListOf<TestState>()
@@ -94,7 +94,7 @@ class SubStateMachineTest {
     }
 
     @Test
-    fun `sub state machine does not restart if state parent state is still the same`() = runTest {
+    fun subStateMachineDoesNotRestartIfStateParentStateIsStillTheSame() = runTest {
         val factoryInvocations = Channel<Unit>(Channel.UNLIMITED)
         val childEntersInitialState = Channel<Unit>(Channel.UNLIMITED)
 
@@ -141,7 +141,7 @@ class SubStateMachineTest {
     }
 
     @Test
-    fun `sub state machine factory is called every time parent state is entered`() = runTest {
+    fun subStateMachineFactoryIsCalledEveryTimeParentStateIsEntered() = runTest {
         val factoryInvocations = Channel<Unit>(Channel.UNLIMITED)
         val childEntersInitialState = Channel<Unit>(Channel.UNLIMITED)
 
@@ -202,7 +202,7 @@ class SubStateMachineTest {
     }
 
     @Test
-    fun `actions are only dispatched to sub state machine while parent state machine is in state`() = runTest {
+    fun actionsAreOnlyDispatchedToSubStateMachineWhileParentStateMachineIsInState() = runTest {
         val childActionInvocations = Channel<Unit>(Channel.UNLIMITED)
         val parentActionInvocations = Channel<Unit>(Channel.UNLIMITED)
         val child = ChildStateMachine(initialState = TestState.S1) {
@@ -250,7 +250,7 @@ class SubStateMachineTest {
     }
 
     @Test
-    fun `actions are only dispatched to sub state machine if they are mapped`() = runTest {
+    fun actionsAreOnlyDispatchedToSubStateMachineIfTheyAreMapped() = runTest {
         val childActionInvocations = Channel<Unit>(Channel.UNLIMITED)
         val parentActionInvocations = Channel<Unit>(Channel.UNLIMITED)
         val child = ChildStateMachine(initialState = TestState.S1) {
@@ -311,7 +311,7 @@ class SubStateMachineTest {
     }
 
     @Test
-    fun `reentering state so that sub state machine triggers works with same child instate`() = runTest {
+    fun reenteringStateSoThatSubStateMachineTriggersWorksWithSameChildInstate() = runTest {
         var childOnEnterS2 = 0
         var childActionA2 = 0
         var parentS2 = 0

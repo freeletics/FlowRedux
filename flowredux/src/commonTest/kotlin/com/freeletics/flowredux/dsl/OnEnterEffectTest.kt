@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.runTest
 class OnEnterEffectTest {
 
     @Test
-    fun `onEnter effect block stops when moved to another state`() = runTest {
+    fun onEnterEffectBlockStopsWhenMovedToAnotherState() = runTest {
         val signal = Channel<Unit>()
         val blockEntered = Channel<Boolean>(Channel.UNLIMITED)
 
@@ -48,7 +48,7 @@ class OnEnterEffectTest {
     }
 
     @Test
-    fun `on entering the same state does not trigger onEnterEffect again`() = runTest {
+    fun onEnteringTheSameStateDoesNotTriggerOnEnterEffectAgain() = runTest {
         var genericStateEffectEntered = 0
         var a1Received = 0
 

@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.runTest
 class CollectWhileInStateEffectTest {
 
     @Test
-    fun `collectWhileInStateEffect stops after having moved to next state`() = runTest {
+    fun collectWhileInStateEffectStopsAfterHavingMovedToNextState() = runTest {
         val stateChange = MutableSharedFlow<Unit>()
         val values = MutableSharedFlow<Int>()
         val recordedValues = Channel<Int>(Channel.UNLIMITED)
@@ -46,7 +46,7 @@ class CollectWhileInStateEffectTest {
     }
 
     @Test
-    fun `collectWhileInStateEffect with flowBuilder stops after having moved to next state`() = runTest {
+    fun collectWhileInStateEffectWithFlowBuilderStopsAfterHavingMovedToNextState() = runTest {
         val stateChange = MutableSharedFlow<Unit>()
         val values = MutableSharedFlow<Int>()
         val recordedValues = Channel<Int>(Channel.UNLIMITED)

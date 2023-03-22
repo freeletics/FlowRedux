@@ -16,7 +16,7 @@ import kotlinx.coroutines.test.runTest
 class CollectWhileInStateTest {
 
     @Test
-    fun `collectWhileInState stops after having moved to next state`() = runTest {
+    fun collectWhileInStateStopsAfterHavingMovedToNextState() = runTest {
         val values = MutableSharedFlow<Int>()
         val recordedValues = Channel<Int>(Channel.UNLIMITED)
 
@@ -43,7 +43,7 @@ class CollectWhileInStateTest {
     }
 
     @Test
-    fun `collectWhileInState with flowBuilder stops after having moved to next state`() = runTest {
+    fun collectWhileInStateWithFlowBuilderStopsAfterHavingMovedToNextState() = runTest {
         val values = MutableSharedFlow<Int>()
         val recordedValues = Channel<Int>(Channel.UNLIMITED)
 
@@ -70,7 +70,7 @@ class CollectWhileInStateTest {
     }
 
     @Test
-    fun `move from collectWhileInState to next state with action`() = runTest {
+    fun moveFromCollectWhileInStateToNextStateWithAction() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 collectWhileInState(flowOf(1)) { _, state ->
@@ -110,7 +110,7 @@ class CollectWhileInStateTest {
     }
 
     @Test
-    fun `collectWhileInState flowBuilder receives any GenericState state update`() = runTest {
+    fun collectWhileInStateFlowBuilderReceivesAnyGenericStateStateUpdate() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
