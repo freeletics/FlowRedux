@@ -22,7 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.freeletics.flowredux.R
+import com.freeletics.flowredux.sample.android.R
 import com.freeletics.flowredux.sample.shared.Action
 import com.freeletics.flowredux.sample.shared.FavoriteStatus
 import com.freeletics.flowredux.sample.shared.GithubRepository
@@ -31,10 +31,10 @@ import com.freeletics.flowredux.sample.shared.RetryToggleFavoriteAction
 import com.freeletics.flowredux.sample.shared.ToggleFavoriteAction
 
 @Composable
-fun ReposListUi(repos: List<GithubRepository>, loadMore: Boolean, dispatch: (Action) -> Unit) {
+fun ReposListUi(modifier: Modifier, repos: List<GithubRepository>, loadMore: Boolean, dispatch: (Action) -> Unit) {
     val listState = rememberLazyListState()
 
-    LazyColumn(state = listState, modifier = Modifier.wrapContentSize()) {
+    LazyColumn(state = listState, modifier = modifier) {
         itemsIndexed(repos) { index, repo ->
             GithubRepoUi(repo, dispatch)
             if (index == repos.size - 1) { // user scrolls until the end of the list.

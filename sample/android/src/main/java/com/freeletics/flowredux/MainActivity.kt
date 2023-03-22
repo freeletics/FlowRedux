@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.ComponentActivity
 import com.freeletics.flowredux.compose.ComposeActivity
+import com.freeletics.flowredux.sample.android.R
 import com.freeletics.flowredux.traditional.TraditionalPopularRepositoriesActivity
 
 class MainActivity : ComponentActivity() {

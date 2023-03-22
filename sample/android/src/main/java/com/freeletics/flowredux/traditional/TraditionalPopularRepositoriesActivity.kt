@@ -5,7 +5,7 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.RecyclerView
-import com.freeletics.flowredux.R
+import com.freeletics.flowredux.sample.android.R
 import com.freeletics.flowredux.sample.shared.LoadFirstPagePaginationState
 import com.freeletics.flowredux.sample.shared.LoadNextPage
 import com.freeletics.flowredux.sample.shared.LoadingFirstPageError
@@ -47,7 +47,7 @@ class TraditionalPopularRepositoriesActivity : ComponentActivity() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
 
-                val endReached = !recyclerView!!.canScrollVertically(1)
+                val endReached = !recyclerView.canScrollVertically(1)
                 Timber.d("Scroll changed: $endReached")
                 if (endReached) {
                     viewModel.dispatch(LoadNextPage)

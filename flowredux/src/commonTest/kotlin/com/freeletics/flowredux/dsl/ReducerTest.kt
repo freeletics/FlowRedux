@@ -5,7 +5,7 @@ import com.freeletics.flowredux.dsl.internal.reducer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ReducerTest {
+internal class ReducerTest {
 
     private sealed class TestState {
         object A : TestState()

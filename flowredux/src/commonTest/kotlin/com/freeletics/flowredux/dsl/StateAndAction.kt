@@ -1,13 +1,13 @@
 package com.freeletics.flowredux.dsl
 
-sealed class TestAction {
+internal sealed class TestAction {
     object A1 : TestAction()
     object A2 : TestAction()
     object A3 : TestAction()
     data class A4(val i: Int) : TestAction()
 }
 
-sealed class TestState {
+internal sealed class TestState {
     object Initial : TestState()
     object S1 : TestState()
     object S2 : TestState()

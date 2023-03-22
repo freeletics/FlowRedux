@@ -11,7 +11,7 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SubStateMachineTest {
+internal class SubStateMachineTest {
 
     @Test
     fun childStateMachineEmitsInitialStateToParentStateMachine() = runTest {

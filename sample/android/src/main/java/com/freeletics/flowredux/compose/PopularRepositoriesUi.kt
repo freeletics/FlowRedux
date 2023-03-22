@@ -1,12 +1,15 @@
 package com.freeletics.flowredux.compose
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.freeletics.flowredux.R
+import com.freeletics.flowredux.sample.android.R
 import com.freeletics.flowredux.sample.shared.Action
 import com.freeletics.flowredux.sample.shared.LoadFirstPagePaginationState
 import com.freeletics.flowredux.sample.shared.LoadingFirstPageError
@@ -23,13 +26,29 @@ fun PopularRepositoriesUi(state: PaginationState?, dispatch: (Action) -> Unit) {
             when (state) {
                 null, // null means state machine did not emit yet the first state --> in mean time show Loading
                 is LoadFirstPagePaginationState,
-                -> LoadingUi()
-                is LoadingFirstPageError -> ErrorUi(dispatch)
+                -> LoadingUi(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it),
+                )
+                is LoadingFirstPageError -> ErrorUi(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it),
+                    dispatch = dispatch,
+                )
                 is ShowContentPaginationState -> {
                     val showLoadNextPageUi = state.shouldShowLoadMoreIndicator()
                     val showErrorSnackBar = state.shouldShowErrorSnackbar()
 
-                    ReposListUi(repos = state.items, loadMore = showLoadNextPageUi, dispatch = dispatch)
+                    ReposListUi(
+                        repos = state.items,
+                        loadMore = showLoadNextPageUi,
+                        dispatch = dispatch,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(it),
+                    )
 
                     val errorMessage = stringResource(R.string.unexpected_error)
                     if (showErrorSnackBar) {

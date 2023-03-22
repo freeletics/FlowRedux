@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
-import com.freeletics.flowredux.R
+import com.freeletics.flowredux.sample.android.R
 import com.freeletics.flowredux.sample.shared.Action
 import com.freeletics.flowredux.sample.shared.FavoriteStatus
 import com.freeletics.flowredux.sample.shared.GithubRepository
@@ -80,7 +80,6 @@ private fun githubAdapterDelegate(dispatch: (Action) -> Unit) =
                     starIcon.setImageResource(R.drawable.ic_warning)
                 }
             }
-            starIcon
         }
     }
 

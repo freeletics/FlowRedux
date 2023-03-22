@@ -1,0 +1,16 @@
+plugins {
+    alias(libs.plugins.fgp.android)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.publish)
+}
+
+freeletics {
+    explicitApi()
+    enableCompose()
+}
+
+dependencies {
+    api(projects.flowredux)
+    api(libs.androidx.compose.runtime)
+    implementation(libs.coroutines.core)
+}

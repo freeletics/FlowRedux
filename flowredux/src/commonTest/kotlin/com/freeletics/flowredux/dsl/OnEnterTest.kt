@@ -12,7 +12,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class OnEnterTest {
+internal class OnEnterTest {
 
     @Test
     fun onEnterBlockStopsWhenMovedToAnotherState() = runTest {

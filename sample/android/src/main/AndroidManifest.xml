@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".SampleApplication"
-        android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
+        android:name="com.freeletics.flowredux.SampleApplication"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:icon="@mipmap/ic_launcher"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".compose.ComposeActivity"
-            android:exported="false" />
-        <activity android:name=".MainActivity" android:exported="true">
+
+        <activity android:name="com.freeletics.flowredux.MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".traditional.TraditionalPopularRepositoriesActivity"
+            android:name="com.freeletics.flowredux.compose.ComposeActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="com.freeletics.flowredux.traditional.TraditionalPopularRepositoriesActivity"
             android:exported="false" />
     </application>
 
