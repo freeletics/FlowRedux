@@ -24,4 +24,6 @@ dependencyResolutionManagement {
     // repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
 }
 
-include ':flowredux', ':sample:android', ':sample:shared_code', ':compose'
+rootProject.name = "flowredux-library"
+
+include ':flowredux', ':compose', ':sample:android', ':sample:shared_code'

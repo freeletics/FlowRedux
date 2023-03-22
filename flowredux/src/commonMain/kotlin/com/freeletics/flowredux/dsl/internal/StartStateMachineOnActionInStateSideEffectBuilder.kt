@@ -9,8 +9,6 @@ import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.dsl.flow.whileInState
 import com.freeletics.mad.statemachine.StateMachine
 import kotlin.reflect.KClass
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
@@ -19,8 +17,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, ActionThatTriggeredStartingStateMachine : A, S : Any, A : Any>(
     private val subStateMachineFactory: (
         action: ActionThatTriggeredStartingStateMachine,
@@ -36,7 +32,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
 
             actions.whileInState(isInState, getState) { inStateAction ->
-                channelFlow<Action<S, A>> {
+                channelFlow {
                     val subStateMachinesMap = SubStateMachinesMap<SubStateMachineState, SubStateMachineAction, ActionThatTriggeredStartingStateMachine>()
 
                     inStateAction
@@ -100,11 +96,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
         }
     }
 
-    @ExperimentalCoroutinesApi
-    @FlowPreview
     internal class SubStateMachinesMap<S : Any, A : Any, ActionThatTriggeredStartingStateMachine : Any> {
-        @ExperimentalCoroutinesApi
-        @FlowPreview
         internal data class StateMachineAndJob<S : Any, A : Any>(
             val stateMachine: StateMachine<S, A>,
             val job: Job,

@@ -4,9 +4,7 @@ import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.dsl.internal.Action
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 
-@FlowPreview
 @ExperimentalCoroutinesApi
 @FlowReduxDsl
 public class FlowReduxStoreBuilder<S : Any, A : Any> {
@@ -33,7 +31,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
         block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
         // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
-        //  or is this actaully a feature :)
+        //  or is this actually a feature :)
         val builder = InStateBuilderBlock<SubState, S, A>(_isInState = { state ->
             subStateClass.isInstance(state)
         },)
@@ -65,7 +63,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
         block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
         // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
-        //  or is this actaully a feature :)
+        //  or is this actually a feature :)
         val builder = InStateBuilderBlock<SubState, S, A>(_isInState = { state ->
             @Suppress("UNCHECKED_CAST")
             subStateClass.isInstance(state) && additionalIsInState(state as SubState)

@@ -8,7 +8,6 @@ import com.freeletics.flowredux.dsl.util.AtomicCounter
 import com.freeletics.flowredux.reduxStore
 import com.freeletics.mad.statemachine.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -17,7 +16,6 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 
-@FlowPreview
 @ExperimentalCoroutinesApi
 public abstract class FlowReduxStateMachine<S : Any, A : Any>(
     private val initialStateSupplier: () -> S,

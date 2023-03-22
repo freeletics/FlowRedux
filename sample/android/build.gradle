@@ -33,6 +33,13 @@ android {
     lintOptions {
        abortOnError false
     }
+
+    packagingOptions {
+        // TODO https://github.com/Kotlin/kotlinx.coroutines/issues/3668
+        resources {
+            excludes += ['META-INF/versions/9/previous-compilation-data.bin']
+        }
+    }
 }
 
 dependencies {

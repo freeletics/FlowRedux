@@ -6,12 +6,11 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.test.runTest
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class SubStateMachineTest {
 
     @Test
@@ -367,7 +366,7 @@ class SubStateMachineTest {
     }
 }
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 private fun ChildStateMachine(
     initialState: TestState = TestState.Initial,
     builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit,

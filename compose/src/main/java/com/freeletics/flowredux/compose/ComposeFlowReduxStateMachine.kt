@@ -7,7 +7,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 
 /**
@@ -23,7 +22,6 @@ import kotlinx.coroutines.launch
  * [FlowReduxStateMachine] is emitted just a bit later (non null value then).
  */
 @ExperimentalCoroutinesApi
-@FlowPreview
 @Composable
 public fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberState(): State<S?> {
     return produceState<S?>(initialValue = null, this) {
@@ -67,7 +65,6 @@ public data class StateAndDispatch<S : Any, A : Any>(
  * [FlowReduxStateMachine] is emitted just a bit later (non null value then).
  */
 @ExperimentalCoroutinesApi
-@FlowPreview
 @Composable
 public fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberStateAndDispatch(): StateAndDispatch<S, A> {
     val stateMachine = this
