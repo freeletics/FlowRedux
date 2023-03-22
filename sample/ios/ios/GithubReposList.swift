@@ -7,7 +7,7 @@
 //
 
 import SwiftUI
-import shared_code
+import shared
 
 struct GithubReposList: View {
     let contentState: ShowContentPaginationState
