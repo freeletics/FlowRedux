@@ -5,50 +5,16 @@ plugins {
 
 freeletics {
     explicitApi()
-}
 
-// TODO replace with addCommonTargets() after adding JS support (blocked by Kotlin 1.8.20)
-kotlin {
-    jvm()
-
-    linuxX64()
-
-    iosArm32()
-    iosArm64()
-    iosX64()
-    iosSimulatorArm64()
-
-    macosArm64()
-    macosX64()
-
-    mingwX64()
-
-    tvosArm64()
-    tvosX64()
-
-    watchosArm32()
-    watchosArm64()
-    watchosX86()
-    watchosX64()
-    watchosSimulatorArm64()
-
-    def nativeMain = sourceSets.create("nativeMain") { sourceSet ->
-        sourceSet.dependsOn(sourceSets.getByName("commonMain"))
-    }
-    def nativeTest = sourceSets.create("nativeTest") { sourceSet ->
-        sourceSet.dependsOn(sourceSets.getByName("commonTest"))
-    }
-    targets.configureEach {
-        if (it.platformType.name == "native") {
-            it.compilations.getByName("main").source(nativeMain)
-            it.compilations.getByName("test").source(nativeTest)
-        }
-    }
+    addCommonTargets()
 }
 
 dependencies {
     commonMainApi(libs.coroutines.core)
     commonMainApi(libs.mad.statemachine)
+    // TODO remove when updating to coroutines 1.7.0-RC or newer
+    //  https://youtrack.jetbrains.com/issue/KT-57235
+    jsMainImplementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:${libs.versions.kotlin.get()}")
 
     commonTestImplementation(libs.kotlin.test)
     commonTestImplementation(libs.kotlin.test.annotations)

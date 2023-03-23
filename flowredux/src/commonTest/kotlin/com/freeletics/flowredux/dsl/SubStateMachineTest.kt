@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -110,7 +110,9 @@ internal class SubStateMachineTest {
             inState<TestState.GenericState> {
                 onEnterStartStateMachine(
                     stateMachineFactory = {
-                        check(factoryInvocations.trySendBlocking(Unit).isSuccess)
+                        launch {
+                            factoryInvocations.send(Unit)
+                        }
                         child
                     },
                     actionMapper = { it },
@@ -157,7 +159,9 @@ internal class SubStateMachineTest {
             inState<TestState.S1> {
                 onEnterStartStateMachine(
                     stateMachineFactory = {
-                        check(factoryInvocations.trySendBlocking(Unit).isSuccess)
+                        launch {
+                            factoryInvocations.send(Unit)
+                        }
                         child
                     },
                     actionMapper = { it },
