@@ -15,11 +15,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up JDK
+      - name: Install JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
-          java-version: '11'
+          distribution: zulu
+          java-version: 19
 
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1.5.1

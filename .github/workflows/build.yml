@@ -8,12 +8,8 @@ on:
 
 jobs:
   build:
-    name: JDK ${{ matrix.java_version }}
+    name: Build
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        java_version: [11]
 
     steps:
       - name: Checkout
@@ -22,11 +18,11 @@ jobs:
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v1
 
-      - name: Install JDK ${{ matrix.java_version }}
+      - name: Install JDK
         uses: actions/setup-java@v3
         with:
           distribution: zulu
-          java-version: ${{ matrix.java_version }}
+          java-version: 19
 
       - name: Install Android SDK
         run: ./.github/android-sdk.sh
