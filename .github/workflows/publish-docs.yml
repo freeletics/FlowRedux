@@ -56,6 +56,7 @@ jobs:
           cp README.md docs/index.md
           sed -i '/^\[\!\[GitHub release/d' docs/index.md
           sed -i "s/<latest-version>/$(git describe --tags --abbrev=0)/" docs/index.md
+          cp CHANGELOG.md docs/changelog.md
           mkdir -p docs/API/dsl
           cp -R flowredux/build/dokka/html/. docs/API/dsl
           mkdir -p docs/API/compose
