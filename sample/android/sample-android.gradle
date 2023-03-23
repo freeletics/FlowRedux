@@ -1,39 +1,13 @@
 plugins {
-    alias(libs.plugins.android.app)
-    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.fgp.android.app)
+}
+
+freeletics {
+    enableCompose()
+    optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
 }
 
 android {
-    namespace = "com.freeletics.flowredux"
-    compileSdkVersion libs.versions.android.compile.get().toInteger()
-
-    defaultConfig {
-        applicationId "com.freeletics.flowredux"
-        minSdkVersion libs.versions.android.min.get().toInteger()
-        targetSdkVersion libs.versions.android.target.get().toInteger()
-    }
-
-    buildFeatures {
-        compose true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion libs.versions.androidx.compose.compiler.get()
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.toVersion(libs.versions.java.get())
-        targetCompatibility JavaVersion.toVersion(libs.versions.java.get())
-    }
-
-    kotlinOptions {
-        jvmTarget = libs.versions.java.get()
-    }
-
-    lintOptions {
-       abortOnError false
-    }
-
     packagingOptions {
         // TODO https://github.com/Kotlin/kotlinx.coroutines/issues/3668
         resources {
@@ -62,7 +36,7 @@ dependencies {
     implementation libs.material
     implementation libs.timber
 
-    implementation project(':sample:shared_code')
-    implementation project(':flowredux')
-    implementation project(':compose')
+    implementation projects.sample.sharedCode
+    implementation projects.flowredux
+    implementation projects.compose
 }

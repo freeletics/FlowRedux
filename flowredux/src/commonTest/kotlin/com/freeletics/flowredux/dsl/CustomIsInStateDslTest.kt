@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CustomIsInStateDslTest {
+internal class CustomIsInStateDslTest {
 
     @Test
     fun onActionTriggersOnlyWhileInCustomState() = runTest {

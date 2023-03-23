@@ -2,7 +2,8 @@
 kotlin = "1.8.10"
 coroutines = "1.7.0-Beta"
 
-java = "1.8"
+java-target = "1.8"
+java-toolchain = "11"
 
 android-gradle = "7.4.2"
 android-min = "21"
@@ -25,10 +26,11 @@ material = "1.8.0"
 adapterdelegates = "4.3.2"
 timber = "5.0.1"
 
-mad = "0.13.0"
+mad = "0.13.1"
 
 turbine = "0.12.1"
 
+fgp = "0.2.2"
 publish = "0.24.0"
 dokka = "1.8.10"
 ktlint = "11.3.1"
@@ -67,6 +69,14 @@ mad-statemachine = { module = "com.freeletics.mad:state-machine", version.ref = 
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 [plugins]
+fgp-android = { id = "com.freeletics.gradle.common.android", version.ref = "fgp" }
+fgp-android-app = { id = "com.freeletics.gradle.common.android.app", version.ref = "fgp" }
+fgp-jvm = { id = "com.freeletics.gradle.common.jvm", version.ref = "fgp" }
+fgp-multiplatform = { id = "com.freeletics.gradle.common.multiplatform", version.ref = "fgp" }
+fgp-publish = { id = "com.freeletics.gradle.publish.oss", version.ref = "fgp" }
+fgp-root = { id = "com.freeletics.gradle.root", version.ref = "fgp" }
+fgp-settings = { id = "com.freeletics.gradle.settings", version.ref = "fgp" }
+
 android-app = { id = "com.android.application", version.ref = "android-gradle" }
 android-library = { id = "com.android.library", version.ref = "android-gradle" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

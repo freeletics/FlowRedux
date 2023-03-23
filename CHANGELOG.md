@@ -3,16 +3,19 @@ Change Log
 
 ## 1.0.3 **UNRELEASED**
 
-- The sub state machine DSL methods now take `StateMachine` instead of `FlowReduxStateMachine` as parameter. 
+- Updated to Coroutines 1.7.0.
+- Removed the `@FlowPreview` opt in annotation, `@ExperimentalCoroutinesApi` is still required.
+- The sub state machine DSL methods now take `StateMachine` instead of `FlowReduxStateMachine` as parameter.
   This allows using different kinds of state machines together with FlowRedux which might ease migrating
   a state machine to FlowRedux.
 - A few methods which already had reified overloads are now hidden from auto complete (this change is binary
   compatible).
+- Added `tvosSimulatorArm64` and `watchosX64` targets.
 
 
 ## 1.0.2 *(2022-11-15)*
 
-- Support optional values in the `actionMapper` of sub state machines. When the mapper returns null the action won't be forwarded which removes the need to either handle all 
+- Support optional values in the `actionMapper` of sub state machines. When the mapper returns null the action won't be forwarded which removes the need to either handle all
   actions in the sub state machine or introduce a no op action.
 
 
@@ -63,9 +66,9 @@ We now recommend to use lambdas instead of method references in the flow redux D
 **Breaking changes:**
 
 - Removed `dsl` artifact (and gradle module).`FlowReduxStateMachine` and all DSL stuff now lives inside `flowredux` artifact. Change your maven coordintaes
-  from `com.freeletics.flowredux:dsl:0.11.0` to `com.freeletics.flowredux:flowredux:0.12.0`. Package names renamed the same so no breaking change at code level. This is just a 
+  from `com.freeletics.flowredux:dsl:0.11.0` to `com.freeletics.flowredux:flowredux:0.12.0`. Package names renamed the same so no breaking change at code level. This is just a
   breaking change at artifact and packaging level.
-- Removes Logger as we don't need it 
+- Removes Logger as we don't need it
 
 **Fixed:**
 
@@ -134,7 +137,7 @@ A bunch of Bug fixes, please update!
 - Fixed unit tests to run with multithreaded dispatcher
 
 **API changes:**
-- Removed FlatMapPolicy from `onEnter` 
+- Removed FlatMapPolicy from `onEnter`
 - Removed  `collectWhileInAnyState`. Use `inState<RootClassFromStateHierarchy> { collectWhileInState(flow) {... }  } ` instead to get to the same endresult.
 
 
@@ -162,7 +165,7 @@ This release contains breaking changes
 **Breaking change**
 
 Artifact coordinates did change:
-For multiplatform are from now on 
+For multiplatform are from now on
 ```groovy
 implementation 'com.freeletics.flowredux:flowredux:0.4.0'
 implementation 'com.freeletics.flowredux:dsl:0.4.0'
@@ -179,21 +182,21 @@ This is more streamlined now with kotlin multiplatform library packaging best pr
 
 **New**
 - Added `setState (runIf: (State) -> Boolean ) { ... }` where in `runIf` you can specify if this setState block should actually run or not. Per default it will only run if you are still in the state specified in `inState`
-- Added a generic way to define `inState(isInState = (State) -> Boolean) { ... }` in addintion to `isInState<State>`. 
+- Added a generic way to define `inState(isInState = (State) -> Boolean) { ... }` in addintion to `isInState<State>`.
 
 **Breaking changes**
-- Renamed `observeWhileInState` to `collectWhileInState()` #63 
+- Renamed `observeWhileInState` to `collectWhileInState()` #63
 - Renamed `observe()` to `collectInAnyState()`
 - Renamed type alias `StateAccessor` to `GetState`
 
 **Improvement**
-- Don't package test libraries in jvm dsl jar artifact #54 
+- Don't package test libraries in jvm dsl jar artifact #54
 
 
 ## 0.2.1 *(2020-02-02)*
 
 - Multiplatform release for iOS, jvm, watchOS and TvOS. JavaScript not included yet.
-- Renamed `library` artifact to `flowredux` 
+- Renamed `library` artifact to `flowredux`
 - introduces `inState<> { onEnter() }` to DSL
 - Added a sample app for android and iOS (using SwiftUI).
 
@@ -203,5 +206,4 @@ This is more streamlined now with kotlin multiplatform library packaging best pr
 First official release targeting JVM only (Multiplatform coming soon). Contains
 
  - FlowrRedux: the core library (think of it as the low level API)
- - FlowRedux-DSL: A fluend DSL to describe your ReduxStore (think of it as the high level API)l 
- 
+ - FlowRedux-DSL: A fluend DSL to describe your ReduxStore (think of it as the high level API)l

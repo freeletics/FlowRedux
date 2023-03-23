@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class OnActionTest {
+internal class OnActionTest {
 
     @Test
     fun actionBlockStopsWhenMovedToAnotherState() = runTest {

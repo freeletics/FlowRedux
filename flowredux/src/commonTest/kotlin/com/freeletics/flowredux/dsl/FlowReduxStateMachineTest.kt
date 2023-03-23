@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class FlowReduxStateMachineTest {
+internal class FlowReduxStateMachineTest {
 
     @Test
     fun emptyStateMachineJustEmitsInitialState() = runTest {

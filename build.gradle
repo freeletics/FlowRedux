@@ -1,41 +1,14 @@
 plugins {
-    alias(libs.plugins.binarycompatibility)
-    alias(libs.plugins.dependency.analysis)
-
     alias(libs.plugins.kotlin.multiplatform) apply false
-    alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.android.app) apply false
     alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.dependency.analysis) apply false
     alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.dokka) apply false
     alias(libs.plugins.publish) apply false
-}
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
-
-dependencyAnalysis {
-    issues {
-        all {
-            ignoreKtx(true)
-
-            onAny {
-                severity('fail')
-            }
-        }
-    }
-
-    dependencies {
-        bundle("androidx-compose-ui") {
-            primary("androidx.compose.ui:ui")
-            includeGroup("androidx.compose.ui")
-        }
-        bundle("androidx-compose-foundation") {
-            primary("androidx.compose.foundation:foundation")
-            includeGroup("androidx.compose.foundation")
-        }
-    }
+    alias(libs.plugins.fgp.root)
+    alias(libs.plugins.binarycompatibility)
 }
 
 apiValidation {

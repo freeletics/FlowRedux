@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CollectWhileInStateEffectTest {
+internal class CollectWhileInStateEffectTest {
 
     @Test
     fun collectWhileInStateEffectStopsAfterHavingMovedToNextState() = runTest {

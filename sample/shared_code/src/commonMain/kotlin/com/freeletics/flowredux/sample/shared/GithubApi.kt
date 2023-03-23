@@ -45,6 +45,7 @@ class GithubApi {
         }
     }
 
+    @Suppress("unused_parameter")
     suspend fun markAsFavorite(repoId: String, favorite: Boolean) {
         delay(2000) // simulate network effect
         if (shouldFail()) {

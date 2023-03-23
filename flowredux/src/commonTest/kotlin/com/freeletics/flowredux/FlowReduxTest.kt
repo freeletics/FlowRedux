@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class FlowReduxTest {
+internal class FlowReduxTest {
 
     @Test
     fun initialStateIsEmittedEvenWithoutActionsAsInput() = runTest {

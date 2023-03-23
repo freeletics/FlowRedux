@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 
-class SubStateMachinesMapTest {
+internal class SubStateMachinesMapTest {
 
     @Test
     fun addingNewStateMachineWorksAndCancelsPreviousOne() = runTest {
