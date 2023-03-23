@@ -9,6 +9,9 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -25,6 +28,8 @@ class OnActionTest {
                 on<TestAction.A1> { _, state ->
                     blockEntered.send(true)
                     signal.awaitComplete()
+                    // while we wait for S2 to be emitted which cancels the block the cancelattion might happen slightly afterwards
+                    delay(100)
                     // this should never be reached because state transition did happen in the meantime,
                     // therefore this whole block must be canceled
                     reached = true
@@ -44,6 +49,8 @@ class OnActionTest {
             sm.dispatchAsync(TestAction.A2)
             assertEquals(TestState.S2, awaitItem())
             signal.close()
+            advanceUntilIdle()
+            runCurrent()
         }
 
         assertFalse(reached)
