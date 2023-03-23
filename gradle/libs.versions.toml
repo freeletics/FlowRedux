@@ -73,7 +73,7 @@ fgp-android = { id = "com.freeletics.gradle.common.android", version.ref = "fgp"
 fgp-android-app = { id = "com.freeletics.gradle.common.android.app", version.ref = "fgp" }
 fgp-jvm = { id = "com.freeletics.gradle.common.jvm", version.ref = "fgp" }
 fgp-multiplatform = { id = "com.freeletics.gradle.common.multiplatform", version.ref = "fgp" }
-fgp-publish = { id = "com.freeletics.gradle.publish.oss", version.ref = "fgp" }
+fgp-publish = { id = "com.freeletics.gradle.publish.common.oss", version.ref = "fgp" }
 fgp-root = { id = "com.freeletics.gradle.root", version.ref = "fgp" }
 fgp-settings = { id = "com.freeletics.gradle.settings", version.ref = "fgp" }
 
