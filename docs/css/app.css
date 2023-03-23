@@ -27,22 +27,18 @@ body, input {
     font-family: aktiv-grotesk,"Helvetica Neue",helvetica,sans-serif;
     line-height: normal;
     font-weight: bold;
-    color: #353535;
+    color: #283237;
 }
 
-button.dl {
-  font-weight: 300;
-  font-size: 25px;
-  line-height: 40px;
-  padding: 3px 10px;
-  display: inline-block;
-  border-radius: 6px;
-  color: #f0f0f0;
-  margin: 5px 0;
-  width: auto;
+.md-typeset a {
+    color: #3375b8;
 }
 
-.logo {
-  text-align: center;
-  margin-top: 150px;
+:root {
+  --md-primary-fg-color:        #283237;
+  --md-primary-fg-color--light: #283237;
+  --md-primary-fg-color--dark:  #283237;
+
+  --md-primary-accent-color:              #3375b8;
+  --md-primary-accent-color--transparent: #3375b8;
 }
