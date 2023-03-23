@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.runTest
 class OnActionEffectTest {
 
     @Test
-    fun `action effect block stops when moved to another state`() = runTest {
+    fun actionEffectBlockStopsWhenMovedToAnotherState() = runTest {
         val signal = Channel<Unit>()
         val blockEntered = Channel<Boolean>(Channel.UNLIMITED)
 
@@ -49,7 +49,7 @@ class OnActionEffectTest {
     }
 
     @Test
-    fun `on action effect is triggered`() = runTest {
+    fun onActionEffectIsTriggered() = runTest {
         val signal = Channel<Unit>()
         val triggered = Channel<Boolean>(Channel.UNLIMITED)
 

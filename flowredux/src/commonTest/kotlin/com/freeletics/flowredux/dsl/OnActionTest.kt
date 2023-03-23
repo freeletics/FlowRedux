@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.runTest
 class OnActionTest {
 
     @Test
-    fun `action block stops when moved to another state`() = runTest {
+    fun actionBlockStopsWhenMovedToAnotherState() = runTest {
         val signal = Channel<Unit>()
         val blockEntered = Channel<Boolean>()
 
@@ -50,7 +50,7 @@ class OnActionTest {
     }
 
     @Test
-    fun `on action gets triggered and moves to next state`() = runTest {
+    fun onActionGetsTriggeredAndMovesToNextState() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> { _, state ->

@@ -20,7 +20,7 @@ import kotlinx.coroutines.test.runTest
 class FlowReduxTest {
 
     @Test
-    fun `initial state is emitted even without actions as input`() = runTest {
+    fun initialStateIsEmittedEvenWithoutActionsAsInput() = runTest {
         var reducerInvocations = 0
 
         emptyFlow<Int>()
@@ -37,7 +37,7 @@ class FlowReduxTest {
     }
 
     @Test
-    fun `store without side effects just runs reducer`() = runTest {
+    fun storeWithoutSideEffectsJustRunsReducer() = runTest {
         flow {
             emit(1)
             emit(2)
@@ -52,7 +52,7 @@ class FlowReduxTest {
     }
 
     @Test
-    fun `store with empty side effect that emits nothing`() = runTest {
+    fun storeWithEmptySideEffectThatEmitsNothing() = runTest {
         val sideEffect1Actions = mutableListOf<Int>()
 
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
@@ -77,7 +77,7 @@ class FlowReduxTest {
     }
 
     @Test
-    fun `store with 2 side effects and they emit nothing`() = runTest {
+    fun storeWith2SideEffectsAndTheyEmitNothing() = runTest {
         val sideEffect1Actions = mutableListOf<Int>()
         val sideEffect2Actions = mutableListOf<Int>()
 
@@ -104,7 +104,7 @@ class FlowReduxTest {
     }
 
     @Test
-    fun `store with 2 simple side effects`() = runTest {
+    fun storeWith2SimpleSideEffects() = runTest {
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
             actions.flatMapConcat {
                 if (it < 6) {
@@ -147,7 +147,7 @@ class FlowReduxTest {
     }
 
     @Test
-    fun `store with 2 simple side effects synchronous`() = runTest {
+    fun storeWith2SimpleSideEffectsSynchronous() = runTest {
         val sideEffect1: SideEffect<String, Int> = { actions, _ ->
             actions.flatMapConcat {
                 if (it < 6) {
@@ -190,7 +190,7 @@ class FlowReduxTest {
     }
 
     @Test
-    fun `canceling the flow of input actions also cancels all side effects`() = runTest {
+    fun cancelingTheFlowOfInputActionsAlsoCancelsAllSideEffects() = runTest {
         var sideEffect1Started = false
         var sideEffect2Started = false
         var sideEffect1Ended = false

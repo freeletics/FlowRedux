@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.runTest
 class CustomIsInStateDslTest {
 
     @Test
-    fun `on Action triggers only while in custom state`() = runTest {
+    fun onActionTriggersOnlyWhileInCustomState() = runTest {
         var counter1 = 0
         var counter2 = 0
 
@@ -62,7 +62,7 @@ class CustomIsInStateDslTest {
     }
 
     @Test
-    fun `collectWhileInState stops when leaving custom state`() = runTest {
+    fun collectWhileInStateStopsWhenLeavingCustomState() = runTest {
         var reached = false
 
         val gs1 = TestState.GenericState("asd", 1)

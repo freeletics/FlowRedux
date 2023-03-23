@@ -16,7 +16,7 @@ import kotlinx.coroutines.withTimeout
 class SubStateMachinesMapTest {
 
     @Test
-    fun `adding new state machine works and cancels previous one`() = runTest {
+    fun addingNewStateMachineWorksAndCancelsPreviousOne() = runTest {
         val map = StartStateMachineOnActionInStateSideEffectBuilder.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
 
         val actionThatTriggered = TestAction.A4(1)
@@ -51,7 +51,7 @@ class SubStateMachinesMapTest {
     }
 
     @Test
-    fun `adding state machine does not cancel previous if ActionThatTriggered is not equal to original one`() = runTest {
+    fun addingStateMachineDoesNotCancelPreviousIfActionThatTriggeredIsNotEqualToOriginalOne() = runTest {
         val map = StartStateMachineOnActionInStateSideEffectBuilder.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
 
         val a1 = TestAction.A4(1)
@@ -97,7 +97,7 @@ class SubStateMachinesMapTest {
     }
 
     @Test
-    fun `iterating over all state machines work`() = runTest {
+    fun iteratingOverAllStateMachinesWork() = runTest {
         val map = StartStateMachineOnActionInStateSideEffectBuilder.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
         val a1 = TestAction.A4(1)
         val s1 = StateMachine()
