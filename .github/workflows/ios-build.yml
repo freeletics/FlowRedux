@@ -2,12 +2,9 @@ name: iOS Build CI
 
 on:
   push:
-    branches: [ master ]
-    paths-ignore: [ '**.md', '**.MD' ]
+    branches:
+      - 'main'
   pull_request:
-    branches: [ master ]
-    paths-ignore: [ '**.md', '**.MD' ]
-  workflow_dispatch:
 
 jobs:
   build:
@@ -61,16 +58,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-konan-
 
-      - name: Install Cocoapods
-        run: |
-          ./gradlew :sample:shared_code:podGenIOS --parallel
-          cd sample/ios
-          pod install
-
       - name: Build
         uses: sersoft-gmbh/xcodebuild-action@v2.0.1
         with:
-          workspace: sample/ios/ios.xcworkspace
+          project: sample/ios/ios.xcodeproj
           scheme: ios
           action: build
           sdk: iphonesimulator

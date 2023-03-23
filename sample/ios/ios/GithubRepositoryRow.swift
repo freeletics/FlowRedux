@@ -7,7 +7,7 @@
 //
 
 import SwiftUI
-import shared_code
+import shared
 
 struct GithubRepositoryRow: View {
     let repo: GithubRepository

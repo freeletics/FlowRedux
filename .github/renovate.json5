@@ -22,6 +22,18 @@
         "gradle"
       ],
       prBodyNotes: "[Changelog](https://docs.gradle.org/{{{newVersion}}}/release-notes.html)"
+    },
+    {
+      matchPackagePatterns: [
+        "^com.freeletics.gradle"
+      ],
+      groupName: "Freeletics Gradle Plugin"
+    },
+    {
+      matchPackagePatterns: [
+          "^androidx.compose"
+      ],
+      groupName: "Compose"
     }
   ]
 }

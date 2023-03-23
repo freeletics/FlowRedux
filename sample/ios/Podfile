@@ -1,7 +1,0 @@
-use_frameworks!
-
-platform :ios, '12.2'
-
-target 'ios' do
-    pod 'shared_code', :path => '../shared_code'
-end
