@@ -1,27 +1,31 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.kotlin.cocoapods)
-    //alias(libs.plugins.codesync)
 }
 
 version = "1.0.0"
 
+def xcFramework = new org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFrameworkConfig(project, "shared")
 kotlin {
-    jvm()
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
 
-//    cocoapods {
-//        summary = "Some description for a Kotlin/Native module"
-//        homepage = "Link to a Kotlin/Native module homepage"
-//        name = "shared_code"
-//        ios.deploymentTarget = "12.2"
-//        podfile = project.file("../ios/Podfile")
-//        framework {
-//            baseName = "shared_code"
-//        }
-//    }
+    jvm()
+    iosX64() {
+        binaries.framework {
+            baseName = "shared"
+            xcFramework.add(it)
+        }
+    }
+    iosArm64() {
+        binaries.framework {
+            baseName = "shared"
+            xcFramework.add(it)
+        }
+    }
+    iosSimulatorArm64() {
+        binaries.framework {
+            baseName = "shared"
+            xcFramework.add(it)
+        }
+    }
 
     sourceSets {
         all {
@@ -50,8 +54,3 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         jvmTarget = libs.versions.java.get()
     }
 }
-
-//xcodeSync {
-//    projectPath = "../ios/ios.xcodeproj"
-//    target = "iosApp"
-//}

@@ -7,7 +7,7 @@
 //
 
 import SwiftUI
-import shared_code
+import shared
 import os.log
 
 struct ContentView: View {
