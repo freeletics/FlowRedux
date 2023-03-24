@@ -49,7 +49,9 @@ jobs:
         run: pip install mkdocs-material
 
       - name: Build docs
-        run: ./gradlew dokkaHtml
+        # need to set the version name because for the default committed snapshot version
+        # dokkaHtml tasks get skipped
+        run: ./gradlew dokkaHtml -PVERSION_NAME=
 
       - name: Copy docs
         run: |
