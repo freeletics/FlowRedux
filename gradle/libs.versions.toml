@@ -30,7 +30,7 @@ mad = "0.13.2"
 
 turbine = "0.12.1"
 
-fgp = "0.2.2"
+fgp = "0.2.3"
 publish = "0.24.0"
 dokka = "1.8.10"
 ktlint = "11.3.1"
