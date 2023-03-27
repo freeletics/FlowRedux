@@ -22,32 +22,38 @@ struct GithubRepositoryRow: View {
 
             Text("\(repo.stargazersCount)")
             
-            switch repo.favoriteStatus {
-            case .notFavorite:
-                Image(systemName: "star")
-                    .onTapGesture {
-                        dispatchAction(ToggleFavoriteAction(id: repo.id))
-                    }
-        
-            case .favorite:
-                Image(systemName: "star.fill")
-                    .onTapGesture {
-                        dispatchAction(ToggleFavoriteAction(id: repo.id))
-                    }
-                
-            case .operationFailed:
-                Image(systemName: "exclamationmark.circle")
-                    .onTapGesture {
-                        dispatchAction(RetryToggleFavoriteAction(id: repo.id))
-                    }
-                
-                
-            case .operationInProgress:
-                LoadingIndicatorView(style: .verySmall)
+            favoriteStatusView()
+                .frame(width: 16, height: 16)
+        }
+    }
 
-            default:
-                fatalError("Unhandled case: \(repo.favoriteStatus)")
-            }
+    @ViewBuilder
+    private func favoriteStatusView() -> some View {
+        switch repo.favoriteStatus {
+        case .notFavorite:
+            Image(systemName: "star")
+                .onTapGesture {
+                    dispatchAction(ToggleFavoriteAction(id: repo.id))
+                }
+            
+        case .favorite:
+            Image(systemName: "star.fill")
+                .onTapGesture {
+                    dispatchAction(ToggleFavoriteAction(id: repo.id))
+                }
+            
+        case .operationFailed:
+            Image(systemName: "exclamationmark.circle")
+                .onTapGesture {
+                    dispatchAction(RetryToggleFavoriteAction(id: repo.id))
+                }
+            
+            
+        case .operationInProgress:
+            LoadingIndicatorView(style: .verySmall)
+            
+        default:
+            fatalError("Unhandled case: \(repo.favoriteStatus)")
         }
     }
 }
