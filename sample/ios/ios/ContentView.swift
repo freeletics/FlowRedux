@@ -40,16 +40,16 @@ struct ContentView: View {
     }
 
     private func triggerReloadFirstPage() {
-        self.stateMachine.dispatch(action: RetryLoadingFirstPage())
+        stateMachine.dispatch(action: RetryLoadingFirstPage())
     }
     
     
     private func dispatchAction(action : Action){
-        self.stateMachine.dispatch(action: action)
+        stateMachine.dispatch(action: action)
     }
 
     private func startStateMachine() {
-        self.stateMachine.start(stateChangeListener: { (paginationState: PaginationState) -> Void in
+        stateMachine.start(stateChangeListener: { (paginationState: PaginationState) -> Void in
             NSLog("Swift UI \(paginationState) to render")
             self.state = paginationState
         })
