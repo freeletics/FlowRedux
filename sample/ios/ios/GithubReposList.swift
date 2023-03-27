@@ -50,14 +50,26 @@ struct GithubReposList: View {
     }
 }
 
-/*
 struct GithubReposList_Previews: PreviewProvider {
     static var previews: some View {
-        GithubReposList(contentState: [GithubRepository(id: "1", name: "Repop name", stargazersCount: 123)], endOfListReached: { }, showLoadMoreIndicator: true)
-        .previewLayout(.fixed(width: 300, height: 70))
+        VStack {
+            view(forLoadingState: .loading)
+            view(forLoadingState: .error)
+            view(forLoadingState: .idle)
+        }
+    }
+
+    private static func view(forLoadingState loadingState: NextPageLoadingState) -> GithubReposList {
+        GithubReposList(contentState: .init(items: [GithubRepository(id: "1",
+                                                                     name: "repo name",
+                                                                     stargazersCount: 123,
+                                                                     favoriteStatus: .notFavorite)],
+                                            nextPageLoadingState: loadingState,
+                                            currentPage: 1,
+                                            canLoadNextPage: true),
+                        dispatchAction: { _ in })
     }
 }
-*/
 
 extension GithubRepository: Identifiable {
 }
