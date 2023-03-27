@@ -17,14 +17,10 @@ struct GithubRepositoryRow: View {
     var body: some View {
         HStack {
             Text(repo.name)
-                .frame(width: .infinity)
             
             Spacer()
 
             Text("\(repo.stargazersCount)")
-            
-            Spacer()
-
             
             switch repo.favoriteStatus {
             case .notFavorite:
