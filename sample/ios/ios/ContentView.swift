@@ -18,23 +18,25 @@ struct ContentView: View {
     )
 
     var body: some View {
-        
-        return ZStack {
-            if state is LoadFirstPagePaginationState {
-                LoadingIndicatorView()
-            } else if let state = state as? ShowContentPaginationState {
-                GithubReposList(
-                    contentState: state,
-                    dispatchAction: dispatchAction
-                )
-            } else if state is LoadingFirstPageError {
-                // TODO extract standalone widget?
-                Button(action: triggerReloadFirstPage) {
-                    Text("An error has occured.\nClick here to retry.")
-                }
-            }
-        }.onAppear(perform: startStateMachine)
+        contentView()
+            .onAppear(perform: startStateMachine)
 
+    }
+
+    @ViewBuilder
+    private func contentView() -> some View {
+        switch state {
+        case is LoadFirstPagePaginationState:
+            LoadingIndicatorView()
+        case let state as ShowContentPaginationState:
+            GithubReposList(contentState: state, dispatchAction: dispatchAction)
+        case is LoadingFirstPageError:
+            Button(action: triggerReloadFirstPage) {
+                Text("An error has occured.\nClick here to retry.")
+            }
+        default:
+            EmptyView()
+        }
     }
 
     private func triggerReloadFirstPage() {
