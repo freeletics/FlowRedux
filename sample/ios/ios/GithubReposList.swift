@@ -30,14 +30,14 @@ struct GithubReposList: View {
         case .loading:
             HStack(alignment: .center) {
                 LoadingIndicatorView(style: .small)
-            }.frame(maxWidth: .infinity)
+            }
         case .error:
             HStack(alignment: .center) {
                 Text("An error has occurred")
                     .background(Color.black)
                     .foregroundColor(Color.white)
                     .padding(10)
-            }.frame(maxWidth: .infinity)
+            }
         case .idle:
             // Work around to get notified when we have reached the end of the list by showing an invisible rect
             Rectangle()
