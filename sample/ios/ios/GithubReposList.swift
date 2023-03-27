@@ -19,27 +19,33 @@ struct GithubReposList: View {
                 GithubRepositoryRow(repo: repo, dispatchAction: dispatchAction)
             }
 
-            switch contentState.nextPageLoadingState {
-            case .loading:
-                HStack(alignment: .center) {
-                    LoadingIndicatorView(style: .small)
-                }.frame(maxWidth: .infinity)
-            case .error:
-                HStack(alignment: .center) {
-                    Text("An error has occurred")
-                        .background(Color.black)
-                        .foregroundColor(Color.white)
-                        .padding(10)
-                }.frame(maxWidth: .infinity)
-            case .idle:
-                // Work around to get notified when we have reached the end of the list by showing an invisible rect
-                Rectangle()
-                    .size(width: 0, height: 0)
-                    .onAppear(perform: { dispatchAction( LoadNextPage() ) })
-            default:
-                fatalError("Unhandled case: \(contentState.nextPageLoadingState)")
+            nextLoadingPageStatusView()
+                .frame(maxWidth: .infinity)
+        }
+    }
 
-            }
+    @ViewBuilder
+    private func nextLoadingPageStatusView() -> some View {
+        switch contentState.nextPageLoadingState {
+        case .loading:
+            HStack(alignment: .center) {
+                LoadingIndicatorView(style: .small)
+            }.frame(maxWidth: .infinity)
+        case .error:
+            HStack(alignment: .center) {
+                Text("An error has occurred")
+                    .background(Color.black)
+                    .foregroundColor(Color.white)
+                    .padding(10)
+            }.frame(maxWidth: .infinity)
+        case .idle:
+            // Work around to get notified when we have reached the end of the list by showing an invisible rect
+            Rectangle()
+                .size(width: 0, height: 0)
+                .onAppear(perform: { dispatchAction( LoadNextPage() ) })
+        default:
+            fatalError("Unhandled case: \(contentState.nextPageLoadingState)")
+
         }
     }
 }
