@@ -60,11 +60,18 @@ struct GithubRepositoryRow: View {
 
 struct GithubRepositoryRow_Previews: PreviewProvider {
     static var previews: some View {
+        VStack {
+            view(forFavoriteStatus: .favorite)
+            view(forFavoriteStatus: .notFavorite)
+            view(forFavoriteStatus: .operationInProgress)
+            view(forFavoriteStatus: .operationFailed)
+        }
+    }
+
+    private static func view(forFavoriteStatus favoriteStatus: FavoriteStatus) -> GithubRepositoryRow {
         GithubRepositoryRow(
-            repo: GithubRepository(id: "some_id", name: "Github Repo name", stargazersCount: 23, favoriteStatus: FavoriteStatus.notFavorite),
-            dispatchAction: { action in
-                
-            }
+            repo: GithubRepository(id: "some_id", name: "Github Repo name", stargazersCount: 23, favoriteStatus: favoriteStatus),
+            dispatchAction: { _ in }
         )
     }
 }
