@@ -31,9 +31,7 @@ struct ContentView: View {
         case let state as ShowContentPaginationState:
             GithubReposList(contentState: state, dispatchAction: dispatchAction)
         case is LoadingFirstPageError:
-            Button(action: triggerReloadFirstPage) {
-                Text("An error has occured.\nClick here to retry.")
-            }
+            ErrorView(action: triggerReloadFirstPage)
         default:
             EmptyView()
         }

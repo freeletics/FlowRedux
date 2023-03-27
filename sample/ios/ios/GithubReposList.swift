@@ -32,12 +32,7 @@ struct GithubReposList: View {
                 LoadingIndicatorView(style: .small)
             }
         case .error:
-            HStack(alignment: .center) {
-                Text("An error has occurred")
-                    .background(Color.black)
-                    .foregroundColor(Color.white)
-                    .padding(10)
-            }
+            ErrorView { dispatchAction(LoadNextPage()) }
         case .idle:
             // Work around to get notified when we have reached the end of the list by showing an invisible rect
             Rectangle()
