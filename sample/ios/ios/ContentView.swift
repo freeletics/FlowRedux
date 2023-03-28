@@ -33,7 +33,7 @@ struct ContentView: View {
         case is LoadingFirstPageError:
             ErrorView(action: triggerReloadFirstPage)
         default:
-            EmptyView()
+            fatalError("Unknown state: \(state.self)")
         }
     }
 
