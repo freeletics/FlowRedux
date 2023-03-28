@@ -8,17 +8,16 @@
 
 import SwiftUI
 
-enum IndicatorStyle : CGFloat{
+enum IndicatorStyle: CGFloat{
     case big = 100
     case small = 25
     case verySmall = 10
 }
 
-
 struct LoadingIndicatorView: View {
     @State private var spinCircle = false
-    private var style: IndicatorStyle
-    
+    private let style: IndicatorStyle
+
     init(style: IndicatorStyle = .big) {
         self.style = style
     }
@@ -27,13 +26,13 @@ struct LoadingIndicatorView: View {
        ZStack {
            Circle()
                .trim(from: 0.5, to: 1)
-               .stroke(Color.blue, lineWidth:4)
-            .frame(width: self.style.rawValue)
+               .stroke(Color.blue, lineWidth: 4)
+            .frame(width: style.rawValue)
                .rotationEffect(.degrees(spinCircle ? 0 : -360), anchor: .center)
-               .animation(Animation.linear(duration: 1).repeatForever(autoreverses: false))
+               .animation(.linear(duration: 1).repeatForever(autoreverses: false))
        }
        .onAppear {
-           self.spinCircle = true
+           spinCircle = true
        }
    }
 }

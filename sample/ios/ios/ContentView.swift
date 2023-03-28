@@ -18,36 +18,36 @@ struct ContentView: View {
     )
 
     var body: some View {
-        
-        return ZStack {
-            if state is LoadFirstPagePaginationState {
-                LoadingIndicatorView()
-            } else if let state = state as? ShowContentPaginationState {
-                GithubReposList(
-                    contentState: state,
-                    dispatchAction: dispatchAction
-                )
-            } else if state is LoadingFirstPageError {
-                // TODO extract standalone widget?
-                Button(action: triggerReloadFirstPage) {
-                    Text("An error has occured.\nClick here to retry.")
-                }
-            }
-        }.onAppear(perform: startStateMachine)
+        contentView()
+            .onAppear(perform: startStateMachine)
 
     }
 
+    @ViewBuilder
+    private func contentView() -> some View {
+        switch state {
+        case is LoadFirstPagePaginationState:
+            LoadingIndicatorView()
+        case let state as ShowContentPaginationState:
+            GithubReposList(contentState: state, dispatchAction: dispatchAction)
+        case is LoadingFirstPageError:
+            ErrorView(action: triggerReloadFirstPage)
+        default:
+            fatalError("Unknown state: \(state.self)")
+        }
+    }
+
     private func triggerReloadFirstPage() {
-        self.stateMachine.dispatch(action: RetryLoadingFirstPage())
+        stateMachine.dispatch(action: RetryLoadingFirstPage())
     }
     
     
     private func dispatchAction(action : Action){
-        self.stateMachine.dispatch(action: action)
+        stateMachine.dispatch(action: action)
     }
 
     private func startStateMachine() {
-        self.stateMachine.start(stateChangeListener: { (paginationState: PaginationState) -> Void in
+        stateMachine.start(stateChangeListener: { (paginationState: PaginationState) -> Void in
             NSLog("Swift UI \(paginationState) to render")
             self.state = paginationState
         })

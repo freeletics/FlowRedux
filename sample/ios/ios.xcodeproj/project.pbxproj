@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		959B53F229D23132002ECCA3 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 959B53F129D23132002ECCA3 /* ErrorView.swift */; };
 		D10566BB23B2188400647884 /* LoadingIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10566BA23B2188400647884 /* LoadingIndicatorView.swift */; };
 		D13C078C23CCE43800B8BCC7 /* GithubReposList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13C078B23CCE43800B8BCC7 /* GithubReposList.swift */; };
 		D182CE8823CCE5AA00E368A6 /* GithubRepositoryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D182CE8723CCE5AA00E368A6 /* GithubRepositoryRow.swift */; };
@@ -30,6 +31,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		959B53F129D23132002ECCA3 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		D10566BA23B2188400647884 /* LoadingIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingIndicatorView.swift; sourceTree = "<group>"; };
 		D13C078B23CCE43800B8BCC7 /* GithubReposList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubReposList.swift; sourceTree = "<group>"; };
 		D182CE8723CCE5AA00E368A6 /* GithubRepositoryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubRepositoryRow.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 				D10566BA23B2188400647884 /* LoadingIndicatorView.swift */,
 				D13C078B23CCE43800B8BCC7 /* GithubReposList.swift */,
 				D182CE8723CCE5AA00E368A6 /* GithubRepositoryRow.swift */,
+				959B53F129D23132002ECCA3 /* ErrorView.swift */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -251,6 +254,7 @@
 				D182CE8823CCE5AA00E368A6 /* GithubRepositoryRow.swift in Sources */,
 				D13C078C23CCE43800B8BCC7 /* GithubReposList.swift in Sources */,
 				D1D799FF23A53A03009C5D8D /* SceneDelegate.swift in Sources */,
+				959B53F229D23132002ECCA3 /* ErrorView.swift in Sources */,
 				D1D79A0123A53A03009C5D8D /* ContentView.swift in Sources */,
 				D10566BB23B2188400647884 /* LoadingIndicatorView.swift in Sources */,
 			);
