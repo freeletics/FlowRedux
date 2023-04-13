@@ -5,7 +5,7 @@ coroutines = "1.7.0-Beta"
 java-target = "1.8"
 java-toolchain = "19"
 
-android-gradle = "7.4.2"
+android-gradle = "8.0.0"
 android-min = "21"
 android-target = "33"
 android-compile = "33"
