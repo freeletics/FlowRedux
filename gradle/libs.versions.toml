@@ -34,7 +34,7 @@ fgp = "0.3.1"
 publish = "0.25.2"
 dokka = "1.8.10"
 ktlint = "11.3.1"
-binarycompatibility = "0.13.0"
+binarycompatibility = "0.13.1"
 dependency-analysis = "1.19.0"
 
 [libraries]
