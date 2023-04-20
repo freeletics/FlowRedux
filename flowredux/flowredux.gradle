@@ -12,9 +12,6 @@ freeletics {
 dependencies {
     commonMainApi(libs.coroutines.core)
     commonMainApi(libs.mad.statemachine)
-    // TODO remove when updating to coroutines 1.7.0-RC or newer
-    //  https://youtrack.jetbrains.com/issue/KT-57235
-    jsMainImplementation("org.jetbrains.kotlin:kotlinx-atomicfu-runtime:${libs.versions.kotlin.get()}")
 
     commonTestImplementation(libs.kotlin.test)
     commonTestImplementation(libs.kotlin.test.annotations)
