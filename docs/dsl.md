@@ -1250,7 +1250,7 @@ fun `on http success move to ShowContent state`() = runTest{
     val startState = State(Loading) // Create a FlowRedux State object
     val changedState : ChangedState<ListState> = statemachine.loadItemsAndMoveToContentOrError(startState)
 
-    val result : ListState = changedState.reduce(startState) // FlowRedux API: you must call reduce
+    val result : ListState = changedState.reduce(startState.snapshot) // FlowRedux API: you must call reduce
 
     val expected = ShowContent(items)
     assertEquals(expected, result)
