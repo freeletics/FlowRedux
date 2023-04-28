@@ -72,7 +72,9 @@ internal class StartStateMachineOnActionInStateTest {
             inState<TestState.S3> {
                 on<TestAction.A2> { _, state ->
                     childS3A2Handled++
-                    state.override { TestState.S1 } // Doesn't really matter which state, parent ignores it anyway
+                    state.override {
+                        TestState.S1
+                    } // Doesn't really matter which state, parent ignores it anyway
                 }
             }
             inState<TestState.S1> {

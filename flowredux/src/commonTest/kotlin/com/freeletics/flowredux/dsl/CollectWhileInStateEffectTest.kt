@@ -57,7 +57,7 @@ internal class CollectWhileInStateEffectTest {
                     it.flatMapConcat {
                         stateChange
                     }
-                },) { _, state ->
+                }) { _, state ->
                     state.override { TestState.S1 }
                 }
 

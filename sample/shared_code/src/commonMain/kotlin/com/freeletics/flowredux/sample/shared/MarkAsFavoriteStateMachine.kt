@@ -15,11 +15,15 @@ class MarkAsFavoriteStateMachine(
 
     init {
         spec {
-            inState<GithubRepository>(additionalIsInState = { it.favoriteStatus == FavoriteStatus.OPERATION_IN_PROGRESS }) {
+            inState<GithubRepository>(additionalIsInState = {
+                it.favoriteStatus == FavoriteStatus.OPERATION_IN_PROGRESS
+            }) {
                 onEnter { markAsFavorite(it) }
             }
 
-            inState<GithubRepository>(additionalIsInState = { it.favoriteStatus == FavoriteStatus.OPERATION_FAILED }) {
+            inState<GithubRepository>(additionalIsInState = {
+                it.favoriteStatus == FavoriteStatus.OPERATION_FAILED
+            }) {
                 onEnter { resetErrorStateAfter3Seconds(it) }
                 on<RetryToggleFavoriteAction> { action, state -> resetErrorState(action, state) }
             }
@@ -29,7 +33,10 @@ class MarkAsFavoriteStateMachine(
     private suspend fun markAsFavorite(state: State<GithubRepository>): ChangedState<GithubRepository> {
         return try {
             val shouldBeMarkedAsFavorite = favoriteStatusWhenStarting == FavoriteStatus.NOT_FAVORITE
-            githubApi.markAsFavorite(repoId = state.snapshot.id, favorite = shouldBeMarkedAsFavorite)
+            githubApi.markAsFavorite(
+                repoId = state.snapshot.id,
+                favorite = shouldBeMarkedAsFavorite,
+            )
             state.mutate {
                 copy(
                     favoriteStatus = if (shouldBeMarkedAsFavorite) {

@@ -60,13 +60,18 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                             // Launch substatemachine
                                             val job = launch {
                                                 stateMachine.state
-                                                    .onCompletion { subStateMachinesMap.remove(stateMachine) }
+                                                    .onCompletion {
+                                                        subStateMachinesMap.remove(stateMachine)
+                                                    }
                                                     .collect { subStateMachineState ->
                                                         runOnlyIfInInputState(getState, isInState) { parentState ->
                                                             send(
                                                                 ChangeStateAction(
                                                                     runReduceOnlyIf = isInState,
-                                                                    changedState = stateMapper(State(parentState), subStateMachineState),
+                                                                    changedState = stateMapper(
+                                                                        State(parentState),
+                                                                        subStateMachineState,
+                                                                    ),
                                                                 ),
                                                             )
                                                         }
@@ -116,7 +121,10 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                 val existingStateMachinesAndJobs: StateMachineAndJob<S, A>? = stateMachinesAndJobsMap[actionThatStartedStateMachine]
                 existingStateMachinesAndJobs?.job?.cancel()
 
-                stateMachinesAndJobsMap[actionThatStartedStateMachine] = StateMachineAndJob(stateMachine = stateMachine, job = job)
+                stateMachinesAndJobsMap[actionThatStartedStateMachine] = StateMachineAndJob(
+                    stateMachine = stateMachine,
+                    job = job,
+                )
             }
         }
 

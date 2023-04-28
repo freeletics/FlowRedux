@@ -34,7 +34,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
         //  or is this actually a feature :)
         val builder = InStateBuilderBlock<SubState, S, A>(_isInState = { state ->
             subStateClass.isInstance(state)
-        },)
+        })
         block(builder)
         builderBlocks.add(builder)
     }
@@ -67,7 +67,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
         val builder = InStateBuilderBlock<SubState, S, A>(_isInState = { state ->
             @Suppress("UNCHECKED_CAST")
             subStateClass.isInstance(state) && additionalIsInState(state as SubState)
-        },)
+        })
         block(builder)
         builderBlocks.add(builder)
     }

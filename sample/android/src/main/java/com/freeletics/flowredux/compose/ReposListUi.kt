@@ -31,7 +31,12 @@ import com.freeletics.flowredux.sample.shared.RetryToggleFavoriteAction
 import com.freeletics.flowredux.sample.shared.ToggleFavoriteAction
 
 @Composable
-fun ReposListUi(modifier: Modifier, repos: List<GithubRepository>, loadMore: Boolean, dispatch: (Action) -> Unit) {
+fun ReposListUi(
+    modifier: Modifier,
+    repos: List<GithubRepository>,
+    loadMore: Boolean,
+    dispatch: (Action) -> Unit,
+) {
     val listState = rememberLazyListState()
 
     LazyColumn(state = listState, modifier = modifier) {
