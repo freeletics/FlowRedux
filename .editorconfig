@@ -1,14 +1,15 @@
-root = true
-
 [*]
-indent_size = 4
 charset = utf-8
-trim_trailing_whitespace = true
+end_of_line = lf
+indent_size = 4
+indent_style = space
 insert_final_newline = true
+# TODO: set to 120
+max_line_length = off
+tab_width = 4
+ij_continuation_indent_size = 4
 
 [*.{kt,kts}]
-max_line_length = off
-ij_kotlin_imports_layout=*
-
+ktlint_code_style = android
 ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true

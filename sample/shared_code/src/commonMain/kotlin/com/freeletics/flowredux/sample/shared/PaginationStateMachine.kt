@@ -36,11 +36,15 @@ class InternalPaginationStateMachine(
                 }
             }
 
-            inState<ShowContentPaginationState>(additionalIsInState = { it.canLoadNextPage && it.nextPageLoadingState == NextPageLoadingState.LOADING }) {
+            inState<ShowContentPaginationState>(additionalIsInState = {
+                it.canLoadNextPage && it.nextPageLoadingState == NextPageLoadingState.LOADING
+            }) {
                 onEnter { loadNextPage(it) }
             }
 
-            inState<ShowContentPaginationState>(additionalIsInState = { it.nextPageLoadingState == NextPageLoadingState.ERROR }) {
+            inState<ShowContentPaginationState>(additionalIsInState = {
+                it.nextPageLoadingState == NextPageLoadingState.ERROR
+            }) {
                 onEnter { showPaginationErrorFor3SecsThenReset(it) }
             }
 

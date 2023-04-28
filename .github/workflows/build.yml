@@ -30,7 +30,7 @@ jobs:
       - uses: gradle/gradle-build-action@v2
 
       - name: Lint check with Ktlint
-        run: ./gradlew ktlintCheck
+        run: ./kotlinw .kts/ktlint.main.kts
 
       - name: Build with Gradle
         run: ./gradlew build buildHealth --stacktrace
