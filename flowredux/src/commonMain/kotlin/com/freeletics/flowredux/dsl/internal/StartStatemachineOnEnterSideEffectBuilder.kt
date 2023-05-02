@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
@@ -42,6 +43,10 @@ internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : 
                 if (stateOnEntering == null) {
                     emptyFlow() // somehow we left already the state but flow did not cancel yet
                 } else {
+                    // Used to synchronize the dispatching of actions to the sub statemachine
+                    // by first waiting until the sub statemachine is actually collected
+                    val coroutineWaiter = CoroutineWaiter()
+
                     // create sub statemachine via factory.
                     // Cleanup of instantiated sub statemachine reference is happening in .onComplete {...}
                     var subStateMachine: StateMachine<SubStateMachineState, SubStateMachineAction>? =
@@ -54,6 +59,7 @@ internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : 
                                 // dispatch the incoming actions to the statemachine
                                 coroutineScope {
                                     launch {
+                                        coroutineWaiter.waitUntilResumed()
                                         actionMapper(action.action)?.let {
                                             // safety net:
                                             // if sub statemachine is null then flow got canceled but
@@ -75,8 +81,9 @@ internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : 
                                     // Safety net: we have transitioned to another state
                                     emptyFlow()
                                 } else {
-                                    subStateMachine?.state
-                                        ?: emptyFlow() // if null then flow has been canceled
+                                    subStateMachine?.state?.onStart {
+                                        coroutineWaiter.resume() // once we start collecting state we can resume dispatching any waiting actions
+                                    } ?: emptyFlow() // if null then flow has been canceled
                                 }
                             } else {
                                 // Safety net: stop collecting state of sub state machine
