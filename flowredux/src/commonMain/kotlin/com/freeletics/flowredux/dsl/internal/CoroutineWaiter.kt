@@ -25,10 +25,19 @@ import kotlin.jvm.JvmInline
  */
 @JvmInline
 internal value class CoroutineWaiter(private val job: CompletableJob = Job()) {
+    /**
+     * Suspends the current coroutine (that calls this method) until #resume()
+     * is called (by another coroutine).
+     */
     suspend inline fun waitUntilResumed() {
         job.join()
     }
 
+    /**
+     * Resumes any waiting coroutine that has been suspended by calling #waitUntilResumed().
+     *
+     * Calling this method multiple times has no effect. Once resumed, it stays resumed forever.
+     */
     fun resume() {
         job.complete()
     }
