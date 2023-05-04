@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.8.20"
+kotlin = "1.8.21"
 coroutines = "1.7.0-RC"
 
 java-target = "1.8"
