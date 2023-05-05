@@ -45,15 +45,4 @@ internal value class CoroutineWaiter(private val job: CompletableJob = Job()) {
     internal fun isResumed(): Boolean {
         return job.isCompleted
     }
-
-    /**
-     * This function is only meant to be used for unit testing purposes.
-     *
-     * Returns true if this [CoroutineWaiter] is the same as the [other] [CoroutineWaiter]
-     * by comparing the identity of the underlying [Job] instance.
-     *
-     * The reason why this function exists is because inline value classes do not support identity comparison
-     * with === operator nor equals() comparison. It is simply not implemented and supported by the kotlin compiler.
-     */
-    internal fun isTheSame(other: CoroutineWaiter): Boolean = job === other.job
 }
