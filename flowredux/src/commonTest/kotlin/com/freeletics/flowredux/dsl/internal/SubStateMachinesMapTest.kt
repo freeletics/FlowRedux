@@ -132,12 +132,12 @@ internal class SubStateMachinesMapTest {
             when (i) {
                 0 -> {
                     assertSame(s1, sm)
-                    assertEquals(w2, waiter)
+                    assertTrue(w1.isTheSame(waiter))
                 }
 
                 1 -> {
                     assertSame(s2, sm)
-                    assertEquals(w2, waiter)
+                    assertTrue(w2.isTheSame(waiter))
                 }
                 else -> throw Exception("Unexpected loop value $i")
             }
