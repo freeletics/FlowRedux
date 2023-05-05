@@ -22,6 +22,7 @@ internal class SubStateMachinesMapTest {
         val map = StartStateMachineOnActionInStateSideEffectBuilder.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
 
         val actionThatTriggered = TestAction.A4(1)
+        val w1 = CoroutineWaiter()
         val s1 = StateMachine()
         assertEquals(0, s1.stateFlowStarted)
         assertEquals(0, s1.stateFlowCompleted)
@@ -33,16 +34,17 @@ internal class SubStateMachinesMapTest {
         b1.awaitTrue()
         assertEquals(0, map.size())
 
-        map.cancelPreviousAndAddNew(actionThatTriggered, s1, j1)
+        map.cancelPreviousAndAddNew(actionThatTriggered, s1, w1, j1)
         assertEquals(1, map.size())
 
         val s2 = StateMachine()
+        val w2 = CoroutineWaiter()
         val j2 = launch {
             s2.state.collect()
         }
 
         val b2 = AwaitableBoolean { s1.stateFlowCompleted >= 1 }
-        map.cancelPreviousAndAddNew(actionThatTriggered, s2, j2)
+        map.cancelPreviousAndAddNew(actionThatTriggered, s2, w2, j2)
         assertEquals(1, map.size())
         assertTrue(j1.isCancelled)
         assertEquals(1, s1.stateFlowStarted)
@@ -58,6 +60,7 @@ internal class SubStateMachinesMapTest {
 
         val a1 = TestAction.A4(1)
         val s1 = StateMachine()
+        val w1 = CoroutineWaiter()
         assertEquals(0, s1.stateFlowStarted)
         assertEquals(0, s1.stateFlowCompleted)
         val b1 = AwaitableBoolean { s1.stateFlowStarted >= 1 }
@@ -68,10 +71,11 @@ internal class SubStateMachinesMapTest {
         b1.awaitTrue()
         assertEquals(0, map.size())
 
-        map.cancelPreviousAndAddNew(a1, s1, j1)
+        map.cancelPreviousAndAddNew(a1, s1, w1, j1)
         assertEquals(1, map.size())
 
         val s2 = StateMachine()
+        val w2 = CoroutineWaiter()
         val b2 = AwaitableBoolean { s2.stateFlowStarted >= 1 }
 
         val j2 = launch {
@@ -79,7 +83,7 @@ internal class SubStateMachinesMapTest {
         }
 
         val a2 = TestAction.A4(2) // Different action
-        map.cancelPreviousAndAddNew(a2, s2, j2)
+        map.cancelPreviousAndAddNew(a2, s2, w2, j2)
         b2.awaitTrue()
         assertEquals(2, map.size())
 
@@ -102,6 +106,7 @@ internal class SubStateMachinesMapTest {
     fun iteratingOverAllStateMachinesWork() = runTest {
         val map = StartStateMachineOnActionInStateSideEffectBuilder.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
         val a1 = TestAction.A4(1)
+        val w1 = CoroutineWaiter()
         val s1 = StateMachine()
         val j1 = launch {
             s1.state.collect()
@@ -109,23 +114,31 @@ internal class SubStateMachinesMapTest {
 
         assertEquals(0, map.size())
 
-        map.cancelPreviousAndAddNew(a1, s1, j1)
+        map.cancelPreviousAndAddNew(a1, s1, w1, j1)
         assertEquals(1, map.size())
 
         val a2 = TestAction.A4(2) // Different action
+        val w2 = CoroutineWaiter()
         val s2 = StateMachine()
         val j2 = launch {
             s2.state.collect()
         }
 
-        map.cancelPreviousAndAddNew(a2, s2, j2)
+        map.cancelPreviousAndAddNew(a2, s2, w2, j2)
         assertEquals(2, map.size())
 
         var i = 0
-        map.forEachStateMachine { sm ->
+        map.forEachStateMachine { sm, waiter ->
             when (i) {
-                0 -> assertSame(s1, sm)
-                1 -> assertSame(s2, sm)
+                0 -> {
+                    assertSame(s1, sm)
+                    assertTrue(w1.isTheSame(waiter))
+                }
+
+                1 -> {
+                    assertSame(s2, sm)
+                    assertTrue(w2.isTheSame(waiter))
+                }
                 else -> throw Exception("Unexpected loop value $i")
             }
             i++
