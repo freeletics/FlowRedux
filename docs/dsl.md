@@ -872,8 +872,10 @@ class FavoriteStatusStateMachine(
 ) {
     init {
         spec {
-            inState<OperationInProgress>{ state ->
-                toggleFavoriteAndSaveToServer(state)
+            inState<OperationInProgress>{ 
+                onEnter { state ->
+                    toggleFavoriteAndSaveToServer(state)
+                }
             }
 
             inState<OperationFailed>{
