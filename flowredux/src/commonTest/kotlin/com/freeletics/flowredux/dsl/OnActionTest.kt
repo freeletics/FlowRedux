@@ -15,10 +15,14 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
+import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class OnActionTest {
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun actionBlockStopsWhenMovedToAnotherState() = runTest {
         val signal = Channel<Unit>()
@@ -35,10 +39,13 @@ internal class OnActionTest {
                     // Therefore we add a tiny delay and use a "real" dispatcher where delay would wait
                     // for real (in contrast to TestDipsatcher used with runTest {...})
                     // to avoid flakiness.
-                    withContext(Dispatchers.Default){
-                        // 20 ms should be enough to make sure that the cancellation happened in the meantime
-                        // because of state transition to TestState.S2 in on<TestAction.A2>.
-                        delay(20)
+                    withContext(Dispatchers.Default) {
+                        val timeElapsed = measureTime {
+                            // 20 ms should be enough to make sure that the cancellation happened in the meantime
+                            // because of state transition to TestState.S2 in on<TestAction.A2>.
+                            delay(20)
+                        }
+                        assertTrue(timeElapsed.toDouble(DurationUnit.MILLISECONDS) < 20, "Time Elapsed: $timeElapsed but expected to be < 20")
                     }
                     // this should never be reached because state transition did happen in the meantime,
                     // therefore this whole block must be canceled
