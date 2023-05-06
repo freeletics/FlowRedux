@@ -45,7 +45,7 @@ internal class OnActionTest {
                             // because of state transition to TestState.S2 in on<TestAction.A2>.
                             delay(10)
                         }
-                        assertTrue(timeElapsed.toDouble(DurationUnit.MILLISECONDS) < 10, "Time Elapsed: $timeElapsed but expected to be < 20")
+                        assertTrue(timeElapsed.toDouble(DurationUnit.MILLISECONDS) < 10, "Time Elapsed: $timeElapsed but expected to be < 10")
                     }
                     // this should never be reached because state transition did happen in the meantime,
                     // therefore this whole block must be canceled
