@@ -36,6 +36,8 @@ internal class OnActionTest {
                     // for real (in contrast to TestDipsatcher used with runTest {...})
                     // to avoid flakiness.
                     withContext(Dispatchers.Default){
+                        // 20 ms should be enough to make sure that the cancellation happened in the meantime
+                        // because of state transition to TestState.S2 in on<TestAction.A2>.
                         delay(20)
                     }
                     // this should never be reached because state transition did happen in the meantime,
