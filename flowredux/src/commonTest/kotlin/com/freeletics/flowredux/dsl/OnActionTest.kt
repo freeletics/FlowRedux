@@ -24,7 +24,7 @@ internal class OnActionTest {
 
     @OptIn(ExperimentalTime::class)
     @Test
-    fun actionBlockStopsWhenMovedToAnotherState() = runTest {
+    fun actionBlockStopsWhenMovedToAnotherStateWithin10Milliseconds() = runTest {
         val signal = Channel<Unit>()
         val blockEntered = Channel<Boolean>()
 
@@ -41,11 +41,11 @@ internal class OnActionTest {
                     // to avoid flakiness.
                     withContext(Dispatchers.Default) {
                         val timeElapsed = measureTime {
-                            // 20 ms should be enough to make sure that the cancellation happened in the meantime
+                            // 10 ms should be enough to make sure that the cancellation happened in the meantime
                             // because of state transition to TestState.S2 in on<TestAction.A2>.
-                            delay(20)
+                            delay(10)
                         }
-                        assertTrue(timeElapsed.toDouble(DurationUnit.MILLISECONDS) < 20, "Time Elapsed: $timeElapsed but expected to be < 20")
+                        assertTrue(timeElapsed.toDouble(DurationUnit.MILLISECONDS) < 10, "Time Elapsed: $timeElapsed but expected to be < 20")
                     }
                     // this should never be reached because state transition did happen in the meantime,
                     // therefore this whole block must be canceled
