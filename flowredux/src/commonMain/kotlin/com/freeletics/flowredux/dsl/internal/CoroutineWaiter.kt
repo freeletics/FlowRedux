@@ -29,7 +29,7 @@ internal value class CoroutineWaiter(private val job: CompletableJob = Job()) {
      * Suspends the current coroutine (that calls this method) until #resume()
      * is called (by another coroutine).
      */
-    suspend inline fun waitUntilResumed() {
+    internal suspend inline fun waitUntilResumed() {
         job.join()
     }
 
@@ -38,11 +38,22 @@ internal value class CoroutineWaiter(private val job: CompletableJob = Job()) {
      *
      * Calling this method multiple times has no effect. Once resumed, it stays resumed forever.
      */
-    fun resume() {
+    internal fun resume() {
         job.complete()
     }
 
-    fun isResumed(): Boolean {
+    internal fun isResumed(): Boolean {
         return job.isCompleted
     }
+
+    /**
+     * This function is only meant to be used for unit testing purposes.
+     *
+     * Returns true if this [CoroutineWaiter] is the same as the [other] [CoroutineWaiter]
+     * by comparing the identity of the underlying [Job] instance.
+     *
+     * The reason why this function exists is because inline value classes do not support identity comparison
+     * with === operator nor equals() comparison. It is simply not implemented and supported by the kotlin compiler.
+     */
+    internal fun isTheSame(other: CoroutineWaiter): Boolean = job === other.job
 }

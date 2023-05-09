@@ -13,6 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -45,6 +46,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                     // Nothing needs to be done, these Actions are not interesting for
                                     // this operator, so we can just safely ignore them
                                 }
+
                                 is ExternalWrappedAction<*, *> ->
                                     runOnlyIfInInputState(getState, isInState) { currentState ->
                                         // TODO take ExecutionPolicy into account
@@ -58,8 +60,12 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                             )
 
                                             // Launch substatemachine
+                                            val coroutineWaiter = CoroutineWaiter()
                                             val job = launch {
                                                 stateMachine.state
+                                                    .onStart {
+                                                        coroutineWaiter.resume() // Resume waiting coroutines that dispatch Actions
+                                                    }
                                                     .onCompletion {
                                                         subStateMachinesMap.remove(stateMachine)
                                                     }
@@ -81,12 +87,14 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                                 actionThatStartedStateMachine = actionThatStartsStateMachine,
                                                 stateMachine = stateMachine,
                                                 job = job,
+                                                coroutineWaiter = coroutineWaiter,
                                             )
                                         } else {
                                             // a regular action that needs to be forwarded
                                             // to the active sub state machine
-                                            subStateMachinesMap.forEachStateMachine { stateMachine ->
+                                            subStateMachinesMap.forEachStateMachine { stateMachine, coroutineWaiter ->
                                                 launch {
+                                                    coroutineWaiter.waitUntilResumed() // Wait until sub statemachine's state Flow is collected
                                                     actionMapper(action.action as A)?.let {
                                                         stateMachine.dispatch(it)
                                                     }
@@ -103,8 +111,9 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
 
     internal class SubStateMachinesMap<S : Any, A : Any, ActionThatTriggeredStartingStateMachine : Any> {
         internal data class StateMachineAndJob<S : Any, A : Any>(
-            val stateMachine: StateMachine<S, A>,
-            val job: Job,
+            internal val stateMachine: StateMachine<S, A>,
+            internal val job: Job,
+            internal val coroutineWaiter: CoroutineWaiter,
         )
 
         private val mutex = Mutex()
@@ -115,6 +124,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
         suspend fun cancelPreviousAndAddNew(
             actionThatStartedStateMachine: ActionThatTriggeredStartingStateMachine,
             stateMachine: StateMachine<S, A>,
+            coroutineWaiter: CoroutineWaiter,
             job: Job,
         ) {
             mutex.withLock {
@@ -124,16 +134,17 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                 stateMachinesAndJobsMap[actionThatStartedStateMachine] = StateMachineAndJob(
                     stateMachine = stateMachine,
                     job = job,
+                    coroutineWaiter = coroutineWaiter,
                 )
             }
         }
 
         suspend inline fun forEachStateMachine(
-            crossinline block: suspend (StateMachine<S, A>) -> Unit,
+            crossinline block: suspend (StateMachine<S, A>, CoroutineWaiter) -> Unit,
         ) {
             mutex.withLock {
                 stateMachinesAndJobsMap.values.forEach { stateMachineAndJob ->
-                    block(stateMachineAndJob.stateMachine)
+                    block(stateMachineAndJob.stateMachine, stateMachineAndJob.coroutineWaiter)
                 }
             }
         }
