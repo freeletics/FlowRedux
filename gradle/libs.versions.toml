@@ -30,7 +30,7 @@ mad = "0.14.0"
 
 turbine = "0.12.3"
 
-fgp = "0.3.2"
+fgp = "0.3.4"
 publish = "0.25.2"
 dokka = "1.8.10"
 binarycompatibility = "0.13.1"
