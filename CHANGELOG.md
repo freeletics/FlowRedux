@@ -2,12 +2,12 @@ Change Log
 ==========
 
 ## 1.1.1 **UNRELEASED**
-​
+
 -
-​
-​
+
+
 ## 1.1.0 *(2022-05-08)*
-​
+
 - Updated to Kotlin 1.8.21 and Coroutines 1.7.0.
 - Added support for Kotlin/JS
 - Added support for all [tier 1, 2 and 3 Kotlin/Native targets](https://kotlinlang.org/docs/native-target-support.html)
@@ -19,8 +19,8 @@ Change Log
   compatible).
 - Fixed race condition when using sub state machines that could cause a crash when an action is dispatched 
   shortly after the sub state machine starts.
-​
-​
+
+
 ## 1.0.2 *(2022-11-15)*
 
 - Support optional values in the `actionMapper` of sub state machines. When the mapper returns null the action won't be forwarded which removes the need to either handle all
