@@ -1126,6 +1126,7 @@ spec {
 ## Testing
 You may wonder what is the best way to test a `FlowReduxStateMachine`?
 There are two strategies we want to discuss here in this section:
+
 1. functional integration tests: test the whole state machine as a whole.
 2. Unit tests to test only a certain handler such as `onEnter {}`, `on<Action>` and so on.
 
