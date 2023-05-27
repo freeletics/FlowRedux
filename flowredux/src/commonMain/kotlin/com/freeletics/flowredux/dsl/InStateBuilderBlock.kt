@@ -1,14 +1,14 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
-import com.freeletics.flowredux.dsl.internal.Action
-import com.freeletics.flowredux.dsl.internal.CollectInStateBasedOnStateBuilder
-import com.freeletics.flowredux.dsl.internal.CollectInStateBuilder
-import com.freeletics.flowredux.dsl.internal.InStateSideEffectBuilder
-import com.freeletics.flowredux.dsl.internal.OnActionInStateSideEffectBuilder
-import com.freeletics.flowredux.dsl.internal.OnEnterInStateSideEffectBuilder
-import com.freeletics.flowredux.dsl.internal.StartStateMachineOnActionInStateSideEffectBuilder
-import com.freeletics.flowredux.dsl.internal.StartStatemachineOnEnterSideEffectBuilder
+import com.freeletics.flowredux.sideeffects.Action
+import com.freeletics.flowredux.sideeffects.CollectInStateBasedOnStateBuilder
+import com.freeletics.flowredux.sideeffects.CollectInStateBuilder
+import com.freeletics.flowredux.sideeffects.InStateSideEffectBuilder
+import com.freeletics.flowredux.sideeffects.OnActionInStateSideEffectBuilder
+import com.freeletics.flowredux.sideeffects.OnEnterInStateSideEffectBuilder
+import com.freeletics.flowredux.sideeffects.StartStateMachineOnActionInStateSideEffectBuilder
+import com.freeletics.flowredux.sideeffects.StartStatemachineOnEnterSideEffectBuilder
 import com.freeletics.mad.statemachine.StateMachine
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,13 +17,13 @@ import kotlinx.coroutines.flow.Flow
 @ExperimentalCoroutinesApi
 @FlowReduxDsl
 public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
-    private val _isInState: (S) -> Boolean,
+    private val isInState: (S) -> Boolean,
 ) {
 
-    private val _inStateSideEffectBuilders = ArrayList<InStateSideEffectBuilder<InputState, S, A>>()
+    private val inStateSideEffectBuilders = ArrayList<InStateSideEffectBuilder<InputState, S, A>>()
 
     internal fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {
-        return _inStateSideEffectBuilders.map { it.generateSideEffect() }
+        return inStateSideEffectBuilders.map { it.generateSideEffect() }
     }
 
     /**
@@ -42,31 +42,18 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         on(SubAction::class, executionPolicy, handler)
     }
 
-    /**
-     * Triggers every time an action of type [SubAction] is dispatched while the state machine is
-     * in this state.
-     *
-     * An ongoing [handler] is cancelled when leaving this state. [executionPolicy] is used to
-     * determine the behavior when a new [SubAction] is dispatched while the previous [handler]
-     * execution is still ongoing.
-     */
     @PublishedApi
     internal fun <SubAction : A> on(
         actionClass: KClass<SubAction>,
         executionPolicy: ExecutionPolicy,
         handler: suspend (action: SubAction, state: State<InputState>) -> ChangedState<S>,
     ) {
-        val builder = OnActionInStateSideEffectBuilder<InputState, S, A>(
-            executionPolicy = executionPolicy,
+        inStateSideEffectBuilders += OnActionInStateSideEffectBuilder(
+            isInState = isInState,
             subActionClass = actionClass,
-            isInState = _isInState,
-            handler = { action, state ->
-                @Suppress("UNCHECKED_CAST")
-                handler(action as SubAction, state)
-            },
+            executionPolicy = executionPolicy,
+            handler = handler,
         )
-
-        _inStateSideEffectBuilders.add(builder)
     }
 
     /**
@@ -87,12 +74,6 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         onActionEffect(SubAction::class, executionPolicy, handler)
     }
 
-    /**
-     *  An effect is a way to do some work without changing the state.
-     *  A typical use case would be trigger navigation as some sort of side effect or
-     *  triggering analytics.
-     *  This is the "effect counterpart" to handling actions that you would do with [on].
-     */
     @PublishedApi
     internal fun <SubAction : A> onActionEffect(
         actionClass: KClass<SubAction>,
@@ -102,7 +83,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         on(
             actionClass = actionClass,
             executionPolicy = executionPolicy,
-            handler = { action: SubAction, state: State<InputState> ->
+            handler = { action, state ->
                 handler(action, state.snapshot)
                 NoStateChange
             },
@@ -119,11 +100,9 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
     public fun onEnter(
         handler: suspend (state: State<InputState>) -> ChangedState<S>,
     ) {
-        _inStateSideEffectBuilders.add(
-            OnEnterInStateSideEffectBuilder(
-                isInState = _isInState,
-                handler = handler,
-            ),
+        inStateSideEffectBuilders += OnEnterInStateSideEffectBuilder(
+            isInState = isInState,
+            handler = handler,
         )
     }
 
@@ -159,13 +138,11 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
         handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
     ) {
-        _inStateSideEffectBuilders.add(
-            CollectInStateBuilder(
-                isInState = _isInState,
-                flow = flow,
-                executionPolicy = executionPolicy,
-                handler = handler,
-            ),
+        inStateSideEffectBuilders += CollectInStateBuilder(
+            isInState = isInState,
+            flow = flow,
+            executionPolicy = executionPolicy,
+            handler = handler,
         )
     }
 
@@ -185,13 +162,11 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
         handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
     ) {
-        _inStateSideEffectBuilders.add(
-            CollectInStateBasedOnStateBuilder(
-                isInState = _isInState,
-                flowBuilder = flowBuilder,
-                executionPolicy = executionPolicy,
-                handler = handler,
-            ),
+        inStateSideEffectBuilders += CollectInStateBasedOnStateBuilder(
+            isInState = isInState,
+            flowBuilder = flowBuilder,
+            executionPolicy = executionPolicy,
+            handler = handler,
         )
     }
 
@@ -292,13 +267,11 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
             OverrideState(subState as S)
         },
     ) {
-        _inStateSideEffectBuilders.add(
-            StartStatemachineOnEnterSideEffectBuilder(
-                subStateMachineFactory = stateMachineFactory,
-                actionMapper = actionMapper,
-                stateMapper = stateMapper,
-                isInState = _isInState,
-            ),
+        inStateSideEffectBuilders += StartStatemachineOnEnterSideEffectBuilder(
+            isInState = isInState,
+            subStateMachineFactory = stateMachineFactory,
+            actionMapper = actionMapper,
+            stateMapper = stateMapper,
         )
     }
 
@@ -344,14 +317,12 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
         actionMapper: (A) -> SubStateMachineAction?,
         stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
     ) {
-        val builder = StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachineState, SubStateMachineAction, InputState, SubAction, S, A>(
+        inStateSideEffectBuilders += StartStateMachineOnActionInStateSideEffectBuilder(
+            isInState = isInState,
             subStateMachineFactory = stateMachineFactory,
+            subActionClass = actionClass,
             actionMapper = actionMapper,
             stateMapper = stateMapper,
-            isInState = _isInState,
-            subActionClass = actionClass,
         )
-
-        _inStateSideEffectBuilders.add(builder)
     }
 }

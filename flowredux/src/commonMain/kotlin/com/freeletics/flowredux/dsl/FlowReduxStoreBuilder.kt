@@ -1,7 +1,7 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
-import com.freeletics.flowredux.dsl.internal.Action
+import com.freeletics.flowredux.sideeffects.Action
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -10,6 +10,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 public class FlowReduxStoreBuilder<S : Any, A : Any> {
 
     private val builderBlocks: MutableList<InStateBuilderBlock<*, S, A>> = ArrayList()
+
+    internal fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> =
+        builderBlocks.flatMap { builder ->
+            builder.generateSideEffects()
+        }
 
     /**
      * Define what happens if the store is in a certain state.
@@ -21,22 +26,14 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
         inState(SubState::class, block)
     }
 
-    /**
-     * Define what happens if the store is in a certain state.
-     * "In a certain state" condition is true if state is instance of the type specified as generic function parameter.
-     */
     @PublishedApi
     internal fun <SubState : S> inState(
         subStateClass: KClass<SubState>,
         block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
-        // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
-        //  or is this actually a feature :)
-        val builder = InStateBuilderBlock<SubState, S, A>(_isInState = { state ->
-            subStateClass.isInstance(state)
-        })
-        block(builder)
-        builderBlocks.add(builder)
+        builderBlocks += InStateBuilderBlock<SubState, S, A>(
+            isInState = { state -> subStateClass.isInstance(state) },
+        ).apply(block)
     }
 
     /**
@@ -51,25 +48,16 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
         inState(SubState::class, additionalIsInState, block)
     }
 
-    /**
-     * This variation allows you to specify is a mix between inferring the condition of the generic function type
-     * and additionally can specify and ADDITIONAL condition that also must be true in addition to the check that
-     * the type as specified as generic fun parameter is an instance of the current state.
-     */
     @PublishedApi
     internal fun <SubState : S> inState(
         subStateClass: KClass<SubState>,
         additionalIsInState: (SubState) -> Boolean,
         block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
-        // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
-        //  or is this actually a feature :)
-        val builder = InStateBuilderBlock<SubState, S, A>(_isInState = { state ->
-            @Suppress("UNCHECKED_CAST")
-            subStateClass.isInstance(state) && additionalIsInState(state as SubState)
-        })
-        block(builder)
-        builderBlocks.add(builder)
+        @Suppress("UNCHECKED_CAST")
+        builderBlocks += InStateBuilderBlock<SubState, S, A>(
+            isInState = { state -> subStateClass.isInstance(state) && additionalIsInState(state as SubState) },
+        ).apply(block)
     }
 
     /**
@@ -80,14 +68,8 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
         isInState: (S) -> Boolean,
         block: InStateBuilderBlock<S, S, A>.() -> Unit,
     ) {
-        // TODO check for duplicate inState { ... } blocks of the same SubType and throw Exception
-        val builder = InStateBuilderBlock<S, S, A>(_isInState = isInState)
-        block(builder)
-        builderBlocks.add(builder)
+        builderBlocks += InStateBuilderBlock<S, S, A>(
+            isInState = isInState,
+        ).apply(block)
     }
-
-    internal fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> =
-        builderBlocks.flatMap { builder ->
-            builder.generateSideEffects()
-        }
 }
