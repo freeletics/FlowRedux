@@ -1,4 +1,7 @@
+@file:JvmName("ChangedStateKt") // for binary compatibility
 package com.freeletics.flowredux.dsl
+
+import kotlin.jvm.JvmName
 
 /**
  * Allows to create [ChangedState] objects to change the state as a result of DSL
