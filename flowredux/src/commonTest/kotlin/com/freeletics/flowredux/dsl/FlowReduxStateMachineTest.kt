@@ -1,6 +1,9 @@
 package com.freeletics.flowredux.dsl
 
 import app.cash.turbine.test
+import com.freeletics.flowredux.StateMachine
+import com.freeletics.flowredux.TestAction
+import com.freeletics.flowredux.TestState
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

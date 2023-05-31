@@ -1,11 +1,11 @@
 package com.freeletics.flowredux.dsl
 
-import com.freeletics.flowredux.dsl.internal.Action
-import com.freeletics.flowredux.dsl.internal.ExternalWrappedAction
-import com.freeletics.flowredux.dsl.internal.InitialStateAction
-import com.freeletics.flowredux.dsl.internal.reducer
-import com.freeletics.flowredux.dsl.util.AtomicCounter
 import com.freeletics.flowredux.reduxStore
+import com.freeletics.flowredux.sideeffects.Action
+import com.freeletics.flowredux.sideeffects.ExternalWrappedAction
+import com.freeletics.flowredux.sideeffects.InitialStateAction
+import com.freeletics.flowredux.sideeffects.reducer
+import com.freeletics.flowredux.util.AtomicCounter
 import com.freeletics.mad.statemachine.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -21,12 +21,12 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
     private val initialStateSupplier: () -> S,
 ) : StateMachine<S, A> {
 
+    public constructor(initialState: S) : this(initialStateSupplier = { initialState })
+
     private val inputActions = Channel<A>()
     private lateinit var outputState: Flow<S>
 
     private val activeFlowCounter = AtomicCounter(0)
-
-    public constructor(initialState: S) : this(initialStateSupplier = { initialState })
 
     protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
         if (::outputState.isInitialized) {

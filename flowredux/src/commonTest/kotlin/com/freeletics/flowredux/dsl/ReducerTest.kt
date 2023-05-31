@@ -1,7 +1,7 @@
 package com.freeletics.flowredux.dsl
 
-import com.freeletics.flowredux.dsl.internal.ChangeStateAction
-import com.freeletics.flowredux.dsl.internal.reducer
+import com.freeletics.flowredux.sideeffects.ChangeStateAction
+import com.freeletics.flowredux.sideeffects.reducer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
