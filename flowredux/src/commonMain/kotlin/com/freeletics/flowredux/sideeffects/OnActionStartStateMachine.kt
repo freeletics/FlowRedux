@@ -24,7 +24,7 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
     internal val subActionClass: KClass<out A>,
     private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
-) : SideEffect<InputState, S, A>() {
+) : LegacySideEffect<InputState, S, A>() {
 
     @Suppress("UNCHECKED_CAST")
     override fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>> {

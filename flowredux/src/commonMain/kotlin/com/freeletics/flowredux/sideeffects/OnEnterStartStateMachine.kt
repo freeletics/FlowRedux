@@ -23,7 +23,7 @@ internal class OnEnterStartStateMachine<SubStateMachineState : Any, SubStateMach
     private val subStateMachineFactory: (InputState) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
     private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
-) : SideEffect<InputState, S, A>() {
+) : LegacySideEffect<InputState, S, A>() {
 
     override fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>> {
         return dispatchActionsToSubStateMachineAndCollectSubStateMachineState(actions, getState)

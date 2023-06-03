@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 internal class OnEnter<InputState : S, S : Any, A : Any>(
     override val isInState: IsInState<S>,
     private val handler: suspend (state: State<InputState>) -> ChangedState<S>,
-) : SideEffect<InputState, S, A>() {
+) : LegacySideEffect<InputState, S, A>() {
 
     override fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>> {
         return actions

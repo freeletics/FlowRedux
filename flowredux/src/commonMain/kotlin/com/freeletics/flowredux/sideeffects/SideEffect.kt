@@ -4,9 +4,34 @@ import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.NoStateChange
 import com.freeletics.flowredux.dsl.UnsafeMutateState
 import com.freeletics.flowredux.dsl.reduce
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
+
+internal abstract class LegacySideEffect<InputState : S, S, A> : SideEffect<InputState, S, A>() {
+
+    private val actions = Channel<Action<A>>()
+
+    override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
+        return produceState(actions.receiveAsFlow(), getState)
+    }
+
+    abstract fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>>
+
+    override suspend fun sendState(state: S) {
+        actions.send(InitialStateAction())
+    }
+
+    override suspend fun sendAction(action: A) {
+        actions.send(ExternalWrappedAction(action))
+    }
+}
 
 internal abstract class SideEffect<InputState : S, S, A> {
     fun interface IsInState<S> {
@@ -15,7 +40,11 @@ internal abstract class SideEffect<InputState : S, S, A> {
 
     abstract val isInState: IsInState<S>
 
-    abstract fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>>
+    abstract fun produceState(getState: GetState<S>): Flow<ChangedState<S>>
+
+    open suspend fun sendState(state: S) {}
+
+    open suspend fun sendAction(action: A) {}
 
     protected inline fun changeState(
         crossinline getState: GetState<S>,
@@ -63,14 +92,61 @@ internal class SideEffectBuilder<InputState : S, S, A>(
     fun build() = builder()
 }
 
-internal typealias GetState<S> = () -> S
+internal class ManagedSideEffect<InputState : S, S, A>(
+    private val builder: SideEffectBuilder<InputState, S, A>,
+    private val scope: CoroutineScope,
+    private val getState: GetState<S>,
+    private val stateChanges: SendChannel<ChangedState<S>>,
+) {
 
-internal fun <InputState : S, S, A> SideEffect<InputState, S, A>.produceStateGuarded(
-    actions: Flow<Action<A>>,
-    getState: GetState<S>,
-): Flow<ChangedState<S>> {
-    return produceState(actions, getState).map { guardWithIsInState(it, this) }
+    private var current: Current? = null
+
+    suspend fun sendStateChange(state: S) {
+        if (builder.isInState.check(state)) {
+            var current = current
+            if (current == null) {
+                val currentSideEffect = builder.build()
+                val currentJob = scope.launch {
+                    currentSideEffect.produceState(getState).collect {
+                        // the side effect is in state might be more specific than the one in the builder
+                        stateChanges.send(guardWithIsInState(it, currentSideEffect))
+                    }
+                }
+                current = Current(currentJob, currentSideEffect)
+                this.current = current
+            }
+
+            current.sideEffect.sendState(state)
+        }
+    }
+
+    suspend fun cancelIfNeeded(state: S) {
+        val current = current
+        if (current != null) {
+            if (!current.sideEffect.isInState.check(state)) {
+                current.job.cancel(StateChangeCancellationException())
+                current.job.join()
+                this.current = null
+            }
+        }
+    }
+
+    suspend fun sendAction(action: A, state: S) {
+        val current = current
+        if (current != null && current.sideEffect.isInState.check(state)) {
+            current.sideEffect.sendAction(action)
+        }
+    }
+
+    private inner class Current(
+        val job: Job,
+        val sideEffect: SideEffect<InputState, S, A>
+    )
 }
+
+internal class StateChangeCancellationException : CancellationException("StateMachine moved to a different state")
+
+internal typealias GetState<S> = () -> S
 
 private fun <InputState : S, S> guardWithIsInState(changedState: ChangedState<S>, sideEffect: SideEffect<InputState, S, *>): ChangedState<S> {
     if (changedState is NoStateChange) {
