@@ -12,8 +12,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -90,22 +90,10 @@ internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : 
                                 // Safety net: stop collecting state of sub state machine
                                 // This should never be called as the full flow should be canceled.
                                 emptyFlow()
-                            }.mapNotNull { subStateMachineState: SubStateMachineState ->
-                                var changeStateAction: ChangeStateAction<S, A>? = null
-
-                                runOnlyIfInInputState(getState) { inputState ->
-                                    changeStateAction = ChangeStateAction<S, A>(
-                                        runReduceOnlyIf = isInState,
-                                        changedState = stateMapper(
-                                            State(inputState),
-                                            subStateMachineState,
-                                        ),
-                                    )
+                            }.flatMapConcat { subStateMachineState ->
+                                stateChange(getState) { inputState ->
+                                    stateMapper(State(inputState), subStateMachineState)
                                 }
-
-                                changeStateAction
-                                // can be null if not in input state
-                                // but null will be filtered out by .mapNotNull()
                             }
                         }
                         .onCompletion {

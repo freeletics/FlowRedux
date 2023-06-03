@@ -12,7 +12,6 @@ import com.freeletics.flowredux.util.whileInState
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapNotNull
 
 @ExperimentalCoroutinesApi
@@ -39,32 +38,11 @@ internal class OnActionInStateSideEffectBuilder<InputState : S, SubAction : A, S
                     }
                 }
                     .flatMapWithExecutionPolicy(executionPolicy) { action ->
-                        onActionSideEffectFactory(
-                            action = action,
-                            getState = getState,
-                        )
+                        stateChange(getState) { snapshot ->
+                            handler(action, State(snapshot))
+                        }
                     }
             }
         }
     }
-
-    private fun onActionSideEffectFactory(
-        action: SubAction,
-        getState: GetState<S>,
-    ): Flow<Action<S, A>> =
-        flow {
-            runOnlyIfInInputState(getState) { inputState ->
-                val changeState = handler(
-                    action,
-                    State(inputState),
-                )
-
-                emit(
-                    ChangeStateAction<S, A>(
-                        changedState = changeState,
-                        runReduceOnlyIf = { state -> isInState.check(state) },
-                    ),
-                )
-            }
-        }
 }

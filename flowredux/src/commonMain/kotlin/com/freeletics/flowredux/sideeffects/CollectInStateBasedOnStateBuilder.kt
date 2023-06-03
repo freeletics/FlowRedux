@@ -10,7 +10,6 @@ import com.freeletics.flowredux.util.whileInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapNotNull
 
 /**
@@ -31,8 +30,10 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
             actions.whileInState(isInState, getState) { inStateActions ->
                 flowOfCurrentState(inStateActions, getState)
                     .transformWithFlowBuilder()
-                    .flatMapWithExecutionPolicy(executionPolicy) {
-                        setStateFlow(value = it, getState = getState)
+                    .flatMapWithExecutionPolicy(executionPolicy) { item ->
+                        stateChange(getState) { snapshot ->
+                            handler(item, State(snapshot))
+                        }
                     }
             }
         }
@@ -53,20 +54,5 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
 
     private fun Flow<InputState>.transformWithFlowBuilder(): Flow<T> {
         return flowBuilder(this)
-    }
-
-    private suspend fun setStateFlow(
-        value: T,
-        getState: GetState<S>,
-    ): Flow<Action<S, A>> = flow {
-        runOnlyIfInInputState(getState) { inputState ->
-            val changeState = handler(value, State(inputState))
-            emit(
-                ChangeStateAction<S, A>(
-                    changedState = changeState,
-                    runReduceOnlyIf = { state -> isInState.check(state) },
-                ),
-            )
-        }
     }
 }

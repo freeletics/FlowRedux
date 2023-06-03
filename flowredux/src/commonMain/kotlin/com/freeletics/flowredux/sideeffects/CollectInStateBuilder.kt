@@ -37,28 +37,15 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
                 .mapToIsInState(isInState, getState)
                 .flatMapLatest { inState ->
                     if (inState) {
-                        flow.flatMapWithExecutionPolicy(executionPolicy) {
-                            setStateFlow(value = it, getState = getState)
+                        flow.flatMapWithExecutionPolicy(executionPolicy) { item ->
+                            stateChange(getState) { snapshot ->
+                                handler(item, State(snapshot))
+                            }
                         }
                     } else {
                         emptyFlow()
                     }
                 }
-        }
-    }
-
-    private suspend fun setStateFlow(
-        value: T,
-        getState: GetState<S>,
-    ): Flow<Action<S, A>> = flow {
-        runOnlyIfInInputState(getState) { inputState ->
-            val changeState = handler(value, State(inputState))
-            emit(
-                ChangeStateAction<S, A>(
-                    changedState = changeState,
-                    runReduceOnlyIf = { state -> isInState.check(state) },
-                ),
-            )
         }
     }
 }
