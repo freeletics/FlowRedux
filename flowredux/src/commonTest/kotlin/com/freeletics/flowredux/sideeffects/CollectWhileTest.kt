@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@Suppress("deprecation")
 internal class CollectWhileTest {
 
     @Test
@@ -26,6 +27,33 @@ internal class CollectWhileTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 collectWhileInState(values) { v, state ->
+                    recordedValues.send(v)
+                    state.override { TestState.S1 }
+                }
+            }
+        }
+
+        sm.state.test {
+            assertEquals(TestState.Initial, awaitItem())
+            values.emit(1)
+            assertEquals(TestState.S1, awaitItem())
+
+            values.emit(2)
+            values.emit(3)
+            recordedValues.consumeAsFlow().test {
+                assertEquals(1, awaitItem())
+            }
+        }
+    }
+
+    @Test
+    fun collectWhileInStateBasedOnStateStopsAfterHavingMovedToNextState() = runTest {
+        val values = MutableSharedFlow<Int>()
+        val recordedValues = Channel<Int>(Channel.UNLIMITED)
+
+        val sm = StateMachine {
+            inState<TestState.Initial> {
+                collectWhileInStateBasedOnState({ values }) { v, state ->
                     recordedValues.send(v)
                     state.override { TestState.S1 }
                 }
@@ -109,6 +137,71 @@ internal class CollectWhileTest {
 
             sm.dispatchAsync(TestAction.A2)
             assertEquals(TestState.S1, awaitItem())
+        }
+    }
+
+
+    @Test
+    fun moveFromCollectWhileInStateBasedOnStateToNextStateWithAction() = runTest {
+        val sm = StateMachine {
+            inState<TestState.Initial> {
+                collectWhileInStateBasedOnState({ flowOf(1) }) { _, state ->
+                    state.override { TestState.S1 }
+                }
+            }
+
+            inState<TestState.S1> {
+                on<TestAction.A1> { _, state ->
+                    state.override { TestState.S2 }
+                }
+            }
+
+            inState<TestState.S2> {
+                on<TestAction.A2> { _, state ->
+                    state.override { TestState.S1 }
+                }
+            }
+        }
+
+        sm.state.test {
+            assertEquals(TestState.Initial, awaitItem())
+            assertEquals(TestState.S1, awaitItem())
+
+            sm.dispatchAsync(TestAction.A1)
+            assertEquals(TestState.S2, awaitItem())
+
+            sm.dispatchAsync(TestAction.A2)
+            assertEquals(TestState.S1, awaitItem())
+
+            sm.dispatchAsync(TestAction.A1)
+            assertEquals(TestState.S2, awaitItem())
+
+            sm.dispatchAsync(TestAction.A2)
+            assertEquals(TestState.S1, awaitItem())
+        }
+    }
+
+    @Test
+    fun collectWhileInStateBasedOnStateReceivesInitialState() = runTest {
+        val sm = StateMachine {
+            inState<TestState.Initial> {
+                onEnter {
+                    it.override { TestState.GenericState("", 1) }
+                }
+            }
+            inState<TestState.GenericState> {
+                collectWhileInStateBasedOnState({ flowOf(it.anInt * 10) }) { value, state ->
+                    state.override {
+                        TestState.GenericState(aString = aString + value, anInt = value)
+                    }
+                }
+            }
+        }
+
+        sm.state.test {
+            assertEquals(TestState.Initial, awaitItem())
+            assertEquals(TestState.GenericState("", 1), awaitItem())
+            assertEquals(TestState.GenericState("10", 10), awaitItem())
         }
     }
 

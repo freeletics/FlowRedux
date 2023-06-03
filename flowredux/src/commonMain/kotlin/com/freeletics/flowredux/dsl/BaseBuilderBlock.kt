@@ -152,6 +152,31 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
     }
 
     /**
+     * Triggers every time the state machine enters this state. The passed [Flow] created by
+     * [flowBuilder] will be collected and any emission will be passed to [handler].
+     *
+     * The collection as well as any ongoing [handler] is cancelled when leaving this state.
+     *
+     * [executionPolicy] is used to determine the behavior when a new emission from `Flow` arrives
+     * before the previous [handler] invocation completed. By default [ExecutionPolicy.ORDERED]
+     * is applied.
+     */
+    public fun <T> collectWhileInStateBasedOnState(
+        flowBuilder: (InputState) -> Flow<T>,
+        executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
+        handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
+    ) {
+        sideEffectBuilders += SideEffectBuilder(isInState) { initialState ->
+            CollectWhile(
+                isInState = sideEffectIsInState(),
+                flow = flowBuilder(initialState),
+                executionPolicy = executionPolicy,
+                handler = handler,
+            )
+        }
+    }
+
+    /**
      * Triggers every time the state machine enters this state. [flowBuilder] will get a
      * [Flow] that emits the current [InputState] and any change to it. The transformed `Flow` that
      * [flowBuilder] returns will be collected and any emission will be passed to [handler].
@@ -162,6 +187,7 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
      * `Flow` arrives before the previous [handler] invocation completed. By default
      * [ExecutionPolicy.ORDERED] is applied.
      */
+    @Deprecated("Use untilIdentityChanges combined with collectWhileInStateBasedOnState instead")
     public fun <T> collectWhileInState(
         flowBuilder: (state: Flow<InputState>) -> Flow<T>,
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
@@ -208,11 +234,36 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
      * This is the "effect counterpart" of [collectWhileInState] and follows the same logic
      * when it triggers and when it gets canceled.
      */
+    public fun <T> collectWhileInStateBasedOnStateEffect(
+        flowBuilder: (InputState) -> Flow<T>,
+        executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
+        handler: suspend (item: T, state: InputState) -> Unit,
+    ) {
+        collectWhileInStateBasedOnState(
+            flowBuilder = flowBuilder,
+            executionPolicy = executionPolicy,
+            handler = { value: T, state: State<InputState> ->
+                handler(value, state.snapshot)
+                NoStateChange
+            },
+        )
+    }
+
+    /**
+     * An effect is a way to do some work without changing the state.
+     * A typical use case is to trigger navigation as some sort of side effect or
+     * triggering analytics or do logging.
+     *
+     * This is the "effect counterpart" of [collectWhileInState] and follows the same logic
+     * when it triggers and when it gets canceled.
+     */
+    @Deprecated("Use untilIdentityChanges combined with collectWhileInStateBasedOnStateEffect instead")
     public fun <T> collectWhileInStateEffect(
         flowBuilder: (state: Flow<InputState>) -> Flow<T>,
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
         handler: suspend (item: T, state: InputState) -> Unit,
     ) {
+        @Suppress("DEPRECATION")
         collectWhileInState(
             flowBuilder = flowBuilder,
             executionPolicy = executionPolicy,

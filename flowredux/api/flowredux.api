@@ -3,6 +3,10 @@ public abstract class com/freeletics/flowredux/dsl/BaseBuilderBlock {
 	public final fun collectWhileInState (Lkotlinx/coroutines/flow/Flow;Lcom/freeletics/flowredux/dsl/ExecutionPolicy;Lkotlin/jvm/functions/Function3;)V
 	public static synthetic fun collectWhileInState$default (Lcom/freeletics/flowredux/dsl/BaseBuilderBlock;Lkotlin/jvm/functions/Function1;Lcom/freeletics/flowredux/dsl/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
 	public static synthetic fun collectWhileInState$default (Lcom/freeletics/flowredux/dsl/BaseBuilderBlock;Lkotlinx/coroutines/flow/Flow;Lcom/freeletics/flowredux/dsl/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
+	public final fun collectWhileInStateBasedOnState (Lkotlin/jvm/functions/Function1;Lcom/freeletics/flowredux/dsl/ExecutionPolicy;Lkotlin/jvm/functions/Function3;)V
+	public static synthetic fun collectWhileInStateBasedOnState$default (Lcom/freeletics/flowredux/dsl/BaseBuilderBlock;Lkotlin/jvm/functions/Function1;Lcom/freeletics/flowredux/dsl/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
+	public final fun collectWhileInStateBasedOnStateEffect (Lkotlin/jvm/functions/Function1;Lcom/freeletics/flowredux/dsl/ExecutionPolicy;Lkotlin/jvm/functions/Function3;)V
+	public static synthetic fun collectWhileInStateBasedOnStateEffect$default (Lcom/freeletics/flowredux/dsl/BaseBuilderBlock;Lkotlin/jvm/functions/Function1;Lcom/freeletics/flowredux/dsl/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
 	public final fun collectWhileInStateEffect (Lkotlin/jvm/functions/Function1;Lcom/freeletics/flowredux/dsl/ExecutionPolicy;Lkotlin/jvm/functions/Function3;)V
 	public final fun collectWhileInStateEffect (Lkotlinx/coroutines/flow/Flow;Lcom/freeletics/flowredux/dsl/ExecutionPolicy;Lkotlin/jvm/functions/Function3;)V
 	public static synthetic fun collectWhileInStateEffect$default (Lcom/freeletics/flowredux/dsl/BaseBuilderBlock;Lkotlin/jvm/functions/Function1;Lcom/freeletics/flowredux/dsl/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
