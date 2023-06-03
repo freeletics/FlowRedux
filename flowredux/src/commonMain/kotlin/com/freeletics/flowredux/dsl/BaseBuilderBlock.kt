@@ -2,11 +2,12 @@ package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.sideeffects.CollectWhile
 import com.freeletics.flowredux.sideeffects.CollectWhileBasedOnState
-import com.freeletics.flowredux.sideeffects.InStateSideEffectBuilder
 import com.freeletics.flowredux.sideeffects.OnAction
 import com.freeletics.flowredux.sideeffects.OnActionStartStateMachine
 import com.freeletics.flowredux.sideeffects.OnEnter
 import com.freeletics.flowredux.sideeffects.OnEnterStartStateMachine
+import com.freeletics.flowredux.sideeffects.SideEffect
+import com.freeletics.flowredux.sideeffects.SideEffectBuilder
 import com.freeletics.mad.statemachine.StateMachine
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,9 +17,12 @@ import kotlinx.coroutines.flow.Flow
 @FlowReduxDsl
 public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> internal constructor() {
 
-    internal abstract val isInState: (S) -> Boolean
+    internal abstract val isInState: SideEffectBuilder.IsInState<S>
+    internal open fun sideEffectIsInState() = SideEffect.IsInState<S> {
+        isInState.check(it)
+    }
 
-    internal val sideEffectBuilders = ArrayList<InStateSideEffectBuilder<InputState, S, A>>()
+    internal val sideEffectBuilders = ArrayList<SideEffectBuilder<InputState, S, A>>()
 
     /**
      * Triggers every time an action of type [SubAction] is dispatched while the state machine is
@@ -42,12 +46,14 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
         executionPolicy: ExecutionPolicy,
         handler: suspend (action: SubAction, state: State<InputState>) -> ChangedState<S>,
     ) {
-        sideEffectBuilders += OnAction(
-            isInState = isInState,
-            subActionClass = actionClass,
-            executionPolicy = executionPolicy,
-            handler = handler,
-        )
+        sideEffectBuilders += SideEffectBuilder(isInState) {
+            OnAction(
+                isInState = sideEffectIsInState(),
+                subActionClass = actionClass,
+                executionPolicy = executionPolicy,
+                handler = handler,
+            )
+        }
     }
 
     /**
@@ -94,10 +100,12 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
     public fun onEnter(
         handler: suspend (state: State<InputState>) -> ChangedState<S>,
     ) {
-        sideEffectBuilders += OnEnter(
-            isInState = isInState,
-            handler = handler,
-        )
+        sideEffectBuilders += SideEffectBuilder(isInState) {
+            OnEnter(
+                isInState = sideEffectIsInState(),
+                handler = handler,
+            )
+        }
     }
 
     /**
@@ -132,12 +140,14 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
         handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
     ) {
-        sideEffectBuilders += CollectWhile(
-            isInState = isInState,
-            flow = flow,
-            executionPolicy = executionPolicy,
-            handler = handler,
-        )
+        sideEffectBuilders += SideEffectBuilder(isInState) {
+            CollectWhile(
+                isInState = sideEffectIsInState(),
+                flow = flow,
+                executionPolicy = executionPolicy,
+                handler = handler,
+            )
+        }
     }
 
     /**
@@ -156,12 +166,14 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
         handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
     ) {
-        sideEffectBuilders += CollectWhileBasedOnState(
-            isInState = isInState,
-            flowBuilder = flowBuilder,
-            executionPolicy = executionPolicy,
-            handler = handler,
-        )
+        sideEffectBuilders += SideEffectBuilder(isInState) {
+            CollectWhileBasedOnState(
+                isInState = sideEffectIsInState(),
+                flowBuilder = flowBuilder,
+                executionPolicy = executionPolicy,
+                handler = handler,
+            )
+        }
     }
 
     /**
@@ -261,12 +273,14 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
             OverrideState(subState as S)
         },
     ) {
-        sideEffectBuilders += OnEnterStartStateMachine(
-            isInState = isInState,
-            subStateMachineFactory = stateMachineFactory,
-            actionMapper = actionMapper,
-            stateMapper = stateMapper,
-        )
+        sideEffectBuilders += SideEffectBuilder(isInState) {
+            OnEnterStartStateMachine(
+                isInState = sideEffectIsInState(),
+                subStateMachineFactory = stateMachineFactory,
+                actionMapper = actionMapper,
+                stateMapper = stateMapper,
+            )
+        }
     }
 
     public inline fun <reified SubAction : A, SubStateMachineState : Any> onActionStartStateMachine(
@@ -311,12 +325,14 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
         actionMapper: (A) -> SubStateMachineAction?,
         stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
     ) {
-        sideEffectBuilders += OnActionStartStateMachine(
-            isInState = isInState,
-            subStateMachineFactory = stateMachineFactory,
-            subActionClass = actionClass,
-            actionMapper = actionMapper,
-            stateMapper = stateMapper,
-        )
+        sideEffectBuilders += SideEffectBuilder(isInState) {
+            OnActionStartStateMachine(
+                isInState = sideEffectIsInState(),
+                subStateMachineFactory = stateMachineFactory,
+                subActionClass = actionClass,
+                actionMapper = actionMapper,
+                stateMapper = stateMapper,
+            )
+        }
     }
 }

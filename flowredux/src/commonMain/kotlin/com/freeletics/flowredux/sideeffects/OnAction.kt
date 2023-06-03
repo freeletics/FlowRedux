@@ -2,8 +2,6 @@
 
 package com.freeletics.flowredux.sideeffects
 
-import com.freeletics.flowredux.GetState
-import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.ExecutionPolicy
 import com.freeletics.flowredux.dsl.State
@@ -20,29 +18,26 @@ internal class OnAction<InputState : S, SubAction : A, S : Any, A : Any>(
     internal val subActionClass: KClass<SubAction>,
     internal val executionPolicy: ExecutionPolicy,
     internal val handler: suspend (action: SubAction, state: State<InputState>) -> ChangedState<S>,
-) : InStateSideEffectBuilder<InputState, S, A>() {
+) : SideEffect<InputState, S, A>() {
 
-    override fun generateSideEffect(): SideEffect<S, A> {
-        return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
-
-            actions.whileInState(isInState, getState) { inStateAction ->
-                inStateAction.mapNotNull {
-                    when (it) {
-                        is ExternalWrappedAction<*, *> -> if (subActionClass.isInstance(it.action)) {
-                            it.action as SubAction
-                        } else {
-                            null
-                        }
-                        is ChangeStateAction -> null
-                        is InitialStateAction -> null
+    override fun produceState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<ChangeStateAction<S, A>> {
+        return actions.whileInState(isInState, getState) { inStateAction ->
+            inStateAction.mapNotNull {
+                when (it) {
+                    is ExternalWrappedAction<*, *> -> if (subActionClass.isInstance(it.action)) {
+                        it.action as SubAction
+                    } else {
+                        null
+                    }
+                    is ChangeStateAction -> null
+                    is InitialStateAction -> null
+                }
+            }
+                .flatMapWithExecutionPolicy(executionPolicy) { action ->
+                    changeState(getState) { snapshot ->
+                        handler(action, State(snapshot))
                     }
                 }
-                    .flatMapWithExecutionPolicy(executionPolicy) { action ->
-                        changeState(getState) { snapshot ->
-                            handler(action, State(snapshot))
-                        }
-                    }
-            }
         }
     }
 }

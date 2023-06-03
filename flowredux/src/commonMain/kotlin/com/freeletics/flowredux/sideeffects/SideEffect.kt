@@ -1,28 +1,22 @@
 package com.freeletics.flowredux.sideeffects
 
-import com.freeletics.flowredux.GetState
-import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.dsl.ChangedState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-/**
- * It's just not an Interface to not expose internal class `Action` to the public.
- * Thus it's an internal abstract class but you can think of it as an internal interface.
- */
-internal abstract class InStateSideEffectBuilder<InputState : S, S, A> {
+internal abstract class SideEffect<InputState : S, S, A> {
     fun interface IsInState<S> {
         fun check(state: S): Boolean
     }
 
     abstract val isInState: IsInState<S>
 
-    abstract fun generateSideEffect(): SideEffect<S, A>
+    abstract fun produceState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<ChangeStateAction<S, A>>
 
     protected inline fun changeState(
         crossinline getState: GetState<S>,
         crossinline block: suspend (InputState) -> ChangedState<S>,
-    ): Flow<Action<S, A>> {
+    ): Flow<ChangeStateAction<S, A>> {
         return flow {
             runOnlyIfInInputState(getState) {
                 val changedState = block(it)
@@ -53,3 +47,16 @@ internal abstract class InStateSideEffectBuilder<InputState : S, S, A> {
         }
     }
 }
+
+internal class SideEffectBuilder<InputState : S, S, A>(
+    val isInState: IsInState<S>,
+    private val builder: () -> SideEffect<InputState, S, A>,
+) {
+    fun interface IsInState<S> {
+        fun check(state: S): Boolean
+    }
+
+    fun build() = builder()
+}
+
+internal typealias GetState<S> = () -> S
