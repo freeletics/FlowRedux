@@ -7,4 +7,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @FlowReduxDsl
 public class ConditionBuilderBlock<InputState : S, S : Any, A : Any> internal constructor(
     override val isInState: SideEffectBuilder.IsInState<S>,
-) : BaseBuilderBlock<InputState, S, A>()
+) : BaseBuilderBlock<InputState, S, A>() {
+
+    public fun untilIdentityChanges(
+        identity: (InputState) -> Any,
+        block: IdentityBuilderBlock<InputState, S, A>.() -> Unit,
+    ) {
+        sideEffectBuilders += IdentityBuilderBlock<InputState, S, A>(isInState, identity)
+            .apply(block)
+            .sideEffectBuilders
+    }
+}

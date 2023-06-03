@@ -30,6 +30,7 @@ public final class com/freeletics/flowredux/dsl/ChangedStateKt {
 }
 
 public final class com/freeletics/flowredux/dsl/ConditionBuilderBlock : com/freeletics/flowredux/dsl/BaseBuilderBlock {
+	public final fun untilIdentityChanges (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 }
 
 public final class com/freeletics/flowredux/dsl/ExecutionPolicy : java/lang/Enum {
@@ -57,8 +58,12 @@ public final class com/freeletics/flowredux/dsl/FlowReduxStoreBuilder {
 	public final fun inStateWithCondition (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 }
 
+public final class com/freeletics/flowredux/dsl/IdentityBuilderBlock : com/freeletics/flowredux/dsl/BaseBuilderBlock {
+}
+
 public final class com/freeletics/flowredux/dsl/InStateBuilderBlock : com/freeletics/flowredux/dsl/BaseBuilderBlock {
 	public final fun condition (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
+	public final fun untilIdentityChanges (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 }
 
 public final class com/freeletics/flowredux/dsl/State {

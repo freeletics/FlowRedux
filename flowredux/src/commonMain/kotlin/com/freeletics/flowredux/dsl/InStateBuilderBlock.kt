@@ -18,4 +18,13 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any> internal cons
             isInState.check(it) && condition(it as InputState)
         }.apply(block).sideEffectBuilders
     }
+
+    public fun untilIdentityChanges(
+        identity: (InputState) -> Any,
+        block: IdentityBuilderBlock<InputState, S, A>.() -> Unit,
+    ) {
+        sideEffectBuilders += IdentityBuilderBlock<InputState, S, A>(isInState, identity)
+            .apply(block)
+            .sideEffectBuilders
+    }
 }
