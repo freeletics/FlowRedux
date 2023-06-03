@@ -4,11 +4,10 @@ import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.ExecutionPolicy
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.util.flatMapWithExecutionPolicy
-import com.freeletics.flowredux.util.whileInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.receiveAsFlow
 
 @ExperimentalCoroutinesApi
 internal class CollectWhileBasedOnState<T, InputState : S, S : Any, A : Any>(
@@ -16,31 +15,23 @@ internal class CollectWhileBasedOnState<T, InputState : S, S : Any, A : Any>(
     private val flowBuilder: (Flow<InputState>) -> Flow<T>,
     private val executionPolicy: ExecutionPolicy,
     private val handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
-) : LegacySideEffect<InputState, S, A>() {
+) : SideEffect<InputState, S, A>() {
 
-    override fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>> {
-        return actions.whileInState(isInState, getState) { inStateActions ->
-            flowOfCurrentState(inStateActions, getState)
-                .transformWithFlowBuilder()
-                .flatMapWithExecutionPolicy(executionPolicy) { item ->
-                    changeState(getState) { snapshot ->
-                        handler(item, State(snapshot))
-                    }
+    private val states = Channel<InputState>()
+
+    override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
+        return states.receiveAsFlow()
+            .transformWithFlowBuilder()
+            .flatMapWithExecutionPolicy(executionPolicy) { item ->
+                changeState(getState) { inputState ->
+                    handler(item, State(inputState))
                 }
-        }
+            }
     }
 
     @Suppress("unchecked_cast")
-    private fun flowOfCurrentState(
-        actions: Flow<Action<A>>,
-        getState: GetState<S>,
-    ): Flow<InputState> {
-        // after every state change there is a guaranteed action emission so we use this
-        // to get the current state
-        return actions.mapNotNull { getState() as? InputState }
-            // an action emission does not guarantee that the state changed so we need to filter
-            // out multiple emissions of identical state objects
-            .distinctUntilChanged()
+    override suspend fun sendState(state: S) {
+        states.send(state as InputState)
     }
 
     private fun Flow<InputState>.transformWithFlowBuilder(): Flow<T> {
