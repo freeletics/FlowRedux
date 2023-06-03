@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class SubStateMachineTest {
+internal class OnEnterStateMachineTest {
 
     @Test
     fun childStateMachineEmitsInitialStateToParentStateMachine() = runTest {
