@@ -1,7 +1,6 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
-import com.freeletics.flowredux.sideeffects.Action
 import com.freeletics.flowredux.sideeffects.CollectInStateBasedOnStateBuilder
 import com.freeletics.flowredux.sideeffects.CollectInStateBuilder
 import com.freeletics.flowredux.sideeffects.InStateSideEffectBuilder
@@ -22,7 +21,7 @@ public class InStateBuilderBlock<InputState : S, S : Any, A : Any>(
 
     private val inStateSideEffectBuilders = ArrayList<InStateSideEffectBuilder<InputState, S, A>>()
 
-    internal fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> {
+    internal fun generateSideEffects(): List<SideEffect<S, A>> {
         return inStateSideEffectBuilders.map { it.generateSideEffect() }
     }
 

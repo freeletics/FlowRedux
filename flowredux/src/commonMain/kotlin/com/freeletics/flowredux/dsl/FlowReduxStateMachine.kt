@@ -1,17 +1,11 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.reduxStore
-import com.freeletics.flowredux.sideeffects.Action
-import com.freeletics.flowredux.sideeffects.ExternalWrappedAction
-import com.freeletics.flowredux.sideeffects.InitialStateAction
-import com.freeletics.flowredux.sideeffects.reducer
 import com.freeletics.flowredux.util.AtomicCounter
 import com.freeletics.mad.statemachine.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -40,12 +34,7 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
 
         outputState = inputActions
             .receiveAsFlow()
-            .map<A, Action<S, A>> { ExternalWrappedAction(it) }
-            .onStart {
-                emit(InitialStateAction())
-            }
-            .reduxStore(initialStateSupplier, sideEffects, ::reducer)
-            .distinctUntilChanged { old, new -> old === new } // distinct until not the same object reference.
+            .reduxStore(initialStateSupplier, sideEffects)
             .onStart {
                 if (activeFlowCounter.incrementAndGet() > 1) {
                     throw IllegalStateException(

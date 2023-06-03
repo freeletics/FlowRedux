@@ -1,4 +1,5 @@
 @file:JvmName("ChangedStateKt") // for binary compatibility
+
 package com.freeletics.flowredux.dsl
 
 import kotlin.jvm.JvmName

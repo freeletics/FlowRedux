@@ -31,7 +31,7 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
     private val handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
-    override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
+    override fun generateSideEffect(): SideEffect<S, A> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             actions
                 .mapToIsInState(isInState, getState)

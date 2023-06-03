@@ -1,38 +1,20 @@
 package com.freeletics.flowredux
 
+import com.freeletics.flowredux.sideeffects.Action
+import com.freeletics.flowredux.sideeffects.ChangeStateAction
+import com.freeletics.flowredux.sideeffects.ExternalWrappedAction
+import com.freeletics.flowredux.sideeffects.InitialStateAction
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onStart
 
-/**
- * Creates a Redux store with an initial state. If your initial state is an expensive computation
- * consider using [reduxStore]  which has an initialStateSupplier as parameter that produces the
- * first state lazily once the flow starts.
-
-@ExperimentalCoroutinesApi
-fun <A, S> Flow<A>.reduxStore(
- initialState: S,
- sideEffects: Iterable<SideEffect<S, A>>,
- logger: FlowReduxLogger? = null,
- reducer: Reducer<S, A>
-): Flow<S> = reduxStore(
- initialStateSupplier = { initialState },
- sideEffects = sideEffects,
- logger = logger,
- reducer = reducer
-)
- */
-
-/**
- * Creates a Redux store with a [initialStateSupplier] that produces the first state lazily once
- * the flow starts.
- */
-internal fun <A, S> Flow<A>.reduxStore(
+internal fun <A : Any, S : Any> Flow<A>.reduxStore(
     initialStateSupplier: () -> S,
     sideEffects: Iterable<SideEffect<S, A>>,
-    reducer: Reducer<S, A>,
 ): Flow<S> = flow {
     var currentState: S = initialStateSupplier()
     val getState: GetState<S> = { currentState }
@@ -41,23 +23,36 @@ internal fun <A, S> Flow<A>.reduxStore(
     emit(currentState)
 
     val loopbacks = sideEffects.map {
-        Channel<A>()
+        Channel<Action<S, A>>()
     }
     val sideEffectActions = sideEffects.mapIndexed { index, sideEffect ->
         val actionsFlow = loopbacks[index].consumeAsFlow()
         sideEffect(actionsFlow, getState)
     }
     val upstreamActions = this@reduxStore
+        .map<A, Action<S, A>> { ExternalWrappedAction(it) }
+        .onStart {
+            emit(InitialStateAction())
+        }
 
     (sideEffectActions + upstreamActions).merge().collect { action ->
         // Change state
-        val newState: S = reducer(currentState, action)
-        currentState = newState
-        emit(newState)
+        if (action is ChangeStateAction<S, A>) {
+            val newState = action.reduce(currentState)
+            if (currentState !== newState) {
+                currentState = newState
+                emit(newState)
 
-        // broadcast action
-        loopbacks.forEach {
-            it.send(action)
+                // broadcast state change
+                loopbacks.forEach {
+                    it.send(InitialStateAction())
+                }
+            }
+        } else {
+            // broadcast action
+            loopbacks.forEach {
+                it.send(action)
+            }
         }
     }
 }
