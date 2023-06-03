@@ -18,7 +18,7 @@ internal class CollectWhileBasedOnState<T, InputState : S, S : Any, A : Any>(
     private val handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
 ) : SideEffect<InputState, S, A>() {
 
-    override fun produceState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<ChangeStateAction<S, A>> {
+    override fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>> {
         return actions.whileInState(isInState, getState) { inStateActions ->
             flowOfCurrentState(inStateActions, getState)
                 .transformWithFlowBuilder()
@@ -32,7 +32,7 @@ internal class CollectWhileBasedOnState<T, InputState : S, S : Any, A : Any>(
 
     @Suppress("unchecked_cast")
     private fun flowOfCurrentState(
-        actions: Flow<Action<S, A>>,
+        actions: Flow<Action<A>>,
         getState: GetState<S>,
     ): Flow<InputState> {
         // after every state change there is a guaranteed action emission so we use this

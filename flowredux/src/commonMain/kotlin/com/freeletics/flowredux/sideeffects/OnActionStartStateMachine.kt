@@ -27,7 +27,7 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
 ) : SideEffect<InputState, S, A>() {
 
     @Suppress("UNCHECKED_CAST")
-    override fun produceState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<ChangeStateAction<S, A>> {
+    override fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>> {
         return actions.whileInState(isInState, getState) { inStateAction ->
             channelFlow {
                 val subStateMachinesMap = SubStateMachinesMap<SubStateMachineState, SubStateMachineAction, ActionThatTriggeredStartingStateMachine>()
@@ -36,14 +36,12 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
                     .collect { action ->
                         // collect upstream
                         when (action) {
-                            is ChangeStateAction,
                             is InitialStateAction,
                             -> {
                                 // Nothing needs to be done, these Actions are not interesting for
                                 // this operator, so we can just safely ignore them
                             }
-
-                            is ExternalWrappedAction<*, *> ->
+                            is ExternalWrappedAction ->
                                 runOnlyIfInInputState(getState) { currentState ->
                                     // TODO take ExecutionPolicy into account
                                     if (subActionClass.isInstance(action.action)) {
@@ -67,15 +65,8 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
                                                 }
                                                 .collect { subStateMachineState ->
                                                     runOnlyIfInInputState(getState) { parentState ->
-                                                        send(
-                                                            ChangeStateAction(
-                                                                runReduceOnlyIf = isInState,
-                                                                changedState = stateMapper(
-                                                                    State(parentState),
-                                                                    subStateMachineState,
-                                                                ),
-                                                            ),
-                                                        )
+                                                        val changedState = stateMapper(State(parentState), subStateMachineState)
+                                                        send(changedState)
                                                     }
                                                 }
                                         }
@@ -91,7 +82,7 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
                                         subStateMachinesMap.forEachStateMachine { stateMachine, coroutineWaiter ->
                                             launch {
                                                 coroutineWaiter.waitUntilResumed() // Wait until sub statemachine's state Flow is collected
-                                                actionMapper(action.action as A)?.let {
+                                                actionMapper(action.action)?.let {
                                                     stateMachine.dispatch(it)
                                                 }
                                             }

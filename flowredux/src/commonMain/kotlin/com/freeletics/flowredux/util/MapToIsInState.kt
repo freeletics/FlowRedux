@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
-internal fun <S, A> Flow<Action<S, A>>.mapToIsInState(
+internal fun <S, A> Flow<Action<A>>.mapToIsInState(
     isInState: SideEffect.IsInState<S>,
     getState: GetState<S>,
 ): Flow<Boolean> {

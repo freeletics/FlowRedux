@@ -1,7 +1,7 @@
 package com.freeletics.flowredux.util
 
+import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.sideeffects.Action
-import com.freeletics.flowredux.sideeffects.ChangeStateAction
 import com.freeletics.flowredux.sideeffects.GetState
 import com.freeletics.flowredux.sideeffects.SideEffect
 import kotlinx.coroutines.CancellationException
@@ -11,12 +11,12 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 
-internal fun <S, A> Flow<Action<S, A>>.whileInState(
+internal fun <S, A> Flow<Action<A>>.whileInState(
     isInState: SideEffect.IsInState<S>,
     getState: GetState<S>,
-    transform: suspend (Flow<Action<S, A>>) -> Flow<ChangeStateAction<S, A>>,
+    transform: suspend (Flow<Action<A>>) -> Flow<ChangedState<S>>,
 ) = channelFlow {
-    var currentChannel: Channel<Action<S, A>>? = null
+    var currentChannel: Channel<Action<A>>? = null
 
     // collect upstream
     collect { value ->

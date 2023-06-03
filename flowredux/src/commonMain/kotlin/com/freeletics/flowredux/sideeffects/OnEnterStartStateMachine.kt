@@ -25,17 +25,17 @@ internal class OnEnterStartStateMachine<SubStateMachineState : Any, SubStateMach
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
 ) : SideEffect<InputState, S, A>() {
 
-    override fun produceState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<ChangeStateAction<S, A>> {
+    override fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>> {
         return dispatchActionsToSubStateMachineAndCollectSubStateMachineState(actions, getState)
     }
 
     @Suppress("UNCHECKED_CAST")
     private fun dispatchActionsToSubStateMachineAndCollectSubStateMachineState(
-        upstreamActions: Flow<Action<S, A>>,
+        upstreamActions: Flow<Action<A>>,
         getState: GetState<S>,
-    ): Flow<ChangeStateAction<S, A>> {
+    ): Flow<ChangedState<S>> {
         return upstreamActions
-            .whileInState(isInState, getState) { actions: Flow<Action<S, A>> ->
+            .whileInState(isInState, getState) { actions: Flow<Action<A>> ->
                 val stateOnEntering = getState() as? InputState
                 if (stateOnEntering == null) {
                     emptyFlow() // somehow we left already the state but flow did not cancel yet
@@ -52,7 +52,7 @@ internal class OnEnterStartStateMachine<SubStateMachineState : Any, SubStateMach
                     // build the to be returned flow
                     actions
                         .onEach { action ->
-                            if (action is ExternalWrappedAction<S, A>) {
+                            if (action is ExternalWrappedAction<A>) {
                                 // dispatch the incoming actions to the statemachine
                                 coroutineScope {
                                     launch {

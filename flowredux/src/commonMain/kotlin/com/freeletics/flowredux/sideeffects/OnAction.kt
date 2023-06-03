@@ -20,16 +20,15 @@ internal class OnAction<InputState : S, SubAction : A, S : Any, A : Any>(
     internal val handler: suspend (action: SubAction, state: State<InputState>) -> ChangedState<S>,
 ) : SideEffect<InputState, S, A>() {
 
-    override fun produceState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<ChangeStateAction<S, A>> {
+    override fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>> {
         return actions.whileInState(isInState, getState) { inStateAction ->
             inStateAction.mapNotNull {
                 when (it) {
-                    is ExternalWrappedAction<*, *> -> if (subActionClass.isInstance(it.action)) {
+                    is ExternalWrappedAction -> if (subActionClass.isInstance(it.action)) {
                         it.action as SubAction
                     } else {
                         null
                     }
-                    is ChangeStateAction -> null
                     is InitialStateAction -> null
                 }
             }
