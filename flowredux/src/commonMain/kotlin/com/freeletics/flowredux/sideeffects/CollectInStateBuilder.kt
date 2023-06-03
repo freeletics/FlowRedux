@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.flow
  */
 @ExperimentalCoroutinesApi
 internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
-    private val isInState: (S) -> Boolean,
+    override val isInState: IsInState<S>,
     private val flow: Flow<T>,
     private val executionPolicy: ExecutionPolicy,
     private val handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
@@ -51,12 +51,12 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
         value: T,
         getState: GetState<S>,
     ): Flow<Action<S, A>> = flow {
-        runOnlyIfInInputState(getState, isInState) { inputState ->
+        runOnlyIfInInputState(getState) { inputState ->
             val changeState = handler(value, State(inputState))
             emit(
                 ChangeStateAction<S, A>(
                     changedState = changeState,
-                    runReduceOnlyIf = { state -> isInState(state) },
+                    runReduceOnlyIf = { state -> isInState.check(state) },
                 ),
             )
         }

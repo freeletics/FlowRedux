@@ -8,17 +8,21 @@ import com.freeletics.flowredux.SideEffect
  * Thus it's an internal abstract class but you can think of it as an internal interface.
  */
 internal abstract class InStateSideEffectBuilder<InputState : S, S, A> {
+    fun interface IsInState<S> {
+        fun check(state: S): Boolean
+    }
 
-    internal abstract fun generateSideEffect(): SideEffect<S, A>
+    abstract val isInState: IsInState<S>
 
-    internal suspend inline fun runOnlyIfInInputState(
+    abstract fun generateSideEffect(): SideEffect<S, A>
+
+    protected suspend inline fun runOnlyIfInInputState(
         getState: GetState<S>,
-        isInState: (S) -> Boolean,
         crossinline block: suspend (InputState) -> Unit,
     ) {
         val currentState = getState()
         // only start if is in state condition is still true
-        if (isInState(currentState)) {
+        if (isInState.check(currentState)) {
             val inputState = try {
                 @Suppress("UNCHECKED_CAST")
                 currentState as InputState

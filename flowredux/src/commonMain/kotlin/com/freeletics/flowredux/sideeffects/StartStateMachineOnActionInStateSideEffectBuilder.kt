@@ -20,7 +20,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, ActionThatTriggeredStartingStateMachine : A, S : Any, A : Any>(
-    private val isInState: (S) -> Boolean,
+    override val isInState: IsInState<S>,
     private val subStateMachineFactory: (
         action: ActionThatTriggeredStartingStateMachine,
         state: InputState,
@@ -49,7 +49,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                 }
 
                                 is ExternalWrappedAction<*, *> ->
-                                    runOnlyIfInInputState(getState, isInState) { currentState ->
+                                    runOnlyIfInInputState(getState) { currentState ->
                                         // TODO take ExecutionPolicy into account
                                         if (subActionClass.isInstance(action.action)) {
                                             val actionThatStartsStateMachine =
@@ -71,7 +71,7 @@ internal class StartStateMachineOnActionInStateSideEffectBuilder<SubStateMachine
                                                         subStateMachinesMap.remove(stateMachine)
                                                     }
                                                     .collect { subStateMachineState ->
-                                                        runOnlyIfInInputState(getState, isInState) { parentState ->
+                                                        runOnlyIfInInputState(getState) { parentState ->
                                                             send(
                                                                 ChangeStateAction(
                                                                     runReduceOnlyIf = isInState,

@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : Any, SubStateMachineAction : Any, InputState : S, S : Any, A>(
-    private val isInState: (S) -> Boolean,
+    override val isInState: IsInState<S>,
     private val subStateMachineFactory: (InputState) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
     private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
@@ -93,7 +93,7 @@ internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : 
                             }.mapNotNull { subStateMachineState: SubStateMachineState ->
                                 var changeStateAction: ChangeStateAction<S, A>? = null
 
-                                runOnlyIfInInputState(getState, isInState) { inputState ->
+                                runOnlyIfInInputState(getState) { inputState ->
                                     changeStateAction = ChangeStateAction<S, A>(
                                         runReduceOnlyIf = isInState,
                                         changedState = stateMapper(

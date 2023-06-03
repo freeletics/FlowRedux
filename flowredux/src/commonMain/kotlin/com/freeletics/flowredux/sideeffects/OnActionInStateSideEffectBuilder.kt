@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.mapNotNull
 
 @ExperimentalCoroutinesApi
 internal class OnActionInStateSideEffectBuilder<InputState : S, SubAction : A, S : Any, A : Any>(
-    private val isInState: (S) -> Boolean,
+    override val isInState: IsInState<S>,
     internal val subActionClass: KClass<SubAction>,
     internal val executionPolicy: ExecutionPolicy,
     internal val handler: suspend (action: SubAction, state: State<InputState>) -> ChangedState<S>,
@@ -53,7 +53,7 @@ internal class OnActionInStateSideEffectBuilder<InputState : S, SubAction : A, S
         getState: GetState<S>,
     ): Flow<Action<S, A>> =
         flow {
-            runOnlyIfInInputState(getState, isInState) { inputState ->
+            runOnlyIfInInputState(getState) { inputState ->
                 val changeState = handler(
                     action,
                     State(inputState),
@@ -62,7 +62,7 @@ internal class OnActionInStateSideEffectBuilder<InputState : S, SubAction : A, S
                 emit(
                     ChangeStateAction<S, A>(
                         changedState = changeState,
-                        runReduceOnlyIf = { state -> isInState(state) },
+                        runReduceOnlyIf = { state -> isInState.check(state) },
                     ),
                 )
             }
