@@ -274,10 +274,10 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
             OverrideState(subState as S)
         },
     ) {
-        sideEffectBuilders += SideEffectBuilder(isInState) {
+        sideEffectBuilders += SideEffectBuilder(isInState) { initialState ->
             OnEnterStartStateMachine(
                 isInState = sideEffectIsInState(),
-                subStateMachineFactory = stateMachineFactory,
+                subStateMachine = stateMachineFactory(initialState),
                 actionMapper = actionMapper,
                 stateMapper = stateMapper,
             )
