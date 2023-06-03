@@ -3,6 +3,7 @@ package com.freeletics.flowredux
 import com.freeletics.flowredux.sideeffects.Action
 import com.freeletics.flowredux.sideeffects.ChangeStateAction
 import com.freeletics.flowredux.sideeffects.ExternalWrappedAction
+import com.freeletics.flowredux.sideeffects.InStateSideEffectBuilder
 import com.freeletics.flowredux.sideeffects.InitialStateAction
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -14,10 +15,12 @@ import kotlinx.coroutines.flow.onStart
 
 internal fun <A : Any, S : Any> Flow<A>.reduxStore(
     initialStateSupplier: () -> S,
-    sideEffects: Iterable<SideEffect<S, A>>,
+    sideEffectBuilders: Iterable<InStateSideEffectBuilder<out S, S, A>>,
 ): Flow<S> = flow {
     var currentState: S = initialStateSupplier()
     val getState: GetState<S> = { currentState }
+
+    val sideEffects = sideEffectBuilders.map { it.generateSideEffect() }
 
     // Emit the initial state
     emit(currentState)
