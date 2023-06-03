@@ -33,7 +33,7 @@ turbine = "0.13.0"
 fgp = "0.3.4"
 publish = "0.25.2"
 dokka = "1.8.10"
-binarycompatibility = "0.13.1"
+binarycompatibility = "0.13.2"
 dependency-analysis = "1.20.0"
 
 [libraries]
