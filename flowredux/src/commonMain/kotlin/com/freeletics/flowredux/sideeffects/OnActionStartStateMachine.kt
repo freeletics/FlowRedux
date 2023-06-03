@@ -3,7 +3,6 @@ package com.freeletics.flowredux.sideeffects
 import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.util.CoroutineWaiter
-import com.freeletics.flowredux.util.whileInState
 import com.freeletics.mad.statemachine.StateMachine
 import kotlin.reflect.KClass
 import kotlinx.coroutines.Job
@@ -24,73 +23,64 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
     internal val subActionClass: KClass<out A>,
     private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
-) : LegacySideEffect<InputState, S, A>() {
+) : ActionBasedSideEffect<InputState, S, A>() {
 
-    @Suppress("UNCHECKED_CAST")
-    override fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>> {
-        return actions.whileInState(isInState, getState) { inStateAction ->
-            channelFlow {
-                val subStateMachinesMap = SubStateMachinesMap<SubStateMachineState, SubStateMachineAction, ActionThatTriggeredStartingStateMachine>()
+    override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
+        return channelFlow {
+            val subStateMachinesMap = SubStateMachinesMap<SubStateMachineState, SubStateMachineAction, ActionThatTriggeredStartingStateMachine>()
+            actions.collect { action ->
+                runOnlyIfInInputState(getState) { currentState ->
+                    // TODO take ExecutionPolicy into account
+                    if (subActionClass.isInstance(action)) {
+                        @Suppress("UNCHECKED_CAST")
+                        val actionThatStartsStateMachine =
+                            action as ActionThatTriggeredStartingStateMachine
 
-                inStateAction
-                    .collect { action ->
-                        // collect upstream
-                        when (action) {
-                            is InitialStateAction,
-                            -> {
-                                // Nothing needs to be done, these Actions are not interesting for
-                                // this operator, so we can just safely ignore them
-                            }
-                            is ExternalWrappedAction ->
-                                runOnlyIfInInputState(getState) { currentState ->
-                                    // TODO take ExecutionPolicy into account
-                                    if (subActionClass.isInstance(action.action)) {
-                                        val actionThatStartsStateMachine =
-                                            action.action as ActionThatTriggeredStartingStateMachine
+                        val stateMachine = subStateMachineFactory(
+                            actionThatStartsStateMachine,
+                            currentState,
+                        )
 
-                                        val stateMachine = subStateMachineFactory(
-                                            actionThatStartsStateMachine,
-                                            currentState,
+                        val coroutineWaiter = CoroutineWaiter()
+
+                        // Launch substatemachine
+                        val job = launch {
+                            stateMachine.state
+                                .onStart {
+                                    coroutineWaiter.resume() // Resume waiting coroutines that dispatch Actions
+                                }
+                                .onCompletion {
+                                    subStateMachinesMap.remove(stateMachine)
+                                }
+                                .collect { subStateMachineState ->
+                                    runOnlyIfInInputState(getState) { parentState ->
+                                        val changedState = stateMapper(
+                                            State(parentState),
+                                            subStateMachineState,
                                         )
-
-                                        // Launch substatemachine
-                                        val coroutineWaiter = CoroutineWaiter()
-                                        val job = launch {
-                                            stateMachine.state
-                                                .onStart {
-                                                    coroutineWaiter.resume() // Resume waiting coroutines that dispatch Actions
-                                                }
-                                                .onCompletion {
-                                                    subStateMachinesMap.remove(stateMachine)
-                                                }
-                                                .collect { subStateMachineState ->
-                                                    runOnlyIfInInputState(getState) { parentState ->
-                                                        val changedState = stateMapper(State(parentState), subStateMachineState)
-                                                        send(changedState)
-                                                    }
-                                                }
-                                        }
-                                        subStateMachinesMap.cancelPreviousAndAddNew(
-                                            actionThatStartedStateMachine = actionThatStartsStateMachine,
-                                            stateMachine = stateMachine,
-                                            job = job,
-                                            coroutineWaiter = coroutineWaiter,
-                                        )
-                                    } else {
-                                        // a regular action that needs to be forwarded
-                                        // to the active sub state machine
-                                        subStateMachinesMap.forEachStateMachine { stateMachine, coroutineWaiter ->
-                                            launch {
-                                                coroutineWaiter.waitUntilResumed() // Wait until sub statemachine's state Flow is collected
-                                                actionMapper(action.action)?.let {
-                                                    stateMachine.dispatch(it)
-                                                }
-                                            }
-                                        }
+                                        send(changedState)
                                     }
                                 }
                         }
+                        subStateMachinesMap.cancelPreviousAndAddNew(
+                            actionThatStartedStateMachine = actionThatStartsStateMachine,
+                            stateMachine = stateMachine,
+                            job = job,
+                            coroutineWaiter = coroutineWaiter,
+                        )
+                    } else {
+                        // a regular action that needs to be forwarded
+                        // to the active sub state machine
+                        subStateMachinesMap.forEachStateMachine { stateMachine, coroutineWaiter ->
+                            launch {
+                                coroutineWaiter.waitUntilResumed() // Wait until sub statemachine's state Flow is collected
+                                actionMapper(action)?.let {
+                                    stateMachine.dispatch(it)
+                                }
+                            }
+                        }
                     }
+                }
             }
         }
     }
