@@ -36,14 +36,17 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
      * and additionally can specify and ADDITIONAL condition that also must be true in addition to the check that
      * the type as specified as generic fun parameter is an instance of the current state.
      */
+    @Deprecated("use condition block inside inState instead")
     public inline fun <reified SubState : S> inState(
         noinline additionalIsInState: (SubState) -> Boolean,
         noinline block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
+        @Suppress("DEPRECATION")
         inState(SubState::class, additionalIsInState, block)
     }
 
     @PublishedApi
+    @Deprecated("use condition block inside inState instead")
     internal fun <SubState : S> inState(
         subStateClass: KClass<SubState>,
         additionalIsInState: (SubState) -> Boolean,
@@ -59,6 +62,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
      * Define what happens if the store is in a certain state.
      * @param isInState The condition under which we identify that the state machine is in a given "state".
      */
+    @Deprecated("use condition block inside inState instead")
     public fun inStateWithCondition(
         isInState: (S) -> Boolean,
         block: InStateBuilderBlock<S, S, A>.() -> Unit,

@@ -15,17 +15,15 @@ class MarkAsFavoriteStateMachine(
 
     init {
         spec {
-            inState<GithubRepository>(additionalIsInState = {
-                it.favoriteStatus == FavoriteStatus.OPERATION_IN_PROGRESS
-            }) {
-                onEnter { markAsFavorite(it) }
-            }
+            inState<GithubRepository> {
+                condition({ it.favoriteStatus == FavoriteStatus.OPERATION_IN_PROGRESS }) {
+                    onEnter { markAsFavorite(it) }
+                }
 
-            inState<GithubRepository>(additionalIsInState = {
-                it.favoriteStatus == FavoriteStatus.OPERATION_FAILED
-            }) {
-                onEnter { resetErrorStateAfter3Seconds(it) }
-                on<RetryToggleFavoriteAction> { action, state -> resetErrorState(action, state) }
+                condition({ it.favoriteStatus == FavoriteStatus.OPERATION_FAILED }) {
+                    onEnter { resetErrorStateAfter3Seconds(it) }
+                    on<RetryToggleFavoriteAction> { action, state -> resetErrorState(action, state) }
+                }
             }
         }
     }

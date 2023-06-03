@@ -34,21 +34,15 @@ class InternalPaginationStateMachine(
                 on<LoadNextPage> { _, state ->
                     moveToLoadNextPageStateIfCanLoadNextPage(state)
                 }
-            }
 
-            inState<ShowContentPaginationState>(additionalIsInState = {
-                it.canLoadNextPage && it.nextPageLoadingState == NextPageLoadingState.LOADING
-            }) {
-                onEnter { loadNextPage(it) }
-            }
+                condition({ it.canLoadNextPage && it.nextPageLoadingState == NextPageLoadingState.LOADING }) {
+                    onEnter { loadNextPage(it) }
+                }
 
-            inState<ShowContentPaginationState>(additionalIsInState = {
-                it.nextPageLoadingState == NextPageLoadingState.ERROR
-            }) {
-                onEnter { showPaginationErrorFor3SecsThenReset(it) }
-            }
+                condition({ it.nextPageLoadingState == NextPageLoadingState.ERROR }) {
+                    onEnter { showPaginationErrorFor3SecsThenReset(it) }
+                }
 
-            inState<ShowContentPaginationState> {
                 onActionStartStateMachine(
                     stateMachineFactory = { action: ToggleFavoriteAction, state: ShowContentPaginationState ->
                         val repo = state.items.find { it.id == action.id }!!

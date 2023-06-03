@@ -13,12 +13,11 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 
-@Suppress("DEPRECATION")
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class CustomIsInStateDslTest {
+internal class InStateBuilderBlockConditionTest {
 
     @Test
-    fun onActionTriggersOnlyWhileInCustomState() = runTest {
+    fun onActionTriggersOnlyWhileInCustomCondition() = runTest {
         var counter1 = 0
         var counter2 = 0
 
@@ -31,17 +30,20 @@ internal class CustomIsInStateDslTest {
                     state.override { gs1 }
                 }
             }
-            inStateWithCondition(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
-                on<TestAction.A1> { _, state ->
-                    counter1++
-                    state.override { gs2 }
-                }
-            }
 
-            inStateWithCondition(isInState = { it is TestState.GenericState && it.anInt == 2 }) {
-                on<TestAction.A1> { _, state ->
-                    counter2++
-                    state.override { TestState.S1 }
+            inState<TestState.GenericState> {
+                condition({ it.anInt == 1 }) {
+                    on<TestAction.A1> { _, state ->
+                        counter1++
+                        state.override { gs2 }
+                    }
+                }
+
+                condition({ it.anInt == 2 }) {
+                    on<TestAction.A1> { _, state ->
+                        counter2++
+                        state.override { TestState.S1 }
+                    }
                 }
             }
         }
@@ -61,7 +63,7 @@ internal class CustomIsInStateDslTest {
     }
 
     @Test
-    fun collectWhileInStateStopsWhenLeavingCustomState() = runTest {
+    fun collectWhileInStateStopsWhenLeavingCustomCondition() = runTest {
         var cancellation: Throwable? = null
 
         val gs1 = TestState.GenericState("asd", 1)
@@ -73,25 +75,28 @@ internal class CustomIsInStateDslTest {
                     state.override { gs1 }
                 }
             }
-            inStateWithCondition(isInState = { it is TestState.GenericState && it.anInt == 1 }) {
-                collectWhileInState(
-                    flow {
-                        emit(2)
-                        try {
-                            awaitCancellation()
-                        } catch (t: Throwable) {
-                            cancellation = t
-                            throw t
-                        }
-                    },
-                ) { value, state ->
-                    state.override { TestState.GenericState(value.toString(), value) }
-                }
-            }
 
-            inStateWithCondition(isInState = { it is TestState.GenericState && it.anInt == 2 }) {
-                onEnter {
-                    return@onEnter it.override { TestState.S1 }
+            inState<TestState.GenericState> {
+                condition({ it.anInt == 1 }) {
+                    collectWhileInState(
+                        flow {
+                            emit(2)
+                            try {
+                                awaitCancellation()
+                            } catch (t: Throwable) {
+                                cancellation = t
+                                throw t
+                            }
+                        },
+                    ) { value, state ->
+                        state.override { TestState.GenericState(value.toString(), value) }
+                    }
+                }
+
+                condition({ it.anInt == 2 }) {
+                    onEnter {
+                        return@onEnter it.override { TestState.S1 }
+                    }
                 }
             }
         }
