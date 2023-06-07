@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-# 5.0.0 rc1
-CMDLINE_TOOLS_VERSION=7006259
+# 9.0
+CMDLINE_TOOLS_VERSION=9477386
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   CMDLINE_TOOLS_OS="linux"
