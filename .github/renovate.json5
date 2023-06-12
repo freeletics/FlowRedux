@@ -35,6 +35,14 @@
     },
     {
       matchPackagePatterns: [
+        "^org.jetbrains.kotlin",
+        "com.google.devtools.ksp",
+        "androidx.compose.compiler:compiler",
+      ],
+      groupName: "Kotlin and Compose Compiler"
+    },
+    {
+      matchPackagePatterns: [
           "^androidx.compose"
       ],
       groupName: "Compose"
