@@ -11,6 +11,7 @@ import kotlin.test.assertFalse
 import kotlin.test.fail
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 
@@ -85,6 +86,7 @@ internal class CustomIsInStateDslTest {
                     flow {
                         emit(2)
                         signal1.awaitComplete()
+                        delay(1000)
                         reached = true
                         fail("This should never be reached")
                     },
