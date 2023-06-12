@@ -1,5 +1,6 @@
 package com.freeletics.flowredux
 
+import com.freeletics.flowredux.sideeffects.Action
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -10,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
  * (i.e using filter or ofType operator)
  * @param state [GetState] to get the latest state of the state machine
  */
-internal typealias SideEffect<S, A> = (actions: Flow<A>, getState: GetState<S>) -> Flow<A>
+internal typealias SideEffect<S, A> = (actions: Flow<Action<S, A>>, getState: GetState<S>) -> Flow<Action<S, A>>
 
 /**
  * The GetState is basically just a deferred way to get a state of a [reduxStore] at any given point in time.

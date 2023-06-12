@@ -9,7 +9,7 @@ import com.freeletics.flowredux.SideEffect
  */
 internal abstract class InStateSideEffectBuilder<InputState : S, S, A> {
 
-    internal abstract fun generateSideEffect(): SideEffect<S, Action<S, A>>
+    internal abstract fun generateSideEffect(): SideEffect<S, A>
 
     internal suspend inline fun runOnlyIfInInputState(
         getState: GetState<S>,

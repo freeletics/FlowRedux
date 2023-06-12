@@ -23,7 +23,7 @@ internal class OnActionInStateSideEffectBuilder<InputState : S, SubAction : A, S
     internal val handler: suspend (action: SubAction, state: State<InputState>) -> ChangedState<S>,
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
-    override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
+    override fun generateSideEffect(): SideEffect<S, A> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
 
             actions.whileInState(isInState, getState) { inStateAction ->

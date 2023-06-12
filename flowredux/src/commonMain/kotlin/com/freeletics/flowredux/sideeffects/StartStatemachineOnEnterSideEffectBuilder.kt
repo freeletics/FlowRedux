@@ -27,7 +27,7 @@ internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : 
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
-    override fun generateSideEffect(): SideEffect<S, Action<S, A>> {
+    override fun generateSideEffect(): SideEffect<S, A> {
         return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
             dispatchActionsToSubStateMachineAndCollectSubStateMachineState(actions, getState)
         }

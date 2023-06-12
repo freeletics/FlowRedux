@@ -1,7 +1,6 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.SideEffect
-import com.freeletics.flowredux.sideeffects.Action
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -11,10 +10,11 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
 
     private val builderBlocks: MutableList<InStateBuilderBlock<*, S, A>> = ArrayList()
 
-    internal fun generateSideEffects(): List<SideEffect<S, Action<S, A>>> =
-        builderBlocks.flatMap { builder ->
+    internal fun generateSideEffects(): List<SideEffect<S, A>> {
+        return builderBlocks.flatMap { builder ->
             builder.generateSideEffects()
         }
+    }
 
     /**
      * Define what happens if the store is in a certain state.

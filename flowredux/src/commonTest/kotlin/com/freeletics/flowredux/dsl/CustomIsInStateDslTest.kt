@@ -8,11 +8,18 @@ import com.freeletics.flowredux.TestState
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlin.test.fail
+import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class CustomIsInStateDslTest {
@@ -64,6 +71,7 @@ internal class CustomIsInStateDslTest {
         assertEquals(1, counter2)
     }
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun collectWhileInStateStopsWhenLeavingCustomState() = runTest {
         var reached = false
@@ -85,6 +93,14 @@ internal class CustomIsInStateDslTest {
                     flow {
                         emit(2)
                         signal1.awaitComplete()
+                        withContext(Dispatchers.Default) {
+                            val timeElapsed = measureTime {
+                                // 10 ms should be enough to make sure that the cancellation happened in the meantime
+                                // because of state transition to TestState.S2 in on<TestAction.A2>.
+                                delay(10)
+                            }
+                            assertTrue(timeElapsed.toDouble(DurationUnit.MILLISECONDS) < 10, "Time Elapsed: $timeElapsed but expected to be < 10")
+                        }
                         reached = true
                         fail("This should never be reached")
                     },
