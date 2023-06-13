@@ -30,11 +30,11 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
             )
         }
 
-        val sideEffects = FlowReduxStoreBuilder<S, A>().apply(specBlock).generateSideEffects()
+        val sideEffectBuilders = FlowReduxStoreBuilder<S, A>().apply(specBlock).sideEffectBuilders
 
         outputState = inputActions
             .receiveAsFlow()
-            .reduxStore(initialStateSupplier, sideEffects)
+            .reduxStore(initialStateSupplier, sideEffectBuilders)
             .onStart {
                 if (activeFlowCounter.incrementAndGet() > 1) {
                     throw IllegalStateException(

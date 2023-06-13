@@ -1,20 +1,15 @@
 package com.freeletics.flowredux.dsl
 
-import com.freeletics.flowredux.SideEffect
+import com.freeletics.flowredux.sideeffects.InStateSideEffectBuilder
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 @FlowReduxDsl
-public class FlowReduxStoreBuilder<S : Any, A : Any> {
+public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
 
-    private val builderBlocks: MutableList<InStateBuilderBlock<*, S, A>> = ArrayList()
-
-    internal fun generateSideEffects(): List<SideEffect<S, A>> {
-        return builderBlocks.flatMap { builder ->
-            builder.generateSideEffects()
-        }
-    }
+    private val _sideEffectBuilders: MutableList<InStateSideEffectBuilder<out S, S, A>> = ArrayList()
+    internal val sideEffectBuilders: List<InStateSideEffectBuilder<out S, S, A>> get() = _sideEffectBuilders
 
     /**
      * Define what happens if the store is in a certain state.
@@ -31,9 +26,9 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
         subStateClass: KClass<SubState>,
         block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
-        builderBlocks += InStateBuilderBlock<SubState, S, A>(
+        _sideEffectBuilders += InStateBuilderBlock<SubState, S, A>(
             isInState = { state -> subStateClass.isInstance(state) },
-        ).apply(block)
+        ).apply(block).sideEffectBuilders
     }
 
     /**
@@ -55,9 +50,9 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
         block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
         @Suppress("UNCHECKED_CAST")
-        builderBlocks += InStateBuilderBlock<SubState, S, A>(
+        _sideEffectBuilders += InStateBuilderBlock<SubState, S, A>(
             isInState = { state -> subStateClass.isInstance(state) && additionalIsInState(state as SubState) },
-        ).apply(block)
+        ).apply(block).sideEffectBuilders
     }
 
     /**
@@ -68,8 +63,8 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> {
         isInState: (S) -> Boolean,
         block: InStateBuilderBlock<S, S, A>.() -> Unit,
     ) {
-        builderBlocks += InStateBuilderBlock<S, S, A>(
+        _sideEffectBuilders += InStateBuilderBlock<S, S, A>(
             isInState = isInState,
-        ).apply(block)
+        ).apply(block).sideEffectBuilders
     }
 }
