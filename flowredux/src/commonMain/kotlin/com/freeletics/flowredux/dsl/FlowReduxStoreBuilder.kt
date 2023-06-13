@@ -8,7 +8,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @FlowReduxDsl
 public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
 
-    internal val sideEffectBuilders: MutableList<InStateSideEffectBuilder<out S, S, A>> = ArrayList()
+    private val _sideEffectBuilders: MutableList<InStateSideEffectBuilder<out S, S, A>> = ArrayList()
+    internal val sideEffectBuilders: List<InStateSideEffectBuilder<out S, S, A>> get() = _sideEffectBuilders
 
     /**
      * Define what happens if the store is in a certain state.
@@ -25,7 +26,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
         subStateClass: KClass<SubState>,
         block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
-        sideEffectBuilders += InStateBuilderBlock<SubState, S, A>(
+        _sideEffectBuilders += InStateBuilderBlock<SubState, S, A>(
             isInState = { state -> subStateClass.isInstance(state) },
         ).apply(block).sideEffectBuilders
     }
@@ -49,7 +50,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
         block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
         @Suppress("UNCHECKED_CAST")
-        sideEffectBuilders += InStateBuilderBlock<SubState, S, A>(
+        _sideEffectBuilders += InStateBuilderBlock<SubState, S, A>(
             isInState = { state -> subStateClass.isInstance(state) && additionalIsInState(state as SubState) },
         ).apply(block).sideEffectBuilders
     }
@@ -62,7 +63,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
         isInState: (S) -> Boolean,
         block: InStateBuilderBlock<S, S, A>.() -> Unit,
     ) {
-        sideEffectBuilders += InStateBuilderBlock<S, S, A>(
+        _sideEffectBuilders += InStateBuilderBlock<S, S, A>(
             isInState = isInState,
         ).apply(block).sideEffectBuilders
     }
