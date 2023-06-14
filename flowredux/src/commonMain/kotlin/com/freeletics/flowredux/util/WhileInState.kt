@@ -2,6 +2,7 @@ package com.freeletics.flowredux.util
 
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.sideeffects.Action
+import com.freeletics.flowredux.sideeffects.InStateSideEffectBuilder
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -10,7 +11,7 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 
 internal fun <S, A> Flow<Action<S, A>>.whileInState(
-    isInState: (S) -> Boolean,
+    isInState: InStateSideEffectBuilder.IsInState<S>,
     getState: GetState<S>,
     transform: suspend (Flow<Action<S, A>>) -> Flow<Action<S, A>>,
 ) = channelFlow {
@@ -18,7 +19,7 @@ internal fun <S, A> Flow<Action<S, A>>.whileInState(
 
     // collect upstream
     collect { value ->
-        if (isInState(getState())) {
+        if (isInState.check(getState())) {
             // if there is no Channel yet the state machine just entered the state
             if (currentChannel == null) {
                 currentChannel = Channel()

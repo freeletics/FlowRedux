@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.flow
  */
 @ExperimentalCoroutinesApi
 internal class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
-    private val isInState: (S) -> Boolean,
+    override val isInState: IsInState<S>,
     private val handler: suspend (state: State<InputState>) -> ChangedState<S>,
 ) : InStateSideEffectBuilder<InputState, S, A>() {
 
@@ -38,12 +38,12 @@ internal class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>
     private suspend fun setStateFlow(
         getState: GetState<S>,
     ): Flow<Action<S, A>> = flow {
-        runOnlyIfInInputState(getState, isInState) { inputState ->
+        runOnlyIfInInputState(getState) { inputState ->
             val changeState = handler(State(inputState))
             emit(
                 ChangeStateAction<S, A>(
                     changedState = changeState,
-                    runReduceOnlyIf = { state -> isInState(state) },
+                    runReduceOnlyIf = { state -> isInState.check(state) },
                 ),
             )
         }
