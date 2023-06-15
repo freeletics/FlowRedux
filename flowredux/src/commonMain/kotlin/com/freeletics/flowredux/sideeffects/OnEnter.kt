@@ -9,7 +9,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 
 /**
  * A builder that generates a [SideEffect] that triggers every time the state machine enters
@@ -27,25 +26,13 @@ internal class OnEnter<InputState : S, S : Any, A : Any>(
                 .mapToIsInState(isInState, getState)
                 .flatMapLatest {
                     if (it) {
-                        setStateFlow(getState)
+                        changeState(getState) { snapshot ->
+                            handler(State(snapshot))
+                        }
                     } else {
                         emptyFlow()
                     }
                 }
-        }
-    }
-
-    private suspend fun setStateFlow(
-        getState: GetState<S>,
-    ): Flow<Action<S, A>> = flow {
-        runOnlyIfInInputState(getState) { inputState ->
-            val changeState = handler(State(inputState))
-            emit(
-                ChangeStateAction<S, A>(
-                    changedState = changeState,
-                    runReduceOnlyIf = { state -> isInState.check(state) },
-                ),
-            )
         }
     }
 }

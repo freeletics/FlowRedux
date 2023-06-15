@@ -11,7 +11,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 
 /**
  * A builder to create a [SideEffect] that observes a Flow<T> as long as the redux store is in
@@ -37,28 +36,15 @@ internal class CollectWhile<T, InputState : S, S : Any, A : Any>(
                 .mapToIsInState(isInState, getState)
                 .flatMapLatest { inState ->
                     if (inState) {
-                        flow.flatMapWithExecutionPolicy(executionPolicy) {
-                            setStateFlow(value = it, getState = getState)
+                        flow.flatMapWithExecutionPolicy(executionPolicy) { item ->
+                            changeState(getState) { snapshot ->
+                                handler(item, State(snapshot))
+                            }
                         }
                     } else {
                         emptyFlow()
                     }
                 }
-        }
-    }
-
-    private suspend fun setStateFlow(
-        value: T,
-        getState: GetState<S>,
-    ): Flow<Action<S, A>> = flow {
-        runOnlyIfInInputState(getState) { inputState ->
-            val changeState = handler(value, State(inputState))
-            emit(
-                ChangeStateAction<S, A>(
-                    changedState = changeState,
-                    runReduceOnlyIf = { state -> isInState.check(state) },
-                ),
-            )
         }
     }
 }

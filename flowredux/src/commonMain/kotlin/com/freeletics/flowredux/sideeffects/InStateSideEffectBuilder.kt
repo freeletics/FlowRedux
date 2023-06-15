@@ -2,6 +2,9 @@ package com.freeletics.flowredux.sideeffects
 
 import com.freeletics.flowredux.GetState
 import com.freeletics.flowredux.SideEffect
+import com.freeletics.flowredux.dsl.ChangedState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 /**
  * It's just not an Interface to not expose internal class `Action` to the public.
@@ -15,6 +18,18 @@ internal abstract class InStateSideEffectBuilder<InputState : S, S, A> {
     abstract val isInState: IsInState<S>
 
     abstract fun generateSideEffect(): SideEffect<S, A>
+
+    protected inline fun changeState(
+        crossinline getState: GetState<S>,
+        crossinline block: suspend (InputState) -> ChangedState<S>,
+    ): Flow<Action<S, A>> {
+        return flow {
+            runOnlyIfInInputState(getState) {
+                val changedState = block(it)
+                emit(ChangeStateAction(isInState, changedState))
+            }
+        }
+    }
 
     protected suspend inline fun runOnlyIfInInputState(
         getState: GetState<S>,
