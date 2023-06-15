@@ -20,7 +20,7 @@ internal class SubStateMachinesMapTest {
 
     @Test
     fun addingNewStateMachineWorksAndCancelsPreviousOne() = runTest {
-        val map = StartStateMachineOnActionInStateSideEffectBuilder.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
+        val map = OnActionStartStateMachine.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
 
         val actionThatTriggered = TestAction.A4(1)
         val w1 = CoroutineWaiter()
@@ -57,7 +57,7 @@ internal class SubStateMachinesMapTest {
 
     @Test
     fun addingStateMachineDoesNotCancelPreviousIfActionThatTriggeredIsNotEqualToOriginalOne() = runTest {
-        val map = StartStateMachineOnActionInStateSideEffectBuilder.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
+        val map = OnActionStartStateMachine.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
 
         val a1 = TestAction.A4(1)
         val s1 = StateMachine()
@@ -105,7 +105,7 @@ internal class SubStateMachinesMapTest {
 
     @Test
     fun iteratingOverAllStateMachinesWork() = runTest {
-        val map = StartStateMachineOnActionInStateSideEffectBuilder.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
+        val map = OnActionStartStateMachine.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
         val a1 = TestAction.A4(1)
         val w1 = CoroutineWaiter()
         val s1 = StateMachine()
