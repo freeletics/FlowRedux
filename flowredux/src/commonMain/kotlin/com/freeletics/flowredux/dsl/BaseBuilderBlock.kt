@@ -4,9 +4,9 @@ import com.freeletics.flowredux.sideeffects.CollectWhile
 import com.freeletics.flowredux.sideeffects.CollectWhileBasedOnState
 import com.freeletics.flowredux.sideeffects.InStateSideEffectBuilder
 import com.freeletics.flowredux.sideeffects.OnAction
-import com.freeletics.flowredux.sideeffects.OnActionStateMachine
+import com.freeletics.flowredux.sideeffects.OnActionStartStateMachine
 import com.freeletics.flowredux.sideeffects.OnEnter
-import com.freeletics.flowredux.sideeffects.OnEnterStateMachine
+import com.freeletics.flowredux.sideeffects.OnEnterStartStateMachine
 import com.freeletics.mad.statemachine.StateMachine
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -261,7 +261,7 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
             OverrideState(subState as S)
         },
     ) {
-        sideEffectBuilders += OnEnterStateMachine(
+        sideEffectBuilders += OnEnterStartStateMachine(
             isInState = isInState,
             subStateMachineFactory = stateMachineFactory,
             actionMapper = actionMapper,
@@ -311,7 +311,7 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
         actionMapper: (A) -> SubStateMachineAction?,
         stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
     ) {
-        sideEffectBuilders += OnActionStateMachine(
+        sideEffectBuilders += OnActionStartStateMachine(
             isInState = isInState,
             subStateMachineFactory = stateMachineFactory,
             subActionClass = actionClass,
