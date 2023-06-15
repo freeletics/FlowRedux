@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 
 @ExperimentalCoroutinesApi
-internal class OnActionInStateSideEffectBuilder<InputState : S, SubAction : A, S : Any, A : Any>(
+internal class OnAction<InputState : S, SubAction : A, S : Any, A : Any>(
     override val isInState: IsInState<S>,
     internal val subActionClass: KClass<SubAction>,
     internal val executionPolicy: ExecutionPolicy,

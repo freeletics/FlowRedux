@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.mapNotNull
  * is closed.
  */
 @ExperimentalCoroutinesApi
-internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A : Any>(
+internal class CollectWhileBasedOnState<T, InputState : S, S : Any, A : Any>(
     override val isInState: IsInState<S>,
     private val flowBuilder: (Flow<InputState>) -> Flow<T>,
     private val executionPolicy: ExecutionPolicy,

@@ -14,7 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class StartStateMachineOnActionInStateTest {
+internal class OnActionStartStateMachineTest {
 
     @Test
     fun childStateMachineEmitsInitialStateToParentStateMachine() = runTest {

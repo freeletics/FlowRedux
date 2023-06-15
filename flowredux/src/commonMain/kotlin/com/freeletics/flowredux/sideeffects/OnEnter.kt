@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.flatMapLatest
  * a certain state.
  */
 @ExperimentalCoroutinesApi
-internal class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>(
+internal class OnEnter<InputState : S, S : Any, A : Any>(
     override val isInState: IsInState<S>,
     private val handler: suspend (state: State<InputState>) -> ChangedState<S>,
 ) : InStateSideEffectBuilder<InputState, S, A>() {

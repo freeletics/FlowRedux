@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.flatMapLatest
  * is closed.
  */
 @ExperimentalCoroutinesApi
-internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
+internal class CollectWhile<T, InputState : S, S : Any, A : Any>(
     override val isInState: IsInState<S>,
     private val flow: Flow<T>,
     private val executionPolicy: ExecutionPolicy,

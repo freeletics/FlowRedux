@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class CollectWhileInStateTest {
+internal class CollectWhileTest {
 
     @Test
     fun collectWhileInStateStopsAfterHavingMovedToNextState() = runTest {
