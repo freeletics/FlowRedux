@@ -38,7 +38,7 @@ internal class OnActionInStateSideEffectBuilder<InputState : S, SubAction : A, S
                     }
                 }
                     .flatMapWithExecutionPolicy(executionPolicy) { action ->
-                        stateChange(getState) { snapshot ->
+                        changeState(getState) { snapshot ->
                             handler(action, State(snapshot))
                         }
                     }

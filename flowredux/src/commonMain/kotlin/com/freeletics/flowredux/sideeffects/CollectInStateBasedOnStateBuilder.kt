@@ -31,7 +31,7 @@ internal class CollectInStateBasedOnStateBuilder<T, InputState : S, S : Any, A :
                 flowOfCurrentState(inStateActions, getState)
                     .transformWithFlowBuilder()
                     .flatMapWithExecutionPolicy(executionPolicy) { item ->
-                        stateChange(getState) { snapshot ->
+                        changeState(getState) { snapshot ->
                             handler(item, State(snapshot))
                         }
                     }

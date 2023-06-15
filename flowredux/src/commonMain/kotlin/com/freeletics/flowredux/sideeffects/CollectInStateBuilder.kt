@@ -11,7 +11,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 
 /**
  * A builder to create a [SideEffect] that observes a Flow<T> as long as the redux store is in
@@ -38,7 +37,7 @@ internal class CollectInStateBuilder<T, InputState : S, S : Any, A : Any>(
                 .flatMapLatest { inState ->
                     if (inState) {
                         flow.flatMapWithExecutionPolicy(executionPolicy) { item ->
-                            stateChange(getState) { snapshot ->
+                            changeState(getState) { snapshot ->
                                 handler(item, State(snapshot))
                             }
                         }

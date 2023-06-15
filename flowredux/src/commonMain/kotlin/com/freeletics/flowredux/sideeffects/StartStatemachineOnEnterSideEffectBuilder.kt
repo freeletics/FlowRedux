@@ -91,7 +91,7 @@ internal class StartStatemachineOnEnterSideEffectBuilder<SubStateMachineState : 
                                 // This should never be called as the full flow should be canceled.
                                 emptyFlow()
                             }.flatMapConcat { subStateMachineState ->
-                                stateChange(getState) { inputState ->
+                                changeState(getState) { inputState ->
                                     stateMapper(State(inputState), subStateMachineState)
                                 }
                             }

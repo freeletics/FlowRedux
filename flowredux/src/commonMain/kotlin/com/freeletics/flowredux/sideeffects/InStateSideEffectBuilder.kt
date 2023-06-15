@@ -19,7 +19,7 @@ internal abstract class InStateSideEffectBuilder<InputState : S, S, A> {
 
     abstract fun generateSideEffect(): SideEffect<S, A>
 
-    protected inline fun stateChange(
+    protected inline fun changeState(
         crossinline getState: GetState<S>,
         crossinline block: suspend (InputState) -> ChangedState<S>,
     ): Flow<Action<S, A>> {

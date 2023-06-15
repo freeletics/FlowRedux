@@ -26,7 +26,7 @@ internal class OnEnterInStateSideEffectBuilder<InputState : S, S : Any, A : Any>
                 .mapToIsInState(isInState, getState)
                 .flatMapLatest {
                     if (it) {
-                        stateChange(getState) { snapshot ->
+                        changeState(getState) { snapshot ->
                             handler(State(snapshot))
                         }
                     } else {
