@@ -14,7 +14,7 @@ internal class OnEnter<InputState : S, S : Any, A : Any>(
     private val handler: suspend (state: State<InputState>) -> ChangedState<S>,
 ) : SideEffect<InputState, S, A>() {
 
-    override fun produceState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<ChangeStateAction<S, A>> {
+    override fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>> {
         return actions
             .mapToIsInState(isInState, getState)
             .flatMapLatest {

@@ -1,8 +1,12 @@
 package com.freeletics.flowredux.sideeffects
 
 import com.freeletics.flowredux.dsl.ChangedState
+import com.freeletics.flowredux.dsl.NoStateChange
+import com.freeletics.flowredux.dsl.UnsafeMutateState
+import com.freeletics.flowredux.dsl.reduce
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 internal abstract class SideEffect<InputState : S, S, A> {
     fun interface IsInState<S> {
@@ -11,16 +15,16 @@ internal abstract class SideEffect<InputState : S, S, A> {
 
     abstract val isInState: IsInState<S>
 
-    abstract fun produceState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<ChangeStateAction<S, A>>
+    abstract fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>>
 
     protected inline fun changeState(
         crossinline getState: GetState<S>,
         crossinline block: suspend (InputState) -> ChangedState<S>,
-    ): Flow<ChangeStateAction<S, A>> {
+    ): Flow<ChangedState<S>> {
         return flow {
             runOnlyIfInInputState(getState) {
                 val changedState = block(it)
-                emit(ChangeStateAction(isInState, changedState))
+                emit(changedState)
             }
         }
     }
@@ -60,3 +64,23 @@ internal class SideEffectBuilder<InputState : S, S, A>(
 }
 
 internal typealias GetState<S> = () -> S
+
+internal fun <InputState : S, S, A> SideEffect<InputState, S, A>.produceStateGuarded(
+    actions: Flow<Action<A>>,
+    getState: GetState<S>,
+): Flow<ChangedState<S>> {
+    return produceState(actions, getState).map { guardWithIsInState(it, this) }
+}
+
+private fun <InputState : S, S> guardWithIsInState(changedState: ChangedState<S>, sideEffect: SideEffect<InputState, S, *>): ChangedState<S> {
+    if (changedState is NoStateChange) {
+        return changedState
+    }
+    return UnsafeMutateState<S, S> {
+        if (sideEffect.isInState.check(this)) {
+            changedState.reduce(this)
+        } else {
+            this
+        }
+    }
+}
