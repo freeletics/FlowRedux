@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 internal fun <A : Any, S : Any> Flow<A>.reduxStore(
     initialStateSupplier: () -> S,
@@ -27,28 +29,34 @@ internal fun <A : Any, S : Any> Flow<A>.reduxStore(
         it.sendStateChange(currentState)
     }
 
+    val mutex = Mutex()
+
     launch {
         stateChanges.consumeAsFlow().collect { action ->
             val newState = action.reduce(currentState)
             if (currentState !== newState) {
                 currentState = newState
 
-                sideEffects.forEach {
-                    it.cancelIfNeeded(newState)
-                }
+                mutex.withLock {
+                    sideEffects.forEach {
+                        it.cancelIfNeeded(newState)
+                    }
 
-                send(newState)
+                    send(newState)
 
-                sideEffects.forEach {
-                    it.sendStateChange(currentState)
+                    sideEffects.forEach {
+                        it.sendStateChange(currentState)
+                    }
                 }
             }
         }
     }
 
     this@reduxStore.collect { action ->
-        sideEffects.forEach {
-            it.sendAction(action, currentState)
+        mutex.withLock {
+            sideEffects.forEach {
+                it.sendAction(action, currentState)
+            }
         }
     }
 }
