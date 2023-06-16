@@ -16,7 +16,7 @@ internal class CollectWhileBasedOnState<T, InputState : S, S : Any, A : Any>(
     private val flowBuilder: (Flow<InputState>) -> Flow<T>,
     private val executionPolicy: ExecutionPolicy,
     private val handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
-) : SideEffect<InputState, S, A>() {
+) : LegacySideEffect<InputState, S, A>() {
 
     override fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>> {
         return actions.whileInState(isInState, getState) { inStateActions ->

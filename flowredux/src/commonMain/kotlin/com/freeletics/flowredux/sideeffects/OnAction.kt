@@ -18,7 +18,7 @@ internal class OnAction<InputState : S, SubAction : A, S : Any, A : Any>(
     internal val subActionClass: KClass<SubAction>,
     internal val executionPolicy: ExecutionPolicy,
     internal val handler: suspend (action: SubAction, state: State<InputState>) -> ChangedState<S>,
-) : SideEffect<InputState, S, A>() {
+) : LegacySideEffect<InputState, S, A>() {
 
     override fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>> {
         return actions.whileInState(isInState, getState) { inStateAction ->
