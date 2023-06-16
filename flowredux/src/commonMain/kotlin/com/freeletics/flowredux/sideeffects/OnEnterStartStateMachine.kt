@@ -1,7 +1,5 @@
 package com.freeletics.flowredux.sideeffects
 
-import com.freeletics.flowredux.GetState
-import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.util.CoroutineWaiter
@@ -25,19 +23,17 @@ internal class OnEnterStartStateMachine<SubStateMachineState : Any, SubStateMach
     private val subStateMachineFactory: (InputState) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
     private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
-) : InStateSideEffectBuilder<InputState, S, A>() {
+) : SideEffect<InputState, S, A>() {
 
-    override fun generateSideEffect(): SideEffect<S, A> {
-        return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
-            dispatchActionsToSubStateMachineAndCollectSubStateMachineState(actions, getState)
-        }
+    override fun produceState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<ChangeStateAction<S, A>> {
+        return dispatchActionsToSubStateMachineAndCollectSubStateMachineState(actions, getState)
     }
 
     @Suppress("UNCHECKED_CAST")
     private fun dispatchActionsToSubStateMachineAndCollectSubStateMachineState(
         upstreamActions: Flow<Action<S, A>>,
         getState: GetState<S>,
-    ): Flow<Action<S, A>> {
+    ): Flow<ChangeStateAction<S, A>> {
         return upstreamActions
             .whileInState(isInState, getState) { actions: Flow<Action<S, A>> ->
                 val stateOnEntering = getState() as? InputState

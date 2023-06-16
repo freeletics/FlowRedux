@@ -3,8 +3,9 @@ package com.freeletics.flowredux
 import com.freeletics.flowredux.sideeffects.Action
 import com.freeletics.flowredux.sideeffects.ChangeStateAction
 import com.freeletics.flowredux.sideeffects.ExternalWrappedAction
-import com.freeletics.flowredux.sideeffects.InStateSideEffectBuilder
+import com.freeletics.flowredux.sideeffects.GetState
 import com.freeletics.flowredux.sideeffects.InitialStateAction
+import com.freeletics.flowredux.sideeffects.SideEffectBuilder
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -15,12 +16,12 @@ import kotlinx.coroutines.flow.onStart
 
 internal fun <A : Any, S : Any> Flow<A>.reduxStore(
     initialStateSupplier: () -> S,
-    sideEffectBuilders: Iterable<InStateSideEffectBuilder<out S, S, A>>,
+    sideEffectBuilders: Iterable<SideEffectBuilder<out S, S, A>>,
 ): Flow<S> = flow {
     var currentState: S = initialStateSupplier()
     val getState: GetState<S> = { currentState }
 
-    val sideEffects = sideEffectBuilders.map { it.generateSideEffect() }
+    val sideEffects = sideEffectBuilders.map { it.build() }
 
     // Emit the initial state
     emit(currentState)
@@ -30,7 +31,7 @@ internal fun <A : Any, S : Any> Flow<A>.reduxStore(
     }
     val sideEffectActions = sideEffects.mapIndexed { index, sideEffect ->
         val actionsFlow = loopbacks[index].consumeAsFlow()
-        sideEffect(actionsFlow, getState)
+        sideEffect.produceState(actionsFlow, getState)
     }
     val upstreamActions = this@reduxStore
         .map<A, Action<S, A>> { ExternalWrappedAction(it) }

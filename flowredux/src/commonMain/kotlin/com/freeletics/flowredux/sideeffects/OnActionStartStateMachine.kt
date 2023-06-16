@@ -1,9 +1,5 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package com.freeletics.flowredux.sideeffects
 
-import com.freeletics.flowredux.GetState
-import com.freeletics.flowredux.SideEffect
 import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.util.CoroutineWaiter
@@ -28,84 +24,82 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
     internal val subActionClass: KClass<out A>,
     private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
-) : InStateSideEffectBuilder<InputState, S, A>() {
+) : SideEffect<InputState, S, A>() {
 
-    override fun generateSideEffect(): SideEffect<S, A> {
-        return { actions: Flow<Action<S, A>>, getState: GetState<S> ->
+    @Suppress("UNCHECKED_CAST")
+    override fun produceState(actions: Flow<Action<S, A>>, getState: GetState<S>): Flow<ChangeStateAction<S, A>> {
+        return actions.whileInState(isInState, getState) { inStateAction ->
+            channelFlow {
+                val subStateMachinesMap = SubStateMachinesMap<SubStateMachineState, SubStateMachineAction, ActionThatTriggeredStartingStateMachine>()
 
-            actions.whileInState(isInState, getState) { inStateAction ->
-                channelFlow {
-                    val subStateMachinesMap = SubStateMachinesMap<SubStateMachineState, SubStateMachineAction, ActionThatTriggeredStartingStateMachine>()
+                inStateAction
+                    .collect { action ->
+                        // collect upstream
+                        when (action) {
+                            is ChangeStateAction,
+                            is InitialStateAction,
+                            -> {
+                                // Nothing needs to be done, these Actions are not interesting for
+                                // this operator, so we can just safely ignore them
+                            }
 
-                    inStateAction
-                        .collect { action ->
-                            // collect upstream
-                            when (action) {
-                                is ChangeStateAction,
-                                is InitialStateAction,
-                                -> {
-                                    // Nothing needs to be done, these Actions are not interesting for
-                                    // this operator, so we can just safely ignore them
-                                }
+                            is ExternalWrappedAction<*, *> ->
+                                runOnlyIfInInputState(getState) { currentState ->
+                                    // TODO take ExecutionPolicy into account
+                                    if (subActionClass.isInstance(action.action)) {
+                                        val actionThatStartsStateMachine =
+                                            action.action as ActionThatTriggeredStartingStateMachine
 
-                                is ExternalWrappedAction<*, *> ->
-                                    runOnlyIfInInputState(getState) { currentState ->
-                                        // TODO take ExecutionPolicy into account
-                                        if (subActionClass.isInstance(action.action)) {
-                                            val actionThatStartsStateMachine =
-                                                action.action as ActionThatTriggeredStartingStateMachine
+                                        val stateMachine = subStateMachineFactory(
+                                            actionThatStartsStateMachine,
+                                            currentState,
+                                        )
 
-                                            val stateMachine = subStateMachineFactory(
-                                                actionThatStartsStateMachine,
-                                                currentState,
-                                            )
-
-                                            // Launch substatemachine
-                                            val coroutineWaiter = CoroutineWaiter()
-                                            val job = launch {
-                                                stateMachine.state
-                                                    .onStart {
-                                                        coroutineWaiter.resume() // Resume waiting coroutines that dispatch Actions
-                                                    }
-                                                    .onCompletion {
-                                                        subStateMachinesMap.remove(stateMachine)
-                                                    }
-                                                    .collect { subStateMachineState ->
-                                                        runOnlyIfInInputState(getState) { parentState ->
-                                                            send(
-                                                                ChangeStateAction(
-                                                                    runReduceOnlyIf = isInState,
-                                                                    changedState = stateMapper(
-                                                                        State(parentState),
-                                                                        subStateMachineState,
-                                                                    ),
+                                        // Launch substatemachine
+                                        val coroutineWaiter = CoroutineWaiter()
+                                        val job = launch {
+                                            stateMachine.state
+                                                .onStart {
+                                                    coroutineWaiter.resume() // Resume waiting coroutines that dispatch Actions
+                                                }
+                                                .onCompletion {
+                                                    subStateMachinesMap.remove(stateMachine)
+                                                }
+                                                .collect { subStateMachineState ->
+                                                    runOnlyIfInInputState(getState) { parentState ->
+                                                        send(
+                                                            ChangeStateAction(
+                                                                runReduceOnlyIf = isInState,
+                                                                changedState = stateMapper(
+                                                                    State(parentState),
+                                                                    subStateMachineState,
                                                                 ),
-                                                            )
-                                                        }
+                                                            ),
+                                                        )
                                                     }
-                                            }
-                                            subStateMachinesMap.cancelPreviousAndAddNew(
-                                                actionThatStartedStateMachine = actionThatStartsStateMachine,
-                                                stateMachine = stateMachine,
-                                                job = job,
-                                                coroutineWaiter = coroutineWaiter,
-                                            )
-                                        } else {
-                                            // a regular action that needs to be forwarded
-                                            // to the active sub state machine
-                                            subStateMachinesMap.forEachStateMachine { stateMachine, coroutineWaiter ->
-                                                launch {
-                                                    coroutineWaiter.waitUntilResumed() // Wait until sub statemachine's state Flow is collected
-                                                    actionMapper(action.action as A)?.let {
-                                                        stateMachine.dispatch(it)
-                                                    }
+                                                }
+                                        }
+                                        subStateMachinesMap.cancelPreviousAndAddNew(
+                                            actionThatStartedStateMachine = actionThatStartsStateMachine,
+                                            stateMachine = stateMachine,
+                                            job = job,
+                                            coroutineWaiter = coroutineWaiter,
+                                        )
+                                    } else {
+                                        // a regular action that needs to be forwarded
+                                        // to the active sub state machine
+                                        subStateMachinesMap.forEachStateMachine { stateMachine, coroutineWaiter ->
+                                            launch {
+                                                coroutineWaiter.waitUntilResumed() // Wait until sub statemachine's state Flow is collected
+                                                actionMapper(action.action as A)?.let {
+                                                    stateMachine.dispatch(it)
                                                 }
                                             }
                                         }
                                     }
-                            }
+                                }
                         }
-                }
+                    }
             }
         }
     }

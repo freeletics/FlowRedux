@@ -6,7 +6,7 @@ import com.freeletics.flowredux.dsl.reduce
 internal sealed class Action<S, A>
 
 internal data class ChangeStateAction<S, A>(
-    private val runReduceOnlyIf: InStateSideEffectBuilder.IsInState<S>,
+    private val runReduceOnlyIf: SideEffect.IsInState<S>,
     private val changedState: ChangedState<S>,
 ) : Action<S, A>() {
     fun reduce(state: S): S {
