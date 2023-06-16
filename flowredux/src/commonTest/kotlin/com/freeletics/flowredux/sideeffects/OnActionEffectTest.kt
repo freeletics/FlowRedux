@@ -8,13 +8,11 @@ import com.freeletics.flowredux.TestAction
 import com.freeletics.flowredux.TestState
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
+import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -22,20 +20,19 @@ internal class OnActionEffectTest {
 
     @Test
     fun actionEffectBlockStopsWhenMovedToAnotherState() = runTest {
-        val signal = Channel<Unit>()
         val blockEntered = Channel<Boolean>(Channel.UNLIMITED)
+        var cancellation: Throwable? = null
 
-        var reached = false
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onActionEffect<TestAction.A1> { _, _ ->
                     blockEntered.send(true)
-                    signal.awaitComplete()
-                    // while we wait for S2 to be emitted which cancels the block the cancelattion might happen slightly afterwards
-                    delay(100)
-                    // this should never be reached because state transition did happen in the meantime,
-                    // therefore this whole block must be canceled
-                    reached = true
+                    try {
+                        awaitCancellation()
+                    } catch (t: Throwable) {
+                        cancellation = t
+                        throw t
+                    }
                 }
 
                 on<TestAction.A2> { _, state ->
@@ -50,12 +47,8 @@ internal class OnActionEffectTest {
             assertTrue(blockEntered.awaitItem())
             sm.dispatchAsync(TestAction.A2)
             assertEquals(TestState.S2, awaitItem())
-            signal.close()
-            advanceUntilIdle()
-            runCurrent()
+            assertIs<StateChangeCancellationException>(cancellation)
         }
-
-        assertFalse(reached)
     }
 
     @Test
