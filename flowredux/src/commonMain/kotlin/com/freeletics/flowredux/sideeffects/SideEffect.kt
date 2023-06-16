@@ -99,11 +99,11 @@ internal class ManagedSideEffect<InputState : S, S, A>(
     private val stateChanges: SendChannel<ChangedState<S>>,
 ) {
 
-    private var current: Current? = null
+    private var currentlyActiveSideEffect: CurrentlyActiveSideEffect? = null
 
     suspend fun sendStateChange(state: S) {
         if (builder.isInState.check(state)) {
-            var current = current
+            var current = currentlyActiveSideEffect
             if (current == null) {
                 val currentSideEffect = builder.build()
                 val currentJob = scope.launch {
@@ -112,8 +112,8 @@ internal class ManagedSideEffect<InputState : S, S, A>(
                         stateChanges.send(guardWithIsInState(it, currentSideEffect))
                     }
                 }
-                current = Current(currentJob, currentSideEffect)
-                this.current = current
+                current = CurrentlyActiveSideEffect(currentJob, currentSideEffect)
+                this.currentlyActiveSideEffect = current
             }
 
             current.sideEffect.sendState(state)
@@ -121,24 +121,24 @@ internal class ManagedSideEffect<InputState : S, S, A>(
     }
 
     suspend fun cancelIfNeeded(state: S) {
-        val current = current
+        val current = currentlyActiveSideEffect
         if (current != null) {
             if (!current.sideEffect.isInState.check(state)) {
                 current.job.cancel(StateChangeCancellationException())
                 current.job.join()
-                this.current = null
+                this.currentlyActiveSideEffect = null
             }
         }
     }
 
     suspend fun sendAction(action: A, state: S) {
-        val current = current
+        val current = currentlyActiveSideEffect
         if (current != null && current.sideEffect.isInState.check(state)) {
             current.sideEffect.sendAction(action)
         }
     }
 
-    private inner class Current(
+    private inner class CurrentlyActiveSideEffect(
         val job: Job,
         val sideEffect: SideEffect<InputState, S, A>
     )
