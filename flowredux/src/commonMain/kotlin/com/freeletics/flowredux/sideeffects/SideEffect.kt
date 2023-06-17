@@ -93,13 +93,14 @@ internal abstract class ActionBasedSideEffect<InputState : S, S, A> : SideEffect
 
 internal class SideEffectBuilder<InputState : S, S, A>(
     val isInState: IsInState<S>,
-    private val builder: () -> SideEffect<InputState, S, A>,
+    private val builder: (InputState) -> SideEffect<InputState, S, A>,
 ) {
     fun interface IsInState<S> {
         fun check(state: S): Boolean
     }
 
-    fun build() = builder()
+    @Suppress("UNCHECKED_CAST")
+    fun build(state: S) = builder(state as InputState)
 }
 
 internal class ManagedSideEffect<InputState : S, S, A>(
@@ -115,7 +116,7 @@ internal class ManagedSideEffect<InputState : S, S, A>(
         if (builder.isInState.check(state)) {
             var current = currentlyActiveSideEffect
             if (current == null) {
-                val currentSideEffect = builder.build()
+                val currentSideEffect = builder.build(state)
                 val currentJob = scope.launch {
                     currentSideEffect.produceState(getState).collect {
                         // the side effect is in state might be more specific than the one in the builder

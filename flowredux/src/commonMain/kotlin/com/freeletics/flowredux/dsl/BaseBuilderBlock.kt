@@ -100,9 +100,10 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
     public fun onEnter(
         handler: suspend (state: State<InputState>) -> ChangedState<S>,
     ) {
-        sideEffectBuilders += SideEffectBuilder(isInState) {
+        sideEffectBuilders += SideEffectBuilder(isInState) { initialState ->
             OnEnter(
                 isInState = sideEffectIsInState(),
+                initialState = initialState,
                 handler = handler,
             )
         }
