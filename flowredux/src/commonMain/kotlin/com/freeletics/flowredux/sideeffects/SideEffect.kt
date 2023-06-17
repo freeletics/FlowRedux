@@ -14,25 +14,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-internal abstract class LegacySideEffect<InputState : S, S, A> : SideEffect<InputState, S, A>() {
-
-    private val actions = Channel<Action<A>>()
-
-    override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
-        return produceState(actions.receiveAsFlow(), getState)
-    }
-
-    abstract fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>>
-
-    override suspend fun sendState(state: S) {
-        actions.send(InitialStateAction())
-    }
-
-    override suspend fun sendAction(action: A) {
-        actions.send(ExternalWrappedAction(action))
-    }
-}
-
 internal abstract class SideEffect<InputState : S, S, A> {
     fun interface IsInState<S> {
         fun check(state: S): Boolean
