@@ -4,12 +4,8 @@ import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.ExecutionPolicy
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.util.flatMapWithExecutionPolicy
-import com.freeletics.flowredux.util.mapToIsInState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 
 @ExperimentalCoroutinesApi
 internal class CollectWhile<T, InputState : S, S : Any, A : Any>(
@@ -17,21 +13,13 @@ internal class CollectWhile<T, InputState : S, S : Any, A : Any>(
     private val flow: Flow<T>,
     private val executionPolicy: ExecutionPolicy,
     private val handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
-) : LegacySideEffect<InputState, S, A>() {
+) : SideEffect<InputState, S, A>() {
 
-    override fun produceState(actions: Flow<Action<A>>, getState: GetState<S>): Flow<ChangedState<S>> {
-        return actions
-            .mapToIsInState(isInState, getState)
-            .flatMapLatest { inState ->
-                if (inState) {
-                    flow.flatMapWithExecutionPolicy(executionPolicy) { item ->
-                        changeState(getState) { snapshot ->
-                            handler(item, State(snapshot))
-                        }
-                    }
-                } else {
-                    emptyFlow()
-                }
+    override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
+        return flow.flatMapWithExecutionPolicy(executionPolicy) { item ->
+            changeState(getState) { inputState ->
+                handler(item, State(inputState))
             }
+        }
     }
 }
