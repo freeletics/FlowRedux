@@ -81,6 +81,16 @@ internal abstract class SideEffect<InputState : S, S, A> {
     }
 }
 
+internal abstract class ActionBasedSideEffect<InputState : S, S, A> : SideEffect<InputState, S, A>() {
+
+    private val actionChannel = Channel<A>()
+    protected val actions get() = actionChannel.receiveAsFlow()
+
+    override suspend fun sendAction(action: A) {
+        actionChannel.send(action)
+    }
+}
+
 internal class SideEffectBuilder<InputState : S, S, A>(
     val isInState: IsInState<S>,
     private val builder: () -> SideEffect<InputState, S, A>,
