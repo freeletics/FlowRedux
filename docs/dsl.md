@@ -701,7 +701,7 @@ class ItemListStateMachine(
 ```
 
 Do you notice something?
-With more blocks we add the state machine itself gets harder to read, understand and maintain.
+With more blocks we add the state machine itself gets harder to read, to understand and to maintain.
 What we are aiming for with FlowRedux and it's DSL is to get a readable overview about what the state machine is supposed to do on a high level.
 If you take a look at the example from above, however, you will notice that it isn't easy
 to read and get bloated with implementation details.
