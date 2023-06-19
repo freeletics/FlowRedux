@@ -1,6 +1,7 @@
 [versions]
-kotlin = "1.8.21"
+kotlin = "1.8.20"
 coroutines = "1.7.1"
+compose-multiplatform = "1.4.0"
 
 java-target = "1.8"
 java-toolchain = "19"
@@ -11,7 +12,7 @@ android-target = "33"
 android-compile = "33"
 androidx-activity = "1.7.2"
 androidx-appcompat = "1.6.1"
-androidx-compose-compiler = "1.4.7"
+androidx-compose-compiler = "1.4.6"
 androidx-compose-runtime = "1.4.3"
 androidx-compose-ui = "1.4.3"
 androidx-compose-foundation = "1.4.3"
@@ -40,6 +41,7 @@ dependency-analysis = "1.20.0"
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-annotations = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+compose-multiplatform-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
 
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
@@ -81,6 +83,7 @@ android-app = { id = "com.android.application", version.ref = "android-gradle" }
 android-library = { id = "com.android.library", version.ref = "android-gradle" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 publish = { id = "com.vanniktech.maven.publish", version.ref = "publish" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 binarycompatibility = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binarycompatibility" }
