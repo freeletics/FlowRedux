@@ -456,7 +456,7 @@ class ItemListStateMachine : FlowReduxStateMachine<ListState, Action>(initialSta
 We already covered `inState<State>` that builds upon the recommended best practice that every State of your state machine is expressed us it's own type in Kotlin.
 
 Sometimes, however, you need a bit more flexibility than just relaying on types to model state.
-For that use case you can use `inStateWithCondition(isInState: (State) -> Boolean)`.
+For that use case you can add  `condition( isConditionMet: (State) -> Boolean)` blocks inside your `inState<State>` blocks. 
 
 Example: One could have also modeled the state for our `ItemListStateMachine` as the following:
 
@@ -491,43 +491,45 @@ class ItemListStateMachine(
 
     init {
         spec {
-            inStateWithCondition(isInState = { state -> state.loading == true }) {
-                onEnter { state: State<ListState> ->
-                    // we entered the Loading, so let's do the http request
-                    try {
-                        val items = httpClient.loadItems()
-                        state.mutate {
-                            this.copy(loading = false, items = items, error = null, errorCountdown = null)
-                        }
-                    } catch (t: Throwable) {
-                        state.mutate {
-                            this.copy(loading = false, items = emptyList(), error = t, errorCountdown = 3)
+            inState<ListState> {
+                condition({ state -> state.loading == true }) {
+                    onEnter { state: State<ListState> ->
+                        // we entered the Loading, so let's do the http request
+                        try {
+                            val items = httpClient.loadItems()
+                            state.mutate {
+                                this.copy(loading = false, items = items, error = null, errorCountdown = null)
+                            }
+                        } catch (t: Throwable) {
+                            state.mutate {
+                                this.copy(loading = false, items = emptyList(), error = t, errorCountdown = 3)
+                            }
                         }
                     }
                 }
-            }
 
-            inStateWithCondition(isInState = { state -> state.error != null }) {
-                on<RetryLoadingAction> { action : RetryLoadingAction, state : State<ListState> ->
-                    state.mutate {
-                        this.copy(loading = true, items = emptyList(), error = null, errorCountdown = null)
+                condition({ state -> state.error != null }) {
+                    on<RetryLoadingAction> { action : RetryLoadingAction, state : State<ListState> ->
+                        state.mutate {
+                            this.copy(loading = true, items = emptyList(), error = null, errorCountdown = null)
+                        }
                     }
-                }
 
-                val timer : Flow<Int> = timerThatEmitsEverySecond()
-                collectWhileInState(timer) { value : Int, state : State<ListState> ->
-                    state.mutate {
-                        if (errorCountdown!! > 0)
-                            //  decrease the countdown by 1 second
-                            this.copy(errorCountdown = this.errorCountdown!! - 1)
-                        else
-                            // transition to the Loading
-                            this.copy(
-                                loading = true,
-                                items = emptyList(),
-                                error = null,
-                                errorCountdown = null
-                            )
+                    val timer : Flow<Int> = timerThatEmitsEverySecond()
+                    collectWhileInState(timer) { value : Int, state : State<ListState> ->
+                        state.mutate {
+                            if (errorCountdown!! > 0)
+                                //  decrease the countdown by 1 second
+                                this.copy(errorCountdown = this.errorCountdown!! - 1)
+                            else
+                                // transition to the Loading
+                                this.copy(
+                                    loading = true,
+                                    items = emptyList(),
+                                    error = null,
+                                    errorCountdown = null
+                                )
+                        }
                     }
                 }
             }
@@ -536,12 +538,10 @@ class ItemListStateMachine(
 }
 ```
 
-Instead of `inState<State> { ... }` use `inStateWithCondition`  .
-It takes a lambda as parameter that looks like `(State) -> Boolean` so that.
-If that lambda returns `true` it means we are in that state, otherwise not (returning false).
-The rest still remains the same.
-You can use `onEnter`, `on<Action>` and `collectWhileInState` the exact way as you already know.
-However, since `inStateWithCondition` has no generics, FlowRedux cannot infer types in `onEnter`, `on`, etc.
+`condition` takes a lambda as parameter the following signature: `(State) -> Boolean`.
+If that lambda returns `true` it means the condition is met, otherwise not (returning false).
+You can use `onEnter`, `on<Action>` and `collectWhileInState` the exact way as you already know, just wrapped around a `condition` block.
+
 
 ## Acting across multiple states
 
