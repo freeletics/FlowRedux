@@ -538,7 +538,7 @@ class ItemListStateMachine(
 }
 ```
 
-`condition` takes a lambda as parameter the following signature: `(State) -> Boolean`.
+`condition` takes a lambda as parameter with the following signature: `(State) -> Boolean`.
 If that lambda returns `true` it means the condition is met, otherwise not (returning false).
 You can use `onEnter`, `on<Action>` and `collectWhileInState` the exact way as you already know, just wrapped around a `condition` block.
 
