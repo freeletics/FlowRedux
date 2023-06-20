@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@Suppress("deprecation")
 internal class CollectWhileTest {
 
     @Test
@@ -46,13 +47,13 @@ internal class CollectWhileTest {
     }
 
     @Test
-    fun collectWhileInStateWithFlowBuilderStopsAfterHavingMovedToNextState() = runTest {
+    fun collectWhileInStateWithBuilderStopsAfterHavingMovedToNextState() = runTest {
         val values = MutableSharedFlow<Int>()
         val recordedValues = Channel<Int>(Channel.UNLIMITED)
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                collectWhileInState({ it.flatMapConcat { values } }) { v, state ->
+                collectWhileInState({ values }) { v, state ->
                     recordedValues.send(v)
                     state.override { TestState.S1 }
                 }
@@ -112,28 +113,59 @@ internal class CollectWhileTest {
         }
     }
 
+
     @Test
-    fun collectWhileInStateFlowBuilderReceivesAnyGenericStateStateUpdate() = runTest {
+    fun moveFromCollectWhileInStateWithBuilderToNextStateWithAction() = runTest {
+        val sm = StateMachine {
+            inState<TestState.Initial> {
+                collectWhileInState({ flowOf(1) }) { _, state ->
+                    state.override { TestState.S1 }
+                }
+            }
+
+            inState<TestState.S1> {
+                on<TestAction.A1> { _, state ->
+                    state.override { TestState.S2 }
+                }
+            }
+
+            inState<TestState.S2> {
+                on<TestAction.A2> { _, state ->
+                    state.override { TestState.S1 }
+                }
+            }
+        }
+
+        sm.state.test {
+            assertEquals(TestState.Initial, awaitItem())
+            assertEquals(TestState.S1, awaitItem())
+
+            sm.dispatchAsync(TestAction.A1)
+            assertEquals(TestState.S2, awaitItem())
+
+            sm.dispatchAsync(TestAction.A2)
+            assertEquals(TestState.S1, awaitItem())
+
+            sm.dispatchAsync(TestAction.A1)
+            assertEquals(TestState.S2, awaitItem())
+
+            sm.dispatchAsync(TestAction.A2)
+            assertEquals(TestState.S1, awaitItem())
+        }
+    }
+
+    @Test
+    fun collectWhileInStateWithBuilderReceivesInitialState() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
-                    it.override { TestState.GenericState("", 0) }
+                    it.override { TestState.GenericState("", 1) }
                 }
             }
             inState<TestState.GenericState> {
-                collectWhileInState({
-                    it.flatMapConcat { state ->
-                        flow {
-                            emit(1 + 10 * state.anInt)
-                        }
-                    }
-                }) { value, state ->
+                collectWhileInState({ flowOf(it.anInt * 10) }) { value, state ->
                     state.override {
-                        if (value < 10000) {
-                            TestState.GenericState(aString = aString + value, anInt = value)
-                        } else {
-                            TestState.S1
-                        }
+                        TestState.GenericState(aString = aString + value, anInt = value)
                     }
                 }
             }
@@ -141,12 +173,8 @@ internal class CollectWhileTest {
 
         sm.state.test {
             assertEquals(TestState.Initial, awaitItem())
-            assertEquals(TestState.GenericState("", 0), awaitItem())
-            assertEquals(TestState.GenericState("1", 1), awaitItem())
-            assertEquals(TestState.GenericState("111", 11), awaitItem())
-            assertEquals(TestState.GenericState("111111", 111), awaitItem())
-            assertEquals(TestState.GenericState("1111111111", 1111), awaitItem())
-            assertEquals(TestState.S1, awaitItem())
+            assertEquals(TestState.GenericState("", 1), awaitItem())
+            assertEquals(TestState.GenericState("10", 10), awaitItem())
         }
     }
 }

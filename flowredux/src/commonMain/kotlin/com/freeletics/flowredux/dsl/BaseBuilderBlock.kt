@@ -1,7 +1,6 @@
 package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.sideeffects.CollectWhile
-import com.freeletics.flowredux.sideeffects.CollectWhileBasedOnState
 import com.freeletics.flowredux.sideeffects.OnAction
 import com.freeletics.flowredux.sideeffects.OnActionStartStateMachine
 import com.freeletics.flowredux.sideeffects.OnEnter
@@ -152,25 +151,24 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
     }
 
     /**
-     * Triggers every time the state machine enters this state. [flowBuilder] will get a
-     * [Flow] that emits the current [InputState] and any change to it. The transformed `Flow` that
-     * [flowBuilder] returns will be collected and any emission will be passed to [handler].
+     * Triggers every time the state machine enters this state. The passed [Flow] created by
+     * [flowBuilder] will be collected and any emission will be passed to [handler].
      *
      * The collection as well as any ongoing [handler] is cancelled when leaving this state.
      *
-     * [executionPolicy] is used to determine the behavior when a new emission from [flowBuilder]'s
-     * `Flow` arrives before the previous [handler] invocation completed. By default
-     * [ExecutionPolicy.ORDERED] is applied.
+     * [executionPolicy] is used to determine the behavior when a new emission from `Flow` arrives
+     * before the previous [handler] invocation completed. By default [ExecutionPolicy.ORDERED]
+     * is applied.
      */
     public fun <T> collectWhileInState(
-        flowBuilder: (state: Flow<InputState>) -> Flow<T>,
+        flowBuilder: (InputState) -> Flow<T>,
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
         handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
     ) {
-        sideEffectBuilders += SideEffectBuilder(isInState) {
-            CollectWhileBasedOnState(
-                isInState = sideEffectIsInState(it),
-                flowBuilder = flowBuilder,
+        sideEffectBuilders += SideEffectBuilder(isInState) { initialState ->
+            CollectWhile(
+                isInState = sideEffectIsInState(initialState),
+                flow = flowBuilder(initialState),
                 executionPolicy = executionPolicy,
                 handler = handler,
             )
@@ -209,7 +207,7 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
      * when it triggers and when it gets canceled.
      */
     public fun <T> collectWhileInStateEffect(
-        flowBuilder: (state: Flow<InputState>) -> Flow<T>,
+        flowBuilder: (InputState) -> Flow<T>,
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
         handler: suspend (item: T, state: InputState) -> Unit,
     ) {
