@@ -47,40 +47,13 @@ internal class CollectWhileTest {
     }
 
     @Test
-    fun collectWhileInStateBasedOnStateStopsAfterHavingMovedToNextState() = runTest {
+    fun collectWhileInStateStopsAfterHavingMovedToNextState() = runTest {
         val values = MutableSharedFlow<Int>()
         val recordedValues = Channel<Int>(Channel.UNLIMITED)
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                collectWhileInStateBasedOnState({ values }) { v, state ->
-                    recordedValues.send(v)
-                    state.override { TestState.S1 }
-                }
-            }
-        }
-
-        sm.state.test {
-            assertEquals(TestState.Initial, awaitItem())
-            values.emit(1)
-            assertEquals(TestState.S1, awaitItem())
-
-            values.emit(2)
-            values.emit(3)
-            recordedValues.consumeAsFlow().test {
-                assertEquals(1, awaitItem())
-            }
-        }
-    }
-
-    @Test
-    fun collectWhileInStateWithFlowBuilderStopsAfterHavingMovedToNextState() = runTest {
-        val values = MutableSharedFlow<Int>()
-        val recordedValues = Channel<Int>(Channel.UNLIMITED)
-
-        val sm = StateMachine {
-            inState<TestState.Initial> {
-                collectWhileInState({ it.flatMapConcat { values } }) { v, state ->
+                collectWhileInState({ values }) { v, state ->
                     recordedValues.send(v)
                     state.override { TestState.S1 }
                 }
@@ -145,7 +118,7 @@ internal class CollectWhileTest {
     fun moveFromCollectWhileInStateBasedOnStateToNextStateWithAction() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
-                collectWhileInStateBasedOnState({ flowOf(1) }) { _, state ->
+                collectWhileInState({ flowOf(1) }) { _, state ->
                     state.override { TestState.S1 }
                 }
             }
@@ -182,7 +155,7 @@ internal class CollectWhileTest {
     }
 
     @Test
-    fun collectWhileInStateBasedOnStateReceivesInitialState() = runTest {
+    fun collectWhileInStateReceivesInitialState() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
@@ -190,7 +163,7 @@ internal class CollectWhileTest {
                 }
             }
             inState<TestState.GenericState> {
-                collectWhileInStateBasedOnState({ flowOf(it.anInt * 10) }) { value, state ->
+                collectWhileInState({ flowOf(it.anInt * 10) }) { value, state ->
                     state.override {
                         TestState.GenericState(aString = aString + value, anInt = value)
                     }
@@ -202,44 +175,6 @@ internal class CollectWhileTest {
             assertEquals(TestState.Initial, awaitItem())
             assertEquals(TestState.GenericState("", 1), awaitItem())
             assertEquals(TestState.GenericState("10", 10), awaitItem())
-        }
-    }
-
-    @Test
-    fun collectWhileInStateFlowBuilderReceivesAnyGenericStateStateUpdate() = runTest {
-        val sm = StateMachine {
-            inState<TestState.Initial> {
-                onEnter {
-                    it.override { TestState.GenericState("", 0) }
-                }
-            }
-            inState<TestState.GenericState> {
-                collectWhileInState({
-                    it.flatMapConcat { state ->
-                        flow {
-                            emit(1 + 10 * state.anInt)
-                        }
-                    }
-                }) { value, state ->
-                    state.override {
-                        if (value < 10000) {
-                            TestState.GenericState(aString = aString + value, anInt = value)
-                        } else {
-                            TestState.S1
-                        }
-                    }
-                }
-            }
-        }
-
-        sm.state.test {
-            assertEquals(TestState.Initial, awaitItem())
-            assertEquals(TestState.GenericState("", 0), awaitItem())
-            assertEquals(TestState.GenericState("1", 1), awaitItem())
-            assertEquals(TestState.GenericState("111", 11), awaitItem())
-            assertEquals(TestState.GenericState("111111", 111), awaitItem())
-            assertEquals(TestState.GenericState("1111111111", 1111), awaitItem())
-            assertEquals(TestState.S1, awaitItem())
         }
     }
 }

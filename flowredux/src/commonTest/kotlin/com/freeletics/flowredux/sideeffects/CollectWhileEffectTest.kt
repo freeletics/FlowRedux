@@ -51,7 +51,7 @@ internal class CollectWhileEffectTest {
     }
 
     @Test
-    fun collectWhileInStateBasedOnStateEffectStopsAfterHavingMovedToNextState() = runTest {
+    fun collectWhileInStateEffectStopsAfterHavingMovedToNextState() = runTest {
         val values = MutableSharedFlow<Int>()
         val recordedValues = Channel<String>(Channel.UNLIMITED)
 
@@ -62,7 +62,7 @@ internal class CollectWhileEffectTest {
                 }
             }
             inState<TestState.GenericState> {
-                collectWhileInStateBasedOnStateEffect({ initial ->  values.map { "${initial.aString}$it" } }) { v, _ ->
+                collectWhileInStateEffect({ initial ->  values.map { "${initial.aString}$it" } }) { v, _ ->
                     recordedValues.send(v)
                 }
 
@@ -88,42 +88,6 @@ internal class CollectWhileEffectTest {
             assertEquals("a1", awaitItem())
             assertEquals("a2", awaitItem())
             assertEquals("a3", awaitItem())
-        }
-    }
-
-    @Test
-    fun collectWhileInStateEffectWithFlowBuilderStopsAfterHavingMovedToNextState() = runTest {
-        val stateChange = MutableSharedFlow<Unit>()
-        val values = MutableSharedFlow<Int>()
-        val recordedValues = Channel<Int>(Channel.UNLIMITED)
-
-        val sm = StateMachine {
-            inState<TestState.Initial> {
-                collectWhileInState({
-                    it.flatMapConcat {
-                        stateChange
-                    }
-                }) { _, state ->
-                    state.override { TestState.S1 }
-                }
-
-                collectWhileInStateEffect({ it.flatMapConcat { values } }) { v, _ ->
-                    recordedValues.send(v)
-                }
-            }
-        }
-
-        sm.state.test {
-            assertEquals(TestState.Initial, awaitItem())
-            values.emit(1)
-            stateChange.emit(Unit)
-            assertEquals(TestState.S1, awaitItem())
-
-            values.emit(2)
-            values.emit(3)
-            recordedValues.consumeAsFlow().test {
-                assertEquals(1, awaitItem())
-            }
         }
     }
 }
