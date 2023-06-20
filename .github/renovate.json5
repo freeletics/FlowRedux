@@ -38,7 +38,7 @@
         "^org.jetbrains.kotlin",
         "com.google.devtools.ksp",
         "org.jetbrains.compose",
-        "androidx.compose.compiler:compiler"
+        "androidx.compose.compiler"
       ],
       groupName: "Kotlin and Compose Compiler"
     },
