@@ -23,8 +23,6 @@ internal abstract class SideEffect<InputState : S, S, A> {
 
     abstract fun produceState(getState: GetState<S>): Flow<ChangedState<S>>
 
-    open suspend fun sendState(state: S) {}
-
     open suspend fun sendAction(action: A) {}
 
     protected inline fun changeState(
@@ -93,7 +91,7 @@ internal class ManagedSideEffect<InputState : S, S, A>(
 
     private var currentlyActiveSideEffect: CurrentlyActiveSideEffect? = null
 
-    suspend fun sendStateChange(state: S) {
+    suspend fun startIfNeeded(state: S) {
         if (builder.isInState.check(state)) {
             var current = currentlyActiveSideEffect
             if (current == null) {
@@ -107,8 +105,6 @@ internal class ManagedSideEffect<InputState : S, S, A>(
                 current = CurrentlyActiveSideEffect(currentJob, currentSideEffect)
                 this.currentlyActiveSideEffect = current
             }
-
-            current.sideEffect.sendState(state)
         }
     }
 
