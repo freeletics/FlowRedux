@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class InStateBuilderBlockConditionTest {
+internal class ConditionBlockTest {
 
     @Test
     fun onActionTriggersOnlyWhileInCustomCondition() = runTest {
