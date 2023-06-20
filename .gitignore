@@ -14,3 +14,7 @@ kotlin-js-store/
 .idea*
 *.thumbnails
 .python-version
+
+
+.java-version
+.vscode/

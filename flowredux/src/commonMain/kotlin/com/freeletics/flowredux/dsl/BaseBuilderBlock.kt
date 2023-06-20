@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.Flow
 public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> internal constructor() {
 
     internal abstract val isInState: SideEffectBuilder.IsInState<S>
-    internal open fun sideEffectIsInState() = SideEffect.IsInState<S> {
+    internal open fun sideEffectIsInState(initialState: InputState) = SideEffect.IsInState<S> {
         isInState.check(it)
     }
 
@@ -47,7 +47,7 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) {
             OnAction(
-                isInState = sideEffectIsInState(),
+                isInState = sideEffectIsInState(it),
                 subActionClass = actionClass,
                 executionPolicy = executionPolicy,
                 handler = handler,
@@ -101,7 +101,7 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) { initialState ->
             OnEnter(
-                isInState = sideEffectIsInState(),
+                isInState = sideEffectIsInState(initialState),
                 initialState = initialState,
                 handler = handler,
             )
@@ -142,7 +142,7 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) {
             CollectWhile(
-                isInState = sideEffectIsInState(),
+                isInState = sideEffectIsInState(it),
                 flow = flow,
                 executionPolicy = executionPolicy,
                 handler = handler,
@@ -167,7 +167,7 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) { initialState ->
             CollectWhile(
-                isInState = sideEffectIsInState(),
+                isInState = sideEffectIsInState(initialState),
                 flow = flowBuilder(initialState),
                 executionPolicy = executionPolicy,
                 handler = handler,
@@ -274,7 +274,7 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) { initialState ->
             OnEnterStartStateMachine(
-                isInState = sideEffectIsInState(),
+                isInState = sideEffectIsInState(initialState),
                 subStateMachine = stateMachineFactory(initialState),
                 actionMapper = actionMapper,
                 stateMapper = stateMapper,
@@ -326,7 +326,7 @@ public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> interna
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) {
             OnActionStartStateMachine(
-                isInState = sideEffectIsInState(),
+                isInState = sideEffectIsInState(it),
                 subStateMachineFactory = stateMachineFactory,
                 subActionClass = actionClass,
                 actionMapper = actionMapper,
