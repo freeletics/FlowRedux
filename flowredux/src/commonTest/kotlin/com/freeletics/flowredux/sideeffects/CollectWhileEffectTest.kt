@@ -51,7 +51,7 @@ internal class CollectWhileEffectTest {
     }
 
     @Test
-    fun collectWhileInStateEffectStopsAfterHavingMovedToNextState() = runTest {
+    fun collectWhileInStateEffectWithBuilderStopsAfterHavingMovedToNextState() = runTest {
         val values = MutableSharedFlow<Int>()
         val recordedValues = Channel<String>(Channel.UNLIMITED)
 

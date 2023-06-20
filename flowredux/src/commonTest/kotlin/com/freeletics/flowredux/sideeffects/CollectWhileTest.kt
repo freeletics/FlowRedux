@@ -47,7 +47,7 @@ internal class CollectWhileTest {
     }
 
     @Test
-    fun collectWhileInStateStopsAfterHavingMovedToNextState() = runTest {
+    fun collectWhileInStateWithBuilderStopsAfterHavingMovedToNextState() = runTest {
         val values = MutableSharedFlow<Int>()
         val recordedValues = Channel<Int>(Channel.UNLIMITED)
 
@@ -115,7 +115,7 @@ internal class CollectWhileTest {
 
 
     @Test
-    fun moveFromCollectWhileInStateBasedOnStateToNextStateWithAction() = runTest {
+    fun moveFromCollectWhileInStateWithBuilderToNextStateWithAction() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 collectWhileInState({ flowOf(1) }) { _, state ->
@@ -155,7 +155,7 @@ internal class CollectWhileTest {
     }
 
     @Test
-    fun collectWhileInStateReceivesInitialState() = runTest {
+    fun collectWhileInStateWithBuilderReceivesInitialState() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
