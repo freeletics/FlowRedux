@@ -44,7 +44,10 @@
     },
     {
       matchPackagePatterns: [
-          "^androidx.compose..*(?<!compose.compiler)$"
+        "androidx.compose.runtime",
+        "androidx.compose.ui",
+        "androidx.compose.foundation",
+        "androidx.compose.material",
       ],
       groupName: "Compose"
     }
