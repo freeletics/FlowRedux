@@ -10,7 +10,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 
@@ -62,7 +61,7 @@ internal class CollectWhileEffectTest {
                 }
             }
             inState<TestState.GenericState> {
-                collectWhileInStateEffect({ initial ->  values.map { "${initial.aString}$it" } }) { v, _ ->
+                collectWhileInStateEffect({ initial -> values.map { "${initial.aString}$it" } }) { v, _ ->
                     recordedValues.send(v)
                 }
 

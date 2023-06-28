@@ -128,7 +128,7 @@ internal class ManagedSideEffect<InputState : S, S, A>(
 
     private inner class CurrentlyActiveSideEffect(
         val job: Job,
-        val sideEffect: SideEffect<InputState, S, A>
+        val sideEffect: SideEffect<InputState, S, A>,
     )
 }
 
