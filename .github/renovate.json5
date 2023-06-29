@@ -29,13 +29,13 @@
     },
     {
       matchPackagePatterns: [
-        "^com.freeletics.gradle"
+        "com.freeletics.gradle"
       ],
       groupName: "Freeletics Gradle Plugin"
     },
     {
       matchPackagePatterns: [
-        "^org.jetbrains.kotlin",
+        "org.jetbrains.kotlin:",
         "com.google.devtools.ksp",
         "org.jetbrains.compose",
         "androidx.compose.compiler"
