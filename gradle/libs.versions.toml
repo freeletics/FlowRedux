@@ -1,7 +1,8 @@
 [versions]
-kotlin = "1.8.20"
+kotlin = "1.8.22"
 coroutines = "1.7.2"
-compose-multiplatform = "1.4.0"
+compose-multiplatform = "1.4.1"
+compose-multiplatform-compiler = "1.4.8"
 
 java-target = "1.8"
 java-toolchain = "19"
@@ -12,7 +13,7 @@ android-target = "33"
 android-compile = "33"
 androidx-activity = "1.7.2"
 androidx-appcompat = "1.6.1"
-androidx-compose-compiler = "1.4.6"
+androidx-compose-compiler = "1.4.8"
 androidx-compose-runtime = "1.4.3"
 androidx-compose-ui = "1.4.3"
 androidx-compose-foundation = "1.4.3"
@@ -42,6 +43,7 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotlin-test-annotations = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 compose-multiplatform-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
+compose-multiplatform-compiler = { module = "org.jetbrains.compose.compiler:compiler", version.ref = "compose-multiplatform-compiler" }
 
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
