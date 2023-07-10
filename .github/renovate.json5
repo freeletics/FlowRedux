@@ -35,10 +35,8 @@
     },
     {
       matchPackagePatterns: [
-        "org.jetbrains.kotlin:",
-        "org.jetbrains.kotlin.android",
-        "org.jetbrains.kotlin.jvm",
-        "org.jetbrains.kotlin.multiplatform",
+        "org.jetbrains.kotlin",
+        "!org.jetbrains.kotlinx",
         "com.google.devtools.ksp",
         "org.jetbrains.compose",
         "androidx.compose.compiler"
