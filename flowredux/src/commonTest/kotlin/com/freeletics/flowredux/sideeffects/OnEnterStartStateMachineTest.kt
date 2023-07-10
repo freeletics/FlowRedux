@@ -346,7 +346,10 @@ internal class OnEnterStartStateMachineTest {
             inState<TestState.S2> {
                 onEnterEffect { parentS2++ }
                 onEnterStartStateMachine(
-                    stateMachineFactory = { childFactory++; child },
+                    stateMachineFactory = {
+                        childFactory++
+                        child
+                    },
                     actionMapper = { it },
                     stateMapper = { state, childState -> state.override { childState } },
                 )
