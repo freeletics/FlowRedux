@@ -10,6 +10,6 @@ tab_width = 4
 ij_continuation_indent_size = 4
 
 [*.{kt,kts}]
-ktlint_code_style = android
+ij_kotlin_imports_layout=*
 ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true
