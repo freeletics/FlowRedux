@@ -7,7 +7,8 @@ plugins {
 freeletics {
     explicitApi()
 
-    // TODO addCommonTargets()
+    // TODO https://github.com/JetBrains/compose-multiplatform/issues/3344
+    // addCommonTargets(androidNativeTargets = false)
 }
 
 compose {
