@@ -15,7 +15,6 @@ compose {
     kotlinCompilerPlugin.set(libs.versions.compose.multiplatform.compiler)
 }
 
-
 kotlin {
     jvm()
 
