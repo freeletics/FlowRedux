@@ -3,6 +3,7 @@ charset = utf-8
 end_of_line = lf
 indent_size = 4
 indent_style = space
+trim_trailing_whitespace = true
 insert_final_newline = true
 # TODO: set to 120
 max_line_length = off
@@ -13,3 +14,6 @@ ij_continuation_indent_size = 4
 ij_kotlin_imports_layout=*
 ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true
+
+# ktlint specific options
+ktlint_ignore_back_ticked_identifier = false
