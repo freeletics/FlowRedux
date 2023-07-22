@@ -1,9 +1,61 @@
 Change Log
 ==========
 
-## 1.1.1 **UNRELEASED**
+## 1.2.0 **UNRELEASED**
 
--
+#### DSL additions
+- Added new `condition` block that allows specifying additional condition for a state. The block
+  supports all the same methods that `inState` supports.
+  ```kotlin
+  spec {
+    inState<MyState> {
+      // general onEnter/onAction/... methods
+
+      condition({ state -> state.value == "condition" }) { 
+        // onEnter/onAction/... methods that will only be triggered when the condition is true
+      }
+    }
+  }
+  ```
+- Added new `untilIdentityChanges` block. This allows to give a state object an identity
+  like an id and will re-trigger anything running in that block whenever the identity changes.
+  ```kotlin
+  spec {
+    inState<MyState> {
+      // general onEnter/onAction/... methods
+
+      untilIdentityChanges({ state -> state.searchQuery }) { 
+        // triggered whenever `searchQuery` changes
+        onEnterEffect { state ->
+          sendAnalyticsEvent(state.searchQuery)
+        }
+        
+        // whenever `searchQuery` changes the collection is stopped and a new flow is built and collected
+        collectWhileInState({ state -> loadSearchResults(state.searchQuery )}) { result, state ->
+          // update state based on result
+        }
+      }
+    }
+  }
+  ```
+
+#### Internal re-write
+
+- The internals of FlowRedux have been completely rewritten and simplified. The library behavior
+  is now much more consistent and predictable.
+- Cancellation of a running block like `collectWhileInState` is now guaranteed to happen before
+  anything in the new state starts.
+
+#### Other changes
+
+- The `collectWhileInState` method that has a lambda parameter to build the collected `Flow`.
+  now receives `S` instead of `Flow<S>` as its parameter.
+- The compose artifact now a multiplatform library with support for all platform supported
+  by compose-multiplatform.
+
+#### Deprecations
+- `inState` with `additionalIsInState` has been deprecated in favor of the `condition` block.
+- `inStateWithCondition` has been deprecated in favor of the `condition` block.
 
 
 ## 1.1.0 *(2022-05-08)*
