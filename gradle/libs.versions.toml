@@ -7,7 +7,7 @@ compose-multiplatform-compiler = "1.4.8"
 java-target = "1.8"
 java-toolchain = "19"
 
-android-gradle = "8.0.2"
+android-gradle = "8.1.0"
 android-min = "21"
 android-target = "33"
 android-compile = "33"
