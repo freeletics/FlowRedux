@@ -72,7 +72,8 @@ public fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberStateAndDispat
     return StateAndDispatch(
         state = stateMachine.rememberState(),
         dispatchAction = remember(stateMachine) {
-            { action: A ->
+            {
+                    action: A ->
                 scope.launch {
                     stateMachine.dispatch(action)
                 }

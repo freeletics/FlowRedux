@@ -2,37 +2,50 @@
 set -e
 
 ROOT_DIR="$(dirname $0)"
-KOTLIN_VERSION="$(grep -m 1 '^kotlin \?=' $ROOT_DIR/gradle/libs.versions.toml | cut -d'"' -f2)"
-INSTALLATION_DIR="${HOME}/.kotlinw"
+
+JDK_VERSION="$(grep -s 'java-gradle' $ROOT_DIR/gradle/libs.versions.toml | cut -d'"' -f2)"
+if [ -z "$JDK_VERSION" ]; then
+  JDK_VERSION="19"
+fi
+
+KOTLIN_VERSION="1.9.0"
+if [ -f "$ROOT_DIR/gradle/libs.versions.toml" ]; then
+  KOTLIN_VERSION="$(grep -m 1 '^kotlin \?=' $ROOT_DIR/gradle/libs.versions.toml | cut -d'"' -f2)"
+fi
+
+INSTALLATION_DIR="${HOME}/.kotlinw/${KOTLIN_VERSION}"
 BINARY_DIR="${INSTALLATION_DIR}/kotlinc/bin"
 
-function internal_kotlinw() {
-  if [ ! -f "${BINARY_DIR}/kotlin" ]; then
-    internal_install_and_link_kotlin_compiler
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  if [ -d "/usr/lib/jvm/zulu-$JDK_VERSION-amd64" ]; then
+    JAVA_HOME="/usr/lib/jvm/zulu-$JDK_VERSION-amd64/"
+  elif [ -d "/usr/lib/jvm/zulu$JDK_VERSION-ca-amd64" ]; then
+    JAVA_HOME="/usr/lib/jvm/zulu$JDK_VERSION-ca-amd64/"
+  else 
+    java --version
   fi
-
-  local current_version
-  current_version="$("${BINARY_DIR}/kotlin" -version 2> /dev/null)"
-  local expected_version_regex
-  expected_version_regex="Kotlin version ${KOTLIN_VERSION}.*"
-  if ! [[ "${current_version}" =~ ${expected_version_regex} ]]; then
-    internal_install_and_link_kotlin_compiler
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  JAVA_HOME="/Library/Java/JavaVirtualMachines/zulu-$JDK_VERSION.jdk/Contents/Home"
+  if [ ! -d "/Library/Java/JavaVirtualMachines/zulu-${JDK_VERSION}.jdk/Contents/Home" ]; then
+    echo "Installing JDK ${JDK_VERSION} (you may be prompted for your password)..."
+    brew tap mdogan/zulu
+    brew install --cask "zulu-jdk${JDK_VERSION}"
   fi
+else
+  echo "Only macOS and Linux are supported."
+  exit 1
+fi
 
-  # this works around an issue where the Kotlin compiler used by ktlint accesses code that JDK 12+ don't allow access to
-  export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED"
-
-  "${BINARY_DIR}/kotlin" "$@"
-}
-
-function internal_install_and_link_kotlin_compiler() {
+if [ ! -f "${BINARY_DIR}/kotlin" ]; then
   echo "Downloading Kotlin ${KOTLIN_VERSION}"
-  rm -rf "${INSTALLATION_DIR}"
-  local temp_file
+  mkdir -p ${INSTALLATION_DIR}
   temp_file=$(mktemp /tmp/kotlin.zip.XXXXXX)
   curl -sLo "${temp_file}" "https://github.com/JetBrains/kotlin/releases/download/v${KOTLIN_VERSION}/kotlin-compiler-${KOTLIN_VERSION}.zip"
   unzip -q "${temp_file}" -d "${INSTALLATION_DIR}"
   rm -f "${temp_file}"
-}
+fi
 
-internal_kotlinw "$@"
+# this works around an issue where the Kotlin compiler used by ktlint accesses code that JDK 12+ don't allow access to
+export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED"
+
+"${BINARY_DIR}/kotlin" "$@"

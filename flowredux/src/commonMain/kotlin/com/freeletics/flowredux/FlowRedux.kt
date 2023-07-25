@@ -26,7 +26,7 @@ internal fun <A : Any, S : Any> Flow<A>.reduxStore(
     // Emit the initial state
     send(currentState)
     sideEffects.forEach {
-        it.sendStateChange(currentState)
+        it.startIfNeeded(currentState)
     }
 
     val mutex = Mutex()
@@ -45,7 +45,7 @@ internal fun <A : Any, S : Any> Flow<A>.reduxStore(
                     send(newState)
 
                     sideEffects.forEach {
-                        it.sendStateChange(currentState)
+                        it.startIfNeeded(currentState)
                     }
                 }
             }

@@ -29,22 +29,26 @@
     },
     {
       matchPackagePatterns: [
-        "^com.freeletics.gradle"
+        "com.freeletics.gradle"
       ],
       groupName: "Freeletics Gradle Plugin"
     },
     {
       matchPackagePatterns: [
-        "^org.jetbrains.kotlin",
+        "org.jetbrains.kotlin",
+        "!org.jetbrains.kotlinx",
         "com.google.devtools.ksp",
         "org.jetbrains.compose",
-        "androidx.compose.compiler:compiler",
+        "androidx.compose.compiler"
       ],
       groupName: "Kotlin and Compose Compiler"
     },
     {
       matchPackagePatterns: [
-          "^androidx.compose"
+        "androidx.compose.runtime",
+        "androidx.compose.ui",
+        "androidx.compose.foundation",
+        "androidx.compose.material",
       ],
       groupName: "Compose"
     }
