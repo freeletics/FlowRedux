@@ -38,9 +38,9 @@ spec {
             onEnter { state -> 
                 val s = state.snapshot
                 if (s.selectedEmail != null) {
-                    val details = loadEmailDetails(state.selectedEmail.emailId)
+                    val details = loadEmailDetails(s.selectedEmail.emailId)
                     state.mutate { 
-                        copy(selectedEmail = selectedEmail.details = details)
+                        copy(selectedEmail = selectedEmail.copy(details = details))
                     }
                 } else {
                     state.noChange()
@@ -51,4 +51,13 @@ spec {
 }
 ```
 
-What 
+The important bit to note is that `untilIdentiyChanged` is that it still works with the surounding condition.
+In this example it means that while the state machine is in the `InboxState`.
+The `untilIdentityChanged{...}` block also "starts" immediately and keep track of the "identity" of the state. 
+In the example above the identity is the id of the selected email. 
+Whenver the id of the selected email changes then whatever is inside the `untilIdentityChanged{...}` block will be canceled and restarted with the changed state. 
+In our example it means that the `onEnter{...}` block gets canceled if a new email is selected and the `onEnter{...}` is started but this time with another email id for the selected email.
+
+Depending on your use case, maybe [ExecutionPolicy](ExecutionPolicy.md) or [hierarchical state machines](composing-statemachines.md) can achieve the same or are even better suited.
+
+``
