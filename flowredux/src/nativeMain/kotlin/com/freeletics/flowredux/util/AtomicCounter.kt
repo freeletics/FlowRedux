@@ -1,6 +1,6 @@
 package com.freeletics.flowredux.util
 
-import kotlin.native.concurrent.AtomicInt
+import kotlin.concurrent.AtomicInt
 
 internal actual class AtomicCounter actual constructor(initialValue: Int) {
 
