@@ -37,6 +37,7 @@ public final class com/freeletics/flowredux/dsl/ExecutionPolicy : java/lang/Enum
 	public static final field CANCEL_PREVIOUS Lcom/freeletics/flowredux/dsl/ExecutionPolicy;
 	public static final field ORDERED Lcom/freeletics/flowredux/dsl/ExecutionPolicy;
 	public static final field UNORDERED Lcom/freeletics/flowredux/dsl/ExecutionPolicy;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lcom/freeletics/flowredux/dsl/ExecutionPolicy;
 	public static fun values ()[Lcom/freeletics/flowredux/dsl/ExecutionPolicy;
 }
