@@ -59,5 +59,3 @@ Whenver the id of the selected email changes then whatever is inside the `untilI
 In our example it means that the `onEnter{...}` block gets canceled if a new email is selected and the `onEnter{...}` is started but this time with another email id for the selected email.
 
 Depending on your use case, maybe [ExecutionPolicy](ExecutionPolicy.md) or [hierarchical state machines](composing-statemachines.md) can achieve the same or are even better suited.
-
-``
