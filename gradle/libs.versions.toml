@@ -1,7 +1,7 @@
 [versions]
 kotlin = "1.8.22"
 coroutines = "1.7.3"
-compose-multiplatform = "1.4.1"
+compose-multiplatform = "1.4.3"
 compose-multiplatform-compiler = "1.4.8"
 
 java-target = "1.8"
