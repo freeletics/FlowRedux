@@ -140,7 +140,7 @@ All that `FavoriteStatusStateMachine` does is making an http request to the back
 
 This is how the UI should looks like:
 
-![Sample UI](images/favorite-state-list.gif)
+![Sample UI](../images/favorite-state-list.gif)
 
 
 Now let's connect this with our `ItemListStateMachine` by using `onActionStartStateMachine()`.
