@@ -25,7 +25,7 @@ spec {
         onEnterEffect{ state -> ... } // You can have multiple onEnterEffect
         collectWhileInStateEffect(flow1){ valueEmitedFromFlow, state -> ... } // You can have multiple collectWhileInstate
 
-        // hierarchical state machines
+        // Hierarchical state machines
         onEnterStartStateMachine(
             stateMachineFactory = { stateSnapshot : State1  -> OtherStateMachine() },
             stateMapper = { state : State<State1>, otherStateMachineState : OtherState ->
