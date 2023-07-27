@@ -16,7 +16,7 @@ spec {
         onEnter{ state -> ... } // Called exactly one time when the given state has been entered
         onEnter{ state -> ... } // You can have multiple onEnter blocks
         
-        // Collect a Flow (from coroutine package) as long as the state machine is in the state (see inState<State>)
+        // Collect a Flow (from kotlinx.coroutines) as long as the state machine is in the state (see inState<State>)
         collectWhileInstate(flow1) { valueEmitedFromFlow, state -> ... } // stops flow collection when state is left
         collectWhileInstate(flow2) { valueEmitedFromFlow, state -> ... } // You can have multiple collectWhileInstate
 
