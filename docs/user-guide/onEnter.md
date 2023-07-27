@@ -45,4 +45,4 @@ Recall that FlowRedux is a multi-threaded asynchronous state machine. We will ta
 
 The key takeaway here is that with `onEnter { ... }` you can do some work whenever your state machine is entering this state and then move on to another state by calling `State.override()` or `State.mutate()`
 
-To be able to fully understand the code snipped from above, let's take a look at `State<T>` and `ChangedState<T>`.
+To be able to fully understand the code snippet from above, let's take a look at `State<T>` and `ChangedState<T>`.
