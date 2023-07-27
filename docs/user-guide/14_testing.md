@@ -45,7 +45,7 @@ fun `move from Loading to Error state on error http response`() = runTest {
     val statemachine = ItemListStateMachine(httpClient)
     statemachine.state.test {
         assertEquals(Loading, awaitItem()) // initial state
-        assertEquals(Error(cause = exception, countdown = 3), awaitItem())
+        assertEquals(Error(message = "A network error occurred", countdown = 3), awaitItem())
     }
 }
 ```
@@ -66,7 +66,7 @@ Now let's write a test that checks that pressing the retry button works:
 ```kotlin
 @Test
 fun `from Error state to Loading if RetryLoadingAction is dispatched`() = runTest {
-    val initialState = Error(cause = IOException("fake"), countdown = 3)
+    val initialState = Error(message = "A network error occurred", countdown = 3)
     val statemachine = ItemListStateMachine(httpClient, initialState)
 
     statemachine.state.test {
@@ -80,15 +80,15 @@ fun `from Error state to Loading if RetryLoadingAction is dispatched`() = runTes
 }
 
 @Test `once Error countdown is 0 move to Loading state`() = runTest {
-    val cause = IOException("fake")
-    val initialState = Error(cause = cause, countdown = 3)
+    val msg = "A network error occurred"
+    val initialState = Error(message = msg, countdown = 3)
     val statemachine = ItemListStateMachine(httpClient, initialState)
 
     statemachine.state.test {
         assertEquals(initialState, awaitItem())
-        assertEquals(Error(cause, 2))
-        assertEquals(Error(cause, 1))
-        assertEquals(Error(cause, 0))
+        assertEquals(Error(msg, 2))
+        assertEquals(Error(msg, 1))
+        assertEquals(Error(msg, 0))
         assertEquals(Loading, awaitItem())
     }
 }
@@ -111,7 +111,7 @@ suspend fun loadItemsAndMoveToContentOrError(state: State<Loading>): ChangedStat
         val items = httpClient.loadItems()
         state.override { ShowContent(items) }
     } catch (t: Throwable) {
-        state.override { Error(cause = t, countdown = 3) }
+        state.override { Error(message = "A network error occurred", countdown = 3) }
     }
 }
 ```

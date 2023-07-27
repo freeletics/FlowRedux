@@ -39,7 +39,7 @@ sealed interface ListState {
     data class ShowContent(val items: List<Item>) : PostLoading
 
     // Error while loading happened
-    data class Error(val cause: Throwable) : PostLoading
+    data class Error(val message: String) : PostLoading
 }
 ```
 

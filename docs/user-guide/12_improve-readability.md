@@ -17,7 +17,7 @@ class ItemListStateMachine(
                         val items = httpClient.loadItems()
                         state.override { ShowContent(items) }
                     } catch (t: Throwable) {
-                        state.override { Error(t, countdown = 3) }   // countdown is new
+                        state.override { Error("A network error occurred", countdown = 3) }   // countdown is new
                     }
                 }
             }

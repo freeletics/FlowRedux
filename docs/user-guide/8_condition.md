@@ -13,7 +13,7 @@ Example: One could have also modeled the state for our `ItemListStateMachine` as
 data class ListState(
     val loading: Boolean, // true means loading, false means not loading
     val items: List<Items>, // empty list if no items loaded yet
-    val error: Throwable?, // if not null we are in error state
+    val errorMessage: String?, // if not null we are in error state
     val errorCountDown: Int? // the seconds for the error countdown
 )
 ```
@@ -49,7 +49,12 @@ class ItemListStateMachine(
                             }
                         } catch (t: Throwable) {
                             state.mutate {
-                                this.copy(loading = false, items = emptyList(), error = t, errorCountdown = 3)
+                                this.copy(
+                                    loading = false, 
+                                    items = emptyList(), 
+                                    error = "A network error occurred", 
+                                    errorCountdown = 3
+                                )
                             }
                         }
                     }

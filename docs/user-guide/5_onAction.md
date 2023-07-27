@@ -22,7 +22,7 @@ class ItemListStateMachine(
                         val items = httpClient.loadItems()
                         state.override { ShowContent(items) }
                     } catch (t: Throwable) {
-                        state.override { Error(t) }
+                        state.override { Error("A network error occurred") }
                     }
                 }
             }

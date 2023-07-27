@@ -13,7 +13,7 @@ To implement this let's first extend our `Error` state:
 
 ```kotlin
 data class Error(
-    val cause: Throwable,
+    val message: String,
     val countdown: Int // This value is decreased from 3 then 2 then 1 and represents the countdown value.
 ) : ListState
 ```
@@ -34,7 +34,10 @@ class ItemListStateMachine(
                         val items = httpClient.loadItems()
                         state.override { ShowContent(items) }
                     } catch (t: Throwable) {
-                        state.override { Error(t, countdown = 3) }   // countdown is new
+                        state.override { Error(
+                            message ="A network error occurred", 
+                            countdown = 3 // countdown is new
+                        ) }
                     }
                 }
             }

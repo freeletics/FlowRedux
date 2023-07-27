@@ -19,7 +19,7 @@ class ItemListStateMachine(
                         val items = httpClient.loadItems()  // loadItems() is a suspend function
                         state.override { ShowContent(items) }  // return ShowContent from onEnter block
                     } catch (t: Throwable) {
-                        state.override { Error(t) }   // return Error state from onEnter block
+                        state.override { Error("A network error occurred") }   // return Error state from onEnter block
                     }
                 }
             }
