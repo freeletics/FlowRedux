@@ -5,7 +5,7 @@ repo_url: https://github.com/freeletics/FlowRedux
 site_description: "Kotlin Multiplatform library to create state machines"
 site_author: Freeletics
 
-copyright: 'Copyright &copy; 2020 Freeletics.'
+copyright: 'Copyright &copy; 2023 Freeletics.'
 
 theme:
   name: 'material'
@@ -33,7 +33,7 @@ nav:
     - 'Acting across multiple states': user-guide/10_accross-multiple-states.md
     - 'ExecutionPolicy': user-guide/11_ExecutionPolicy.md
     - 'Improve readability': user-guide/12_improve-readability.md
-    - 'Composing statemachines': user-guide/13_composing_statemachines.md
+    - 'Composing statemachines': user-guide/13_composing-statemachines.md
     - 'Writing test': user-guide/14_testing.md
   - 'DSL-Cheatsheet': dsl-cheatsheet.md
   - 'Multiplatform': multiplatform.md
