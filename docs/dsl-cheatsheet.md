@@ -1,6 +1,6 @@
 # DSL Cheatsheet
 
-If you want to learn more about a particular part of the DSL, we recommend taking a look at the [user guide](user-guide/).
+If you want to learn more about a particular part of the DSL, we recommend taking a look at the [user guide](/user-guide/).
 
 The following section describes the syntax and usage of the DSL blocks:
 
