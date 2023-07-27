@@ -15,5 +15,7 @@ internal sealed class TestState {
 
     data class GenericState(val aString: String, val anInt: Int) : TestState()
 
+    data class GenericNullableState(val aString: String?, val anInt: Int?) : TestState()
+
     data class CounterState(val counter: Int) : TestState()
 }
