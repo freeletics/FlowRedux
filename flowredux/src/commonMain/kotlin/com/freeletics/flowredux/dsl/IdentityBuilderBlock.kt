@@ -8,7 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @FlowReduxDsl
 public class IdentityBuilderBlock<InputState : S, S : Any, A : Any> internal constructor(
     override val isInState: SideEffectBuilder.IsInState<S>,
-    private val identity: (InputState) -> Any,
+    private val identity: (InputState) -> Any?,
 ) : BaseBuilderBlock<InputState, S, A>() {
 
     @Suppress("UNCHECKED_CAST")
