@@ -10,13 +10,13 @@ spec {
 
         // Handle external "input", called Actions
         on<Action1>{ action, state -> ... } //  Handle an action
-        on<Action2>(ExecutionPolicy){ action, state -> ... } //  You can have multiple on<Action> blocks. Optinal specify ExecutionPolicy
+        on<Action2>(ExecutionPolicy){ action, state -> ... } //  You can have multiple on<Action> blocks. Optionally specify ExecutionPolicy
        
         // Do something when you enter the state.
-        onEnter{ state -> ... } // called exactly one time when the given state has been entered
+        onEnter{ state -> ... } // Called exactly one time when the given state has been entered
         onEnter{ state -> ... } // You can have multiple onEnter blocks
         
-        // Collect a Flow (from coroutine package) as long as the state machine is in the state (see inState<State>)
+        // Collect a Flow (from kotlinx.coroutines) as long as the state machine is in the state (see inState<State>)
         collectWhileInstate(flow1) { valueEmitedFromFlow, state -> ... } // stops flow collection when state is left
         collectWhileInstate(flow2) { valueEmitedFromFlow, state -> ... } // You can have multiple collectWhileInstate
 
@@ -25,7 +25,7 @@ spec {
         onEnterEffect{ state -> ... } // You can have multiple onEnterEffect
         collectWhileInStateEffect(flow1){ valueEmitedFromFlow, state -> ... } // You can have multiple collectWhileInstate
 
-        // hierarchical state machines
+        // Hierarchical state machines
         onEnterStartStateMachine(
             stateMachineFactory = { stateSnapshot : State1  -> OtherStateMachine() },
             stateMapper = { state : State<State1>, otherStateMachineState : OtherState ->
@@ -45,9 +45,9 @@ spec {
         condition({state.someString == "Hello" }){
             // Everything inside this block only executes if the surounding condition is met 
             // and the state machine is in the state as specified by the top level inState<State1>.
-            // 
-            //  you can have multiple of the dsl blocks, i.e. multiple on<Action> blocks and so on.
-            on<Action3>{ action, state -> ... } // you can have multiple on<Action>
+
+            //  You can have each DSL block multiple times, i.e. multiple on<Action> blocks and so on.
+            on<Action3>{ action, state -> ... }
             onEnter{ state -> ... }
             collectWhileInState(flow){ valueEmitedFromFlow, state -> ... } 
             onActionEffect{ action, state -> ...}
@@ -74,7 +74,7 @@ spec {
                 // Please note that you cannot have a condition block inside an untilIdentityChanged block
             }
 
-            // Please note taht you cannot have nested conditions inside a condition block
+            // Please note that you cannot have nested conditions inside a condition block
         }
     }
 

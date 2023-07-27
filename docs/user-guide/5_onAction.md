@@ -43,7 +43,7 @@ class ItemListStateMachine(
 }
 ```
 
-A `on { ... }` block gets 2 parameters:  `action` which is the actual instance of the `Action` that triggered this block
+An `on { ... }` block gets 2 parameters:  `action` which is the actual instance of the `Action` that triggered this block
 and `state : State<T>` which gives us access to the current state and let us to state transitions with `.override()`.
 `on { ... }` is actually pretty similar to `onEnter {...}` just with a different "trigger" (action vs. entering a state)
 . Furthermore, `on { ... }` has the same characteristics as `onEnter { ... }`:

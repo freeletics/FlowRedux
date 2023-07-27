@@ -36,7 +36,7 @@ There are three options to choose from:
     }
     ```
 
-    Let's assume that we trigger two times `BarAction`.
+    Let's assume that we trigger `BarAction` two times.
     We use random amount of seconds for waiting.
     Since we use `UNORDERED` as policy `on<BarAction>` the handler block gets executed 2 times without canceling the previous one (that is the difference  to `CANCEL_PREVIOUS`).
     Moreover, `UNORDERED` doesn't make any promise on order of execution of the block (see `ORDERED` if you need promises on order).

@@ -17,7 +17,7 @@ class ItemListStateMachine(
 }
 ```
 
-`inState<Loading>` is just an "entry point".
+`inState<Loading>` is just an "entry point" that describes that anything inside this block should only be executed while the state machine is currently in a state that matches the given class.
 Next let's discuss what an `inState` block can contain as triggers to actually "do something":
 
 1. `onEnter`: Triggers whenever we enter that state
