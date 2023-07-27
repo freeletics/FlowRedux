@@ -37,6 +37,9 @@ class InternalPaginationStateMachine(
 
                 condition({ it.canLoadNextPage && it.nextPageLoadingState == NextPageLoadingState.LOADING }) {
                     onEnter { loadNextPage(it) }
+                    untilIdentityChanges({it}){
+                        con
+                    }
                 }
 
                 condition({ it.nextPageLoadingState == NextPageLoadingState.ERROR }) {

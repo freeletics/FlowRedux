@@ -58,4 +58,4 @@ In the example above the identity is the id of the selected email.
 Whenver the id of the selected email changes then whatever is inside the `untilIdentityChanged{...}` block will be canceled and restarted with the changed state. 
 In our example it means that the `onEnter{...}` block gets canceled if a new email is selected and the `onEnter{...}` is started but this time with another email id for the selected email.
 
-Depending on your use case, maybe [ExecutionPolicy](ExecutionPolicy.md) or [hierarchical state machines](composing-statemachines.md) can achieve the same or are even better suited.
+Depending on your use case, maybe [ExecutionPolicy](11_ExecutionPolicy.md) or [hierarchical state machines](13_composing-statemachines.md) can achieve the same or are even better suited.

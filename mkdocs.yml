@@ -21,14 +21,15 @@ theme:
 nav:
   - 'Overview':
     - 'Getting Started': index.md
-    - 'Exploring the DSL': dsl.md
+    - 'User Guide': user-guide
+    - 'DSL-Cheatsheet': dsl-cheatsheet.md
     - 'Multiplatform': multiplatform.md
     - 'Compose': compose.md
     - 'API':
       - 'DSL': API/dsl
       - 'Compose': API/compose
   - 'Contributing': contributing.md
-  - changelog.md
+  - 'Changelog': changelog.md
 
 extra_css:
   - 'css/app.css'
