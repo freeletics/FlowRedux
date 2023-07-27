@@ -13,7 +13,7 @@ spec {
         on<Action2>(ExecutionPolicy){ action, state -> ... } //  You can have multiple on<Action> blocks. Optionally specify ExecutionPolicy
        
         // Do something when you enter the state.
-        onEnter{ state -> ... } // called exactly one time when the given state has been entered
+        onEnter{ state -> ... } // Called exactly one time when the given state has been entered
         onEnter{ state -> ... } // You can have multiple onEnter blocks
         
         // Collect a Flow (from coroutine package) as long as the state machine is in the state (see inState<State>)
