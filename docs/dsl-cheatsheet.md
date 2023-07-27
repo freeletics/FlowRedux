@@ -10,7 +10,7 @@ spec {
 
         // Handle external "input", called Actions
         on<Action1>{ action, state -> ... } //  Handle an action
-        on<Action2>(ExecutionPolicy){ action, state -> ... } //  You can have multiple on<Action> blocks. Optinal specify ExecutionPolicy
+        on<Action2>(ExecutionPolicy){ action, state -> ... } //  You can have multiple on<Action> blocks. Optionally specify ExecutionPolicy
        
         // Do something when you enter the state.
         onEnter{ state -> ... } // called exactly one time when the given state has been entered
