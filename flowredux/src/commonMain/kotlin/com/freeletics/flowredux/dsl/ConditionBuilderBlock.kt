@@ -18,7 +18,7 @@ public class ConditionBuilderBlock<InputState : S, S : Any, A : Any> internal co
      * Afterwards a the blocks are started again for the new `identity`.
      */
     public fun untilIdentityChanges(
-        identity: (InputState) -> Any,
+        identity: (InputState) -> Any?,
         block: IdentityBuilderBlock<InputState, S, A>.() -> Unit,
     ) {
         sideEffectBuilders += IdentityBuilderBlock<InputState, S, A>(isInState, identity)
