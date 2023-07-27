@@ -49,7 +49,7 @@ and `state : State<T>` which gives us access to the current state and let us to 
 . Furthermore, `on { ... }` has the same characteristics as `onEnter { ... }`:
 
 - **`on { ... }` is running asynchronously in a coroutine**. That means whatever you do inside the `on` block is not
-  blocking anything else. You can totally run here long-running and expensive calls (like doing a http request).
+  blocking anything else. You can totally run suspending calls (like doing a http request).
 - **`on { ... }` expects a lambda (or function) with the following
   signature: `(action : Action , state : State<T>) -> ChangedState<T>`**.
 - **The execution of the `on { ... }` is canceled as soon as state condition specified in the surrounding `inState` block

@@ -34,7 +34,7 @@ We will covered `State<T>` in the next section.
 Let's talk about `onEnter`:
 
 - **`onEnter { ... }` is running asynchronously in a coroutine**. That means whatever you do inside the `onEnter` block
-  is not blocking anything else. You can totally run here long-running and expensive calls (like doing a http request).
+  is not blocking anything else. You can totally run any suspending calls (like doing a http request).
 - **`onEnter { ... }` expects a lambda (or function) with the following
   signature: `onEnter( (State<T>) -> ChangedState<T> )`**. We will cover that in detail in the next section.
 - **`onEnter { ... }` is executed exactly once when the surrounding `inState<T>` condition is met**.
