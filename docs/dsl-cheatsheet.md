@@ -74,7 +74,7 @@ spec {
                 // Please note that you cannot have a condition block inside an untilIdentityChanged block
             }
 
-            // Please note taht you cannot have nested conditions inside a condition block
+            // Please note that you cannot have nested conditions inside a condition block
         }
     }
 
