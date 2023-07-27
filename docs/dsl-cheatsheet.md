@@ -45,9 +45,9 @@ spec {
         condition({state.someString == "Hello" }){
             // Everything inside this block only executes if the surounding condition is met 
             // and the state machine is in the state as specified by the top level inState<State1>.
-            // 
-            //  you can have multiple of the dsl blocks, i.e. multiple on<Action> blocks and so on.
-            on<Action3>{ action, state -> ... } // you can have multiple on<Action>
+
+            //  You can have each DSL block multiple times, i.e. multiple on<Action> blocks and so on.
+            on<Action3>{ action, state -> ... }
             onEnter{ state -> ... }
             collectWhileInState(flow){ valueEmitedFromFlow, state -> ... } 
             onActionEffect{ action, state -> ...}
