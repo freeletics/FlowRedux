@@ -64,7 +64,7 @@ You may wonder why we need `FavoriteStatus` and why it is not just a `Boolean` t
 Remember: we also need to talk to a server (via http) whenever the user wants to mark an `Item` as favorite or unmark it.
 The UI looks like this:
 
-![Item state favorite](images/item-favorite-state.gif)
+![Item state favorite](../images/item-favorite-state.gif)
 
 
 Let's for now ignore the `ItemListStateMachine` and only focus on our new requirements: marking an `Item` as favorite (or unmark it) plus the communication with our backend server to store that information.

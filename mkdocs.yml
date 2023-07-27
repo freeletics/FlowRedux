@@ -21,7 +21,7 @@ theme:
 nav:
   - 'Overview':
     - 'Getting Started': index.md
-    - 'User Guide': user-guide
+    - 'User Guide': user-guide/README.md
     - 'DSL-Cheatsheet': dsl-cheatsheet.md
     - 'Multiplatform': multiplatform.md
     - 'Compose': compose.md
