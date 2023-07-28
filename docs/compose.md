@@ -33,7 +33,8 @@ fun SearchBoxUi(searchQuery : String, dispatchAction: (AddressBookAction) -> Uni
     Column {
       TextField(
         value = searchQuery,
-        onValueChange = { text -> dispatchAction(SearchQueryChangedAction(text)) } // dispatches action async to state machine
+        // dispatches action async to state machine
+        onValueChange = { text -> dispatchAction(SearchQueryChangedAction(text)) } 
       )
    }
 }

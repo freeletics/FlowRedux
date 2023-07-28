@@ -112,8 +112,17 @@ implementation 'com.freeletics.flowredux:compose:<latest-version>'
 implementation 'com.freeletics.flowredux:flowredux:<latest-version>'
 ```
 
-### JavaScript
-No javascript version released yet but it is on our roadmap.
+FlowRedux is supported on:
+
+- JVM / Android
+- iOS
+- watchOS
+- tvOS
+- macOS
+- Linux
+- Windows
+
+We do plan to add support for JavaScript but it’s not available yet.
 
 ### Snapshot
 Latest snapshot (directly published from `main` branch from CI on each change):
@@ -134,5 +143,5 @@ allprojects {
 Then just use `-SNAPSHOT`suffix as version name like
 
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux:1.0.3-SNAPSHOT'
+implementation 'com.freeletics.flowredux:flowredux:1.1.1-SNAPSHOT'
 ```
