@@ -36,7 +36,6 @@ nav:
     - 'Composing statemachines': user-guide/13_composing-statemachines.md
     - 'Writing test': user-guide/14_testing.md
   - 'DSL-Cheatsheet': dsl-cheatsheet.md
-  - 'Multiplatform': multiplatform.md
   - 'Compose': compose.md
   - 'API':
     - 'DSL': API/dsl
