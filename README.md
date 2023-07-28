@@ -143,5 +143,5 @@ allprojects {
 Then just use `-SNAPSHOT`suffix as version name like
 
 ```groovy
-implementation 'com.freeletics.flowredux:flowredux:1.1.1-SNAPSHOT'
+implementation 'com.freeletics.flowredux:flowredux:1.2.1-SNAPSHOT'
 ```
