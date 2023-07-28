@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-## 1.2.0 **UNRELEASED**
+## 1.2.0 *(2023-07-28)*
 
 #### DSL additions
 - Added new `condition` block that allows specifying additional condition for a state. The block
