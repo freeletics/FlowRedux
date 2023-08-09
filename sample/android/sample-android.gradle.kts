@@ -3,8 +3,11 @@ plugins {
 }
 
 freeletics {
-    enableCompose()
     optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+
+    android {
+        enableCompose()
+    }
 }
 
 dependencies {

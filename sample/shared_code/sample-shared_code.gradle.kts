@@ -5,8 +5,10 @@ plugins {
 freeletics {
     optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
 
-    addJvmTarget()
-    addIosTargets("shared", true)
+    multiplatform {
+        addJvmTarget()
+        addIosTargets("shared", true)
+    }
 }
 
 dependencies {
