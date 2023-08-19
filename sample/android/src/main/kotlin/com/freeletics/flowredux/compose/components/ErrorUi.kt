@@ -1,4 +1,4 @@
-package com.freeletics.flowredux.compose
+package com.freeletics.flowredux.compose.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -17,7 +17,10 @@ import com.freeletics.flowredux.sample.shared.Action
 import com.freeletics.flowredux.sample.shared.RetryLoadingFirstPage
 
 @Composable
-fun ErrorUi(modifier: Modifier, dispatch: (Action) -> Unit) {
+internal fun ErrorUi(
+    dispatch: (Action) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Box(modifier) {
         Column(
             modifier = Modifier

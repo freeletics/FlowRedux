@@ -2,6 +2,7 @@ package com.freeletics.flowredux.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,63 +13,74 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.freeletics.flowredux.compose.components.LoadingUi
 import com.freeletics.flowredux.sample.android.R
 import com.freeletics.flowredux.sample.shared.Action
 import com.freeletics.flowredux.sample.shared.FavoriteStatus
 import com.freeletics.flowredux.sample.shared.GithubRepository
-import com.freeletics.flowredux.sample.shared.LoadNextPage
 import com.freeletics.flowredux.sample.shared.RetryToggleFavoriteAction
 import com.freeletics.flowredux.sample.shared.ToggleFavoriteAction
 
 @Composable
-fun ReposListUi(
-    modifier: Modifier,
+internal fun ReposListUi(
     repos: List<GithubRepository>,
     loadMore: Boolean,
     dispatch: (Action) -> Unit,
+    modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
 ) {
-    val listState = rememberLazyListState()
-
-    LazyColumn(state = listState, modifier = modifier) {
-        itemsIndexed(repos) { index, repo ->
-            GithubRepoUi(repo, dispatch)
-            if (index == repos.size - 1) { // user scrolls until the end of the list.
-                // identifying if user scrolled until the end can be done differently
-                dispatch(LoadNextPage)
-            }
+    LazyColumn(
+        modifier = modifier,
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        items(
+            items = repos,
+            key = { it.id },
+            contentType = { _ -> "GithubRepoUi" },
+        ) { repo ->
+            GithubRepoUi(
+                modifier = Modifier
+                    .fillParentMaxWidth(),
+                repo = repo,
+                dispatch = dispatch,
+            )
         }
 
         if (loadMore) {
-            item {
-                LoadNextPageUi()
+            item(
+                key = "LoadNextPageUi",
+                contentType = "LoadNextPageUi",
+            ) {
+                LoadNextPageUi(
+                    modifier = Modifier
+                        .fillParentMaxWidth(),
+                )
             }
-        }
-    }
-
-    if (loadMore) {
-        LaunchedEffect(loadMore) {
-            listState.animateScrollToItem(repos.size)
         }
     }
 }
 
 @Composable
-fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
+private fun GithubRepoUi(
+    repo: GithubRepository,
+    dispatch: (Action) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .wrapContentHeight()
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp),
     ) {
         Text(
             modifier = Modifier
@@ -77,6 +89,7 @@ fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
                 .fillMaxWidth(),
             text = repo.name,
         )
+
         when (repo.favoriteStatus) {
             FavoriteStatus.FAVORITE, FavoriteStatus.NOT_FAVORITE ->
                 Image(
@@ -98,6 +111,7 @@ fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
                     .width(24.dp)
                     .height(24.dp),
             )
+
             FavoriteStatus.OPERATION_FAILED -> Image(
                 modifier = Modifier
                     .width(24.dp)
@@ -108,7 +122,9 @@ fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
                 contentDescription = "Stars icon error",
             )
         }
+
         Spacer(modifier = Modifier.width(8.dp))
+
         Text(
             modifier = Modifier.width(50.dp),
             text = repo.stargazersCount.toString(),
@@ -117,10 +133,11 @@ fun GithubRepoUi(repo: GithubRepository, dispatch: (Action) -> Unit) {
 }
 
 @Composable
-fun LoadNextPageUi() {
+private fun LoadNextPageUi(
+    modifier: Modifier = Modifier,
+) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .wrapContentHeight()
             .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
