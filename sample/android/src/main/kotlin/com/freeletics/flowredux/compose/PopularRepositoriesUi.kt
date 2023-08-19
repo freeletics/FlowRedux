@@ -9,8 +9,9 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.freeletics.flowredux.compose.components.ErrorUi
@@ -22,6 +23,7 @@ import com.freeletics.flowredux.sample.shared.LoadingFirstPageError
 import com.freeletics.flowredux.sample.shared.NextPageLoadingState
 import com.freeletics.flowredux.sample.shared.PaginationState
 import com.freeletics.flowredux.sample.shared.ShowContentPaginationState
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -32,6 +34,7 @@ internal fun PopularRepositoriesUi(
 ) {
     SampleTheme {
         val snackbarHostState = remember { SnackbarHostState() }
+        val scope = rememberCoroutineScope()
 
         Scaffold(
             modifier = modifier,
@@ -73,11 +76,15 @@ internal fun PopularRepositoriesUi(
                     if (showErrorSnackBar) {
                         val errorMessage = stringResource(R.string.unexpected_error)
 
-                        LaunchedEffect(snackbarHostState) {
-                            snackbarHostState.showSnackbar(
-                                message = errorMessage,
-                                duration = SnackbarDuration.Indefinite, // Will be dismissed by changing state
-                            )
+                        DisposableEffect(snackbarHostState, scope) {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = errorMessage,
+                                    duration = SnackbarDuration.Short,
+                                )
+                            }
+
+                            onDispose { }
                         }
                     }
                 }
