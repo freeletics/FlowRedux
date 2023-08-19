@@ -32,6 +32,7 @@ timber = "5.0.1"
 mad = "0.15.0"
 
 turbine = "1.0.0"
+kotlinx-collections-immutable= "0.3.5"
 
 fgp = "0.5.0"
 publish = "0.25.3"
@@ -73,6 +74,7 @@ timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 mad-statemachine = { module = "com.freeletics.mad:state-machine", version.ref = "mad" }
 
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
 
 [plugins]
 fgp-android = { id = "com.freeletics.gradle.common.android", version.ref = "fgp" }

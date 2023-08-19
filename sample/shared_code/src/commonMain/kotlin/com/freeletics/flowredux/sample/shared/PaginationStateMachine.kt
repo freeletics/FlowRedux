@@ -3,6 +3,8 @@ package com.freeletics.flowredux.sample.shared
 import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.State
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -57,13 +59,15 @@ class InternalPaginationStateMachine(
                 ) { inputState: State<ShowContentPaginationState>, childState: GithubRepository ->
                     inputState.mutate {
                         copy(
-                            items = items.map { repoItem ->
-                                if (repoItem.id == childState.id) {
-                                    childState
-                                } else {
-                                    repoItem
+                            items = items
+                                .map { repoItem ->
+                                    if (repoItem.id == childState.id) {
+                                        childState
+                                    } else {
+                                        repoItem
+                                    }
                                 }
-                            },
+                                .toPersistentList(),
                         )
                     }
                 }
@@ -95,7 +99,7 @@ class InternalPaginationStateMachine(
             when (val pageResult: PageResult = githubApi.loadPage(page = 0)) {
                 PageResult.NoNextPage -> {
                     ShowContentPaginationState(
-                        items = emptyList(),
+                        items = persistentListOf(),
                         canLoadNextPage = false,
                         currentPage = 1,
                         nextPageLoadingState = NextPageLoadingState.IDLE,
@@ -103,7 +107,7 @@ class InternalPaginationStateMachine(
                 }
                 is PageResult.Page -> {
                     ShowContentPaginationState(
-                        items = pageResult.items,
+                        items = pageResult.items.toPersistentList(),
                         canLoadNextPage = true,
                         currentPage = pageResult.page,
                         nextPageLoadingState = NextPageLoadingState.IDLE,
@@ -134,7 +138,7 @@ class InternalPaginationStateMachine(
                 is PageResult.Page -> {
                     state.mutate {
                         copy(
-                            items = items + pageResult.items,
+                            items = items.addAll(pageResult.items),
                             canLoadNextPage = true,
                             currentPage = nextPageNumber,
                             nextPageLoadingState = NextPageLoadingState.IDLE,

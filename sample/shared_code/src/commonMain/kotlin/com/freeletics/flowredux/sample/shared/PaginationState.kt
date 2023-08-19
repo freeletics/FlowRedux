@@ -1,8 +1,12 @@
 package com.freeletics.flowredux.sample.shared
 
+import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.PersistentList
+
 /**
  * parent class for all states
  */
+@Immutable
 sealed interface PaginationState
 
 /**
@@ -39,7 +43,7 @@ enum class NextPageLoadingState {
  * State that represents displaying a list of  [GithubRepository] items
  */
 data class ShowContentPaginationState(
-    val items: List<GithubRepository>,
+    val items: PersistentList<GithubRepository>,
     val nextPageLoadingState: NextPageLoadingState,
     internal val currentPage: Int,
     internal val canLoadNextPage: Boolean,

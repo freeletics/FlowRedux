@@ -13,4 +13,5 @@ freeletics {
 
 dependencies {
     commonMainApi(projects.flowredux)
+    commonMainApi(libs.kotlinx.collections.immutable)
 }

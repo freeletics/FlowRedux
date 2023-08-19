@@ -1,8 +1,11 @@
 package com.freeletics.flowredux.sample.shared
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Parent class for all actions
  */
+@Immutable
 sealed interface Action
 
 /**

@@ -1,5 +1,8 @@
 package com.freeletics.flowredux.sample.shared
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 enum class FavoriteStatus {
     /**
      * It is not marked as favorite yet
