@@ -69,15 +69,21 @@ public data class StateAndDispatch<S : Any, A : Any>(
 public fun <S : Any, A : Any> FlowReduxStateMachine<S, A>.rememberStateAndDispatch(): StateAndDispatch<S, A> {
     val stateMachine = this
     val scope = rememberCoroutineScope()
-    return StateAndDispatch(
-        state = stateMachine.rememberState(),
-        dispatchAction = remember(stateMachine) {
-            {
-                    action: A ->
-                scope.launch {
-                    stateMachine.dispatch(action)
-                }
+
+    val state = stateMachine.rememberState()
+    val dispatchAction = remember(scope, stateMachine) {
+        { action: A ->
+            scope.launch {
+                stateMachine.dispatch(action)
             }
-        },
-    )
+            Unit
+        }
+    }
+
+    return remember(state, dispatchAction) {
+        StateAndDispatch(
+            state = state,
+            dispatchAction = dispatchAction,
+        )
+    }
 }
