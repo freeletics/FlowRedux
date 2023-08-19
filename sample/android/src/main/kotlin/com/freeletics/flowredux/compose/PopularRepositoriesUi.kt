@@ -26,6 +26,7 @@ import com.freeletics.flowredux.sample.shared.PaginationState
 import com.freeletics.flowredux.sample.shared.ShowContentPaginationState
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
+import timber.log.Timber
 
 internal object PopularRepositoriesUiDefaults {
     const val VisibleItemsThreshold = 2
@@ -97,6 +98,7 @@ internal fun PopularRepositoriesUi(
                         val size = state.items.size
 
                         LaunchedEffect(listState, size) {
+                            Timber.tag("PopularRepositoriesUi").d("Scroll to $size")
                             listState.animateScrollToItem(size)
                         }
                     }
@@ -107,6 +109,10 @@ internal fun PopularRepositoriesUi(
                             .filter { layoutInfo ->
                                 val index = layoutInfo.visibleItemsInfo.lastOrNull()?.index
                                 val totalItemsCount = layoutInfo.totalItemsCount
+
+                                Timber
+                                    .tag("PopularRepositoriesUi")
+                                    .d("layoutInfo: index=$index, totalItemsCount=$totalItemsCount")
 
                                 index != null && index + visibleItemsThreshold >= totalItemsCount
                             }
