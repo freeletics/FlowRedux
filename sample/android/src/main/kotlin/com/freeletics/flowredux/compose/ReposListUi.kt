@@ -19,6 +19,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -28,8 +31,16 @@ import com.freeletics.flowredux.sample.android.R
 import com.freeletics.flowredux.sample.shared.Action
 import com.freeletics.flowredux.sample.shared.FavoriteStatus
 import com.freeletics.flowredux.sample.shared.GithubRepository
+import com.freeletics.flowredux.sample.shared.LoadNextPage
 import com.freeletics.flowredux.sample.shared.RetryToggleFavoriteAction
 import com.freeletics.flowredux.sample.shared.ToggleFavoriteAction
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.filter
+import timber.log.Timber
+
+internal object ReposListUiDefaults {
+    const val VisibleItemsThreshold = 1
+}
 
 @Composable
 internal fun ReposListUi(
@@ -38,7 +49,23 @@ internal fun ReposListUi(
     dispatch: (Action) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
+    visibleItemsThreshold: Int = ReposListUiDefaults.VisibleItemsThreshold,
 ) {
+    LoadNextPageEffect(
+        listState = listState,
+        visibleItemsThreshold = visibleItemsThreshold,
+        onLoadNextPage = remember(dispatch) {
+            { dispatch(LoadNextPage) }
+        },
+    )
+
+    if (loadMore) {
+        LaunchedEffect(listState) {
+            val lastIndex = listState.layoutInfo.totalItemsCount - 1
+            listState.animateScrollToItem(lastIndex)
+        }
+    }
+
     LazyColumn(
         modifier = modifier,
         state = listState,
@@ -68,6 +95,32 @@ internal fun ReposListUi(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun LoadNextPageEffect(
+    listState: LazyListState,
+    visibleItemsThreshold: Int,
+    onLoadNextPage: () -> Unit,
+) {
+    LaunchedEffect(listState, onLoadNextPage, visibleItemsThreshold) {
+        snapshotFlow { listState.layoutInfo }
+            .filter { layoutInfo ->
+                val lastIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index
+                val totalItemsCount = layoutInfo.totalItemsCount
+
+                lastIndex != null && lastIndex + visibleItemsThreshold >= totalItemsCount
+            }
+            .conflate()
+            .collect {
+                Timber
+                    .tag("ReposListUi")
+                    .d("load next page")
+
+                // user scrolls until the end of the list.
+                onLoadNextPage()
+            }
     }
 }
 
