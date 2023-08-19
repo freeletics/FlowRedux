@@ -39,7 +39,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.filter
 
 internal object ReposListUiDefaults {
-    const val VisibleItemsThreshold = 1
+    const val VisibleItemsThreshold = 0
 }
 
 @Composable
