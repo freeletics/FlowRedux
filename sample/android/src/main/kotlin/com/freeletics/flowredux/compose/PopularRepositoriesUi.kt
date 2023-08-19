@@ -4,11 +4,13 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.freeletics.flowredux.compose.components.ErrorUi
@@ -29,11 +31,11 @@ internal fun PopularRepositoriesUi(
     modifier: Modifier = Modifier,
 ) {
     SampleTheme {
-        val scaffoldState = rememberScaffoldState()
+        val snackbarHostState = remember { SnackbarHostState() }
 
         Scaffold(
             modifier = modifier,
-            scaffoldState = scaffoldState,
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         ) { paddingValues ->
 
             when (state) {
@@ -71,8 +73,8 @@ internal fun PopularRepositoriesUi(
                     if (showErrorSnackBar) {
                         val errorMessage = stringResource(R.string.unexpected_error)
 
-                        LaunchedEffect(scaffoldState.snackbarHostState) {
-                            scaffoldState.snackbarHostState.showSnackbar(
+                        LaunchedEffect(snackbarHostState) {
+                            snackbarHostState.showSnackbar(
                                 message = errorMessage,
                                 duration = SnackbarDuration.Indefinite, // Will be dismissed by changing state
                             )
