@@ -4,6 +4,7 @@ import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.State
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
  * Instead the "wrappter class" [PaginationStateMachine] should be used which hides `Flow` etc.
  * but uses traditional "callbacks". That way it is easier to use on iOS.
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class InternalPaginationStateMachine(
     private val githubApi: GithubApi,
 ) : FlowReduxStateMachine<PaginationState, Action>(LoadFirstPagePaginationState) {

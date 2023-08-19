@@ -10,7 +10,11 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,10 +30,12 @@ import com.freeletics.flowredux.sample.shared.PaginationState
 import com.freeletics.flowredux.sample.shared.ShowContentPaginationState
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 internal object PopularRepositoriesUiDefaults {
-    const val VisibleItemsThreshold = 2
+    const val VisibleItemsThreshold = 10
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -41,11 +47,15 @@ internal fun PopularRepositoriesUi(
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     visibleItemsThreshold: Int = PopularRepositoriesUiDefaults.VisibleItemsThreshold,
 ) {
+    val scope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
+
     SampleTheme {
         Scaffold(
             modifier = modifier,
             scaffoldState = scaffoldState,
         ) { paddingValues ->
+
             when (state) {
                 null, // null means state machine did not emit yet the first state --> in mean time show Loading
                 is LoadFirstPagePaginationState,
@@ -65,7 +75,6 @@ internal fun PopularRepositoriesUi(
                 )
 
                 is ShowContentPaginationState -> {
-                    val listState = rememberLazyListState()
 
                     val showLoadNextPageUi = state.shouldShowLoadMoreIndicator()
                     val showErrorSnackBar = state.shouldShowErrorSnackbar()
@@ -93,14 +102,25 @@ internal fun PopularRepositoriesUi(
                         }
                     }
 
+                    val curSize by rememberUpdatedState(newValue = state.items.size)
+
                     // Effect to scroll to the end of the list when loading next page
                     if (showLoadNextPageUi) {
-                        val size = state.items.size
+                        val index = state.items.size + 1
+                        Timber.tag("PopularRepositoriesUi").d("Scroll to $index, curSize=$curSize")
 
-                        LaunchedEffect(listState, size) {
-                            Timber.tag("PopularRepositoriesUi").d("Scroll to $size")
-                            listState.animateScrollToItem(size)
+                        DisposableEffect(listState, scope) {
+                            scope.launch {
+                                listState.animateScrollToItem(curSize)
+                            }
+                            onDispose {  }
                         }
+//
+//                        LaunchedEffect(listState) {
+//                            Timber.tag("PopularRepositoriesUi").d("Scroll to $size, curSize=$curSize")
+//                            listState.animateScrollToItem(size)
+//                            Timber.tag("PopularRepositoriesUi").d("Scroll to $size done, curSize=$curSize")
+//                        }
                     }
 
                     // Effect to load next page
@@ -118,6 +138,10 @@ internal fun PopularRepositoriesUi(
                             }
                             .conflate()
                             .collect {
+                                Timber
+                                    .tag("PopularRepositoriesUi")
+                                    .d("load next page")
+
                                 // user scrolls until the end of the list.
                                 dispatch(LoadNextPage)
                             }
