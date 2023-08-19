@@ -1,10 +1,11 @@
 package com.freeletics.flowredux.sample.shared
 
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class GithubApi {
-
-    internal var githubData = (0..120).map {
+    private val githubData = List(120) {
         GithubRepository(
             id = "$it",
             name = "Repository $it",
@@ -17,7 +18,9 @@ class GithubApi {
 
     // Used to simulate network errors
     private var counter = 0
-    private fun shouldFail(): Boolean = counter++ % 4 == 0
+    private val counterMutex = Mutex()
+    private suspend inline fun shouldFail(): Boolean =
+        counterMutex.withLock { counter++ } % 4 == 0
 
     suspend fun loadPage(page: Int): PageResult {
         delay(2000)
@@ -34,7 +37,7 @@ class GithubApi {
                     end,
                 )
             } else {
-                emptyList<GithubRepository>()
+                emptyList()
             }
             ).run {
             if (isEmpty()) {
@@ -57,7 +60,7 @@ class GithubApi {
 }
 
 sealed class PageResult {
-    internal object NoNextPage : PageResult()
+    internal data object NoNextPage : PageResult()
     internal data class Page(val page: Int, val items: List<GithubRepository>) : PageResult()
 }
 

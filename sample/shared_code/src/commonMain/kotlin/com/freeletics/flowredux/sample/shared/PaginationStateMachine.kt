@@ -22,6 +22,7 @@ class InternalPaginationStateMachine(
     init {
         spec {
 
+            @Suppress("RemoveExplicitTypeArguments") // Keep for readability
             inState<LoadFirstPagePaginationState> {
                 onEnter { loadFirstPage(it) }
             }

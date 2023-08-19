@@ -3,17 +3,17 @@ package com.freeletics.flowredux.sample.shared
 /**
  * parent class for all states
  */
-sealed class PaginationState
+sealed interface PaginationState
 
 /**
  * State that represents loading the first page
  */
-object LoadFirstPagePaginationState : PaginationState()
+data object LoadFirstPagePaginationState : PaginationState
 
 /**
  * An error has occurred while loading the first page
  */
-data class LoadingFirstPageError(val cause: Throwable) : PaginationState()
+data class LoadingFirstPageError(val cause: Throwable) : PaginationState
 
 /**
  * Modeling state for Pull To Refresh and load next state
@@ -43,4 +43,4 @@ data class ShowContentPaginationState(
     val nextPageLoadingState: NextPageLoadingState,
     internal val currentPage: Int,
     internal val canLoadNextPage: Boolean,
-) : PaginationState()
+) : PaginationState

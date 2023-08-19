@@ -36,9 +36,7 @@ import com.freeletics.flowredux.sample.shared.GithubRepository
 import com.freeletics.flowredux.sample.shared.LoadNextPage
 import com.freeletics.flowredux.sample.shared.RetryToggleFavoriteAction
 import com.freeletics.flowredux.sample.shared.ToggleFavoriteAction
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 
 internal object ReposListUiDefaults {
     const val VisibleItemsThreshold = 1
@@ -109,11 +107,13 @@ private fun LoadNextPageEffect(
 ) {
     LaunchedEffect(listState, onLoadNextPage, visibleItemsThreshold) {
         snapshotFlow { listState.layoutInfo }
-            .map { it.visibleItemsInfo.lastOrNull()?.index to it.totalItemsCount }
-            .distinctUntilChanged()
-            .filter { (lastIndex, totalItemsCount) ->
-                lastIndex != null
-                    && lastIndex + visibleItemsThreshold >= totalItemsCount
+            .filter { layoutInfo ->
+                val lastVisibleIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index
+                val lastIndex = layoutInfo.totalItemsCount - 1
+
+                lastVisibleIndex != null
+                    && lastIndex >= 0
+                    && lastVisibleIndex + visibleItemsThreshold >= lastIndex
             }
             .collect {
                 // user scrolls until the end of the list.

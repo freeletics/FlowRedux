@@ -7,6 +7,7 @@ freeletics {
 
     android {
         enableCompose()
+        enableViewBinding()
     }
 }
 
