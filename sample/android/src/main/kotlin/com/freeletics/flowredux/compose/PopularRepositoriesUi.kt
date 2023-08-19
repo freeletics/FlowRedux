@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -22,17 +21,16 @@ import com.freeletics.flowredux.sample.shared.NextPageLoadingState
 import com.freeletics.flowredux.sample.shared.PaginationState
 import com.freeletics.flowredux.sample.shared.ShowContentPaginationState
 
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun PopularRepositoriesUi(
     state: PaginationState?,
     dispatch: (Action) -> Unit,
     modifier: Modifier = Modifier,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
 ) {
-
     SampleTheme {
+        val scaffoldState = rememberScaffoldState()
+
         Scaffold(
             modifier = modifier,
             scaffoldState = scaffoldState,
