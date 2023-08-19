@@ -35,6 +35,7 @@ import com.freeletics.flowredux.sample.shared.GithubRepository
 import com.freeletics.flowredux.sample.shared.LoadNextPage
 import com.freeletics.flowredux.sample.shared.RetryToggleFavoriteAction
 import com.freeletics.flowredux.sample.shared.ToggleFavoriteAction
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.filter
 
 internal object ReposListUiDefaults {
@@ -43,7 +44,7 @@ internal object ReposListUiDefaults {
 
 @Composable
 internal fun ReposListUi(
-    repos: List<GithubRepository>,
+    repos: ImmutableList<GithubRepository>,
     loadMore: Boolean,
     dispatch: (Action) -> Unit,
     modifier: Modifier = Modifier,
