@@ -1,10 +1,16 @@
 package com.freeletics.flowredux.sample.shared
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
-class GithubApi {
+class GithubApi(
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+) {
     private val githubData = List(120) {
         GithubRepository(
             id = "$it",
@@ -22,7 +28,7 @@ class GithubApi {
     private suspend inline fun shouldFail(): Boolean =
         counterMutex.withLock { counter++ } % 4 == 0
 
-    suspend fun loadPage(page: Int): PageResult {
+    suspend fun loadPage(page: Int): PageResult = withContext(ioDispatcher) {
         delay(2000)
         if (shouldFail()) {
             throw Exception("Faked network error")
@@ -30,7 +36,7 @@ class GithubApi {
         val start = page * pageSize
         val end = min(githubData.size, page * pageSize + pageSize)
 
-        return (
+        (
             if (start < githubData.size) {
                 githubData.subList(
                     start,
@@ -49,7 +55,7 @@ class GithubApi {
     }
 
     @Suppress("unused_parameter")
-    suspend fun markAsFavorite(repoId: String, favorite: Boolean) {
+    suspend fun markAsFavorite(repoId: String, favorite: Boolean) = withContext(ioDispatcher) {
         delay(2000) // simulate network effect
         if (shouldFail()) {
             throw Exception("Faked network error")
