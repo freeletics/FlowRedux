@@ -14,6 +14,7 @@ apiValidation {
     ignoredProjects += listOf(
         "android",
         "shared_code",
+        "compose_stable_marker",
     )
 
     nonPublicMarkers += listOf(
