@@ -37,6 +37,7 @@ dependencies {
     implementation(libs.coroutines.core)
     implementation(libs.material)
     implementation(libs.timber)
+    implementation(libs.kotlinx.collections.immutable)
 
     implementation(projects.sample.sharedCode)
     implementation(projects.flowredux)
