@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime;
+package androidx.compose.runtime
 
 /**
  * Copied from https://github.com/skydoves/compose-stable-marker.
