@@ -9,8 +9,12 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 class GithubApi(
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val ioDispatcher: CoroutineDispatcher,
 ) {
+    // ObjC does not support default values for parameters,
+    // so we need to provide a secondary constructor
+    constructor() : this(Dispatchers.IO)
+
     private val githubData = List(120) {
         GithubRepository(
             id = "$it",
