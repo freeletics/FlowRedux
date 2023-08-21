@@ -14,5 +14,5 @@ freeletics {
 dependencies {
     commonMainApi(projects.flowredux)
     commonMainApi(libs.kotlinx.collections.immutable)
-    commonMainCompileOnly(projects.sample.composeStableMarker)
+    commonMainCompileOnly(libs.jetbrains.compose.runtime)
 }
