@@ -86,7 +86,6 @@ internal fun PopularRepositoriesUi(
     }
 }
 
-
 private fun ShowContentPaginationState.shouldShowLoadMoreIndicator(): Boolean = when (this.nextPageLoadingState) {
     NextPageLoadingState.LOADING -> true
     else -> false

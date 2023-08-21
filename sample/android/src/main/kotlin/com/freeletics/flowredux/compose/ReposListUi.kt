@@ -109,9 +109,9 @@ private fun LoadNextPageEffect(
                 val lastVisibleIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index
                 val lastIndex = layoutInfo.totalItemsCount - 1
 
-                lastVisibleIndex != null
-                    && lastIndex >= 0
-                    && lastVisibleIndex + visibleItemsThreshold >= lastIndex
+                lastVisibleIndex != null &&
+                    lastIndex >= 0 &&
+                    lastVisibleIndex + visibleItemsThreshold >= lastIndex
             }
             .collect {
                 // user scrolls until the end of the list.
