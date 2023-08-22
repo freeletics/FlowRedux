@@ -3,8 +3,10 @@ package com.freeletics.flowredux.sample.shared
 import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.FlowReduxStateMachine
 import com.freeletics.flowredux.dsl.State
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MarkAsFavoriteStateMachine(
     private val githubApi: GithubApi,
     repository: GithubRepository,

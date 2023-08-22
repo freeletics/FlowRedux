@@ -1,20 +1,23 @@
 package com.freeletics.flowredux.sample.shared
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Parent class for all actions
  */
+@Immutable
 sealed interface Action
 
 /**
  * Triggers reloading the first page. Should be only used while in [LoadingFirstPageError]
  */
-object RetryLoadingFirstPage : Action
+data object RetryLoadingFirstPage : Action
 
 /**
  * Triggers loading the next page. This is typically triggered if the user scrolls until the end
  * of the list and want to load the next page.
  */
-object LoadNextPage : Action
+data object LoadNextPage : Action
 
 /**
  * Mark a repository as favorite

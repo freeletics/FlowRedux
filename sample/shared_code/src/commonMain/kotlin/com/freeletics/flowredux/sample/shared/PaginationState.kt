@@ -1,19 +1,23 @@
 package com.freeletics.flowredux.sample.shared
 
+import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.PersistentList
+
 /**
  * parent class for all states
  */
-sealed class PaginationState
+@Immutable
+sealed interface PaginationState
 
 /**
  * State that represents loading the first page
  */
-object LoadFirstPagePaginationState : PaginationState()
+data object LoadFirstPagePaginationState : PaginationState
 
 /**
  * An error has occurred while loading the first page
  */
-data class LoadingFirstPageError(val cause: Throwable) : PaginationState()
+data class LoadingFirstPageError(val cause: Throwable) : PaginationState
 
 /**
  * Modeling state for Pull To Refresh and load next state
@@ -39,8 +43,8 @@ enum class NextPageLoadingState {
  * State that represents displaying a list of  [GithubRepository] items
  */
 data class ShowContentPaginationState(
-    val items: List<GithubRepository>,
+    val items: PersistentList<GithubRepository>,
     val nextPageLoadingState: NextPageLoadingState,
     internal val currentPage: Int,
     internal val canLoadNextPage: Boolean,
-) : PaginationState()
+) : PaginationState

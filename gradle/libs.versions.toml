@@ -12,12 +12,14 @@ android-min = "21"
 android-target = "34"
 android-compile = "34"
 androidx-activity = "1.7.2"
+androidx-annotation = "1.6.0"
 androidx-appcompat = "1.6.1"
 androidx-compose-compiler = "1.5.1"
 androidx-compose-runtime = "1.5.0"
 androidx-compose-ui = "1.5.0"
 androidx-compose-foundation = "1.5.0"
 androidx-compose-material = "1.5.0"
+androidx-compose-material3 = "1.1.1"
 androidx-constraintlayout = "2.1.4"
 androidx-core = "1.10.1"
 androidx-lifecycle = "2.6.1"
@@ -31,6 +33,8 @@ timber = "5.0.1"
 mad = "0.15.0"
 
 turbine = "1.0.0"
+kotlinx-collections-immutable= "0.3.5"
+jetbrains-compose-runtime = "1.4.3"
 
 fgp = "0.5.0"
 publish = "0.25.3"
@@ -49,6 +53,7 @@ coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", ve
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
+androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "androidx-compose-compiler" }
@@ -56,6 +61,7 @@ androidx-compose-runtime = { module = "androidx.compose.runtime:runtime", versio
 androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "androidx-compose-ui" }
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "androidx-compose-foundation" }
 androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "androidx-compose-material" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "androidx-compose-material3" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-lifecycle = { module = "androidx.lifecycle:lifecycle-common", version.ref = "androidx-lifecycle" }
@@ -71,6 +77,8 @@ timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 mad-statemachine = { module = "com.freeletics.mad:state-machine", version.ref = "mad" }
 
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
+jetbrains-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "jetbrains-compose-runtime" }
 
 [plugins]
 fgp-android = { id = "com.freeletics.gradle.common.android", version.ref = "fgp" }

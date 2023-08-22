@@ -3,6 +3,8 @@ package com.freeletics.flowredux.compose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import com.freeletics.flowredux.sample.shared.GithubApi
 import com.freeletics.flowredux.sample.shared.InternalPaginationStateMachine
 
@@ -12,9 +14,15 @@ class ComposeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             val (state, dispatch) = stateMachine.rememberStateAndDispatch()
-            PopularRepositoriesUi(state.value, dispatch)
+
+            PopularRepositoriesUi(
+                modifier = Modifier.fillMaxSize(),
+                state = state.value,
+                dispatch = dispatch,
+            )
         }
     }
 }

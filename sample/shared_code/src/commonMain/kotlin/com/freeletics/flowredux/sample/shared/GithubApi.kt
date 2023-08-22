@@ -1,10 +1,21 @@
 package com.freeletics.flowredux.sample.shared
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
-class GithubApi {
+class GithubApi(
+    private val ioDispatcher: CoroutineDispatcher,
+) {
+    // ObjC does not support default values for parameters,
+    // so we need to provide a secondary constructor
+    constructor() : this(Dispatchers.IO)
 
-    internal var githubData = (0..120).map {
+    private val githubData = List(120) {
         GithubRepository(
             id = "$it",
             name = "Repository $it",
@@ -17,9 +28,11 @@ class GithubApi {
 
     // Used to simulate network errors
     private var counter = 0
-    private fun shouldFail(): Boolean = counter++ % 4 == 0
+    private val counterMutex = Mutex()
+    private suspend inline fun shouldFail(): Boolean =
+        counterMutex.withLock { counter++ } % 4 == 0
 
-    suspend fun loadPage(page: Int): PageResult {
+    suspend fun loadPage(page: Int): PageResult = withContext(ioDispatcher) {
         delay(2000)
         if (shouldFail()) {
             throw Exception("Faked network error")
@@ -27,14 +40,14 @@ class GithubApi {
         val start = page * pageSize
         val end = min(githubData.size, page * pageSize + pageSize)
 
-        return (
+        (
             if (start < githubData.size) {
                 githubData.subList(
                     start,
                     end,
                 )
             } else {
-                emptyList<GithubRepository>()
+                emptyList()
             }
             ).run {
             if (isEmpty()) {
@@ -46,7 +59,7 @@ class GithubApi {
     }
 
     @Suppress("unused_parameter")
-    suspend fun markAsFavorite(repoId: String, favorite: Boolean) {
+    suspend fun markAsFavorite(repoId: String, favorite: Boolean) = withContext(ioDispatcher) {
         delay(2000) // simulate network effect
         if (shouldFail()) {
             throw Exception("Faked network error")
@@ -57,7 +70,7 @@ class GithubApi {
 }
 
 sealed class PageResult {
-    internal object NoNextPage : PageResult()
+    internal data object NoNextPage : PageResult()
     internal data class Page(val page: Int, val items: List<GithubRepository>) : PageResult()
 }
 

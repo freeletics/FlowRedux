@@ -14,7 +14,7 @@ struct ContentView: View {
     @State private var state: PaginationState = LoadFirstPagePaginationState()
     private let stateMachine: PaginationStateMachine = PaginationStateMachine(
         githubApi: GithubApi(),
-        scope: NsQueueCoroutineScope()
+        scope: ImmediateMainScopeKt.ImmediateMainScope()
     )
 
     var body: some View {
@@ -40,8 +40,8 @@ struct ContentView: View {
     private func triggerReloadFirstPage() {
         stateMachine.dispatch(action: RetryLoadingFirstPage())
     }
-    
-    
+
+
     private func dispatchAction(action : Action){
         stateMachine.dispatch(action: action)
     }
@@ -52,7 +52,7 @@ struct ContentView: View {
             self.state = paginationState
         })
     }
-    
+
 }
 
 struct ContentView_Previews: PreviewProvider {
