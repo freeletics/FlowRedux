@@ -22,7 +22,7 @@ jobs:
           java-version: 19
 
       - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1.5.1
+        uses: maxim-lobanov/setup-xcode@v1.6.0
         with:
           xcode-version: 'latest-stable'
 
