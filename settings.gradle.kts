@@ -6,14 +6,8 @@ pluginManagement {
     }
 }
 
-dependencyResolutionManagement {
-    repositories {
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    }
-}
-
 plugins {
-    id("com.freeletics.gradle.settings").version("0.6.1")
+    id("com.freeletics.gradle.settings").version("0.7.0")
 }
 
 rootProject.name = "flowredux-library"

@@ -1,18 +1,15 @@
 plugins {
     alias(libs.plugins.fgp.multiplatform)
     alias(libs.plugins.fgp.publish)
-    alias(libs.plugins.compose.multiplatform)
 }
 
 freeletics {
-    explicitApi()
+    useCompose()
 
     // TODO https://github.com/JetBrains/compose-multiplatform/issues/3344
-    // addCommonTargets(androidNativeTargets = false)
-}
-
-compose {
-    kotlinCompilerPlugin.set(libs.versions.compose.multiplatform.compiler)
+    // multiplatform {
+    //     addCommonTargets()
+    // }
 }
 
 kotlin {
@@ -47,6 +44,6 @@ kotlin {
 
 dependencies {
     commonMainApi(projects.flowredux)
-    commonMainApi(libs.compose.multiplatform.runtime)
+    commonMainApi(libs.jetbrains.compose.runtime)
     commonMainImplementation(libs.coroutines.core)
 }
