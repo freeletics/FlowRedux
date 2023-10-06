@@ -16,7 +16,7 @@ androidx-compose-ui = "1.5.3"
 androidx-compose-foundation = "1.5.3"
 androidx-compose-material = "1.5.3"
 androidx-compose-material3 = "1.1.2"
-jetbrains-compose = "1.5.2"
+jetbrains-compose = "1.5.3"
 jetbrains-compose-compiler = "1.5.2"
 
 androidx-activity = "1.7.2"
