@@ -39,7 +39,7 @@ kotlinx-collections-immutable= "0.3.6"
 
 fgp = "0.7.2"
 publish = "0.25.3"
-dokka = "1.9.0"
+dokka = "1.9.10"
 binarycompatibility = "0.13.2"
 dependency-analysis = "1.25.0"
 
