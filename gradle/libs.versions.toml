@@ -37,7 +37,7 @@ mad = "0.15.0"
 turbine = "1.0.0"
 kotlinx-collections-immutable= "0.3.6"
 
-fgp = "0.7.2"
+fgp = "0.8.1"
 publish = "0.25.3"
 dokka = "1.9.10"
 binarycompatibility = "0.13.2"
