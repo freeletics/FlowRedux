@@ -13,7 +13,6 @@ freeletics {
 }
 
 dependencies {
-    implementation(libs.androidx.core)
     implementation(libs.androidx.annotation)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.recyclerview)
