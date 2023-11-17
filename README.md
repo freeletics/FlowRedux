@@ -4,7 +4,7 @@ Building async. running Kotlin Multiplatform state machine made easy with a DSL 
 
 ## Usage
 
-Full documentation and best practices can be found here: https://freeletics.github.io/FlowRedux/dsl/
+Full documentation and best practices can be found here: https://freeletics.github.io/FlowRedux/
 
 ```kotlin
 sealed interface State
