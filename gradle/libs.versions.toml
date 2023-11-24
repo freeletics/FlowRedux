@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.9.20"
+kotlin = "1.9.21"
 coroutines = "1.7.3"
 
 java-target = "1.8"
@@ -17,7 +17,7 @@ androidx-compose-foundation = "1.5.4"
 androidx-compose-material = "1.5.4"
 androidx-compose-material3 = "1.1.2"
 jetbrains-compose = "1.5.11"
-jetbrains-compose-compiler = "1.5.3"
+jetbrains-compose-compiler = "1.5.4"
 
 androidx-activity = "1.8.1"
 androidx-annotation = "1.7.0"
