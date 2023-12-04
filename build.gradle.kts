@@ -21,13 +21,3 @@ apiValidation {
         "androidx.annotation.VisibleForTesting",
     )
 }
-
-dependencyAnalysis {
-    issues {
-        project(":sample:android") {
-            onIncorrectConfiguration {
-                exclude("org.jetbrains.kotlin:kotlin-stdlib")
-            }
-        }
-    }
-}
