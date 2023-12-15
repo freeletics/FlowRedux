@@ -80,32 +80,31 @@ internal class OnActionTest {
         }
     }
 
-
     @Test
-    fun onActionOrdered() = runTest { turbineScope {
-        val sm = StateMachine(TestState.GenericNullableState(null, null)) {
-            inState<TestState.GenericNullableState> {
-                on<TestAction.A1>(executionPolicy = ExecutionPolicy.ORDERED) { _, state ->
-                    println("Received a1")
-                    state.mutate { copy(aString = "1") }
-                }
+    fun onActionOrdered() = runTest {
+        turbineScope {
+            val sm = StateMachine(TestState.GenericNullableState(null, null)) {
+                inState<TestState.GenericNullableState> {
+                    on<TestAction.A1>(executionPolicy = ExecutionPolicy.ORDERED) { _, state ->
+                        state.mutate { copy(aString = "1") }
+                    }
 
-                on<TestAction.A2>(executionPolicy = ExecutionPolicy.ORDERED) { _, state ->
-                    println("Received a2")
-                    state.mutate { copy(anInt = 2) }
+                    on<TestAction.A2>(executionPolicy = ExecutionPolicy.ORDERED) { _, state ->
+                        state.mutate { copy(anInt = 2) }
+                    }
                 }
             }
-        }
 
-        val scope = CoroutineScope(context = Dispatchers.Unconfined)
-        val turbine = sm.state.testIn(scope)
-        scope.launch {
-            sm.dispatch(TestAction.A2)
-            sm.dispatch(TestAction.A1)
-        }
+            val scope = CoroutineScope(context = Dispatchers.Unconfined)
+            val turbine = sm.state.testIn(scope)
+            scope.launch {
+                sm.dispatch(TestAction.A2)
+                sm.dispatch(TestAction.A1)
+            }
 
-        assertEquals(TestState.GenericNullableState(null, null), turbine.awaitItem())
-        assertEquals(TestState.GenericNullableState("1", null), turbine.awaitItem())
-        assertEquals(TestState.GenericNullableState("1", 2), turbine.awaitItem())
-    }}
+            assertEquals(TestState.GenericNullableState(null, null), turbine.awaitItem())
+            assertEquals(TestState.GenericNullableState("1", null), turbine.awaitItem())
+            assertEquals(TestState.GenericNullableState("1", 2), turbine.awaitItem())
+        } 
+    }
 }
