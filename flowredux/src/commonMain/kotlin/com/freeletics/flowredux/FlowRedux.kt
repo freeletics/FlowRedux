@@ -20,7 +20,7 @@ internal fun <A : Any, S : Any> Flow<A>.reduxStore(
     var currentState: S = initialStateSupplier()
     val getState: GetState<S> = { currentState }
 
-    val stateChanges = Channel<ChangedState<S>>()
+    val stateChanges = Channel<ChangedState<S>>(Channel.UNLIMITED)
     val sideEffects = sideEffectBuilders.map { ManagedSideEffect(it, this@channelFlow, getState, stateChanges) }
 
     // Emit the initial state
