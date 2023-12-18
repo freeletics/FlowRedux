@@ -32,7 +32,7 @@ material = "1.11.0"
 adapterdelegates = "4.3.2"
 timber = "5.0.1"
 
-mad = "0.15.0"
+khonshu = "0.21.0"
 
 turbine = "1.0.0"
 kotlinx-collections-immutable= "0.3.6"
@@ -76,7 +76,7 @@ adapterdelegates = { module = "com.hannesdorfmann:adapterdelegates4", version.re
 adapterdelegates-dsl = { module = "com.hannesdorfmann:adapterdelegates4-kotlin-dsl", version.ref = "adapterdelegates" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
-mad-statemachine = { module = "com.freeletics.mad:state-machine", version.ref = "mad" }
+khonshu-statemachine = { module = "com.freeletics.khonshu:state-machine", version.ref = "khonshu" }
 
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }

@@ -2,7 +2,7 @@ package com.freeletics.flowredux.dsl
 
 import com.freeletics.flowredux.reduxStore
 import com.freeletics.flowredux.util.AtomicCounter
-import com.freeletics.mad.statemachine.StateMachine
+import com.freeletics.khonshu.statemachine.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow

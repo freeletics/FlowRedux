@@ -3,7 +3,7 @@ package com.freeletics.flowredux.sideeffects
 import com.freeletics.flowredux.dsl.ChangedState
 import com.freeletics.flowredux.dsl.State
 import com.freeletics.flowredux.util.CoroutineWaiter
-import com.freeletics.mad.statemachine.StateMachine
+import com.freeletics.khonshu.statemachine.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
