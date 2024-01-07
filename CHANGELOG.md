@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+## 1.2.1 *(2024-01-07)*
+
+- Fix deadlock when using ExecutionPolicy.ORDERED.
+- Reduce allocations in `rememberStateAndDispatch`. Thanks to @hoc081098 for teh contribution.
+- Updated to Kotlin 1.9.22.
+
+
 ## 1.2.0 *(2023-07-28)*
 
 #### DSL additions
@@ -50,7 +57,7 @@ Change Log
 
 - The `collectWhileInState` method that has a lambda parameter to build the collected `Flow`.
   now receives `S` instead of `Flow<S>` as its parameter.
-- The compose artifact now a multiplatform library with support for all platform supported
+- The compose artifact is now a multiplatform library with support for all platform supported
   by compose-multiplatform.
 
 #### Deprecations
