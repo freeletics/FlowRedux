@@ -32,7 +32,7 @@ jobs:
           xcrun simctl boot iphone-12-pro
           open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
       - name: Cache gradle, wrapper and buildSrc
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -41,7 +41,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Cache konan
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.konan/cache
