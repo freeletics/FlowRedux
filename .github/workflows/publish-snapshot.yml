@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -38,7 +38,7 @@ jobs:
         run: |
           echo "ORG_GRADLE_PROJECT_VERSION_NAME=${{ github.ref_name }}-SNAPSHOT" | sed 's#/#-#g' >> $GITHUB_ENV
 
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/actions/setup-gradle@v3
 
       - name: Publish
         run: ./gradlew publish
