@@ -10,7 +10,7 @@ android-min = "21"
 android-target = "34"
 android-compile = "34"
 
-androidx-compose-compiler = "1.5.10"
+androidx-compose-compiler = "1.5.11"
 androidx-compose-runtime = "1.6.4"
 androidx-compose-ui = "1.6.4"
 androidx-compose-foundation = "1.6.4"
