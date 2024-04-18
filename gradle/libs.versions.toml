@@ -19,7 +19,7 @@ androidx-compose-material3 = "1.2.1"
 jetbrains-compose = "1.6.2"
 jetbrains-compose-compiler = "1.5.10.1"
 
-androidx-activity = "1.8.2"
+androidx-activity = "1.9.0"
 androidx-annotation = "1.7.1"
 androidx-appcompat = "1.6.1"
 androidx-constraintlayout = "2.1.4"
