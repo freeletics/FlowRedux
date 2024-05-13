@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.9.23"
-coroutines = "1.8.0"
+coroutines = "1.8.1"
 
 java-target = "1.8"
 java-toolchain = "19"
