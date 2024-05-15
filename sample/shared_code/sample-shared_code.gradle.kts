@@ -7,7 +7,7 @@ freeletics {
 
     multiplatform {
         addJvmTarget()
-        addIosTargets("shared", true)
+        addIosTargetsWithXcFramework("shared")
     }
 }
 
