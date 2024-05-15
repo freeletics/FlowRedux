@@ -18,9 +18,12 @@ kotlin {
     js(IR) {
         nodejs()
     }
+    wasmJs {
+        nodejs()
+    }
 
     linuxX64()
-    // TODO linuxArm64()
+    linuxArm64()
 
     iosArm64()
     iosX64()

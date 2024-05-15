@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## 1.2.2 **UNRELEASED**
+
+- Added `wasmJs` target.
+
+
 ## 1.2.1 *(2024-01-07)*
 
 - Fix deadlock when using ExecutionPolicy.ORDERED.
