@@ -17,7 +17,7 @@ androidx-compose-foundation = "1.6.7"
 androidx-compose-material = "1.6.7"
 androidx-compose-material3 = "1.2.1"
 jetbrains-compose = "1.6.2"
-jetbrains-compose-compiler = "1.5.13.3"
+jetbrains-compose-compiler = "1.5.14"
 
 androidx-activity = "1.9.0"
 androidx-annotation = "1.8.0"
