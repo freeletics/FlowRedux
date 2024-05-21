@@ -41,26 +41,16 @@
       matchPackagePatterns: [
         "org.jetbrains.kotlin",
         "com.google.devtools.ksp",
-        "dev.zacsweers.kctfork",
-        "androidx.compose.compiler",
-        "org.jetbrains.compose.compiler",
       ],
       excludePackagePatterns: [
         "org.jetbrains.kotlinx",
       ],
-      groupName: "Kotlin and Compose Compiler"
+      groupName: "Kotlin and KSP"
     },
     {
       matchPackagePatterns: [
-        "androidx.compose.runtime",
-        "androidx.compose.ui",
-        "androidx.compose.foundation",
-        "androidx.compose.material",
-        "org.jetbrains.compose$",
-        "org.jetbrains.compose.runtime",
-        "org.jetbrains.compose.ui",
-        "org.jetbrains.compose.foundation",
-        "org.jetbrains.compose.material",
+        "androidx.compose",
+        "org.jetbrains.compose",
       ],
       groupName: "Compose"
     }

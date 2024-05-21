@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: zulu
-          java-version: 19
+          java-version: 22
 
       - name: Install Android SDK
         run: ./.github/android-sdk.sh
