@@ -1,32 +1,40 @@
-#!/usr/bin/env bash
+#!/bin/sh
 set -e
 
-ROOT_DIR="$(dirname $0)"
+ROOT_DIR="$(dirname "$0")"
 
-JDK_VERSION="$(grep -s 'java-gradle' $ROOT_DIR/gradle/libs.versions.toml | cut -d'"' -f2)"
+JDK_VERSION="$(grep -s 'java-gradle' "$ROOT_DIR/gradle/libs.versions.toml" | cut -d'"' -f2)"
 if [ -z "$JDK_VERSION" ]; then
-  JDK_VERSION="19"
+  JDK_VERSION="22"
 fi
 
-KOTLIN_VERSION="1.9.0"
+KOTLIN_VERSION="$(grep -s -m 1 '^kotlin \?=' "$ROOT_DIR/gradle/libs.versions.toml" | cut -d'"' -f2)"
 if [ -f "$ROOT_DIR/gradle/libs.versions.toml" ]; then
-  KOTLIN_VERSION="$(grep -m 1 '^kotlin \?=' $ROOT_DIR/gradle/libs.versions.toml | cut -d'"' -f2)"
+  KOTLIN_VERSION="2.0.0"
 fi
 
-INSTALLATION_DIR="${HOME}/.kotlinw/${KOTLIN_VERSION}"
-BINARY_DIR="${INSTALLATION_DIR}/kotlinc/bin"
+# OS specific support (must be 'true' or 'false').
+case "$(uname -s)" in
+    Linux*)     MACHINE=Linux;;
+    Darwin*)    MACHINE=Mac;;
+    *)          MACHINE="UNSUPPORTED"
+esac
 
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  if [ -d "/usr/lib/jvm/zulu-$JDK_VERSION-amd64" ]; then
-    JAVA_HOME="/usr/lib/jvm/zulu-$JDK_VERSION-amd64/"
-  elif [ -d "/usr/lib/jvm/zulu$JDK_VERSION-ca-amd64" ]; then
-    JAVA_HOME="/usr/lib/jvm/zulu$JDK_VERSION-ca-amd64/"
-  else 
-    java --version
+if [ "$MACHINE" = "Linux" ]; then
+  export JAVA_HOME="/usr/lib/jvm/zulu-$JDK_VERSION-amd64/"
+  if [ ! -d "$JAVA_HOME" ]; then
+    export JAVA_HOME="/usr/lib/jvm/zulu$JDK_VERSION-ca-amd64/"
+    if [ ! -d "$JAVA_HOME" ]; then
+      echo "Installing JDK ${JDK_VERSION} (you may be prompted for your password)..."
+      curl -s https://repos.azul.com/azul-repo.key | sudo gpg --batch --yes --dearmor -o /usr/share/keyrings/azul.gpg
+      echo "deb [signed-by=/usr/share/keyrings/azul.gpg] https://repos.azul.com/zulu/deb stable main" | sudo tee /etc/apt/sources.list.d/zulu.list
+      sudo apt update
+      sudo apt install -y "zulu$JDK_VERSION-jdk"
+    fi
   fi
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-  JAVA_HOME="/Library/Java/JavaVirtualMachines/zulu-$JDK_VERSION.jdk/Contents/Home"
-  if [ ! -d "/Library/Java/JavaVirtualMachines/zulu-${JDK_VERSION}.jdk/Contents/Home" ]; then
+elif [ "$MACHINE" = "Mac" ]; then
+  export JAVA_HOME="/Library/Java/JavaVirtualMachines/zulu-$JDK_VERSION.jdk/Contents/Home"
+  if [ ! -d "$JAVA_HOME" ]; then
     echo "Installing JDK ${JDK_VERSION} (you may be prompted for your password)..."
     brew tap mdogan/zulu
     brew install --cask "zulu-jdk${JDK_VERSION}"
@@ -36,9 +44,12 @@ else
   exit 1
 fi
 
+INSTALLATION_DIR="${HOME}/.kotlinw/${KOTLIN_VERSION}"
+BINARY_DIR="${INSTALLATION_DIR}/kotlinc/bin"
+
 if [ ! -f "${BINARY_DIR}/kotlin" ]; then
   echo "Downloading Kotlin ${KOTLIN_VERSION}"
-  mkdir -p ${INSTALLATION_DIR}
+  mkdir -p "${INSTALLATION_DIR}"
   temp_file=$(mktemp /tmp/kotlin.zip.XXXXXX)
   curl -sLo "${temp_file}" "https://github.com/JetBrains/kotlin/releases/download/v${KOTLIN_VERSION}/kotlin-compiler-${KOTLIN_VERSION}.zip"
   unzip -q "${temp_file}" -d "${INSTALLATION_DIR}"
@@ -48,4 +59,10 @@ fi
 # this works around an issue where the Kotlin compiler used by ktlint accesses code that JDK 12+ don't allow access to
 export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED"
 
-"${BINARY_DIR}/kotlin" "$@"
+SCRIPT_FILE="$1"
+# will remove the first element of the $@ arguments array since we read it already above
+shift
+# uses kotlinc instead of kotlin because the latter doesn't allow specifying a jvm target and defaults to Java 8
+# the -- between SCRIPT_FILE and the other arguments is there so that the arguments are treated as arguments to the
+# script and not to kotlinc
+"${BINARY_DIR}/kotlinc" "-jvm-target" "$JDK_VERSION" "-script" "$SCRIPT_FILE" "--" "${@}"

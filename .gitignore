@@ -1,20 +1,10 @@
-*.iml
 .gradle
-/local.properties
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
+.idea
+local.properties
 .DS_Store
 build/
-/captures
-.externalNativeBuild
-out/
 kotlin-js-store/
+.kotlin/
 
-.idea*
-*.thumbnails
-.python-version
-
-
-.java-version
-.vscode/
+docs/index.md
+docs/changelog.md

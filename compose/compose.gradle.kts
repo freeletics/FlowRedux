@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+
 plugins {
     alias(libs.plugins.fgp.multiplatform)
     alias(libs.plugins.fgp.publish)
@@ -18,6 +20,7 @@ kotlin {
     js(IR) {
         nodejs()
     }
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         nodejs()
     }

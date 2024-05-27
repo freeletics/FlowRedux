@@ -1,23 +1,21 @@
 [versions]
-kotlin = "1.9.24"
+kotlin = "2.0.0"
 coroutines = "1.8.1"
 
-java-target = "1.8"
-java-toolchain = "19"
+java-target = "11"
+java-toolchain = "22"
 
 android-gradle = "8.4.1"
 android-min = "21"
 android-target = "34"
 android-compile = "34"
 
-androidx-compose-compiler = "1.5.14"
 androidx-compose-runtime = "1.6.7"
 androidx-compose-ui = "1.6.7"
 androidx-compose-foundation = "1.6.7"
 androidx-compose-material = "1.6.7"
 androidx-compose-material3 = "1.2.1"
 jetbrains-compose = "1.6.2"
-jetbrains-compose-compiler = "1.5.14"
 
 androidx-activity = "1.9.0"
 androidx-annotation = "1.8.0"
@@ -51,14 +49,12 @@ kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
-androidx-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "androidx-compose-compiler" }
 androidx-compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "androidx-compose-runtime" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "androidx-compose-ui" }
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "androidx-compose-foundation" }
 androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "androidx-compose-material" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "androidx-compose-material3" }
 jetbrains-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "jetbrains-compose" }
-jetbrains-compose-compiler = { module = "org.jetbrains.compose.compiler:compiler", version.ref = "jetbrains-compose-compiler" }
 
 androidx-activity = { module = "androidx.activity:activity", version.ref = "androidx-activity" }
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
@@ -94,7 +90,7 @@ android-app = { id = "com.android.application", version.ref = "android-gradle" }
 android-library = { id = "com.android.library", version.ref = "android-gradle" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }
+compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 publish = { id = "com.vanniktech.maven.publish", version.ref = "publish" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 binarycompatibility = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binarycompatibility" }
