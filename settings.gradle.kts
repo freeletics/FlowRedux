@@ -3,11 +3,16 @@ pluginManagement {
         mavenCentral()
         google()
         gradlePluginPortal()
+        maven {setUrl("https://oss.sonatype.org/content/repositories/snapshots/")}
     }
 }
 
 plugins {
-    id("com.freeletics.gradle.settings").version("0.12.2")
+    id("com.freeletics.gradle.settings").version("js-repository-SNAPSHOT")
 }
 
 rootProject.name = "flowredux-library"
+
+configure<com.freeletics.gradle.plugin.SettingsExtension> {
+    snapshots()
+}
