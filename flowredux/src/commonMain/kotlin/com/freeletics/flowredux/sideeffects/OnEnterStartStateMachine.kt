@@ -42,8 +42,10 @@ internal class OnEnterStartStateMachine<SubStateMachineState : Any, SubStateMach
 
             coroutineWaiter.waitUntilResumed()
             actions.mapNotNull { actionMapper(it) }
-                .collect {
-                    subStateMachine.dispatch(it)
+                .collect { action ->
+                    runOnlyIfInInputState(getState) {
+                        subStateMachine.dispatch(action)
+                    }
                 }
         }
     }
