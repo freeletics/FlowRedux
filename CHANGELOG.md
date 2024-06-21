@@ -1,9 +1,13 @@
 Change Log
 ==========
 
-## 1.2.2 **UNRELEASED**
+## 1.2.2 *(2024-06-21)*
 
 - Added `wasmJs` target.
+- Potentially fix a crash for `onEnterStateMachine` where an action could be dispatched
+  to the sub state machine during cancellation.
+- Updated to Kotlin 2.0.0.
+- Updated to Coroutines 1.8.1.
 
 
 ## 1.2.1 *(2024-01-07)*
@@ -23,7 +27,7 @@ Change Log
     inState<MyState> {
       // general onEnter/onAction/... methods
 
-      condition({ state -> state.value == "condition" }) { 
+      condition({ state -> state.value == "condition" }) {
         // onEnter/onAction/... methods that will only be triggered when the condition is true
       }
     }
@@ -36,12 +40,12 @@ Change Log
     inState<MyState> {
       // general onEnter/onAction/... methods
 
-      untilIdentityChanges({ state -> state.searchQuery }) { 
+      untilIdentityChanges({ state -> state.searchQuery }) {
         // triggered whenever `searchQuery` changes
         onEnterEffect { state ->
           sendAnalyticsEvent(state.searchQuery)
         }
-        
+
         // whenever `searchQuery` changes the collection is stopped and a new flow is built and collected
         collectWhileInState({ state -> loadSearchResults(state.searchQuery )}) { result, state ->
           // update state based on result
@@ -81,7 +85,7 @@ Change Log
   a state machine to FlowRedux.
 - A few methods which already had reified overloads are now hidden from auto complete (this change is binary
   compatible).
-- Fixed race condition when using sub state machines that could cause a crash when an action is dispatched 
+- Fixed race condition when using sub state machines that could cause a crash when an action is dispatched
   shortly after the sub state machine starts.
 
 
