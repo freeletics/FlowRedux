@@ -21,7 +21,7 @@ jobs:
           distribution: zulu
           java-version: 22
 
-      - uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@v4
         with:
           validate-wrappers: true
 
