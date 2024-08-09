@@ -16,7 +16,6 @@ import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class FlowReduxStateMachineTest {
-
     @Test
     fun emptyStateMachineJustEmitsInitialState() = runTest {
         val sm = StateMachine { }
@@ -28,7 +27,6 @@ internal class FlowReduxStateMachineTest {
     @Test
     fun callingSpecBlockTwiceThrowsException() {
         val sm = object : FlowReduxStateMachine<Any, Any>(Any()) {
-
             init {
                 spec { }
             }

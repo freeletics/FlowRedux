@@ -17,10 +17,9 @@ import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class OnEnterStartStateMachineTest {
-
     @Test
     fun childStateMachineEmitsInitialStateToParentStateMachine() = runTest {
-        val child = ChildStateMachine(initialState = TestState.S3) { }
+        val child = childStateMachine(initialState = TestState.S3) { }
         val stateMachine = StateMachine {
             inState<TestState.Initial> {
                 onEnterStartStateMachine(child)
@@ -40,7 +39,7 @@ internal class OnEnterStartStateMachineTest {
         val receivedChildStateUpdates = mutableListOf<TestState>()
         val receivedChildStateUpdatesParentState = mutableListOf<TestState>()
 
-        val child = ChildStateMachine(initialState = TestState.S3) {
+        val child = childStateMachine(initialState = TestState.S3) {
             inState<TestState.S3> {
                 on<TestAction.A1> { _, state ->
                     inS3onA1Action++
@@ -103,7 +102,7 @@ internal class OnEnterStartStateMachineTest {
         val factoryInvocations = Channel<Unit>(Channel.UNLIMITED)
         val childEntersInitialState = Channel<Unit>(Channel.UNLIMITED)
 
-        val child = ChildStateMachine {
+        val child = childStateMachine {
             inState<TestState.Initial> {
                 onEnterEffect {
                     childEntersInitialState.send(Unit)
@@ -152,7 +151,7 @@ internal class OnEnterStartStateMachineTest {
         val factoryInvocations = Channel<Unit>(Channel.UNLIMITED)
         val childEntersInitialState = Channel<Unit>(Channel.UNLIMITED)
 
-        val child = ChildStateMachine {
+        val child = childStateMachine {
             inState<TestState.Initial> {
                 onEnterEffect {
                     childEntersInitialState.send(Unit)
@@ -214,7 +213,7 @@ internal class OnEnterStartStateMachineTest {
     fun actionsAreOnlyDispatchedToSubStateMachineWhileParentStateMachineIsInState() = runTest {
         val childActionInvocations = Channel<Unit>(Channel.UNLIMITED)
         val parentActionInvocations = Channel<Unit>(Channel.UNLIMITED)
-        val child = ChildStateMachine(initialState = TestState.S1) {
+        val child = childStateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
                 on<TestAction.A1> { _, state ->
                     childActionInvocations.send(Unit)
@@ -262,7 +261,7 @@ internal class OnEnterStartStateMachineTest {
     fun actionsAreOnlyDispatchedToSubStateMachineIfTheyAreMapped() = runTest {
         val childActionInvocations = Channel<Unit>(Channel.UNLIMITED)
         val parentActionInvocations = Channel<Unit>(Channel.UNLIMITED)
-        val child = ChildStateMachine(initialState = TestState.S1) {
+        val child = childStateMachine(initialState = TestState.S1) {
             inState<TestState> {
                 on<TestAction> { _, state ->
                     childActionInvocations.send(Unit)
@@ -326,7 +325,7 @@ internal class OnEnterStartStateMachineTest {
         var parentS2 = 0
         var childFactory = 0
 
-        val child = ChildStateMachine(initialState = TestState.S2) {
+        val child = childStateMachine(initialState = TestState.S2) {
             inState<TestState.S2> {
                 onEnter {
                     childOnEnterS2++
@@ -377,12 +376,11 @@ internal class OnEnterStartStateMachineTest {
         }
     }
 
-    private fun ChildStateMachine(
+    private fun childStateMachine(
         initialState: TestState = TestState.Initial,
         builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit,
     ): FlowReduxStateMachine<TestState, TestAction> {
         return object : FlowReduxStateMachine<TestState, TestAction>(initialState) {
-
             init {
                 spec(builderBlock)
             }

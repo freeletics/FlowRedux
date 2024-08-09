@@ -16,7 +16,6 @@ import kotlinx.coroutines.test.runTest
 @OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("DEPRECATION")
 internal class CollectWhileEffectTest {
-
     @Test
     fun collectWhileInStateEffectStopsAfterHavingMovedToNextState() = runTest {
         val stateChange = MutableSharedFlow<Unit>()

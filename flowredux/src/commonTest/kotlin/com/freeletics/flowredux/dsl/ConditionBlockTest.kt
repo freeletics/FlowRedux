@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class ConditionBlockTest {
-
     @Test
     fun onActionTriggersOnlyWhileInCustomCondition() = runTest {
         var counter1 = 0

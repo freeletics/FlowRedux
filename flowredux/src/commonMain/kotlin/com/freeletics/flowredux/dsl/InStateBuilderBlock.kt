@@ -8,7 +8,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 public class InStateBuilderBlock<InputState : S, S : Any, A : Any> internal constructor(
     override val isInState: SideEffectBuilder.IsInState<S>,
 ) : BaseBuilderBlock<InputState, S, A>() {
-
     /**
      * Allows handling certain actions or events only while an extra condition is `true`
      * for the current state.

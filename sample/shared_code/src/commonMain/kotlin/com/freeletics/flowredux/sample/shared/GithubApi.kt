@@ -29,6 +29,7 @@ class GithubApi(
     // Used to simulate network errors
     private var counter = 0
     private val counterMutex = Mutex()
+
     private suspend inline fun shouldFail(): Boolean =
         counterMutex.withLock { counter++ } % 4 == 0
 
@@ -49,7 +50,7 @@ class GithubApi(
             } else {
                 emptyList()
             }
-            ).run {
+        ).run {
             if (isEmpty()) {
                 PageResult.NoNextPage
             } else {
@@ -71,6 +72,7 @@ class GithubApi(
 
 sealed class PageResult {
     internal data object NoNextPage : PageResult()
+
     internal data class Page(val page: Int, val items: List<GithubRepository>) : PageResult()
 }
 

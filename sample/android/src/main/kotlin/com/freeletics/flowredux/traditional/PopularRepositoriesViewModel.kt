@@ -10,7 +10,6 @@ import com.freeletics.flowredux.sample.shared.PaginationState
 import com.freeletics.flowredux.sample.shared.PaginationStateMachine
 
 internal class PopularRepositoriesViewModel : ViewModel() {
-
     private val liveData = MutableLiveData<PaginationState>()
 
     private val stateMachine = PaginationStateMachine(

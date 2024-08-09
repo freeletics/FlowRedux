@@ -17,7 +17,6 @@ import kotlinx.coroutines.withTimeout
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class SubStateMachinesMapTest {
-
     @Test
     fun addingNewStateMachineWorksAndCancelsPreviousOne() = runTest {
         val map = OnActionStartStateMachine.SubStateMachinesMap<TestState, TestAction, TestAction.A4>()
@@ -158,7 +157,6 @@ internal class SubStateMachinesMapTest {
 private class AwaitableBoolean(
     private var value: () -> Boolean,
 ) {
-
     suspend fun awaitTrue(timeOutMillis: Long = 200) {
         withTimeout(timeOutMillis) {
             while (!value()) {

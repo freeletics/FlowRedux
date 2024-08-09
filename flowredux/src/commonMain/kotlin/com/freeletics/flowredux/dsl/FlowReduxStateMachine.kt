@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 public abstract class FlowReduxStateMachine<S : Any, A : Any>(
     private val initialStateSupplier: () -> S,
 ) : StateMachine<S, A> {
-
     public constructor(initialState: S) : this(initialStateSupplier = { initialState })
 
     private val inputActions = Channel<A>()
@@ -71,20 +70,20 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
         if (!::outputState.isInitialized) {
             throw IllegalStateException(
                 """
-                    No state machine specs are defined. Did you call spec { ... } in init {...}?
-                    Example usage:
+                No state machine specs are defined. Did you call spec { ... } in init {...}?
+                Example usage:
 
-                    class MyStateMachine : FlowReduxStateMachine<State, Action>(InitialState) {
+                class MyStateMachine : FlowReduxStateMachine<State, Action>(InitialState) {
 
-                        init{
-                            spec {
-                                inState<FooState> {
-                                    on<BarAction> { ... }
-                                }
-                                ...
+                    init{
+                        spec {
+                            inState<FooState> {
+                                on<BarAction> { ... }
                             }
+                            ...
                         }
                     }
+                }
                 """.trimIndent(),
             )
         }

@@ -7,9 +7,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @ExperimentalCoroutinesApi
 @FlowReduxDsl
 public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
-
-    private val _sideEffectBuilders: MutableList<SideEffectBuilder<out S, S, A>> = ArrayList()
-    internal val sideEffectBuilders: List<SideEffectBuilder<out S, S, A>> get() = _sideEffectBuilders
+    private val sideEffectBuilderList: MutableList<SideEffectBuilder<out S, S, A>> = ArrayList()
+    internal val sideEffectBuilders: List<SideEffectBuilder<out S, S, A>> get() = sideEffectBuilderList
 
     /**
      * Define what happens if the store is in a certain state.
@@ -26,7 +25,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
         subStateClass: KClass<SubState>,
         block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
-        _sideEffectBuilders += InStateBuilderBlock<SubState, S, A>(
+        sideEffectBuilderList += InStateBuilderBlock<SubState, S, A>(
             isInState = { state -> subStateClass.isInstance(state) },
         ).apply(block).sideEffectBuilders
     }
@@ -53,7 +52,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
         block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
     ) {
         @Suppress("UNCHECKED_CAST")
-        _sideEffectBuilders += InStateBuilderBlock<SubState, S, A>(
+        sideEffectBuilderList += InStateBuilderBlock<SubState, S, A>(
             isInState = { state -> subStateClass.isInstance(state) && additionalIsInState(state as SubState) },
         ).apply(block).sideEffectBuilders
     }
@@ -67,7 +66,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
         isInState: (S) -> Boolean,
         block: InStateBuilderBlock<S, S, A>.() -> Unit,
     ) {
-        _sideEffectBuilders += InStateBuilderBlock<S, S, A>(
+        sideEffectBuilderList += InStateBuilderBlock<S, S, A>(
             isInState = isInState,
         ).apply(block).sideEffectBuilders
     }

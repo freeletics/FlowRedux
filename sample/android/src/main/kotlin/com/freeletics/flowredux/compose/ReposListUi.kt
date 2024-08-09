@@ -39,7 +39,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.filter
 
 internal object ReposListUiDefaults {
-    const val VisibleItemsThreshold = 0
+    const val VISIBLE_ITMES_THRESHOLD = 0
 }
 
 @Composable
@@ -49,11 +49,11 @@ internal fun ReposListUi(
     dispatch: (Action) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
-    visibleItemsThreshold: Int = ReposListUiDefaults.VisibleItemsThreshold,
+    VISIBLE_ITMES_THRESHOLD: Int = ReposListUiDefaults.VISIBLE_ITMES_THRESHOLD,
 ) {
     LoadNextPageEffect(
         listState = listState,
-        visibleItemsThreshold = visibleItemsThreshold,
+        VISIBLE_ITMES_THRESHOLD = VISIBLE_ITMES_THRESHOLD,
         onLoadNextPage = { dispatch(LoadNextPage) },
     )
 
@@ -100,10 +100,10 @@ internal fun ReposListUi(
 @Composable
 private fun LoadNextPageEffect(
     listState: LazyListState,
-    visibleItemsThreshold: Int,
+    VISIBLE_ITMES_THRESHOLD: Int,
     onLoadNextPage: () -> Unit,
 ) {
-    LaunchedEffect(listState, onLoadNextPage, visibleItemsThreshold) {
+    LaunchedEffect(listState, onLoadNextPage, VISIBLE_ITMES_THRESHOLD) {
         snapshotFlow { listState.layoutInfo }
             .filter { layoutInfo ->
                 val lastVisibleIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index
@@ -111,7 +111,7 @@ private fun LoadNextPageEffect(
 
                 lastVisibleIndex != null &&
                     lastIndex >= 0 &&
-                    lastVisibleIndex + visibleItemsThreshold >= lastIndex
+                    lastVisibleIndex + VISIBLE_ITMES_THRESHOLD >= lastIndex
             }
             .collect {
                 // user scrolls until the end of the list.
