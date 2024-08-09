@@ -16,7 +16,6 @@ import kotlinx.coroutines.test.runTest
 @Suppress("DEPRECATION")
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class CustomIsInStateDslTest {
-
     @Test
     fun onActionTriggersOnlyWhileInCustomState() = runTest {
         var counter1 = 0

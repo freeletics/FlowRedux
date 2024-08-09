@@ -12,7 +12,6 @@ internal class OnEnter<InputState : S, S : Any, A : Any>(
     private val initialState: InputState,
     private val handler: suspend (state: State<InputState>) -> ChangedState<S>,
 ) : SideEffect<InputState, S, A>() {
-
     override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
         return flow {
             emit(handler(State(initialState)))

@@ -8,7 +8,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 public class ConditionBuilderBlock<InputState : S, S : Any, A : Any> internal constructor(
     override val isInState: SideEffectBuilder.IsInState<S>,
 ) : BaseBuilderBlock<InputState, S, A>() {
-
     /**
      * Anything inside this block will only run while the [identity] of the current state
      * remains the same. The `identity` is determined by the given function and uses

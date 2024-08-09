@@ -9,7 +9,6 @@ import com.freeletics.flowredux.sample.shared.GithubApi
 import com.freeletics.flowredux.sample.shared.InternalPaginationStateMachine
 
 class ComposeActivity : ComponentActivity() {
-
     private val stateMachine = InternalPaginationStateMachine(githubApi = GithubApi())
 
     override fun onCreate(savedInstanceState: Bundle?) {

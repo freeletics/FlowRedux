@@ -19,7 +19,6 @@ internal class OnEnterStartStateMachine<SubStateMachineState : Any, SubStateMach
     private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
 ) : ActionBasedSideEffect<InputState, S, A>() {
-
     override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
         return channelFlow {
             // Used to synchronize the dispatching of actions to the sub statemachine

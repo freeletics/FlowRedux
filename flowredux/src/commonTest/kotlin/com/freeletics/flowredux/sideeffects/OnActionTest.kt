@@ -21,7 +21,6 @@ import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class OnActionTest {
-
     @Test
     fun actionBlockStopsWhenMovedToAnotherStateWithin10Milliseconds() = runTest {
         val blockEntered = Channel<Boolean>()
@@ -105,6 +104,6 @@ internal class OnActionTest {
             assertEquals(TestState.GenericNullableState(null, null), turbine.awaitItem())
             assertEquals(TestState.GenericNullableState("1", null), turbine.awaitItem())
             assertEquals(TestState.GenericNullableState("1", 2), turbine.awaitItem())
-        } 
+        }
     }
 }

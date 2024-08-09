@@ -16,7 +16,6 @@ internal class OnAction<InputState : S, SubAction : A, S : Any, A : Any>(
     internal val executionPolicy: ExecutionPolicy,
     internal val handler: suspend (action: SubAction, state: State<InputState>) -> ChangedState<S>,
 ) : ActionBasedSideEffect<InputState, S, A>() {
-
     override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
         return actions.asSubAction()
             .flatMapWithExecutionPolicy(executionPolicy) { action ->

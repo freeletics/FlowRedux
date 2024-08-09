@@ -61,7 +61,6 @@ internal abstract class SideEffect<InputState : S, S, A> {
 }
 
 internal abstract class ActionBasedSideEffect<InputState : S, S, A> : SideEffect<InputState, S, A>() {
-
     private val actionChannel = Channel<A>()
     protected val actions get() = actionChannel.receiveAsFlow()
 
@@ -88,7 +87,6 @@ internal class ManagedSideEffect<InputState : S, S, A>(
     private val getState: GetState<S>,
     private val stateChanges: SendChannel<ChangedState<S>>,
 ) {
-
     private var currentlyActiveSideEffect: CurrentlyActiveSideEffect? = null
 
     suspend fun startIfNeeded(state: S) {

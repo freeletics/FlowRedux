@@ -18,7 +18,6 @@ import kotlin.LazyThreadSafetyMode.NONE
 import timber.log.Timber
 
 class TraditionalPopularRepositoriesActivity : ComponentActivity() {
-
     private val viewModel by viewModels<PopularRepositoriesViewModel>()
 
     private val binding by lazy(NONE) { ActivityTraditionalPopularRepositoriesBinding.inflate(layoutInflater) }

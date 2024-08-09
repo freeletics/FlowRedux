@@ -14,7 +14,6 @@ internal class CollectWhile<T, InputState : S, S : Any, A : Any>(
     private val executionPolicy: ExecutionPolicy,
     private val handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
 ) : SideEffect<InputState, S, A>() {
-
     override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
         return flow.flatMapWithExecutionPolicy(executionPolicy) { item ->
             changeState(getState) { inputState ->

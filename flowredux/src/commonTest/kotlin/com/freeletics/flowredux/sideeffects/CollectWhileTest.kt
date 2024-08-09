@@ -16,7 +16,6 @@ import kotlinx.coroutines.test.runTest
 @OptIn(ExperimentalCoroutinesApi::class)
 @Suppress("deprecation")
 internal class CollectWhileTest {
-
     @Test
     fun collectWhileInStateStopsAfterHavingMovedToNextState() = runTest {
         val values = MutableSharedFlow<Int>()

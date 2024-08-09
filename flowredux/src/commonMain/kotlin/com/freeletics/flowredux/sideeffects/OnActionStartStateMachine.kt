@@ -24,7 +24,6 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
     private val actionMapper: (A) -> SubStateMachineAction?,
     private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
 ) : ActionBasedSideEffect<InputState, S, A>() {
-
     override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
         return channelFlow {
             val subStateMachinesMap = SubStateMachinesMap<SubStateMachineState, SubStateMachineAction, ActionThatTriggeredStartingStateMachine>()

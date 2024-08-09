@@ -11,10 +11,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 
 internal class CoroutineWaiterTest {
-
     @Test
     fun waitUntilResumedAndOnceResumedDontWaitInTheFutureAnymore() = runTest {
-        withContext(Dispatchers.Unconfined) { // We want real delay() here, thus using this Dispatcher
+        withContext(Dispatchers.Unconfined) {
+            // We want real delay() here, thus using this Dispatcher
             var reached1 = false
             var reached2 = false
             val waiter = CoroutineWaiter()

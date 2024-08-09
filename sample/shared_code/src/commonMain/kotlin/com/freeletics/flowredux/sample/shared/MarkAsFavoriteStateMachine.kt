@@ -11,8 +11,8 @@ class MarkAsFavoriteStateMachine(
     private val githubApi: GithubApi,
     repository: GithubRepository,
 ) : FlowReduxStateMachine<GithubRepository, Action>(
-    initialState = repository.copy(favoriteStatus = FavoriteStatus.OPERATION_IN_PROGRESS),
-) {
+        initialState = repository.copy(favoriteStatus = FavoriteStatus.OPERATION_IN_PROGRESS),
+    ) {
     private val favoriteStatusWhenStarting: FavoriteStatus = repository.favoriteStatus
 
     init {

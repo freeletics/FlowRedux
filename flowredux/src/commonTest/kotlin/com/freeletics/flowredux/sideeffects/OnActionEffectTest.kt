@@ -17,7 +17,6 @@ import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class OnActionEffectTest {
-
     @Test
     fun actionEffectBlockStopsWhenMovedToAnotherState() = runTest {
         val blockEntered = Channel<Boolean>(Channel.UNLIMITED)

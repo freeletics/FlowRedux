@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class IdentityBlockTest {
-
     @Test
     fun blockStartsWheneverIdentityChanges() = runTest {
         var counter = 0
