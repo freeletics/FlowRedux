@@ -33,7 +33,7 @@ timber = "5.0.1"
 mad = "0.24.0"
 
 turbine = "1.1.0"
-kotlinx-collections-immutable= "0.3.7"
+kotlinx-collections-immutable= "0.3.8"
 
 fgp = "0.15.0"
 publish = "0.29.0"
