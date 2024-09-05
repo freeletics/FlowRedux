@@ -35,6 +35,7 @@ import com.freeletics.flowredux.sample.shared.GithubRepository
 import com.freeletics.flowredux.sample.shared.LoadNextPage
 import com.freeletics.flowredux.sample.shared.RetryToggleFavoriteAction
 import com.freeletics.flowredux.sample.shared.ToggleFavoriteAction
+import java.util.Locale
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.filter
 
@@ -180,7 +181,7 @@ private fun GithubRepoUi(
 
             Text(
                 modifier = Modifier.width(50.dp),
-                text = repo.stargazersCount.toString(),
+                text = String.format(Locale.getDefault(), "%d", repo.stargazersCount),
             )
         }
     }
