@@ -12,6 +12,7 @@ import com.freeletics.flowredux.sample.shared.RetryToggleFavoriteAction
 import com.freeletics.flowredux.sample.shared.ToggleFavoriteAction
 import com.hannesdorfmann.adapterdelegates4.AsyncListDifferDelegationAdapter
 import com.hannesdorfmann.adapterdelegates4.dsl.adapterDelegate
+import java.util.Locale
 
 /**
  * Represents a loading object
@@ -58,7 +59,7 @@ private fun githubAdapterDelegate(dispatch: (Action) -> Unit) =
 
         bind {
             repoName.text = item.name
-            starCount.text = item.stargazersCount.toString()
+            starCount.text = String.format(Locale.getDefault(), "%d", item.stargazersCount)
             when (item.favoriteStatus) {
                 FavoriteStatus.FAVORITE -> {
                     progressBar.gone
