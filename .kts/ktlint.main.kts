@@ -3,5 +3,6 @@
 @file:DependsOn("com.freeletics.gradle:scripts-formatting:0.16.0")
 
 import com.freeletics.gradle.scripts.KtLintCli
+import com.github.ajalt.clikt.core.main
 
 KtLintCli().main(args)
