@@ -30,7 +30,7 @@ material = "1.12.0"
 adapterdelegates = "4.3.2"
 timber = "5.0.1"
 
-mad = "0.29.0"
+mad = "0.29.1"
 
 turbine = "1.2.0"
 kotlinx-collections-immutable= "0.3.8"
