@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.fgp.multiplatform)
+    id("com.freeletics.gradle.multiplatform")
 }
 
 freeletics {

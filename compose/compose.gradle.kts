@@ -1,14 +1,14 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-    alias(libs.plugins.fgp.multiplatform)
-    alias(libs.plugins.fgp.publish)
+    id("com.freeletics.gradle.multiplatform")
+    id("com.freeletics.gradle.publish.oss")
 }
 
 freeletics {
     useCompose()
 
-    // TODO https://github.com/JetBrains/compose-multiplatform/issues/3344
+    // TODO https://youtrack.jetbrains.com/issue/CMP-3344
     // multiplatform {
     //     addCommonTargets()
     // }
