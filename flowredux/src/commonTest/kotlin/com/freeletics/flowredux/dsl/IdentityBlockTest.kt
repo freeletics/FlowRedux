@@ -11,6 +11,7 @@ import kotlin.test.assertIs
 import kotlin.test.assertIsNot
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -102,7 +103,8 @@ internal class IdentityBlockTest {
     }
 
     @Test
-    fun blockIsCancelledIfIdentityChanges() = runTest {
+    fun blockIsCancelledIfIdentityChanges() = repeat(5000000) { runTest {
+        val signal = Channel<Unit>()
         val cancellations = mutableListOf<Pair<Int, Throwable>>()
 
         val gs1 = TestState.GenericState("asd", 1)
@@ -118,6 +120,7 @@ internal class IdentityBlockTest {
                 untilIdentityChanges({ it.anInt }) {
                     onEnter {
                         try {
+                            signal.send(Unit)
                             awaitCancellation()
                         } catch (t: Throwable) {
                             cancellations.add(it.snapshot.anInt to t)
@@ -136,16 +139,21 @@ internal class IdentityBlockTest {
             assertEquals(TestState.Initial, awaitItem())
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1, awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1.copy(anInt = 2), awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1.copy(anInt = 3), awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1.copy(anInt = 4), awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1.copy(anInt = 5), awaitItem())
 
             assertEquals(4, cancellations.size)
+            signal.receive()
         }
 
         assertEquals(5, cancellations.size)
@@ -160,7 +168,7 @@ internal class IdentityBlockTest {
         // this last cancellation comes when the state machine shuts down
         assertEquals(5, cancellations[4].first)
         assertIsNot<StateChangeCancellationException>(cancellations[4].second)
-    }
+    }}
 
     @Test
     fun blockIsNotCancelledIfIdentityDoesNotChange() = runTest {
@@ -302,7 +310,8 @@ internal class IdentityBlockTest {
     }
 
     @Test
-    fun blockIsCancelledIfIdentityChangesBetweenNullAndNotNull() = runTest {
+    fun blockIsCancelledIfIdentityChangesBetweenNullAndNotNull() = repeat(5000000) { runTest {
+        val signal = Channel<Unit>()
         val cancellations = mutableListOf<Pair<Int?, Throwable>>()
 
         val gs1 = TestState.GenericNullableState(null, null)
@@ -318,6 +327,7 @@ internal class IdentityBlockTest {
                 untilIdentityChanges({ it.anInt }) {
                     onEnter {
                         try {
+                            signal.send(Unit)
                             awaitCancellation()
                         } catch (t: Throwable) {
                             cancellations.add(it.snapshot.anInt to t)
@@ -336,16 +346,21 @@ internal class IdentityBlockTest {
             assertEquals(TestState.Initial, awaitItem())
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1, awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1.copy(anInt = 1), awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1.copy(anInt = 2), awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1.copy(anInt = 3), awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1.copy(anInt = 4), awaitItem())
 
             assertEquals(4, cancellations.size)
+            signal.receive()
         }
 
         assertEquals(5, cancellations.size)
@@ -360,7 +375,7 @@ internal class IdentityBlockTest {
         // this last cancellation comes when the state machine shuts down
         assertEquals(4, cancellations[4].first)
         assertIsNot<StateChangeCancellationException>(cancellations[4].second)
-    }
+    }}
 
     @Test
     fun blockIsNotCancelledIfIdentityStaysNull() = runTest {
