@@ -18,7 +18,7 @@ import kotlinx.coroutines.test.runTest
 internal class IdentityBlockTest {
     @Test
     fun blockStartsWheneverIdentityChanges() = runTest {
-        var counter = 0
+        val signal = Channel<Unit>(capacity = Int.MAX_VALUE)
 
         val gs1 = TestState.GenericState("asd", 1)
 
@@ -32,7 +32,7 @@ internal class IdentityBlockTest {
             inState<TestState.GenericState> {
                 untilIdentityChanges({ it.anInt }) {
                     onEnterEffect {
-                        counter++
+                        signal.send(Unit)
                     }
                 }
 
@@ -46,17 +46,20 @@ internal class IdentityBlockTest {
             assertEquals(TestState.Initial, awaitItem())
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1, awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1.copy(anInt = 2), awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1.copy(anInt = 3), awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1.copy(anInt = 4), awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1.copy(anInt = 5), awaitItem())
+            signal.receive()
         }
-
-        assertEquals(5, counter)
     }
 
     @Test
@@ -225,7 +228,7 @@ internal class IdentityBlockTest {
 
     @Test
     fun blockStartsWhenIdentityChangesBetweenNullAndNotNull() = runTest {
-        var counter = 0
+        val signal = Channel<Unit>(capacity = Int.MAX_VALUE)
 
         val gs1 = TestState.GenericNullableState(null, null)
 
@@ -239,7 +242,7 @@ internal class IdentityBlockTest {
             inState<TestState.GenericNullableState> {
                 untilIdentityChanges({ it.anInt }) {
                     onEnterEffect {
-                        counter++
+                        signal.send(Unit)
                     }
                 }
 
@@ -257,13 +260,14 @@ internal class IdentityBlockTest {
             assertEquals(TestState.Initial, awaitItem())
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1, awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A1)
             assertEquals(gs1.copy(anInt = 1), awaitItem())
+            signal.receive()
             sm.dispatchAsync(TestAction.A2)
             assertEquals(gs1, awaitItem())
+            signal.receive()
         }
-
-        assertEquals(3, counter)
     }
 
     @Test
