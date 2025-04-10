@@ -103,7 +103,7 @@ internal class IdentityBlockTest {
     }
 
     @Test
-    fun blockIsCancelledIfIdentityChanges() = repeat(5000000) { runTest {
+    fun blockIsCancelledIfIdentityChanges() = runTest {
         val signal = Channel<Unit>()
         val cancellations = mutableListOf<Pair<Int, Throwable>>()
 
@@ -310,7 +310,7 @@ internal class IdentityBlockTest {
     }
 
     @Test
-    fun blockIsCancelledIfIdentityChangesBetweenNullAndNotNull() = repeat(5000000) { runTest {
+    fun blockIsCancelledIfIdentityChangesBetweenNullAndNotNull() = runTest {
         val signal = Channel<Unit>()
         val cancellations = mutableListOf<Pair<Int?, Throwable>>()
 
