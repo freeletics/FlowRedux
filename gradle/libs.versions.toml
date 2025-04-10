@@ -7,8 +7,8 @@ java-toolchain = "22"
 
 android-gradle = "8.7.3"
 android-min = "21"
-android-target = "34"
-android-compile = "34"
+android-target = "35"
+android-compile = "36"
 
 androidx-compose-runtime = "1.7.6"
 androidx-compose-ui = "1.7.6"
