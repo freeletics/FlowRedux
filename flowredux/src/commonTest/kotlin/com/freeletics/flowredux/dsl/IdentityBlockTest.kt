@@ -168,7 +168,7 @@ internal class IdentityBlockTest {
         // this last cancellation comes when the state machine shuts down
         assertEquals(5, cancellations[4].first)
         assertIsNot<StateChangeCancellationException>(cancellations[4].second)
-    }}
+    }
 
     @Test
     fun blockIsNotCancelledIfIdentityDoesNotChange() = runTest {
@@ -375,7 +375,7 @@ internal class IdentityBlockTest {
         // this last cancellation comes when the state machine shuts down
         assertEquals(4, cancellations[4].first)
         assertIsNot<StateChangeCancellationException>(cancellations[4].second)
-    }}
+    }
 
     @Test
     fun blockIsNotCancelledIfIdentityStaysNull() = runTest {
