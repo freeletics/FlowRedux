@@ -99,6 +99,12 @@ internal class OnActionStartStateMachineTest {
                     state.override { TestState.S3 }
                 }
             }
+
+            inState<TestState.S3> {
+                on<TestAction.A2> { _, state ->
+                    state.override { TestState.S2 }
+                }
+            }
         }
 
         parentStateMachine.state.test {
@@ -127,7 +133,7 @@ internal class OnActionStartStateMachineTest {
 
             // Child state machine should have stopped because we are in S3 state
             parentStateMachine.dispatchAsync(TestAction.A2) // should not be handled by child state machine
-            delay(50)
+            assertEquals(TestState.S2, awaitItem())
             // verify child state machine had no interactions
             assertEquals(1, childS3A2Handled)
             assertEquals(1, childS1A2Handled)
