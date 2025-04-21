@@ -5,7 +5,7 @@ coroutines = "1.10.2"
 java-target = "11"
 java-toolchain = "22"
 
-android-gradle = "8.9.1"
+android-gradle = "8.9.2"
 android-min = "21"
 android-target = "35"
 android-compile = "36"
