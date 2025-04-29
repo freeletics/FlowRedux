@@ -21,6 +21,7 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
 
     private val activeFlowCounter = AtomicCounter(0)
 
+    @FlowReduxDsl
     protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
         if (::outputState.isInitialized) {
             throw IllegalStateException(
@@ -48,12 +49,14 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
             }
     }
 
+    @FlowReduxDsl
     override val state: Flow<S>
         get() {
             checkSpecBlockSet()
             return outputState
         }
 
+    @FlowReduxDsl
     override suspend fun dispatch(action: A) {
         checkSpecBlockSet()
         if (activeFlowCounter.get() <= 0) {

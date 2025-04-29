@@ -12,6 +12,7 @@ import kotlin.jvm.JvmName
  * or event happened. Note that it might be outdated by the time the code runs and should
  * never be used within [mutate] or to create an object that is passed to [override]
  */
+@FlowReduxDsl
 public class State<InputState : Any>(
     public val snapshot: InputState,
 ) {
