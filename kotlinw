@@ -3,14 +3,13 @@ set -e
 
 ROOT_DIR="$(dirname "$0")"
 
-JDK_VERSION="$(grep -s 'java-gradle' "$ROOT_DIR/gradle/libs.versions.toml" | cut -d'"' -f2)"
-if [ -z "$JDK_VERSION" ]; then
-  JDK_VERSION="22"
-fi
+KOTLIN_VERSION="$(grep -m 1 '^kotlin \?=' "$ROOT_DIR/gradle/libs.versions.toml" | cut -d'"' -f2)"
+JDK_VERSION="$(grep -s 'toolchainVersion' "$ROOT_DIR/gradle/gradle-daemon-jvm.properties" | cut -d'=' -f2)"
 
-KOTLIN_VERSION="$(grep -s -m 1 '^kotlin \?=' "$ROOT_DIR/gradle/libs.versions.toml" | cut -d'"' -f2)"
-if [ -f "$ROOT_DIR/gradle/libs.versions.toml" ]; then
-  KOTLIN_VERSION="2.0.0"
+if [ "$JDK_VERSION" = "24" ]; then
+  JDK_TARGET_VERSION="23"
+else
+  JDK_TARGET_VERSION="$JDK_VERSION"
 fi
 
 # OS specific support (must be 'true' or 'false').
@@ -57,7 +56,7 @@ if [ ! -f "${BINARY_DIR}/kotlin" ]; then
 fi
 
 # this works around an issue where the Kotlin compiler used by ktlint accesses code that JDK 12+ don't allow access to
-export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED"
+export JAVA_OPTS="--enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow"
 
 SCRIPT_FILE="$1"
 # will remove the first element of the $@ arguments array since we read it already above
@@ -65,4 +64,4 @@ shift
 # uses kotlinc instead of kotlin because the latter doesn't allow specifying a jvm target and defaults to Java 8
 # the -- between SCRIPT_FILE and the other arguments is there so that the arguments are treated as arguments to the
 # script and not to kotlinc
-"${BINARY_DIR}/kotlinc" "-jvm-target" "$JDK_VERSION" "-script" "$SCRIPT_FILE" "--" "${@}"
+"${BINARY_DIR}/kotlinc" "-jvm-target" "$JDK_TARGET_VERSION" "-script" "$SCRIPT_FILE" "--" "${@}"
