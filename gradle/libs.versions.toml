@@ -32,7 +32,7 @@ timber = "5.0.1"
 
 mad = "0.29.1"
 
-turbine = "1.2.0"
+turbine = "1.2.1"
 kotlinx-collections-immutable= "0.4.0"
 
 fgp = "0.25.0"
