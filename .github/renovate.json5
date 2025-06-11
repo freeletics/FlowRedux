@@ -9,7 +9,7 @@
   platformAutomerge: true,
   platformCommit: true,
   assignAutomerge: true,
-  reviewers: ["gabrielittner"],
+  reviewers: ["team:android-oss"],
   rebaseWhen: "conflicted",
   prBodyTemplate: "{{{header}}}{{{table}}}{{{notes}}}{{{changelogs}}}{{{controls}}}{{{footer}}}",
   prBodyColumns: ["Package", "Change", "Age"],
