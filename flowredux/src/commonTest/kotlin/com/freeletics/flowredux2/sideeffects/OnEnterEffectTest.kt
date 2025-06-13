@@ -33,8 +33,8 @@ internal class OnEnterEffectTest {
                     }
                 }
 
-                on<TestAction.A2> { _, state ->
-                    state.override { TestState.S2 }
+                on<TestAction.A2> {
+                    override { TestState.S2 }
                 }
             }
         }
@@ -56,7 +56,7 @@ internal class OnEnterEffectTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
-                    it.override { TestState.GenericState("from initial", 0) }
+                    override { TestState.GenericState("from initial", 0) }
                 }
             }
 
@@ -65,9 +65,9 @@ internal class OnEnterEffectTest {
                     genericStateEffectEntered++
                 }
 
-                on<TestAction.A1> { _, state ->
+                on<TestAction.A1> {
                     a1Received++
-                    state.override { TestState.GenericState("onA1", a1Received) }
+                    override { TestState.GenericState("onA1", a1Received) }
                 }
             }
         }

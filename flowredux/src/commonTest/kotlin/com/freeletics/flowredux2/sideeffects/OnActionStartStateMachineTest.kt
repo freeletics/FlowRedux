@@ -20,9 +20,9 @@ internal class OnActionStartStateMachineTest {
         val child = StateMachine(initialState = TestState.S3)
         val parentStateMachine = StateMachine {
             inState<TestState.Initial> {
-                onActionStartStateMachine<TestAction.A1, TestState>(child) { inputState, childState ->
+                onActionStartStateMachine<TestAction.A1, TestState>(child) { childState ->
                     childStateChanged++
-                    inputState.override { childState }
+                    override { childState }
                 }
             }
         }
@@ -42,9 +42,9 @@ internal class OnActionStartStateMachineTest {
         val child = StateMachine(initialState = TestState.S3)
         val parentStateMachine = StateMachine {
             inState<TestState.Initial> {
-                onActionStartStateMachine<TestAction.A1, TestState>(child) { inputState, _ ->
+                onActionStartStateMachine<TestAction.A1, TestState>(child) {
                     childStateChanged++
-                    inputState.override { TestState.S1 }
+                    override { TestState.S1 }
                 }
             }
         }
@@ -71,37 +71,37 @@ internal class OnActionStartStateMachineTest {
 
         val child = StateMachine(initialState = TestState.S3) {
             inState<TestState.S3> {
-                on<TestAction.A2> { _, state ->
+                on<TestAction.A2> {
                     childS3A2Handled++
-                    state.override {
+                    override {
                         TestState.S1
                     } // Doesn't really matter which state, parent ignores it anyway
                 }
             }
             inState<TestState.S1> {
-                on<TestAction.A2> { _, state ->
+                on<TestAction.A2> {
                     childS1A2Handled++
-                    state.override { TestState.S3 }
+                    override { TestState.S3 }
                 }
             }
         }
 
         val parentStateMachine = StateMachine(initialState = TestState.CounterState(0)) {
             inState<TestState.CounterState> {
-                onActionStartStateMachine<TestAction.A1, TestState>(child) { inputState, childState ->
+                onActionStartStateMachine<TestAction.A1, TestState>(child) { childState ->
                     childStateChanged++
                     recordedSubStates += childState
-                    inputState.mutate { copy(counter = this.counter + 1) }
+                    mutate { copy(counter = this.counter + 1) }
                 }
 
-                on<TestAction.A3> { _, state ->
-                    state.override { TestState.S3 }
+                on<TestAction.A3> {
+                    override { TestState.S3 }
                 }
             }
 
             inState<TestState.S3> {
-                on<TestAction.A2> { _, state ->
-                    state.override { TestState.S2 }
+                on<TestAction.A2> {
+                    override { TestState.S2 }
                 }
             }
         }
@@ -149,16 +149,16 @@ internal class OnActionStartStateMachineTest {
 
         val child = StateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
-                on<TestAction.A3> { _, state -> state.override { TestState.S2 } }
+                on<TestAction.A3> { override { TestState.S2 } }
             }
 
             inState<TestState.S2> {
-                on<TestAction.A2> { _, state -> state.override { TestState.S3 } }
+                on<TestAction.A2> { override { TestState.S3 } }
             }
         }
         val parent = StateMachine(initialState = initialState) {
             inState<TestState.S3> {
-                on<TestAction.A1> { _, state -> state.override { TestState.CounterState(10) } }
+                on<TestAction.A1> { override { TestState.CounterState(10) } }
             }
             inState<TestState.CounterState> {
                 onActionStartStateMachine<TestAction.A4, TestState, TestAction>(
@@ -170,12 +170,12 @@ internal class OnActionStartStateMachineTest {
                         actionMapperRecordings += it
                         it
                     },
-                    stateMapper = { inputState, subState ->
-                        stateMapperRecordings += pairOf(inputState.snapshot, subState)
+                    stateMapper = { subState ->
+                        stateMapperRecordings += pairOf(snapshot, subState)
                         if (subState is TestState.S3) {
-                            inputState.override { TestState.S3 }
+                            override { TestState.S3 }
                         } else {
-                            inputState.mutate {
+                            mutate {
                                 copy(counter = this.counter + 1)
                             }
                         }
@@ -331,9 +331,9 @@ internal class OnActionStartStateMachineTest {
 
         val child = StateMachine(initialState = TestState.S1) {
             inState<TestState> {
-                on<TestAction> { _, state ->
+                on<TestAction> {
                     childActionInvocations.send(Unit)
-                    state.noChange()
+                    noChange()
                 }
             }
         }
@@ -352,13 +352,13 @@ internal class OnActionStartStateMachineTest {
                             is TestAction.A4 -> null
                         }
                     },
-                ) { inputState, childState ->
-                    inputState.override { childState }
+                ) { childState ->
+                    override { childState }
                 }
 
-                on<TestAction> { _, state ->
+                on<TestAction> {
                     parentActionInvocations.send(Unit)
-                    state.noChange()
+                    noChange()
                 }
             }
         }

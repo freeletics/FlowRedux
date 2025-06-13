@@ -41,16 +41,16 @@ internal class OnEnterStartStateMachineTest {
 
         val child = childStateMachine(initialState = TestState.S3) {
             inState<TestState.S3> {
-                on<TestAction.A1> { _, state ->
+                on<TestAction.A1> {
                     inS3onA1Action++
-                    state.override { TestState.S1 }
+                    override { TestState.S1 }
                 }
             }
 
             inState<TestState.S2> {
-                on<TestAction.A1> { _, state ->
+                on<TestAction.A1> {
                     inS2OnA1Action++
-                    state.override { TestState.S2 }
+                    override { TestState.S2 }
                 }
             }
         }
@@ -60,20 +60,20 @@ internal class OnEnterStartStateMachineTest {
                 onEnterStartStateMachine(
                     stateMachine = child,
                     actionMapper = { it },
-                ) { state, subStateMachineState ->
+                ) { subStateMachineState ->
                     receivedChildStateUpdates += subStateMachineState
-                    receivedChildStateUpdatesParentState += state.snapshot
+                    receivedChildStateUpdatesParentState += snapshot
                     if (subStateMachineState == TestState.S3) {
-                        state.noChange()
+                        noChange()
                     } else {
-                        state.override { subStateMachineState }
+                        override { subStateMachineState }
                     }
                 }
             }
 
             inState<TestState.S1> {
-                on<TestAction.A1> { _, state ->
-                    state.override { TestState.S2 }
+                on<TestAction.A1> {
+                    override { TestState.S2 }
                 }
             }
         }
@@ -120,11 +120,11 @@ internal class OnEnterStartStateMachineTest {
                         child
                     },
                     actionMapper = { it },
-                    stateMapper = { state, _ -> state.noChange() },
+                    stateMapper = { noChange() },
                 )
 
-                on<TestAction.A1> { _, state ->
-                    state.override { state.snapshot.copy(anInt = state.snapshot.anInt + 1) }
+                on<TestAction.A1> {
+                    override { snapshot.copy(anInt = snapshot.anInt + 1) }
                 }
             }
         }
@@ -169,17 +169,17 @@ internal class OnEnterStartStateMachineTest {
                         child
                     },
                     actionMapper = { it },
-                    stateMapper = { state, _ -> state.noChange() },
+                    stateMapper = { noChange() },
                 )
 
-                on<TestAction.A1> { _, state ->
-                    state.override { TestState.S2 }
+                on<TestAction.A1> {
+                    override { TestState.S2 }
                 }
             }
 
             inState<TestState.S2> {
-                on<TestAction.A2> { _, state ->
-                    state.override { TestState.S1 }
+                on<TestAction.A2> {
+                    override { TestState.S1 }
                 }
             }
         }
@@ -215,9 +215,9 @@ internal class OnEnterStartStateMachineTest {
         val parentActionInvocations = Channel<Unit>(Channel.UNLIMITED)
         val child = childStateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
-                on<TestAction.A1> { _, state ->
+                on<TestAction.A1> {
                     childActionInvocations.send(Unit)
-                    state.noChange()
+                    noChange()
                 }
             }
         }
@@ -225,12 +225,12 @@ internal class OnEnterStartStateMachineTest {
         val sm = StateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
                 onEnterStartStateMachine(child)
-                on<TestAction.A2> { _, state -> state.override { TestState.S2 } }
+                on<TestAction.A2> { override { TestState.S2 } }
             }
             inState<TestState.S2> {
-                on<TestAction.A1> { _, state ->
+                on<TestAction.A1> {
                     parentActionInvocations.send(Unit)
-                    state.noChange()
+                    noChange()
                 }
             }
         }
@@ -249,7 +249,7 @@ internal class OnEnterStartStateMachineTest {
 
             // dispatch A1 action which is part of child definition but should not be
             //  handled by child because parent not in state where delegation to child happens
-            for (i in 1..3) {
+            repeat(3) {
                 sm.dispatch(TestAction.A1)
                 assertEquals(Unit, parentActionInvocations.awaitItem())
                 assertTrue(childActionInvocations.isEmpty) // no further emissions
@@ -263,9 +263,9 @@ internal class OnEnterStartStateMachineTest {
         val parentActionInvocations = Channel<Unit>(Channel.UNLIMITED)
         val child = childStateMachine(initialState = TestState.S1) {
             inState<TestState> {
-                on<TestAction> { _, state ->
+                on<TestAction> {
                     childActionInvocations.send(Unit)
-                    state.noChange()
+                    noChange()
                 }
             }
         }
@@ -283,9 +283,9 @@ internal class OnEnterStartStateMachineTest {
                         }
                     },
                 )
-                on<TestAction> { _, state ->
+                on<TestAction> {
                     parentActionInvocations.send(Unit)
-                    state.noChange()
+                    noChange()
                 }
             }
         }
@@ -329,18 +329,18 @@ internal class OnEnterStartStateMachineTest {
             inState<TestState.S2> {
                 onEnter {
                     childOnEnterS2++
-                    it.noChange()
+                    noChange()
                 }
-                on<TestAction.A2> { _, state ->
+                on<TestAction.A2> {
                     childActionA2++
-                    state.override { TestState.S1 }
+                    override { TestState.S1 }
                 }
             }
         }
 
         val sm = StateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
-                on<TestAction.A1> { _, state -> state.override { TestState.S2 } }
+                on<TestAction.A1> { override { TestState.S2 } }
             }
             inState<TestState.S2> {
                 onEnterEffect { parentS2++ }
@@ -350,7 +350,7 @@ internal class OnEnterStartStateMachineTest {
                         child
                     },
                     actionMapper = { it },
-                    stateMapper = { state, childState -> state.override { childState } },
+                    stateMapper = { childState -> override { childState } },
                 )
             }
         }

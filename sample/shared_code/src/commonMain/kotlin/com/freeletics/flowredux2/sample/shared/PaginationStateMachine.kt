@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
  * It's callend `Internal` because it is note meant to be accessed publicly as it exposes coroutines
  * Flow and suspending function to dispatch.
  *
- * Instead the "wrappter class" [PaginationStateMachine] should be used which hides `Flow` etc.
+ * Instead the "wrapper class" [PaginationStateMachine] should be used which hides `Flow` etc.
  * but uses traditional "callbacks". That way it is easier to use on iOS.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -23,29 +23,27 @@ class InternalPaginationStateMachine(
 ) : FlowReduxStateMachine<PaginationState, Action>(LoadFirstPagePaginationState) {
     init {
         spec {
-
-            @Suppress("RemoveExplicitTypeArguments") // Keep for readability
             inState<LoadFirstPagePaginationState> {
-                onEnter { loadFirstPage(it) }
+                onEnter { loadFirstPage() }
             }
 
             inState<LoadingFirstPageError> {
-                on<RetryLoadingFirstPage> { _, state ->
-                    state.override { LoadFirstPagePaginationState }
+                on<RetryLoadingFirstPage> {
+                    override { LoadFirstPagePaginationState }
                 }
             }
 
             inState<ShowContentPaginationState> {
-                on<LoadNextPage> { _, state ->
-                    moveToLoadNextPageStateIfCanLoadNextPage(state)
+                on<LoadNextPage> {
+                    moveToLoadNextPageStateIfCanLoadNextPage()
                 }
 
                 condition({ it.canLoadNextPage && it.nextPageLoadingState == NextPageLoadingState.LOADING }) {
-                    onEnter { loadNextPage(it) }
+                    onEnter { loadNextPage() }
                 }
 
                 condition({ it.nextPageLoadingState == NextPageLoadingState.ERROR }) {
-                    onEnter { showPaginationErrorFor3SecsThenReset(it) }
+                    onEnter { showPaginationErrorFor3SecsThenReset() }
                 }
 
                 onActionStartStateMachine(
@@ -56,8 +54,8 @@ class InternalPaginationStateMachine(
                             repository = repo,
                         )
                     },
-                ) { inputState: ChangeableState<ShowContentPaginationState>, childState: GithubRepository ->
-                    inputState.mutate {
+                ) { childState: GithubRepository ->
+                    mutate {
                         copy(
                             items = items
                                 .map { repoItem ->
@@ -75,16 +73,12 @@ class InternalPaginationStateMachine(
         }
     }
 
-    private fun moveToLoadNextPageStateIfCanLoadNextPage(
-        state: ChangeableState<ShowContentPaginationState>,
-    ): ChangedState<PaginationState> {
-        return if (!state.snapshot.canLoadNextPage) {
-            state.noChange()
+    private fun ChangeableState<ShowContentPaginationState>.moveToLoadNextPageStateIfCanLoadNextPage(): ChangedState<PaginationState> {
+        return if (!snapshot.canLoadNextPage) {
+            noChange()
         } else {
-            state.mutate {
-                copy(
-                    nextPageLoadingState = NextPageLoadingState.LOADING,
-                )
+            mutate {
+                copy(nextPageLoadingState = NextPageLoadingState.LOADING)
             }
         }
     }
@@ -92,9 +86,7 @@ class InternalPaginationStateMachine(
     /**
      * Loads the first page
      */
-    private suspend fun loadFirstPage(
-        state: ChangeableState<LoadFirstPagePaginationState>,
-    ): ChangedState<PaginationState> {
+    private suspend fun ChangeableState<LoadFirstPagePaginationState>.loadFirstPage(): ChangedState<PaginationState> {
         val nextState = try {
             when (val pageResult: PageResult = githubApi.loadPage(page = 0)) {
                 PageResult.NoNextPage -> {
@@ -118,17 +110,15 @@ class InternalPaginationStateMachine(
             LoadingFirstPageError(t)
         }
 
-        return state.override { nextState }
+        return override { nextState }
     }
 
-    private suspend fun loadNextPage(
-        state: ChangeableState<ShowContentPaginationState>,
-    ): ChangedState<PaginationState> {
-        val nextPageNumber = state.snapshot.currentPage + 1
+    private suspend fun ChangeableState<ShowContentPaginationState>.loadNextPage(): ChangedState<PaginationState> {
+        val nextPageNumber = snapshot.currentPage + 1
         val nextState: ChangedState<ShowContentPaginationState> = try {
             when (val pageResult = githubApi.loadPage(page = nextPageNumber)) {
                 PageResult.NoNextPage -> {
-                    state.mutate {
+                    mutate {
                         copy(
                             nextPageLoadingState = NextPageLoadingState.IDLE,
                             canLoadNextPage = false,
@@ -136,7 +126,7 @@ class InternalPaginationStateMachine(
                     }
                 }
                 is PageResult.Page -> {
-                    state.mutate {
+                    mutate {
                         copy(
                             items = items.addAll(pageResult.items),
                             canLoadNextPage = true,
@@ -148,7 +138,7 @@ class InternalPaginationStateMachine(
             }
         } catch (t: Throwable) {
             t.printStackTrace()
-            state.mutate {
+            mutate {
                 copy(
                     nextPageLoadingState = NextPageLoadingState.ERROR,
                 )
@@ -158,11 +148,9 @@ class InternalPaginationStateMachine(
         return nextState
     }
 
-    private suspend fun showPaginationErrorFor3SecsThenReset(
-        state: ChangeableState<ShowContentPaginationState>,
-    ): ChangedState<PaginationState> {
+    private suspend fun ChangeableState<ShowContentPaginationState>.showPaginationErrorFor3SecsThenReset(): ChangedState<PaginationState> {
         delay(3000)
-        return state.mutate {
+        return mutate {
             copy(
                 nextPageLoadingState = NextPageLoadingState.IDLE,
             )

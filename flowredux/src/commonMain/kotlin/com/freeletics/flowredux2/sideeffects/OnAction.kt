@@ -14,13 +14,13 @@ internal class OnAction<InputState : S, SubAction : A, S : Any, A : Any>(
     override val isInState: IsInState<S>,
     internal val subActionClass: KClass<SubAction>,
     internal val executionPolicy: ExecutionPolicy,
-    internal val handler: suspend (action: SubAction, state: ChangeableState<InputState>) -> ChangedState<S>,
+    internal val handler: suspend ChangeableState<InputState>.(action: SubAction) -> ChangedState<S>,
 ) : ActionBasedSideEffect<InputState, S, A>() {
     override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
         return actions.asSubAction()
             .flatMapWithExecutionPolicy(executionPolicy) { action ->
                 changeState(getState) { inputState ->
-                    handler(action, ChangeableState(inputState))
+                    ChangeableState(inputState).handler(action)
                 }
             }
     }

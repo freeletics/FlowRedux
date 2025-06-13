@@ -12,12 +12,12 @@ internal class CollectWhile<T, InputState : S, S : Any, A : Any>(
     override val isInState: IsInState<S>,
     private val flow: Flow<T>,
     private val executionPolicy: ExecutionPolicy,
-    private val handler: suspend (item: T, state: ChangeableState<InputState>) -> ChangedState<S>,
+    private val handler: suspend ChangeableState<InputState>.(item: T) -> ChangedState<S>,
 ) : SideEffect<InputState, S, A>() {
     override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
         return flow.flatMapWithExecutionPolicy(executionPolicy) { item ->
             changeState(getState) { inputState ->
-                handler(item, ChangeableState(inputState))
+                ChangeableState(inputState).handler(item)
             }
         }
     }
