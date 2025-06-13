@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class StateMachine(
     initialState: TestState = TestState.Initial,
-    specBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit = {},
+    specBlock: FlowReduxBuilder<TestState, TestAction>.() -> Unit = {},
 ) : FlowReduxStateMachine<TestState, TestAction>(initialStateSupplier = { initialState }) {
     init {
         spec(specBlock)

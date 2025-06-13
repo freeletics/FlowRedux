@@ -5,9 +5,23 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 @FlowReduxDsl
-public class ConditionBuilderBlock<InputState : S, S : Any, A : Any> internal constructor(
+public class InStateBuilder<InputState : S, S : Any, A : Any> internal constructor(
     override val isInState: SideEffectBuilder.IsInState<S>,
-) : BaseBuilderBlock<InputState, S, A>() {
+) : BaseBuilder<InputState, S, A>() {
+    /**
+     * Allows handling certain actions or events only while an extra condition is `true`
+     * for the current state.
+     */
+    public fun condition(
+        condition: (InputState) -> Boolean,
+        block: ConditionBuilder<InputState, S, A>.() -> Unit,
+    ) {
+        sideEffectBuilders += ConditionBuilder<InputState, S, A> {
+            @Suppress("UNCHECKED_CAST")
+            isInState.check(it) && condition(it as InputState)
+        }.apply(block).sideEffectBuilders
+    }
+
     /**
      * Anything inside this block will only run while the [identity] of the current state
      * remains the same. The `identity` is determined by the given function and uses
@@ -18,9 +32,9 @@ public class ConditionBuilderBlock<InputState : S, S : Any, A : Any> internal co
      */
     public fun untilIdentityChanges(
         identity: (InputState) -> Any?,
-        block: IdentityBuilderBlock<InputState, S, A>.() -> Unit,
+        block: IdentityBuilder<InputState, S, A>.() -> Unit,
     ) {
-        sideEffectBuilders += IdentityBuilderBlock<InputState, S, A>(isInState, identity)
+        sideEffectBuilders += IdentityBuilder<InputState, S, A>(isInState, identity)
             .apply(block)
             .sideEffectBuilders
     }

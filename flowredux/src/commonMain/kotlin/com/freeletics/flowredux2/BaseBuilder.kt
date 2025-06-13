@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 
 @ExperimentalCoroutinesApi
 @FlowReduxDsl
-public abstract class BaseBuilderBlock<InputState : S, S : Any, A : Any> internal constructor() {
+public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal constructor() {
     internal abstract val isInState: SideEffectBuilder.IsInState<S>
 
     internal open fun sideEffectIsInState(initialState: InputState) = SideEffect.IsInState<S> {

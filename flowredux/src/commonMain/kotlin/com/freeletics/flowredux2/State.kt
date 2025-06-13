@@ -2,7 +2,7 @@ package com.freeletics.flowredux2
 
 /**
  * Allows to create [ChangedState] objects to change the state as a result of DSL
- * methods like [InStateBuilderBlock.on] or  [InStateBuilderBlock.onEnter].
+ * methods like [InStateBuilder.on] or  [InStateBuilder.onEnter].
  *
  * The [snapshot] property can be used to access the current state at the time the action
  * or event happened. Note that it might be outdated by the time the code runs and should

@@ -1,8 +1,7 @@
-package com.freeletics.flowredux2
+package com.freeletics.flowredux2.sideeffects
 
-import com.freeletics.flowredux2.sideeffects.GetState
-import com.freeletics.flowredux2.sideeffects.ManagedSideEffect
-import com.freeletics.flowredux2.sideeffects.SideEffectBuilder
+import com.freeletics.flowredux2.ChangedState
+import com.freeletics.flowredux2.reduce
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow

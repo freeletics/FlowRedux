@@ -6,7 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 @FlowReduxDsl
-public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
+public class FlowReduxBuilder<S : Any, A : Any> internal constructor() {
     private val sideEffectBuilderList: MutableList<SideEffectBuilder<out S, S, A>> = ArrayList()
     internal val sideEffectBuilders: List<SideEffectBuilder<out S, S, A>> get() = sideEffectBuilderList
 
@@ -15,7 +15,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
      * "In a certain state" condition is true if state is instance of the type specified as generic function parameter.
      */
     public inline fun <reified SubState : S> inState(
-        noinline block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
+        noinline block: InStateBuilder<SubState, S, A>.() -> Unit,
     ) {
         inState(SubState::class, block)
     }
@@ -23,9 +23,9 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
     @PublishedApi
     internal fun <SubState : S> inState(
         subStateClass: KClass<SubState>,
-        block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
+        block: InStateBuilder<SubState, S, A>.() -> Unit,
     ) {
-        sideEffectBuilderList += InStateBuilderBlock<SubState, S, A>(
+        sideEffectBuilderList += InStateBuilder<SubState, S, A>(
             isInState = { state -> subStateClass.isInstance(state) },
         ).apply(block).sideEffectBuilders
     }
@@ -38,7 +38,7 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
     @Deprecated("use condition block inside inState instead")
     public inline fun <reified SubState : S> inState(
         noinline additionalIsInState: (SubState) -> Boolean,
-        noinline block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
+        noinline block: InStateBuilder<SubState, S, A>.() -> Unit,
     ) {
         @Suppress("DEPRECATION")
         inState(SubState::class, additionalIsInState, block)
@@ -49,10 +49,10 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
     internal fun <SubState : S> inState(
         subStateClass: KClass<SubState>,
         additionalIsInState: (SubState) -> Boolean,
-        block: InStateBuilderBlock<SubState, S, A>.() -> Unit,
+        block: InStateBuilder<SubState, S, A>.() -> Unit,
     ) {
         @Suppress("UNCHECKED_CAST")
-        sideEffectBuilderList += InStateBuilderBlock<SubState, S, A>(
+        sideEffectBuilderList += InStateBuilder<SubState, S, A>(
             isInState = { state -> subStateClass.isInstance(state) && additionalIsInState(state as SubState) },
         ).apply(block).sideEffectBuilders
     }
@@ -64,9 +64,9 @@ public class FlowReduxStoreBuilder<S : Any, A : Any> internal constructor() {
     @Deprecated("use condition block inside inState instead")
     public fun inStateWithCondition(
         isInState: (S) -> Boolean,
-        block: InStateBuilderBlock<S, S, A>.() -> Unit,
+        block: InStateBuilder<S, S, A>.() -> Unit,
     ) {
-        sideEffectBuilderList += InStateBuilderBlock<S, S, A>(
+        sideEffectBuilderList += InStateBuilder<S, S, A>(
             isInState = isInState,
         ).apply(block).sideEffectBuilders
     }

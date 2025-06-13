@@ -6,7 +6,7 @@ import com.freeletics.flowredux2.StateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
 import com.freeletics.flowredux2.FlowReduxStateMachine
-import com.freeletics.flowredux2.FlowReduxStoreBuilder
+import com.freeletics.flowredux2.FlowReduxBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -378,7 +378,7 @@ internal class OnEnterStartStateMachineTest {
 
     private fun childStateMachine(
         initialState: TestState = TestState.Initial,
-        builderBlock: FlowReduxStoreBuilder<TestState, TestAction>.() -> Unit,
+        builderBlock: FlowReduxBuilder<TestState, TestAction>.() -> Unit,
     ): FlowReduxStateMachine<TestState, TestAction> {
         return object : FlowReduxStateMachine<TestState, TestAction>(initialState) {
             init {
