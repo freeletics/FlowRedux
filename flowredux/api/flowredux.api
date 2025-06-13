@@ -22,6 +22,17 @@ public abstract class com/freeletics/flowredux2/BaseBuilder {
 	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux2/BaseBuilder;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
 }
 
+public final class com/freeletics/flowredux2/ChangeableState : com/freeletics/flowredux2/State {
+	public fun <init> (Ljava/lang/Object;)V
+	public final fun mutate (Lkotlin/jvm/functions/Function1;)Lcom/freeletics/flowredux2/ChangedState;
+	public final fun noChange ()Lcom/freeletics/flowredux2/ChangedState;
+	public final fun override (Lkotlin/jvm/functions/Function1;)Lcom/freeletics/flowredux2/ChangedState;
+}
+
+public final class com/freeletics/flowredux2/ChangeableStateKt {
+	public static final fun reduce (Lcom/freeletics/flowredux2/ChangedState;Ljava/lang/Object;)Ljava/lang/Object;
+}
+
 public abstract class com/freeletics/flowredux2/ChangedState {
 }
 
@@ -61,15 +72,8 @@ public final class com/freeletics/flowredux2/InStateBuilder : com/freeletics/flo
 	public final fun untilIdentityChanges (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 }
 
-public final class com/freeletics/flowredux2/State {
-	public fun <init> (Ljava/lang/Object;)V
+public abstract class com/freeletics/flowredux2/State {
+	public synthetic fun <init> (Ljava/lang/Object;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun getSnapshot ()Ljava/lang/Object;
-	public final fun mutate (Lkotlin/jvm/functions/Function1;)Lcom/freeletics/flowredux2/ChangedState;
-	public final fun noChange ()Lcom/freeletics/flowredux2/ChangedState;
-	public final fun override (Lkotlin/jvm/functions/Function1;)Lcom/freeletics/flowredux2/ChangedState;
-}
-
-public final class com/freeletics/flowredux2/StateKt {
-	public static final fun reduce (Lcom/freeletics/flowredux2/ChangedState;Ljava/lang/Object;)Ljava/lang/Object;
 }
 

@@ -34,7 +34,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
      */
     public inline fun <reified SubAction : A> on(
         executionPolicy: ExecutionPolicy = ExecutionPolicy.CANCEL_PREVIOUS,
-        noinline handler: suspend (action: SubAction, state: State<InputState>) -> ChangedState<S>,
+        noinline handler: suspend (action: SubAction, state: ChangeableState<InputState>) -> ChangedState<S>,
     ) {
         on(SubAction::class, executionPolicy, handler)
     }
@@ -43,7 +43,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     internal fun <SubAction : A> on(
         actionClass: KClass<SubAction>,
         executionPolicy: ExecutionPolicy,
-        handler: suspend (action: SubAction, state: State<InputState>) -> ChangedState<S>,
+        handler: suspend (action: SubAction, state: ChangeableState<InputState>) -> ChangedState<S>,
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) {
             OnAction(
@@ -97,7 +97,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
      * An ongoing [handler] is cancelled when leaving this state.
      */
     public fun onEnter(
-        handler: suspend (state: State<InputState>) -> ChangedState<S>,
+        handler: suspend (state: ChangeableState<InputState>) -> ChangedState<S>,
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) { initialState ->
             OnEnter(
@@ -138,7 +138,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     public fun <T> collectWhileInState(
         flow: Flow<T>,
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
-        handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
+        handler: suspend (item: T, state: ChangeableState<InputState>) -> ChangedState<S>,
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) {
             CollectWhile(
@@ -163,7 +163,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     public fun <T> collectWhileInState(
         flowBuilder: (InputState) -> Flow<T>,
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
-        handler: suspend (item: T, state: State<InputState>) -> ChangedState<S>,
+        handler: suspend (item: T, state: ChangeableState<InputState>) -> ChangedState<S>,
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) { initialState ->
             CollectWhile(
@@ -191,7 +191,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
         collectWhileInState(
             flow = flow,
             executionPolicy = executionPolicy,
-            handler = { value: T, state: State<InputState> ->
+            handler = { value: T, state: ChangeableState<InputState> ->
                 handler(value, state.snapshot)
                 NoStateChange
             },
@@ -214,7 +214,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
         collectWhileInState(
             flowBuilder = flowBuilder,
             executionPolicy = executionPolicy,
-            handler = { value: T, state: State<InputState> ->
+            handler = { value: T, state: ChangeableState<InputState> ->
                 handler(value, state.snapshot)
                 NoStateChange
             },
@@ -223,7 +223,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
 
     public fun <SubStateMachineState : Any> onEnterStartStateMachine(
         stateMachine: StateMachine<SubStateMachineState, A>,
-        stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
+        stateMapper: (ChangeableState<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
         },
@@ -237,7 +237,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
 
     public fun <SubStateMachineState : Any> onEnterStartStateMachine(
         stateMachineFactory: (InputState) -> StateMachine<SubStateMachineState, A>,
-        stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
+        stateMapper: (ChangeableState<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
         },
@@ -252,7 +252,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     public fun <SubStateMachineState : Any, SubStateMachineAction : Any> onEnterStartStateMachine(
         stateMachine: StateMachine<SubStateMachineState, SubStateMachineAction>,
         actionMapper: (A) -> SubStateMachineAction?,
-        stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
+        stateMapper: (ChangeableState<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
         },
@@ -267,7 +267,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     public fun <SubStateMachineState : Any, SubStateMachineAction : Any> onEnterStartStateMachine(
         stateMachineFactory: (InputState) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
         actionMapper: (A) -> SubStateMachineAction?,
-        stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
+        stateMapper: (ChangeableState<InputState>, SubStateMachineState) -> ChangedState<S> = { _, subState ->
             @Suppress("UNCHECKED_CAST")
             OverrideState(subState as S)
         },
@@ -284,7 +284,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
 
     public inline fun <reified SubAction : A, SubStateMachineState : Any> onActionStartStateMachine(
         stateMachine: StateMachine<SubStateMachineState, A>,
-        noinline stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
+        noinline stateMapper: (ChangeableState<InputState>, SubStateMachineState) -> ChangedState<S>,
     ) {
         onActionStartStateMachine(
             stateMachineFactory = { _: SubAction, _: InputState -> stateMachine },
@@ -295,7 +295,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
 
     public inline fun <reified SubAction : A, SubStateMachineState : Any> onActionStartStateMachine(
         noinline stateMachineFactory: (SubAction, InputState) -> StateMachine<SubStateMachineState, A>,
-        noinline stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
+        noinline stateMapper: (ChangeableState<InputState>, SubStateMachineState) -> ChangedState<S>,
     ) {
         onActionStartStateMachine(
             stateMachineFactory = stateMachineFactory,
@@ -307,7 +307,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     public inline fun <reified SubAction : A, SubStateMachineState : Any, SubStateMachineAction : Any> onActionStartStateMachine(
         noinline stateMachineFactory: (SubAction, InputState) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
         noinline actionMapper: (A) -> SubStateMachineAction?,
-        noinline stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
+        noinline stateMapper: (ChangeableState<InputState>, SubStateMachineState) -> ChangedState<S>,
     ) {
         onActionStartStateMachine(
             actionClass = SubAction::class,
@@ -322,7 +322,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
         actionClass: KClass<out SubAction>,
         stateMachineFactory: (SubAction, InputState) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
         actionMapper: (A) -> SubStateMachineAction?,
-        stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
+        stateMapper: (ChangeableState<InputState>, SubStateMachineState) -> ChangedState<S>,
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) {
             OnActionStartStateMachine(

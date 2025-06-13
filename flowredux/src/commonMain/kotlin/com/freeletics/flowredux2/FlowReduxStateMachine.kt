@@ -1,7 +1,7 @@
 package com.freeletics.flowredux2
 
-import com.freeletics.flowredux2.util.AtomicCounter
 import com.freeletics.flowredux2.sideeffects.reduxStore
+import com.freeletics.flowredux2.util.AtomicCounter
 import com.freeletics.khonshu.statemachine.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel

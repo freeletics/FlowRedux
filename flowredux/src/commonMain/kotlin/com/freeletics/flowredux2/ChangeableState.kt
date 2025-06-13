@@ -1,16 +1,23 @@
 package com.freeletics.flowredux2
 
 /**
+ * Allows access to a [snapshot] that can be used to access the current state at the time the action
+ * or event happened.
+ */
+public sealed class State<InputState : Any>(
+    public val snapshot: InputState,
+)
+
+/**
  * Allows to create [ChangedState] objects to change the state as a result of DSL
  * methods like [InStateBuilder.on] or  [InStateBuilder.onEnter].
  *
- * The [snapshot] property can be used to access the current state at the time the action
- * or event happened. Note that it might be outdated by the time the code runs and should
+ * Note that [snapshot] might be outdated by the time the code runs and should
  * never be used within [mutate] or to create an object that is passed to [override]
  */
-public class State<InputState : Any>(
-    public val snapshot: InputState,
-) {
+public class ChangeableState<InputState : Any>(
+    snapshot: InputState,
+) : State<InputState>(snapshot) {
     /**
      * Use this function if you want to "mutate" the current state by copying the old state
      * and modify some properties in the copy of the new state. A common use case is to call
@@ -43,8 +50,8 @@ public class State<InputState : Any>(
 }
 
 /**
- * Represents a state transition. Instances of this a created through the [State.mutate],
- * [State.override] and [State.noChange] methods.
+ * Represents a state transition. Instances of this a created through the [ChangeableState.mutate],
+ * [ChangeableState.override] and [ChangeableState.noChange] methods.
  *
  * [ChangedState] does not allow you to directly access any property.
  * Then you may wonder how do you write unit test for one of your functions that return a [ChangedState]?
