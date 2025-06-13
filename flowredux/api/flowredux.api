@@ -40,8 +40,6 @@ public final class com/freeletics/flowredux2/ExecutionPolicy : java/lang/Enum {
 
 public final class com/freeletics/flowredux2/FlowReduxBuilder {
 	public final fun inState (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function1;)V
-	public final fun inState (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
-	public final fun inStateWithCondition (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 }
 
 public abstract interface annotation class com/freeletics/flowredux2/FlowReduxDsl : java/lang/annotation/Annotation {
