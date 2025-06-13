@@ -11,7 +11,7 @@ freeletics {
 
 dependencies {
     commonMainApi(libs.coroutines.core)
-    commonMainApi(libs.mad.statemachine)
+    commonMainApi(libs.statemachine)
 
     commonTestImplementation(libs.kotlin.test)
     commonTestImplementation(libs.kotlin.test.annotations)

@@ -23,14 +23,11 @@ androidx-appcompat = "1.7.1"
 androidx-constraintlayout = "2.2.1"
 androidx-core = "1.16.0"
 androidx-lifecycle = "2.9.1"
-androidx-fragment = "1.5.2"
 androidx-recyclerview = "1.4.0"
 
 material = "1.12.0"
 adapterdelegates = "4.3.2"
 timber = "5.0.1"
-
-mad = "0.29.1"
 
 turbine = "1.2.1"
 kotlinx-collections-immutable= "0.4.0"
@@ -61,7 +58,6 @@ androidx-annotation = { module = "androidx.annotation:annotation", version.ref =
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
-androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-lifecycle = { module = "androidx.lifecycle:lifecycle-common", version.ref = "androidx-lifecycle" }
 androidx-livedata = { module = "androidx.lifecycle:lifecycle-livedata-core", version.ref = "androidx-lifecycle" }
 androidx-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
@@ -72,7 +68,7 @@ adapterdelegates = { module = "com.hannesdorfmann:adapterdelegates4", version.re
 adapterdelegates-dsl = { module = "com.hannesdorfmann:adapterdelegates4-kotlin-dsl", version.ref = "adapterdelegates" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
-mad-statemachine = { module = "com.freeletics.mad:state-machine", version.ref = "mad" }
+statemachine = { module = "com.freeletics.khonshu:state-machine", version = "0.29.1" }
 
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
