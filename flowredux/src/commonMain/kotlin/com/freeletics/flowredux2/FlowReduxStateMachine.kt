@@ -1,6 +1,7 @@
 package com.freeletics.flowredux2
 
 import com.freeletics.flowredux2.util.AtomicCounter
+import com.freeletics.flowredux2.sideeffects.reduxStore
 import com.freeletics.khonshu.statemachine.StateMachine
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -20,7 +21,7 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
 
     private val activeFlowCounter = AtomicCounter(0)
 
-    protected fun spec(specBlock: FlowReduxStoreBuilder<S, A>.() -> Unit) {
+    protected fun spec(specBlock: FlowReduxBuilder<S, A>.() -> Unit) {
         if (::outputState.isInitialized) {
             throw IllegalStateException(
                 "State machine spec has already been set. " +
@@ -28,7 +29,7 @@ public abstract class FlowReduxStateMachine<S : Any, A : Any>(
             )
         }
 
-        val sideEffectBuilders = FlowReduxStoreBuilder<S, A>().apply(specBlock).sideEffectBuilders
+        val sideEffectBuilders = FlowReduxBuilder<S, A>().apply(specBlock).sideEffectBuilders
 
         outputState = inputActions
             .receiveAsFlow()

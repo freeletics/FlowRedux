@@ -1,12 +1,12 @@
-public abstract class com/freeletics/flowredux2/BaseBuilderBlock {
+public abstract class com/freeletics/flowredux2/BaseBuilder {
 	public final fun collectWhileInState (Lkotlin/jvm/functions/Function1;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;)V
 	public final fun collectWhileInState (Lkotlinx/coroutines/flow/Flow;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;)V
-	public static synthetic fun collectWhileInState$default (Lcom/freeletics/flowredux2/BaseBuilderBlock;Lkotlin/jvm/functions/Function1;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
-	public static synthetic fun collectWhileInState$default (Lcom/freeletics/flowredux2/BaseBuilderBlock;Lkotlinx/coroutines/flow/Flow;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
+	public static synthetic fun collectWhileInState$default (Lcom/freeletics/flowredux2/BaseBuilder;Lkotlin/jvm/functions/Function1;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
+	public static synthetic fun collectWhileInState$default (Lcom/freeletics/flowredux2/BaseBuilder;Lkotlinx/coroutines/flow/Flow;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
 	public final fun collectWhileInStateEffect (Lkotlin/jvm/functions/Function1;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;)V
 	public final fun collectWhileInStateEffect (Lkotlinx/coroutines/flow/Flow;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;)V
-	public static synthetic fun collectWhileInStateEffect$default (Lcom/freeletics/flowredux2/BaseBuilderBlock;Lkotlin/jvm/functions/Function1;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
-	public static synthetic fun collectWhileInStateEffect$default (Lcom/freeletics/flowredux2/BaseBuilderBlock;Lkotlinx/coroutines/flow/Flow;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
+	public static synthetic fun collectWhileInStateEffect$default (Lcom/freeletics/flowredux2/BaseBuilder;Lkotlin/jvm/functions/Function1;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
+	public static synthetic fun collectWhileInStateEffect$default (Lcom/freeletics/flowredux2/BaseBuilder;Lkotlinx/coroutines/flow/Flow;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
 	public final fun on (Lkotlin/reflect/KClass;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;)V
 	public final fun onActionEffect (Lkotlin/reflect/KClass;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;)V
 	public final fun onActionStartStateMachine (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V
@@ -16,16 +16,16 @@ public abstract class com/freeletics/flowredux2/BaseBuilderBlock {
 	public final fun onEnterStartStateMachine (Lcom/freeletics/khonshu/statemachine/StateMachine;Lkotlin/jvm/functions/Function2;)V
 	public final fun onEnterStartStateMachine (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V
 	public final fun onEnterStartStateMachine (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V
-	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux2/BaseBuilderBlock;Lcom/freeletics/khonshu/statemachine/StateMachine;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
-	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux2/BaseBuilderBlock;Lcom/freeletics/khonshu/statemachine/StateMachine;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
-	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux2/BaseBuilderBlock;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
-	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux2/BaseBuilderBlock;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux2/BaseBuilder;Lcom/freeletics/khonshu/statemachine/StateMachine;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux2/BaseBuilder;Lcom/freeletics/khonshu/statemachine/StateMachine;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux2/BaseBuilder;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux2/BaseBuilder;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
 }
 
 public abstract class com/freeletics/flowredux2/ChangedState {
 }
 
-public final class com/freeletics/flowredux2/ConditionBuilderBlock : com/freeletics/flowredux2/BaseBuilderBlock {
+public final class com/freeletics/flowredux2/ConditionBuilder : com/freeletics/flowredux2/BaseBuilder {
 	public final fun untilIdentityChanges (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 }
 
@@ -36,6 +36,10 @@ public final class com/freeletics/flowredux2/ExecutionPolicy : java/lang/Enum {
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public static fun valueOf (Ljava/lang/String;)Lcom/freeletics/flowredux2/ExecutionPolicy;
 	public static fun values ()[Lcom/freeletics/flowredux2/ExecutionPolicy;
+}
+
+public final class com/freeletics/flowredux2/FlowReduxBuilder {
+	public final fun inState (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function1;)V
 }
 
 public abstract interface annotation class com/freeletics/flowredux2/FlowReduxDsl : java/lang/annotation/Annotation {
@@ -49,14 +53,10 @@ public abstract class com/freeletics/flowredux2/FlowReduxStateMachine : com/free
 	protected final fun spec (Lkotlin/jvm/functions/Function1;)V
 }
 
-public final class com/freeletics/flowredux2/FlowReduxStoreBuilder {
-	public final fun inState (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function1;)V
+public final class com/freeletics/flowredux2/IdentityBuilder : com/freeletics/flowredux2/BaseBuilder {
 }
 
-public final class com/freeletics/flowredux2/IdentityBuilderBlock : com/freeletics/flowredux2/BaseBuilderBlock {
-}
-
-public final class com/freeletics/flowredux2/InStateBuilderBlock : com/freeletics/flowredux2/BaseBuilderBlock {
+public final class com/freeletics/flowredux2/InStateBuilder : com/freeletics/flowredux2/BaseBuilder {
 	public final fun condition (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 	public final fun untilIdentityChanges (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 }
