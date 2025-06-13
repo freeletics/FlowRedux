@@ -1,7 +1,7 @@
 package com.freeletics.flowredux2.sideeffects
 
-import com.freeletics.flowredux2.ChangedState
 import com.freeletics.flowredux2.ChangeableState
+import com.freeletics.flowredux2.ChangedState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

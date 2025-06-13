@@ -1,8 +1,8 @@
 package com.freeletics.flowredux2.sideeffects
 
+import com.freeletics.flowredux2.ChangeableState
 import com.freeletics.flowredux2.ChangedState
 import com.freeletics.flowredux2.ExecutionPolicy
-import com.freeletics.flowredux2.ChangeableState
 import com.freeletics.flowredux2.util.flatMapWithExecutionPolicy
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi

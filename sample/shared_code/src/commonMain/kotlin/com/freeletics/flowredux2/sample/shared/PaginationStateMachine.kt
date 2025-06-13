@@ -1,8 +1,8 @@
 package com.freeletics.flowredux2.sample.shared
 
+import com.freeletics.flowredux2.ChangeableState
 import com.freeletics.flowredux2.ChangedState
 import com.freeletics.flowredux2.FlowReduxStateMachine
-import com.freeletics.flowredux2.ChangeableState
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope

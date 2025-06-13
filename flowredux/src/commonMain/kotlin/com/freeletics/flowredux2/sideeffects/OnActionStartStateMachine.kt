@@ -1,7 +1,7 @@
 package com.freeletics.flowredux2.sideeffects
 
-import com.freeletics.flowredux2.ChangedState
 import com.freeletics.flowredux2.ChangeableState
+import com.freeletics.flowredux2.ChangedState
 import com.freeletics.flowredux2.util.CoroutineWaiter
 import com.freeletics.khonshu.statemachine.StateMachine
 import kotlin.reflect.KClass
