@@ -22,23 +22,23 @@ internal class ConditionBlockTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, state ->
-                    state.override { gs1 }
+                on<TestAction.A1> {
+                    override { gs1 }
                 }
             }
 
             inState<TestState.GenericState> {
                 condition({ it.anInt == 1 }) {
-                    on<TestAction.A1> { _, state ->
+                    on<TestAction.A1> {
                         counter1++
-                        state.override { gs2 }
+                        override { gs2 }
                     }
                 }
 
                 condition({ it.anInt == 2 }) {
-                    on<TestAction.A1> { _, state ->
+                    on<TestAction.A1> {
                         counter2++
-                        state.override { TestState.S1 }
+                        override { TestState.S1 }
                     }
                 }
             }
@@ -67,8 +67,8 @@ internal class ConditionBlockTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, state ->
-                    state.override { gs1 }
+                on<TestAction.A1> {
+                    override { gs1 }
                 }
             }
 
@@ -84,14 +84,14 @@ internal class ConditionBlockTest {
                                 throw t
                             }
                         },
-                    ) { value, state ->
-                        state.override { TestState.GenericState(value.toString(), value) }
+                    ) {
+                        override { TestState.GenericState(it.toString(), it) }
                     }
                 }
 
                 condition({ it.anInt == 2 }) {
                     onEnter {
-                        return@onEnter it.override { TestState.S1 }
+                        return@onEnter override { TestState.S1 }
                     }
                 }
             }

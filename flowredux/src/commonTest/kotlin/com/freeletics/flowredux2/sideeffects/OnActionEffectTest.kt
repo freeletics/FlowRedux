@@ -24,7 +24,7 @@ internal class OnActionEffectTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                onActionEffect<TestAction.A1> { _, _ ->
+                onActionEffect<TestAction.A1> {
                     blockEntered.send(true)
                     try {
                         awaitCancellation()
@@ -34,8 +34,8 @@ internal class OnActionEffectTest {
                     }
                 }
 
-                on<TestAction.A2> { _, state ->
-                    state.override { TestState.S2 }
+                on<TestAction.A2> {
+                    override { TestState.S2 }
                 }
             }
         }
@@ -57,13 +57,13 @@ internal class OnActionEffectTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                onActionEffect<TestAction.A1> { _, _ ->
+                onActionEffect<TestAction.A1> {
                     triggered.send(true)
                 }
 
-                on<TestAction.A1> { _, state ->
+                on<TestAction.A1> {
                     signal.awaitComplete()
-                    state.override { TestState.S2 }
+                    override { TestState.S2 }
                 }
             }
         }
