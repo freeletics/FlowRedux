@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.flow
 internal class OnEnter<InputState : S, S : Any, A : Any>(
     override val isInState: IsInState<S>,
     private val initialState: InputState,
-    private val handler: suspend (state: ChangeableState<InputState>) -> ChangedState<S>,
+    private val handler: suspend ChangeableState<InputState>.() -> ChangedState<S>,
 ) : SideEffect<InputState, S, A>() {
     override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
         return flow {
