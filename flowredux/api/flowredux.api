@@ -25,10 +25,6 @@ public abstract class com/freeletics/flowredux2/BaseBuilderBlock {
 public abstract class com/freeletics/flowredux2/ChangedState {
 }
 
-public final class com/freeletics/flowredux2/ChangedStateKt {
-	public static final fun reduce (Lcom/freeletics/flowredux2/ChangedState;Ljava/lang/Object;)Ljava/lang/Object;
-}
-
 public final class com/freeletics/flowredux2/ConditionBuilderBlock : com/freeletics/flowredux2/BaseBuilderBlock {
 	public final fun untilIdentityChanges (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 }
@@ -73,5 +69,9 @@ public final class com/freeletics/flowredux2/State {
 	public final fun mutate (Lkotlin/jvm/functions/Function1;)Lcom/freeletics/flowredux2/ChangedState;
 	public final fun noChange ()Lcom/freeletics/flowredux2/ChangedState;
 	public final fun override (Lkotlin/jvm/functions/Function1;)Lcom/freeletics/flowredux2/ChangedState;
+}
+
+public final class com/freeletics/flowredux2/StateKt {
+	public static final fun reduce (Lcom/freeletics/flowredux2/ChangedState;Ljava/lang/Object;)Ljava/lang/Object;
 }
 
