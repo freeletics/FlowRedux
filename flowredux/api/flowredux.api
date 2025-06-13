@@ -55,8 +55,6 @@ public abstract class com/freeletics/flowredux/dsl/FlowReduxStateMachine : com/f
 
 public final class com/freeletics/flowredux/dsl/FlowReduxStoreBuilder {
 	public final fun inState (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function1;)V
-	public final fun inState (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
-	public final fun inStateWithCondition (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 }
 
 public final class com/freeletics/flowredux/dsl/IdentityBuilderBlock : com/freeletics/flowredux/dsl/BaseBuilderBlock {
