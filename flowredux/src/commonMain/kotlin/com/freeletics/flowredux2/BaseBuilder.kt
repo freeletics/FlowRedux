@@ -68,7 +68,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
      */
     public inline fun <reified SubAction : A> onActionEffect(
         executionPolicy: ExecutionPolicy = ExecutionPolicy.CANCEL_PREVIOUS,
-        noinline handler: suspend (action: SubAction, stateSnapshot: InputState) -> Unit,
+        noinline handler: suspend (action: SubAction, state: State<InputState>) -> Unit,
     ) {
         onActionEffect(SubAction::class, executionPolicy, handler)
     }
@@ -77,13 +77,13 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     internal fun <SubAction : A> onActionEffect(
         actionClass: KClass<SubAction>,
         executionPolicy: ExecutionPolicy,
-        handler: suspend (action: SubAction, stateSnapshot: InputState) -> Unit,
+        handler: suspend (action: SubAction, state: State<InputState>) -> Unit,
     ) {
         on(
             actionClass = actionClass,
             executionPolicy = executionPolicy,
             handler = { action, state ->
-                handler(action, state.snapshot)
+                handler(action, state)
                 NoStateChange
             },
         )
@@ -117,10 +117,10 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
      * and when it gets canceled.
      */
     public fun onEnterEffect(
-        handler: suspend (stateSnapshot: InputState) -> Unit,
+        handler: suspend (state: State<InputState>) -> Unit,
     ) {
         onEnter { state ->
-            handler(state.snapshot)
+            handler(state)
             NoStateChange
         }
     }
@@ -186,13 +186,13 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     public fun <T> collectWhileInStateEffect(
         flow: Flow<T>,
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
-        handler: suspend (item: T, state: InputState) -> Unit,
+        handler: suspend (item: T, state: State<InputState>) -> Unit,
     ) {
         collectWhileInState(
             flow = flow,
             executionPolicy = executionPolicy,
             handler = { value: T, state: ChangeableState<InputState> ->
-                handler(value, state.snapshot)
+                handler(value, state)
                 NoStateChange
             },
         )
@@ -209,13 +209,13 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     public fun <T> collectWhileInStateEffect(
         flowBuilder: (InputState) -> Flow<T>,
         executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
-        handler: suspend (item: T, state: InputState) -> Unit,
+        handler: suspend (item: T, state: State<InputState>) -> Unit,
     ) {
         collectWhileInState(
             flowBuilder = flowBuilder,
             executionPolicy = executionPolicy,
             handler = { value: T, state: ChangeableState<InputState> ->
-                handler(value, state.snapshot)
+                handler(value, state)
                 NoStateChange
             },
         )
