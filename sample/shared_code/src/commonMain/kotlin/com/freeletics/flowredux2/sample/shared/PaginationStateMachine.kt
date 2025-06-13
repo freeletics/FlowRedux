@@ -2,7 +2,7 @@ package com.freeletics.flowredux2.sample.shared
 
 import com.freeletics.flowredux2.ChangedState
 import com.freeletics.flowredux2.FlowReduxStateMachine
-import com.freeletics.flowredux2.State
+import com.freeletics.flowredux2.ChangeableState
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
@@ -56,7 +56,7 @@ class InternalPaginationStateMachine(
                             repository = repo,
                         )
                     },
-                ) { inputState: State<ShowContentPaginationState>, childState: GithubRepository ->
+                ) { inputState: ChangeableState<ShowContentPaginationState>, childState: GithubRepository ->
                     inputState.mutate {
                         copy(
                             items = items
@@ -76,7 +76,7 @@ class InternalPaginationStateMachine(
     }
 
     private fun moveToLoadNextPageStateIfCanLoadNextPage(
-        state: State<ShowContentPaginationState>,
+        state: ChangeableState<ShowContentPaginationState>,
     ): ChangedState<PaginationState> {
         return if (!state.snapshot.canLoadNextPage) {
             state.noChange()
@@ -93,7 +93,7 @@ class InternalPaginationStateMachine(
      * Loads the first page
      */
     private suspend fun loadFirstPage(
-        state: State<LoadFirstPagePaginationState>,
+        state: ChangeableState<LoadFirstPagePaginationState>,
     ): ChangedState<PaginationState> {
         val nextState = try {
             when (val pageResult: PageResult = githubApi.loadPage(page = 0)) {
@@ -122,7 +122,7 @@ class InternalPaginationStateMachine(
     }
 
     private suspend fun loadNextPage(
-        state: State<ShowContentPaginationState>,
+        state: ChangeableState<ShowContentPaginationState>,
     ): ChangedState<PaginationState> {
         val nextPageNumber = state.snapshot.currentPage + 1
         val nextState: ChangedState<ShowContentPaginationState> = try {
@@ -159,7 +159,7 @@ class InternalPaginationStateMachine(
     }
 
     private suspend fun showPaginationErrorFor3SecsThenReset(
-        state: State<ShowContentPaginationState>,
+        state: ChangeableState<ShowContentPaginationState>,
     ): ChangedState<PaginationState> {
         delay(3000)
         return state.mutate {

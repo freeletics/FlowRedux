@@ -1,7 +1,7 @@
 package com.freeletics.flowredux2.sideeffects
 
 import com.freeletics.flowredux2.ChangedState
-import com.freeletics.flowredux2.State
+import com.freeletics.flowredux2.ChangeableState
 import com.freeletics.flowredux2.util.CoroutineWaiter
 import com.freeletics.khonshu.statemachine.StateMachine
 import kotlin.reflect.KClass
@@ -22,7 +22,7 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
     ) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
     internal val subActionClass: KClass<out A>,
     private val actionMapper: (A) -> SubStateMachineAction?,
-    private val stateMapper: (State<InputState>, SubStateMachineState) -> ChangedState<S>,
+    private val stateMapper: (ChangeableState<InputState>, SubStateMachineState) -> ChangedState<S>,
 ) : ActionBasedSideEffect<InputState, S, A>() {
     override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
         return channelFlow {
@@ -54,7 +54,7 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
                                 .collect { subStateMachineState ->
                                     runOnlyIfInInputState(getState) { parentState ->
                                         val changedState = stateMapper(
-                                            State(parentState),
+                                            ChangeableState(parentState),
                                             subStateMachineState,
                                         )
                                         send(changedState)
