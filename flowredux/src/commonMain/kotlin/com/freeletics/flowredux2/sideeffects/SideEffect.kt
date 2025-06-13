@@ -3,6 +3,7 @@ package com.freeletics.flowredux2.sideeffects
 import com.freeletics.flowredux2.ChangedState
 import com.freeletics.flowredux2.NoStateChange
 import com.freeletics.flowredux2.UnsafeMutateState
+import com.freeletics.flowredux2.reduce
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

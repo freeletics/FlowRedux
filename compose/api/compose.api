@@ -1,15 +1,15 @@
-public final class com/freeletics/flowredux/compose/ComposeFlowReduxStateMachineKt {
-	public static final fun rememberState (Lcom/freeletics/flowredux/dsl/FlowReduxStateMachine;Landroidx/compose/runtime/Composer;I)Landroidx/compose/runtime/State;
-	public static final fun rememberStateAndDispatch (Lcom/freeletics/flowredux/dsl/FlowReduxStateMachine;Landroidx/compose/runtime/Composer;I)Lcom/freeletics/flowredux/compose/StateAndDispatch;
+public final class com/freeletics/flowredux2/compose/ComposeFlowReduxStateMachineKt {
+	public static final fun rememberState (Lcom/freeletics/flowredux2/FlowReduxStateMachine;Landroidx/compose/runtime/Composer;I)Landroidx/compose/runtime/State;
+	public static final fun rememberStateAndDispatch (Lcom/freeletics/flowredux2/FlowReduxStateMachine;Landroidx/compose/runtime/Composer;I)Lcom/freeletics/flowredux2/compose/StateAndDispatch;
 }
 
-public final class com/freeletics/flowredux/compose/StateAndDispatch {
+public final class com/freeletics/flowredux2/compose/StateAndDispatch {
 	public static final field $stable I
 	public fun <init> (Landroidx/compose/runtime/State;Lkotlin/jvm/functions/Function1;)V
 	public final fun component1 ()Landroidx/compose/runtime/State;
 	public final fun component2 ()Lkotlin/jvm/functions/Function1;
-	public final fun copy (Landroidx/compose/runtime/State;Lkotlin/jvm/functions/Function1;)Lcom/freeletics/flowredux/compose/StateAndDispatch;
-	public static synthetic fun copy$default (Lcom/freeletics/flowredux/compose/StateAndDispatch;Landroidx/compose/runtime/State;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lcom/freeletics/flowredux/compose/StateAndDispatch;
+	public final fun copy (Landroidx/compose/runtime/State;Lkotlin/jvm/functions/Function1;)Lcom/freeletics/flowredux2/compose/StateAndDispatch;
+	public static synthetic fun copy$default (Lcom/freeletics/flowredux2/compose/StateAndDispatch;Landroidx/compose/runtime/State;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lcom/freeletics/flowredux2/compose/StateAndDispatch;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getDispatchAction ()Lkotlin/jvm/functions/Function1;
 	public final fun getState ()Landroidx/compose/runtime/State;
