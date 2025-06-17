@@ -11,7 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * It's called `Internal` because it is note meant to be accessed publicly as it exposes coroutines
+ * It's called `Internal` because it is not meant to be accessed publicly as it exposes coroutines
  * Flow and suspending function to dispatch.
  *
  * Instead the "wrapper class" [PaginationStateMachine] should be used which hides `Flow` etc.
