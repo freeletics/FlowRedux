@@ -2,11 +2,11 @@ package com.freeletics.flowredux2.sideeffects
 
 import app.cash.turbine.awaitItem
 import app.cash.turbine.test
+import com.freeletics.flowredux2.FlowReduxBuilder
+import com.freeletics.flowredux2.FlowReduxStateMachine
 import com.freeletics.flowredux2.StateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
-import com.freeletics.flowredux2.FlowReduxStateMachine
-import com.freeletics.flowredux2.FlowReduxBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
