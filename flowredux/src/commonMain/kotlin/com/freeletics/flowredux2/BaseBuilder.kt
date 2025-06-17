@@ -7,6 +7,7 @@ import com.freeletics.flowredux2.sideeffects.OnEnter
 import com.freeletics.flowredux2.sideeffects.OnEnterStartStateMachine
 import com.freeletics.flowredux2.sideeffects.SideEffect
 import com.freeletics.flowredux2.sideeffects.SideEffectBuilder
+import com.freeletics.flowredux2.util.FlowReduxDsl
 import com.freeletics.khonshu.statemachine.StateMachine
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi

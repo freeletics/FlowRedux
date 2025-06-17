@@ -1,9 +1,12 @@
 package com.freeletics.flowredux2
 
+import com.freeletics.flowredux2.util.FlowReduxDsl
+
 /**
  * Allows access to a [snapshot] that can be used to access the current state at the time the action
  * or event happened.
  */
+@FlowReduxDsl
 public sealed class State<InputState : Any>(
     public val snapshot: InputState,
 )
@@ -26,7 +29,7 @@ public class ChangeableState<InputState : Any>(
      * [snapshot] should never be accessed within [reducer]. Use the `this` of the lambda which
      * is guaranteed to be the current state at the time of execution instead.
      */
-    public fun mutate(reducer: InputState.() -> InputState): ChangedState<InputState> {
+    public fun mutate(reducer: @FlowReduxDsl InputState.() -> InputState): ChangedState<InputState> {
         return UnsafeMutateState(reducer)
     }
 
@@ -37,7 +40,7 @@ public class ChangeableState<InputState : Any>(
      * [snapshot] should never be accessed within [reducer]. Use the `this` of the lambda which
      * is guaranteed to be the current state at the time of execution instead.
      */
-    public fun <S : Any> override(reducer: InputState.() -> S): ChangedState<S> {
+    public fun <S : Any> override(reducer: @FlowReduxDsl InputState.() -> S): ChangedState<S> {
         return UnsafeMutateState(reducer)
     }
 
