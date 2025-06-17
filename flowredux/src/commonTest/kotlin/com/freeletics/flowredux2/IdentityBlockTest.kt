@@ -21,8 +21,8 @@ internal class IdentityBlockTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, state ->
-                    state.override { gs1 }
+                on<TestAction.A1> {
+                    override { gs1 }
                 }
             }
 
@@ -33,8 +33,8 @@ internal class IdentityBlockTest {
                     }
                 }
 
-                on<TestAction.A1> { _, state ->
-                    state.mutate { copy(anInt = anInt + 1) }
+                on<TestAction.A1> {
+                    mutate { copy(anInt = anInt + 1) }
                 }
             }
         }
@@ -67,8 +67,8 @@ internal class IdentityBlockTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, state ->
-                    state.override { gs1 }
+                on<TestAction.A1> {
+                    override { gs1 }
                 }
             }
 
@@ -79,8 +79,8 @@ internal class IdentityBlockTest {
                     }
                 }
 
-                on<TestAction.A1> { _, state ->
-                    state.mutate { copy(aString = aString + "1") }
+                on<TestAction.A1> {
+                    mutate { copy(aString = aString + "1") }
                 }
             }
         }
@@ -111,8 +111,8 @@ internal class IdentityBlockTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, state ->
-                    state.override { gs1 }
+                on<TestAction.A1> {
+                    override { gs1 }
                 }
             }
 
@@ -123,14 +123,14 @@ internal class IdentityBlockTest {
                             signal.send(Unit)
                             awaitCancellation()
                         } catch (t: Throwable) {
-                            cancellations.add(it.snapshot.anInt to t)
+                            cancellations.add(snapshot.anInt to t)
                             throw t
                         }
                     }
                 }
 
-                on<TestAction.A1> { _, state ->
-                    state.mutate { copy(anInt = anInt + 1) }
+                on<TestAction.A1> {
+                    mutate { copy(anInt = anInt + 1) }
                 }
             }
         }
@@ -178,8 +178,8 @@ internal class IdentityBlockTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, state ->
-                    state.override { gs1 }
+                on<TestAction.A1> {
+                    override { gs1 }
                 }
             }
 
@@ -189,14 +189,14 @@ internal class IdentityBlockTest {
                         try {
                             awaitCancellation()
                         } catch (t: Throwable) {
-                            cancellations.add(it.snapshot.anInt to t)
+                            cancellations.add(snapshot.anInt to t)
                             throw t
                         }
                     }
                 }
 
-                on<TestAction.A1> { _, state ->
-                    state.mutate { copy(aString = aString + "1") }
+                on<TestAction.A1> {
+                    mutate { copy(aString = aString + "1") }
                 }
             }
         }
@@ -231,8 +231,8 @@ internal class IdentityBlockTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, state ->
-                    state.override { gs1 }
+                on<TestAction.A1> {
+                    override { gs1 }
                 }
             }
 
@@ -243,12 +243,12 @@ internal class IdentityBlockTest {
                     }
                 }
 
-                on<TestAction.A1> { _, state ->
-                    state.mutate { copy(anInt = (anInt ?: 0) + 1) }
+                on<TestAction.A1> {
+                    mutate { copy(anInt = (anInt ?: 0) + 1) }
                 }
 
-                on<TestAction.A2> { _, state ->
-                    state.mutate { copy(anInt = null) }
+                on<TestAction.A2> {
+                    mutate { copy(anInt = null) }
                 }
             }
         }
@@ -275,8 +275,8 @@ internal class IdentityBlockTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, state ->
-                    state.override { gs1 }
+                on<TestAction.A1> {
+                    override { gs1 }
                 }
             }
 
@@ -287,8 +287,8 @@ internal class IdentityBlockTest {
                     }
                 }
 
-                on<TestAction.A1> { _, state ->
-                    state.mutate { copy(aString = aString + "1") }
+                on<TestAction.A1> {
+                    mutate { copy(aString = aString + "1") }
                 }
             }
         }
@@ -319,8 +319,8 @@ internal class IdentityBlockTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, state ->
-                    state.override { gs1 }
+                on<TestAction.A1> {
+                    override { gs1 }
                 }
             }
 
@@ -331,14 +331,14 @@ internal class IdentityBlockTest {
                             signal.send(Unit)
                             awaitCancellation()
                         } catch (t: Throwable) {
-                            cancellations.add(it.snapshot.anInt to t)
+                            cancellations.add(snapshot.anInt to t)
                             throw t
                         }
                     }
                 }
 
-                on<TestAction.A1> { _, state ->
-                    state.mutate { copy(anInt = (anInt ?: 0) + 1) }
+                on<TestAction.A1> {
+                    mutate { copy(anInt = (anInt ?: 0) + 1) }
                 }
             }
         }
@@ -386,8 +386,8 @@ internal class IdentityBlockTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, state ->
-                    state.override { gs1 }
+                on<TestAction.A1> {
+                    override { gs1 }
                 }
             }
 
@@ -397,14 +397,14 @@ internal class IdentityBlockTest {
                         try {
                             awaitCancellation()
                         } catch (t: Throwable) {
-                            cancellations.add(it.snapshot.anInt to t)
+                            cancellations.add(snapshot.anInt to t)
                             throw t
                         }
                     }
                 }
 
-                on<TestAction.A1> { _, state ->
-                    state.mutate { copy(aString = aString + "1") }
+                on<TestAction.A1> {
+                    mutate { copy(aString = aString + "1") }
                 }
             }
         }

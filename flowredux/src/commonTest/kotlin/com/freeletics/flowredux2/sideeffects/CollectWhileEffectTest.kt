@@ -24,12 +24,12 @@ internal class CollectWhileEffectTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                collectWhileInStateEffect(values) { v, _ ->
+                collectWhileInStateEffect(values) { v ->
                     recordedValues.send(v)
                 }
 
-                collectWhileInState(stateChange) { _, state ->
-                    state.override { TestState.S1 }
+                collectWhileInState(stateChange) {
+                    override { TestState.S1 }
                 }
             }
         }
@@ -56,16 +56,16 @@ internal class CollectWhileEffectTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
-                    it.override { TestState.GenericState("a", 0) }
+                    override { TestState.GenericState("a", 0) }
                 }
             }
             inState<TestState.GenericState> {
-                collectWhileInStateEffect({ initial -> values.map { "${initial.aString}$it" } }) { v, _ ->
+                collectWhileInStateEffect({ initial -> values.map { "${initial.aString}$it" } }) { v ->
                     recordedValues.send(v)
                 }
 
-                on<TestAction.A1> { _, state ->
-                    state.override { TestState.S1 }
+                on<TestAction.A1> { state ->
+                    override { TestState.S1 }
                 }
             }
         }

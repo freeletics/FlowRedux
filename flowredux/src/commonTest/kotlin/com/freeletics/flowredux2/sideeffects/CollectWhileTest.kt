@@ -23,9 +23,9 @@ internal class CollectWhileTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                collectWhileInState(values) { v, state ->
+                collectWhileInState(values) { v ->
                     recordedValues.send(v)
-                    state.override { TestState.S1 }
+                    override { TestState.S1 }
                 }
             }
         }
@@ -50,9 +50,9 @@ internal class CollectWhileTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                collectWhileInState({ values }) { v, state ->
+                collectWhileInState({ values }) { v ->
                     recordedValues.send(v)
-                    state.override { TestState.S1 }
+                    override { TestState.S1 }
                 }
             }
         }
@@ -74,20 +74,20 @@ internal class CollectWhileTest {
     fun moveFromCollectWhileInStateToNextStateWithAction() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
-                collectWhileInState(flowOf(1)) { _, state ->
-                    state.override { TestState.S1 }
+                collectWhileInState(flowOf(1)) {
+                    override { TestState.S1 }
                 }
             }
 
             inState<TestState.S1> {
-                on<TestAction.A1> { _, state ->
-                    state.override { TestState.S2 }
+                on<TestAction.A1> {
+                    override { TestState.S2 }
                 }
             }
 
             inState<TestState.S2> {
-                on<TestAction.A2> { _, state ->
-                    state.override { TestState.S1 }
+                on<TestAction.A2> {
+                    override { TestState.S1 }
                 }
             }
         }
@@ -114,20 +114,20 @@ internal class CollectWhileTest {
     fun moveFromCollectWhileInStateWithBuilderToNextStateWithAction() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
-                collectWhileInState({ flowOf(1) }) { _, state ->
-                    state.override { TestState.S1 }
+                collectWhileInState({ flowOf(1) }) {
+                    override { TestState.S1 }
                 }
             }
 
             inState<TestState.S1> {
-                on<TestAction.A1> { _, state ->
-                    state.override { TestState.S2 }
+                on<TestAction.A1> {
+                    override { TestState.S2 }
                 }
             }
 
             inState<TestState.S2> {
-                on<TestAction.A2> { _, state ->
-                    state.override { TestState.S1 }
+                on<TestAction.A2> {
+                    override { TestState.S1 }
                 }
             }
         }
@@ -155,12 +155,12 @@ internal class CollectWhileTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
                 onEnter {
-                    it.override { TestState.GenericState("", 1) }
+                    override { TestState.GenericState("", 1) }
                 }
             }
             inState<TestState.GenericState> {
-                collectWhileInState({ flowOf(it.anInt * 10) }) { value, state ->
-                    state.override {
+                collectWhileInState({ flowOf(it.anInt * 10) }) { value ->
+                    override {
                         TestState.GenericState(aString = aString + value, anInt = value)
                     }
                 }

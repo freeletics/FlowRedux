@@ -17,7 +17,7 @@ internal class OnEnterStartStateMachine<SubStateMachineState : Any, SubStateMach
     override val isInState: IsInState<S>,
     private val subStateMachine: StateMachine<SubStateMachineState, SubStateMachineAction>,
     private val actionMapper: (A) -> SubStateMachineAction?,
-    private val stateMapper: (ChangeableState<InputState>, SubStateMachineState) -> ChangedState<S>,
+    private val stateMapper: ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
 ) : ActionBasedSideEffect<InputState, S, A>() {
     override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
         return channelFlow {
@@ -31,7 +31,7 @@ internal class OnEnterStartStateMachine<SubStateMachineState : Any, SubStateMach
                     .onStart { coroutineWaiter.resume() }
                     .flatMapConcat { subStateMachineState ->
                         changeState(getState) { inputState ->
-                            stateMapper(ChangeableState(inputState), subStateMachineState)
+                            ChangeableState(inputState).stateMapper(subStateMachineState)
                         }
                     }
                     .collect {

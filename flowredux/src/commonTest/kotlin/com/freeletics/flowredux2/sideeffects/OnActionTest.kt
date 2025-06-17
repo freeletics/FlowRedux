@@ -28,7 +28,7 @@ internal class OnActionTest {
 
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, _ ->
+                on<TestAction.A1> {
                     blockEntered.send(true)
                     try {
                         awaitCancellation()
@@ -38,8 +38,8 @@ internal class OnActionTest {
                     }
                 }
 
-                on<TestAction.A2> { _, state ->
-                    state.override { TestState.S2 }
+                on<TestAction.A2> {
+                    override { TestState.S2 }
                 }
             }
         }
@@ -58,14 +58,14 @@ internal class OnActionTest {
     fun onActionGetsTriggeredAndMovesToNextState() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
-                on<TestAction.A1> { _, state ->
-                    state.override { TestState.S1 }
+                on<TestAction.A1> {
+                    override { TestState.S1 }
                 }
             }
 
             inState<TestState.S1> {
-                on<TestAction.A2> { _, state ->
-                    state.override { TestState.S2 }
+                on<TestAction.A2> {
+                    override { TestState.S2 }
                 }
             }
         }
@@ -84,12 +84,12 @@ internal class OnActionTest {
         turbineScope {
             val sm = StateMachine(TestState.GenericNullableState(null, null)) {
                 inState<TestState.GenericNullableState> {
-                    on<TestAction.A1>(executionPolicy = ExecutionPolicy.ORDERED) { _, state ->
-                        state.mutate { copy(aString = "1") }
+                    on<TestAction.A1>(executionPolicy = ExecutionPolicy.ORDERED) {
+                        mutate { copy(aString = "1") }
                     }
 
-                    on<TestAction.A2>(executionPolicy = ExecutionPolicy.ORDERED) { _, state ->
-                        state.mutate { copy(anInt = 2) }
+                    on<TestAction.A2>(executionPolicy = ExecutionPolicy.ORDERED) {
+                        mutate { copy(anInt = 2) }
                     }
                 }
             }
