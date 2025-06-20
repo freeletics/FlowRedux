@@ -53,9 +53,6 @@ public final class com/freeletics/flowredux2/FlowReduxBuilder {
 	public final fun inState (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function1;)V
 }
 
-public abstract interface annotation class com/freeletics/flowredux2/FlowReduxDsl : java/lang/annotation/Annotation {
-}
-
 public abstract class com/freeletics/flowredux2/FlowReduxStateMachine : com/freeletics/khonshu/statemachine/StateMachine {
 	public fun <init> (Ljava/lang/Object;)V
 	public fun <init> (Lkotlin/jvm/functions/Function0;)V

@@ -2,6 +2,7 @@ package com.freeletics.flowredux2
 
 import com.freeletics.flowredux2.sideeffects.SideEffect
 import com.freeletics.flowredux2.sideeffects.SideEffectBuilder
+import com.freeletics.flowredux2.util.FlowReduxDsl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi

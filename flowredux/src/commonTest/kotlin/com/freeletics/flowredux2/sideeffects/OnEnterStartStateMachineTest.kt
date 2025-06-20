@@ -124,7 +124,7 @@ internal class OnEnterStartStateMachineTest {
                 )
 
                 on<TestAction.A1> {
-                    override { snapshot.copy(anInt = snapshot.anInt + 1) }
+                    override { copy(anInt = anInt + 1) }
                 }
             }
         }
