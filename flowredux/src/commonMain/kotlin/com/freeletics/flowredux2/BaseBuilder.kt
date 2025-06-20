@@ -34,7 +34,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
      * state or when a new [SubAction] is dispatched.
      */
     public inline fun <reified SubAction : A> on(
-        executionPolicy: ExecutionPolicy = ExecutionPolicy.CANCEL_PREVIOUS,
+        executionPolicy: ExecutionPolicy = ExecutionPolicy.CancelPrevious,
         noinline handler: suspend ChangeableState<InputState>.(action: SubAction) -> ChangedState<S>,
     ) {
         on(SubAction::class, executionPolicy, handler)
@@ -68,7 +68,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
      * state or when a new [SubAction] is dispatched.
      */
     public inline fun <reified SubAction : A> onActionEffect(
-        executionPolicy: ExecutionPolicy = ExecutionPolicy.CANCEL_PREVIOUS,
+        executionPolicy: ExecutionPolicy = ExecutionPolicy.CancelPrevious,
         noinline handler: suspend State<InputState>.(action: SubAction) -> Unit,
     ) {
         onActionEffect(SubAction::class, executionPolicy, handler)
@@ -133,12 +133,12 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
      * The collection as well as any ongoing [handler] is cancelled when leaving this state.
      *
      * [executionPolicy] is used to determine the behavior when a new emission from [flow] arrives
-     * before the previous [handler] invocation completed. By default [ExecutionPolicy.ORDERED]
+     * before the previous [handler] invocation completed. By default [ExecutionPolicy.Ordered]
      * is applied.
      */
     public fun <T> collectWhileInState(
         flow: Flow<T>,
-        executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
+        executionPolicy: ExecutionPolicy = ExecutionPolicy.Ordered,
         handler: suspend ChangeableState<InputState>.(item: T) -> ChangedState<S>,
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) {
@@ -158,12 +158,12 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
      * The collection as well as any ongoing [handler] is cancelled when leaving this state.
      *
      * [executionPolicy] is used to determine the behavior when a new emission from `Flow` arrives
-     * before the previous [handler] invocation completed. By default [ExecutionPolicy.ORDERED]
+     * before the previous [handler] invocation completed. By default [ExecutionPolicy.Ordered]
      * is applied.
      */
     public fun <T> collectWhileInState(
         flowBuilder: (InputState) -> Flow<T>,
-        executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
+        executionPolicy: ExecutionPolicy = ExecutionPolicy.Ordered,
         handler: suspend ChangeableState<InputState>.(item: T) -> ChangedState<S>,
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) { initialState ->
@@ -186,7 +186,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
      */
     public fun <T> collectWhileInStateEffect(
         flow: Flow<T>,
-        executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
+        executionPolicy: ExecutionPolicy = ExecutionPolicy.Ordered,
         handler: suspend State<InputState>.(item: T) -> Unit,
     ) {
         collectWhileInState(
@@ -209,7 +209,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
      */
     public fun <T> collectWhileInStateEffect(
         flowBuilder: (InputState) -> Flow<T>,
-        executionPolicy: ExecutionPolicy = ExecutionPolicy.ORDERED,
+        executionPolicy: ExecutionPolicy = ExecutionPolicy.Ordered,
         handler: suspend State<InputState>.(item: T) -> Unit,
     ) {
         collectWhileInState(

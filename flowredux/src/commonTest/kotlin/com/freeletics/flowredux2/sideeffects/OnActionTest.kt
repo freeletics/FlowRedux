@@ -11,11 +11,14 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TestTimeSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 
@@ -84,11 +87,11 @@ internal class OnActionTest {
         turbineScope {
             val sm = StateMachine(TestState.GenericNullableState(null, null)) {
                 inState<TestState.GenericNullableState> {
-                    on<TestAction.A1>(executionPolicy = ExecutionPolicy.ORDERED) {
+                    on<TestAction.A1>(executionPolicy = ExecutionPolicy.Ordered) {
                         mutate { copy(aString = "1") }
                     }
 
-                    on<TestAction.A2>(executionPolicy = ExecutionPolicy.ORDERED) {
+                    on<TestAction.A2>(executionPolicy = ExecutionPolicy.Ordered) {
                         mutate { copy(anInt = 2) }
                     }
                 }
@@ -104,6 +107,97 @@ internal class OnActionTest {
             assertEquals(TestState.GenericNullableState(null, null), turbine.awaitItem())
             assertEquals(TestState.GenericNullableState("1", null), turbine.awaitItem())
             assertEquals(TestState.GenericNullableState("1", 2), turbine.awaitItem())
+        }
+    }
+
+    @Test
+    fun onActionThrottled() = runTest {
+        val timeSource = TestTimeSource()
+        turbineScope {
+            val sm = StateMachine(TestState.GenericNullableState(null, null)) {
+                inState<TestState.GenericNullableState> {
+                    on<TestAction.A1>(executionPolicy = ExecutionPolicy.Throttled(500.milliseconds, timeSource)) {
+                        mutate { copy(aString = (aString ?: "") + "1") }
+                    }
+
+                    on<TestAction.A2>(executionPolicy = ExecutionPolicy.Throttled(1000.milliseconds, timeSource)) {
+                        mutate { copy(anInt = (anInt ?: 0) + 1) }
+                    }
+                }
+            }
+
+            sm.state.test {
+                assertEquals(TestState.GenericNullableState(null, null), awaitItem())
+
+                // immediately handles first actions
+                sm.dispatch(TestAction.A1)
+                assertEquals(TestState.GenericNullableState("1", null), awaitItem())
+                sm.dispatch(TestAction.A2)
+                assertEquals(TestState.GenericNullableState("1", 1), awaitItem())
+
+                // ignored actions until reaching time window
+                sm.dispatch(TestAction.A1)
+                sm.dispatch(TestAction.A2)
+                ensureAllEventsConsumed()
+                timeSource += 200.milliseconds
+                sm.dispatch(TestAction.A1)
+                sm.dispatch(TestAction.A2)
+                ensureAllEventsConsumed()
+
+                // handle A1 after reaching it's time window
+                timeSource += 300.milliseconds
+                sm.dispatch(TestAction.A1)
+                assertEquals(TestState.GenericNullableState("11", 1), awaitItem())
+
+                // ignored actions until reaching time window
+                sm.dispatch(TestAction.A2)
+                ensureAllEventsConsumed()
+                timeSource += 300.milliseconds
+                sm.dispatch(TestAction.A1)
+                sm.dispatch(TestAction.A2)
+                ensureAllEventsConsumed()
+
+                // handle A1 and A2 after reaching both time windows
+                timeSource += 200.milliseconds
+                sm.dispatch(TestAction.A1)
+                assertEquals(TestState.GenericNullableState("111", 1), awaitItem())
+                sm.dispatch(TestAction.A2)
+                assertEquals(TestState.GenericNullableState("111", 2), awaitItem())
+            }
+        }
+    }
+
+    @Test
+    fun onActionThrottledWithSlowHandlers() = runTest {
+        val timeSource = TestTimeSource()
+        val startTime = timeSource.markNow()
+        turbineScope {
+            val sm = StateMachine(TestState.GenericNullableState(null, null)) {
+                inState<TestState.GenericNullableState> {
+                    on<TestAction.A1>(executionPolicy = ExecutionPolicy.Throttled(500.milliseconds, timeSource)) {
+                        while (startTime.elapsedNow() < 600.milliseconds) {
+                            delay(100)
+                        }
+                        mutate { copy(aString = (aString ?: "") + "1") }
+                    }
+                }
+            }
+
+            sm.state.test {
+                assertEquals(TestState.GenericNullableState(null, null), awaitItem())
+
+                // immediately handles first actions
+                sm.dispatch(TestAction.A1)
+
+                timeSource += 500.milliseconds
+                sm.dispatch(TestAction.A1)
+
+                timeSource += 100.milliseconds
+                assertEquals(TestState.GenericNullableState("1", null), awaitItem())
+
+                sm.dispatch(TestAction.A1)
+                assertEquals(TestState.GenericNullableState("11", null), awaitItem())
+            }
         }
     }
 }
