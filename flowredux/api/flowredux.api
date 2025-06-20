@@ -40,13 +40,23 @@ public final class com/freeletics/flowredux2/ConditionBuilder : com/freeletics/f
 	public final fun untilIdentityChanges (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 }
 
-public final class com/freeletics/flowredux2/ExecutionPolicy : java/lang/Enum {
-	public static final field CANCEL_PREVIOUS Lcom/freeletics/flowredux2/ExecutionPolicy;
-	public static final field ORDERED Lcom/freeletics/flowredux2/ExecutionPolicy;
-	public static final field UNORDERED Lcom/freeletics/flowredux2/ExecutionPolicy;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Lcom/freeletics/flowredux2/ExecutionPolicy;
-	public static fun values ()[Lcom/freeletics/flowredux2/ExecutionPolicy;
+public abstract interface class com/freeletics/flowredux2/ExecutionPolicy {
+}
+
+public final class com/freeletics/flowredux2/ExecutionPolicy$CancelPrevious : com/freeletics/flowredux2/ExecutionPolicy {
+	public static final field INSTANCE Lcom/freeletics/flowredux2/ExecutionPolicy$CancelPrevious;
+}
+
+public final class com/freeletics/flowredux2/ExecutionPolicy$Ordered : com/freeletics/flowredux2/ExecutionPolicy {
+	public static final field INSTANCE Lcom/freeletics/flowredux2/ExecutionPolicy$Ordered;
+}
+
+public final class com/freeletics/flowredux2/ExecutionPolicy$Throttled : com/freeletics/flowredux2/ExecutionPolicy {
+	public synthetic fun <init> (JLkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class com/freeletics/flowredux2/ExecutionPolicy$Unordered : com/freeletics/flowredux2/ExecutionPolicy {
+	public static final field INSTANCE Lcom/freeletics/flowredux2/ExecutionPolicy$Unordered;
 }
 
 public final class com/freeletics/flowredux2/FlowReduxBuilder {
