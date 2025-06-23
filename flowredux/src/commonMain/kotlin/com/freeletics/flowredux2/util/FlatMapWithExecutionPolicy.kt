@@ -26,11 +26,11 @@ internal fun <T, R> Flow<T>.flatMapWithExecutionPolicy(
         ExecutionPolicy.Unordered -> this.flatMapMerge(transform = transform)
         is ExecutionPolicy.Throttled ->
             this
-                .throttleFist(executionPolicy.duration, executionPolicy.timeSource)
+                .throttleFirst(executionPolicy.duration, executionPolicy.timeSource)
                 .flatMapConcat(transform = transform)
     }
 
-private fun <T> Flow<T>.throttleFist(windowDuration: Duration, timeSource: TimeSource): Flow<T> = channelFlow {
+private fun <T> Flow<T>.throttleFirst(windowDuration: Duration, timeSource: TimeSource): Flow<T> = channelFlow {
     var windowStartTime = timeSource.markNow()
     var emitted = false
     collect { value ->
