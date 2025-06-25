@@ -1,13 +1,13 @@
 [versions]
-kotlin = "2.1.21"
+kotlin = "2.2.0"
 coroutines = "1.10.2"
 
 java-target = "11"
 java-toolchain = "24"
 
-android-gradle = "8.10.1"
+android-gradle = "8.11.0"
 android-min = "21"
-android-target = "35"
+android-target = "36"
 android-compile = "36"
 
 androidx-compose-runtime = "1.8.3"
@@ -32,10 +32,10 @@ timber = "5.0.1"
 turbine = "1.2.1"
 kotlinx-collections-immutable= "0.4.0"
 
-fgp = "0.26.1"
+fgp = "0.27.0"
 publish = "0.33.0"
 dokka = "2.0.0"
-binarycompatibility = "0.17.0"
+binarycompatibility = "0.18.0"
 dependency-analysis = "2.19.0"
 
 [libraries]
