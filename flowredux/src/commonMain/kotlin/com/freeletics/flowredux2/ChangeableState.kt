@@ -66,13 +66,14 @@ internal class UnsafeMutateState<InputState, S>(
     internal val reducer: InputState.() -> S,
 ) : ChangedState<S>() {
     @Suppress("UNCHECKED_CAST")
-    internal fun reduceImpl(state: S): S =
-        reducer(state as InputState)
+    internal fun reduceImpl(state: S): S = reducer(state as InputState)
 }
 
 internal data class OverrideState<S>(internal val newState: S) : ChangedState<S>()
 
 internal object NoStateChange : ChangedState<Nothing>()
+
+internal object NoStateChangeSkipEmission : ChangedState<Nothing>()
 
 /**
  * Transforms the given [state] according to [ChangedState] and returns the new [S].
@@ -82,5 +83,6 @@ public fun <S> ChangedState<S>.reduce(state: S): S {
         is NoStateChange -> state
         is OverrideState -> newState
         is UnsafeMutateState<*, S> -> this.reduceImpl(state)
+        is NoStateChangeSkipEmission -> throw UnsupportedOperationException("Can't reduce $this")
     }
 }
