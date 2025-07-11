@@ -1,11 +1,14 @@
 package com.freeletics.flowredux2.sideeffects
 
 import com.freeletics.flowredux2.ChangedState
+import com.freeletics.flowredux2.NoStateChangeSkipEmission
 import com.freeletics.flowredux2.reduce
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -29,7 +32,7 @@ internal fun <A : Any, S : Any> Flow<A>.reduxStore(
     val mutex = Mutex()
 
     launch {
-        stateChanges.consumeAsFlow().collect { action ->
+        stateChanges.consumeAsFlow().filter { it != NoStateChangeSkipEmission }.collect { action ->
             val newState = action.reduce(currentState)
             if (currentState !== newState) {
                 currentState = newState

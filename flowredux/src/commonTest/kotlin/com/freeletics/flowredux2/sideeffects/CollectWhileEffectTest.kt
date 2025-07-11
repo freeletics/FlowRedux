@@ -17,6 +17,26 @@ import kotlinx.coroutines.test.runTest
 @Suppress("DEPRECATION")
 internal class CollectWhileEffectTest {
     @Test
+    fun doesNotEmitState() = runTest {
+        val values = MutableSharedFlow<Int>()
+
+        val sm = StateMachine {
+            inState<TestState.Initial> {
+                collectWhileInStateEffect(values) { v ->
+                }
+            }
+        }
+
+        sm.state.test {
+            assertEquals(TestState.Initial, awaitItem())
+            values.emit(1)
+            values.emit(2)
+            values.emit(3)
+            values.emit(4)
+            values.emit(5)
+        }
+    }
+    @Test
     fun collectWhileInStateEffectStopsAfterHavingMovedToNextState() = runTest {
         val stateChange = MutableSharedFlow<Unit>()
         val values = MutableSharedFlow<Int>()

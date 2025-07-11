@@ -18,6 +18,21 @@ import kotlinx.coroutines.test.runTest
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class OnActionEffectTest {
     @Test
+    fun doesNotEmitState() = runTest {
+        val sm = StateMachine {
+            inState<TestState.Initial> {
+                onActionEffect<TestAction.A1> {
+                }
+            }
+        }
+
+        sm.state.test {
+            assertEquals(TestState.Initial, awaitItem())
+            sm.dispatch(TestAction.A1)
+        }
+    }
+
+    @Test
     fun actionEffectBlockStopsWhenMovedToAnotherState() = runTest {
         val blockEntered = Channel<Boolean>(Channel.UNLIMITED)
         var cancellation: Throwable? = null
