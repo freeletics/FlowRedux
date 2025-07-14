@@ -85,7 +85,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
             executionPolicy = executionPolicy,
             handler = { action ->
                 handler(action)
-                NoStateChange
+                NoStateChangeSkipEmission
             },
         )
     }
@@ -122,7 +122,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     ) {
         onEnter {
             handler()
-            NoStateChange
+            NoStateChangeSkipEmission
         }
     }
 
@@ -194,7 +194,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
             executionPolicy = executionPolicy,
             handler = { value: T ->
                 handler(value)
-                NoStateChange
+                NoStateChangeSkipEmission
             },
         )
     }
@@ -217,7 +217,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
             executionPolicy = executionPolicy,
             handler = { value: T ->
                 handler(value)
-                NoStateChange
+                NoStateChangeSkipEmission
             },
         )
     }

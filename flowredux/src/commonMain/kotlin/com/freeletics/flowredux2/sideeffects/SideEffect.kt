@@ -2,6 +2,7 @@ package com.freeletics.flowredux2.sideeffects
 
 import com.freeletics.flowredux2.ChangedState
 import com.freeletics.flowredux2.NoStateChange
+import com.freeletics.flowredux2.NoStateChangeSkipEmission
 import com.freeletics.flowredux2.UnsafeMutateState
 import com.freeletics.flowredux2.reduce
 import kotlinx.coroutines.CancellationException
@@ -135,7 +136,7 @@ internal class StateChangeCancellationException : CancellationException("StateMa
 internal typealias GetState<S> = () -> S
 
 private fun <InputState : S, S> guardWithIsInState(changedState: ChangedState<S>, sideEffect: SideEffect<InputState, S, *>): ChangedState<S> {
-    if (changedState is NoStateChange) {
+    if (changedState is NoStateChange || changedState is NoStateChangeSkipEmission) {
         return changedState
     }
     return UnsafeMutateState<S, S> {
