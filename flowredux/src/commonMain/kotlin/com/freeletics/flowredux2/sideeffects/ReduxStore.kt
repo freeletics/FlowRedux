@@ -8,16 +8,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 internal fun <A : Any, S : Any> Flow<A>.reduxStore(
-    initialStateSupplier: () -> S,
+    initialState: S,
     sideEffectBuilders: Iterable<SideEffectBuilder<out S, S, A>>,
 ): Flow<S> = channelFlow {
-    var currentState: S = initialStateSupplier()
+    var currentState: S = initialState
     val getState: GetState<S> = { currentState }
 
     val stateChanges = Channel<ChangedState<S>>(Channel.UNLIMITED)
