@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 internal class StateMachine(
     initialState: TestState = TestState.Initial,
     specBlock: FlowReduxBuilder<TestState, TestAction>.() -> Unit = {},
-) : FlowReduxStateMachine<TestState, TestAction>(initialStateSupplier = { initialState }) {
+) : LegacyFlowReduxStateMachine<TestState, TestAction>(initialStateSupplier = { initialState }) {
     init {
         spec(specBlock)
     }
@@ -29,5 +29,15 @@ internal class StateMachine(
         GlobalScope.launch {
             dispatch(action)
         }
+    }
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+internal class StateMachineFactory(
+    initialState: TestState = TestState.Initial,
+    specBlock: FlowReduxBuilder<TestState, TestAction>.() -> Unit = {},
+) : FlowReduxStateMachineFactory<TestState, TestAction>(initialState = { initialState }) {
+    init {
+        spec(specBlock)
     }
 }

@@ -20,7 +20,7 @@ internal class OnEnterEffectTest {
     fun doesNotEmitState() = runTest {
         val sm = StateMachine {
             inState<TestState.Initial> {
-                onEnterEffect{
+                onEnterEffect {
                 }
             }
         }

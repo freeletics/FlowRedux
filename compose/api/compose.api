@@ -1,6 +1,6 @@
 public final class com/freeletics/flowredux2/compose/ComposeFlowReduxStateMachineKt {
-	public static final fun rememberState (Lcom/freeletics/flowredux2/FlowReduxStateMachine;Landroidx/compose/runtime/Composer;I)Landroidx/compose/runtime/State;
-	public static final fun rememberStateAndDispatch (Lcom/freeletics/flowredux2/FlowReduxStateMachine;Landroidx/compose/runtime/Composer;I)Lcom/freeletics/flowredux2/compose/StateAndDispatch;
+	public static final fun rememberState (Lcom/freeletics/flowredux2/LegacyFlowReduxStateMachine;Landroidx/compose/runtime/Composer;I)Landroidx/compose/runtime/State;
+	public static final fun rememberStateAndDispatch (Lcom/freeletics/flowredux2/LegacyFlowReduxStateMachine;Landroidx/compose/runtime/Composer;I)Lcom/freeletics/flowredux2/compose/StateAndDispatch;
 }
 
 public final class com/freeletics/flowredux2/compose/StateAndDispatch {
