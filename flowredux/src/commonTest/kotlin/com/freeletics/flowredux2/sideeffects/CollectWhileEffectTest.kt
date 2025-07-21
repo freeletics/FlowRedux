@@ -36,6 +36,7 @@ internal class CollectWhileEffectTest {
             values.emit(5)
         }
     }
+
     @Test
     fun collectWhileInStateEffectStopsAfterHavingMovedToNextState() = runTest {
         val stateChange = MutableSharedFlow<Unit>()

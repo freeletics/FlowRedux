@@ -63,11 +63,16 @@ public final class com/freeletics/flowredux2/FlowReduxBuilder {
 	public final fun inState (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function1;)V
 }
 
-public abstract class com/freeletics/flowredux2/FlowReduxStateMachine : com/freeletics/khonshu/statemachine/StateMachine {
+public final class com/freeletics/flowredux2/FlowReduxStateMachine {
+	public final fun dispatch (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getDispatchAction ()Lkotlin/jvm/functions/Function1;
+	public final fun getState ()Ljava/lang/Object;
+}
+
+public abstract class com/freeletics/flowredux2/FlowReduxStateMachineFactory {
 	public fun <init> (Ljava/lang/Object;)V
 	public fun <init> (Lkotlin/jvm/functions/Function0;)V
-	public fun dispatch (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun getState ()Lkotlinx/coroutines/flow/Flow;
+	public final fun launchIn (Lkotlinx/coroutines/CoroutineScope;)Lcom/freeletics/flowredux2/FlowReduxStateMachine;
 	protected final fun spec (Lkotlin/jvm/functions/Function1;)V
 }
 
@@ -77,6 +82,14 @@ public final class com/freeletics/flowredux2/IdentityBuilder : com/freeletics/fl
 public final class com/freeletics/flowredux2/InStateBuilder : com/freeletics/flowredux2/BaseBuilder {
 	public final fun condition (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 	public final fun untilIdentityChanges (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
+}
+
+public abstract class com/freeletics/flowredux2/LegacyFlowReduxStateMachine : com/freeletics/khonshu/statemachine/StateMachine {
+	public fun <init> (Ljava/lang/Object;)V
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
+	public fun dispatch (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun getState ()Lkotlinx/coroutines/flow/Flow;
+	protected final fun spec (Lkotlin/jvm/functions/Function1;)V
 }
 
 public abstract class com/freeletics/flowredux2/State {

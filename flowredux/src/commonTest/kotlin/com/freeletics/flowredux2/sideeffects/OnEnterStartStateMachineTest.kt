@@ -3,7 +3,7 @@ package com.freeletics.flowredux2.sideeffects
 import app.cash.turbine.awaitItem
 import app.cash.turbine.test
 import com.freeletics.flowredux2.FlowReduxBuilder
-import com.freeletics.flowredux2.FlowReduxStateMachine
+import com.freeletics.flowredux2.LegacyFlowReduxStateMachine
 import com.freeletics.flowredux2.StateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
@@ -379,8 +379,8 @@ internal class OnEnterStartStateMachineTest {
     private fun childStateMachine(
         initialState: TestState = TestState.Initial,
         builderBlock: FlowReduxBuilder<TestState, TestAction>.() -> Unit,
-    ): FlowReduxStateMachine<TestState, TestAction> {
-        return object : FlowReduxStateMachine<TestState, TestAction>(initialState) {
+    ): LegacyFlowReduxStateMachine<TestState, TestAction> {
+        return object : LegacyFlowReduxStateMachine<TestState, TestAction>(initialState) {
             init {
                 spec(builderBlock)
             }

@@ -2,7 +2,7 @@ package com.freeletics.flowredux2.sample.shared
 
 import com.freeletics.flowredux2.ChangeableState
 import com.freeletics.flowredux2.ChangedState
-import com.freeletics.flowredux2.FlowReduxStateMachine
+import com.freeletics.flowredux2.LegacyFlowReduxStateMachine
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 class InternalPaginationStateMachine(
     private val githubApi: GithubApi,
-) : FlowReduxStateMachine<PaginationState, Action>(LoadFirstPagePaginationState) {
+) : LegacyFlowReduxStateMachine<PaginationState, Action>(LoadFirstPagePaginationState) {
     init {
         spec {
             inState<LoadFirstPagePaginationState> {

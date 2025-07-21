@@ -23,7 +23,7 @@ internal class FlowReduxStateMachineTest {
 
     @Test
     fun callingSpecBlockTwiceThrowsException() {
-        val sm = object : FlowReduxStateMachine<Any, Any>(Any()) {
+        val sm = object : LegacyFlowReduxStateMachine<Any, Any>(Any()) {
             init {
                 spec { }
             }
@@ -45,7 +45,7 @@ internal class FlowReduxStateMachineTest {
 
     @Test
     fun noSpecBlockSetThrowsException() {
-        val sm = object : FlowReduxStateMachine<Any, Any>(Any()) {}
+        val sm = object : LegacyFlowReduxStateMachine<Any, Any>(Any()) {}
 
         try {
             sm.state
