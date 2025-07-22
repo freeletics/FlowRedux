@@ -86,10 +86,17 @@ public final class com/freeletics/flowredux2/FlowReduxStateMachine {
 
 public abstract class com/freeletics/flowredux2/FlowReduxStateMachineFactory {
 	public static final field $stable I
-	public fun <init> (Ljava/lang/Object;)V
-	public fun <init> (Lkotlin/jvm/functions/Function0;)V
+	public static final field Companion Lcom/freeletics/flowredux2/FlowReduxStateMachineFactory$Companion;
+	public fun <init> (Lcom/freeletics/flowredux2/StateHolder;)V
 	public final fun launchIn (Lkotlinx/coroutines/CoroutineScope;)Lcom/freeletics/flowredux2/FlowReduxStateMachine;
 	protected final fun spec (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class com/freeletics/flowredux2/FlowReduxStateMachineFactory$Companion {
+	public final fun inMemoryStateHolder (Ljava/lang/Object;)Lcom/freeletics/flowredux2/StateHolder;
+	public final fun inMemoryStateHolder (Lkotlin/jvm/functions/Function0;)Lcom/freeletics/flowredux2/StateHolder;
+	public final fun lossyStateHolder (Ljava/lang/Object;)Lcom/freeletics/flowredux2/StateHolder;
+	public final fun lossyStateHolder (Lkotlin/jvm/functions/Function0;)Lcom/freeletics/flowredux2/StateHolder;
 }
 
 public final class com/freeletics/flowredux2/IdentityBuilder : com/freeletics/flowredux2/BaseBuilder {
@@ -111,9 +118,22 @@ public abstract class com/freeletics/flowredux2/LegacyFlowReduxStateMachine : co
 	protected final fun spec (Lkotlin/jvm/functions/Function1;)V
 }
 
+public abstract interface class com/freeletics/flowredux2/SaveableState {
+	public fun save (Landroidx/lifecycle/SavedStateHandle;)V
+}
+
+public final class com/freeletics/flowredux2/SaveableStateHolderKt {
+	public static final fun savedStateHandleStateHolder (Landroidx/lifecycle/SavedStateHandle;Lkotlin/jvm/functions/Function1;)Lcom/freeletics/flowredux2/StateHolder;
+	public static final fun serializableStateHolder (Landroidx/lifecycle/SavedStateHandle;Lkotlinx/serialization/KSerializer;Lkotlin/jvm/functions/Function0;)Lcom/freeletics/flowredux2/StateHolder;
+}
+
 public abstract class com/freeletics/flowredux2/State {
 	public static final field $stable I
 	public synthetic fun <init> (Ljava/lang/Object;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun getSnapshot ()Ljava/lang/Object;
+}
+
+public abstract class com/freeletics/flowredux2/StateHolder {
+	public static final field $stable I
 }
 

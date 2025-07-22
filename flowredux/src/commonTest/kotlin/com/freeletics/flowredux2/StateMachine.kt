@@ -36,7 +36,7 @@ internal class StateMachine(
 internal class StateMachineFactory(
     initialState: TestState = TestState.Initial,
     specBlock: FlowReduxBuilder<TestState, TestAction>.() -> Unit = {},
-) : FlowReduxStateMachineFactory<TestState, TestAction>(initialState = { initialState }) {
+) : FlowReduxStateMachineFactory<TestState, TestAction>(lossyStateHolder(initialState)) {
     init {
         spec(specBlock)
     }
