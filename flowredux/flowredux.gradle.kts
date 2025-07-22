@@ -23,6 +23,7 @@ kotlin {
 
         listOf(
             "jvmMain",
+            "main",
             "jsMain",
             "nativeMain",
             "wasmJsMain",
@@ -38,6 +39,7 @@ dependencies {
     commonMainApi(libs.coroutines.core)
     commonMainApi(libs.statemachine)
     "composeMainApi"(libs.jetbrains.compose.runtime)
+    "composeMainCompileOnly"(libs.androidx.viewmodel.savedstate)
 
     commonTestImplementation(libs.kotlin.test)
     commonTestImplementation(libs.kotlin.test.annotations)
