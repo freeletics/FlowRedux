@@ -2,7 +2,7 @@ package com.freeletics.flowredux2.sample.shared
 
 import com.freeletics.flowredux2.ChangeableState
 import com.freeletics.flowredux2.ChangedState
-import com.freeletics.flowredux2.LegacyFlowReduxStateMachine
+import com.freeletics.flowredux2.FlowReduxStateMachineFactory
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CoroutineScope
@@ -18,9 +18,9 @@ import kotlinx.coroutines.launch
  * but uses traditional "callbacks". That way it is easier to use on iOS.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class InternalPaginationStateMachine(
+class InternalPaginationStateMachineFactory(
     private val githubApi: GithubApi,
-) : LegacyFlowReduxStateMachine<PaginationState, Action>(LoadFirstPagePaginationState) {
+) : FlowReduxStateMachineFactory<PaginationState, Action>(LoadFirstPagePaginationState) {
     init {
         spec {
             inState<LoadFirstPagePaginationState> {
@@ -159,19 +159,17 @@ class InternalPaginationStateMachine(
 }
 
 /**
- * A wrapper class around [InternalPaginationStateMachine] so that you dont need to deal with `Flow`
+ * A wrapper class around [InternalPaginationStateMachineFactory] so that you dont need to deal with `Flow`
  * and suspend functions from iOS.
  */
 class PaginationStateMachine(
     githubApi: GithubApi,
     private val scope: CoroutineScope,
 ) {
-    private val stateMachine = InternalPaginationStateMachine(githubApi = githubApi)
+    private val stateMachine = InternalPaginationStateMachineFactory(githubApi = githubApi).launchIn(scope)
 
     fun dispatch(action: Action) {
-        scope.launch {
-            stateMachine.dispatch(action)
-        }
+        stateMachine.dispatchAction(action)
     }
 
     fun start(stateChangeListener: (PaginationState) -> Unit) {

@@ -34,5 +34,4 @@ dependencies {
 
     implementation(projects.sample.sharedCode)
     implementation(projects.flowredux)
-    implementation(projects.compose)
 }
