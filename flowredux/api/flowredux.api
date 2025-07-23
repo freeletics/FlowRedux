@@ -88,6 +88,8 @@ public abstract class com/freeletics/flowredux2/FlowReduxStateMachineFactory {
 	public static final field $stable I
 	public static final field Companion Lcom/freeletics/flowredux2/FlowReduxStateMachineFactory$Companion;
 	public fun <init> (Lcom/freeletics/flowredux2/StateHolder;)V
+	public fun <init> (Ljava/lang/Object;)V
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
 	public final fun launchIn (Lkotlinx/coroutines/CoroutineScope;)Lcom/freeletics/flowredux2/FlowReduxStateMachine;
 	protected final fun spec (Lkotlin/jvm/functions/Function1;)V
 }
