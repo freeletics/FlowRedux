@@ -6,10 +6,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import com.freeletics.flowredux2.FlowReduxStateMachineFactory.Companion.lossyStateHolder
 import com.freeletics.flowredux2.sideeffects.SideEffectBuilder
 import com.freeletics.flowredux2.sideeffects.reduxStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 
 @ExperimentalCoroutinesApi
@@ -22,26 +24,27 @@ public fun <S : Any, A : Any> stateMachine(
         FlowReduxBuilder<S, A>().apply(specBlock).sideEffectBuilders
     }
 
-    return stateMachine({ initialState }, sideEffectBuilders)
+    return stateMachine(lossyStateHolder(initialState), sideEffectBuilders)
 }
 
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 public fun <S : Any, A : Any> FlowReduxStateMachineFactory<S, A>.produceStateMachine(): FlowReduxStateMachine<State<S>, A> {
     checkInitialized()
-    return stateMachine(initialState, sideEffectBuilders)
+    return stateMachine(stateHolder, sideEffectBuilders)
 }
 
 @Composable
 internal fun <S : Any, A : Any> stateMachine(
-    initialState: () -> S,
+    stateHolder: StateHolder<S>,
     sideEffectBuilders: List<SideEffectBuilder<*, S, A>>,
 ): FlowReduxStateMachine<State<S>, A> {
     val inputActions = remember(sideEffectBuilders) { Channel<A>() }
-    val state = produceState(initialState(), sideEffectBuilders, inputActions) {
+    val state = produceState(stateHolder.getState(), sideEffectBuilders, inputActions) {
         inputActions
             .receiveAsFlow()
             .reduxStore(value, sideEffectBuilders)
+            .onEach { stateHolder.saveState(it) }
             .collect { value = it }
     }
 
