@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.stateIn
 public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>(
     internal val stateHolder: StateHolder<S>,
 ) {
+    public constructor(state: S) : this(inMemoryStateHolder(state))
+    public constructor(stateSupplier: () -> S) : this(inMemoryStateHolder(stateSupplier))
+
     internal lateinit var sideEffectBuilders: List<SideEffectBuilder<*, S, A>>
 
     protected fun spec(specBlock: FlowReduxBuilder<S, A>.() -> Unit) {

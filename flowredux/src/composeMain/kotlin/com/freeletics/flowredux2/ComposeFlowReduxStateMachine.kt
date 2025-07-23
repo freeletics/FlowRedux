@@ -27,7 +27,7 @@ public fun <S : Any, A : Any> stateMachine(
     return stateMachine(lossyStateHolder(initialState), sideEffectBuilders)
 }
 
-@ExperimentalCoroutinesApi
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 public fun <S : Any, A : Any> FlowReduxStateMachineFactory<S, A>.produceStateMachine(): FlowReduxStateMachine<State<S>, A> {
     checkInitialized()
