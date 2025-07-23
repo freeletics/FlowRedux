@@ -1,6 +1,40 @@
 Change Log
 ==========
 
+## 2.0.0-alpha1 *(2024-07-23)*
+
+- New artifact coordinates: `com.freeletics.flowredux2:flowredux:<version>`.
+- New package name: `com.freeletics.flowredux2`
+
+General changes:
+
+- The main class to define ypur state machine is now `FlowReduxStateMachineFactory` which
+  can be started with `launchIn` (Coroutines) or `produceStateMachine` (Compose). Both return
+  an active `FlowReduxStateMachine` that allows dispatching actions to it and observing the
+  current state.
+- The old compose artifact was removed in favor of the mentioned `produceStateMachine`.
+- `FlowReduxStateMachineFactory` offers various `StateHolder` classes that allow to
+  keep the previous state for the next startd state machine. By default the previous state
+  will be kept in memory (`inMemoryStateHolder`). Other APIs allow to just drop the previous
+  state (`lossyStateHolder`) or use `SavedStateHandle` to persist the previous state
+  (`savedStateHandleStateHolder`, `serializableStateHolder`, `parcelableStateHolder`).
+- The old `FlowReduxStateMachine` is available as `LegacyFlowReduxStateMachine` for now.
+
+DSL:
+
+- The `State` class that has the `override`, `mutate` and `noStateChange` methods is now called `ChangeableState`
+  and is the receiver in each DSL block instead of being passed as a parameter. Like before `ChangeableState`
+  allows access to a `snapshot` state.
+- `...Effect` methods now have a `State` class as receiver that allow accessing `snapshot` instead of
+  receiving `snapshot` as a parameter.
+- It's now forbidden to access `snapshot` in the `override` and `mutate` methods to avoid accidental bugs
+  where outdated state is used to build the new state.
+
+Other:
+
+- `...Effect` DSL methods won't cause the previous state to be emitted again when they complete.
+
+
 ## 1.2.2 *(2024-06-21)*
 
 - Added `wasmJs` target.
