@@ -32,8 +32,8 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
         }
     }
 
-    protected fun initializeWith(reuseLastEmittedStatedOnLaunch: Boolean = true, initialState: () -> S) {
-        stateHolder = if (reuseLastEmittedStatedOnLaunch) {
+    protected fun initializeWith(reuseLastEmittedStateOnLaunch: Boolean = true, initialState: () -> S) {
+        stateHolder = if (reuseLastEmittedStateOnLaunch) {
             InMemoryStateHolder(initialState)
         } else {
             LossyStateHolder(initialState)
