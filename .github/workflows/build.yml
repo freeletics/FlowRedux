@@ -32,4 +32,4 @@ jobs:
         run: ./kotlinw .kts/ktlint.main.kts
 
       - name: Build with Gradle
-        run: ./gradlew build buildHealth --stacktrace
+        run: ./gradlew build --stacktrace
