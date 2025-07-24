@@ -20,8 +20,9 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalCoroutinesApi::class)
 class InternalPaginationStateMachineFactory(
     private val githubApi: GithubApi,
-) : FlowReduxStateMachineFactory<PaginationState, Action>(lossyStateHolder(LoadFirstPagePaginationState)) {
+) : FlowReduxStateMachineFactory<PaginationState, Action>() {
     init {
+        initializeWith(LoadFirstPagePaginationState)
         spec {
             inState<LoadFirstPagePaginationState> {
                 onEnter { loadFirstPage() }
