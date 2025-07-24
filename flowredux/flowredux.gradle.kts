@@ -25,12 +25,14 @@ kotlin {
             "jsMain",
             "nativeMain",
             "wasmJsMain",
-            "androidMain"
+            "androidMain",
         ).forEach {
             if (it.endsWith("Main")) {
                 get(it).dependsOn(compose)
             }
         }
+
+        get("androidMain").dependsOn(get("jvmMain"))
     }
 }
 

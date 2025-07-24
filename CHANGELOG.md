@@ -10,6 +10,8 @@ Change Log
   emissions (already was part of alpha 1 but not  mentioned in the release notes).
 - Removed all `FlowReduxStateMachineFactory` constructors as well as the `StateHolder` class
   and functions.
+- Fix android source set not being properly added which caused the `parcelableStateHolder`
+  (now replaced with an `initializeWith` function for `Parcelable` state) not to be called.
 
 
 ## 2.0.0-alpha1 *(2024-07-23)*

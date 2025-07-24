@@ -41,7 +41,7 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
     }
 
     protected fun spec(specBlock: FlowReduxBuilder<S, A>.() -> Unit) {
-        check (!::sideEffectBuilders.isInitialized) {
+        check(!::sideEffectBuilders.isInitialized) {
             "State machine spec has already been set. It's only allowed to call spec {...} once."
         }
         sideEffectBuilders = FlowReduxBuilder<S, A>().apply(specBlock).sideEffectBuilders
@@ -106,7 +106,7 @@ internal abstract class StateHolder<S : Any> internal constructor() {
     internal abstract fun saveState(s: S)
 }
 
-private class LossyStateHolder<S : Any>(
+internal class LossyStateHolder<S : Any>(
     private val initialState: () -> S,
 ) : StateHolder<S>() {
     override fun getState(): S = initialState()
