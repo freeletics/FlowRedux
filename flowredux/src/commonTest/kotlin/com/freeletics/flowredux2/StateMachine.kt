@@ -38,7 +38,7 @@ internal class StateMachineFactory(
     specBlock: FlowReduxBuilder<TestState, TestAction>.() -> Unit = {},
 ) : FlowReduxStateMachineFactory<TestState, TestAction>() {
     init {
-        initializeWith(initialState, reuseLastEmittedStatedOnLaunch = false)
+        initializeWith(initialState, reuseLastEmittedStateOnLaunch = false)
         spec(specBlock)
     }
 }
