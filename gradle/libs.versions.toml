@@ -69,7 +69,7 @@ adapterdelegates = { module = "com.hannesdorfmann:adapterdelegates4", version.re
 adapterdelegates-dsl = { module = "com.hannesdorfmann:adapterdelegates4-kotlin-dsl", version.ref = "adapterdelegates" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
-statemachine = { module = "com.freeletics.khonshu:state-machine", version = "0.30.0" }
+statemachine = { module = "com.freeletics.khonshu:state-machine", version = "0.31.0" }
 
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
