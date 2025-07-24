@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-
 plugins {
     id("com.freeletics.gradle.multiplatform")
     id("com.freeletics.gradle.publish.oss")
@@ -12,6 +9,7 @@ freeletics {
     multiplatform {
         // TODO stop limiting when it's possible to properly exclude targets from compose
         addCommonTargets(limitToComposeTargets = true)
+        addAndroidTarget()
     }
 }
 
@@ -27,11 +25,14 @@ kotlin {
             "jsMain",
             "nativeMain",
             "wasmJsMain",
+            "androidMain",
         ).forEach {
             if (it.endsWith("Main")) {
                 get(it).dependsOn(compose)
             }
         }
+
+        get("androidMain").dependsOn(get("jvmMain"))
     }
 }
 

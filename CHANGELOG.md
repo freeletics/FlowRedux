@@ -1,6 +1,19 @@
 Change Log
 ==========
 
+## 2.0.0-alpha2 *(2024-07-24)*
+
+- `FlowReduxStateMachineFactory` now has several `initializeWith` functions, each matching one
+  of the `...StateHolder` functions that were introduced in alpha 1. `initializeWith` needs
+  to be called from an `init` block similar to `spec`.
+- Added `ExecutionPolicy.Throttled` that can be used to limit subsequent action handling or Flow
+  emissions (already was part of alpha 1 but not  mentioned in the release notes).
+- Removed all `FlowReduxStateMachineFactory` constructors as well as the `StateHolder` class
+  and functions.
+- Fix android source set not being properly added which caused the `parcelableStateHolder`
+  (now replaced with an `initializeWith` function for `Parcelable` state) not to be called.
+
+
 ## 2.0.0-alpha1 *(2024-07-23)*
 
 - New artifact coordinates: `com.freeletics.flowredux2:flowredux:<version>`.

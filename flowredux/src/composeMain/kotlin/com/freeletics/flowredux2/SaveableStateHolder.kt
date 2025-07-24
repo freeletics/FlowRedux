@@ -4,20 +4,24 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.savedstate.SavedState
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
 
-public fun <S : SaveableState> savedStateHandleStateHolder(savedStateHandle: SavedStateHandle, initialState: (SavedStateHandle) -> S): StateHolder<S> {
-    return SavedStateHandleStateHolder(savedStateHandle, initialState)
+@OptIn(ExperimentalCoroutinesApi::class)
+public fun <S : SaveableState> FlowReduxStateMachineFactory<S, *>.initializeWith(savedStateHandle: SavedStateHandle, initialState: (SavedStateHandle) -> S) {
+    stateHolder = SavedStateHandleStateHolder(savedStateHandle, initialState)
 }
 
-public inline fun <reified S : Any> serializableStateHolder(savedStateHandle: SavedStateHandle, noinline initialState: () -> S): StateHolder<S> {
-    return serializableStateHolder(savedStateHandle, serializer<S>(), initialState)
+@OptIn(ExperimentalCoroutinesApi::class)
+public inline fun <reified S : Any> FlowReduxStateMachineFactory<S, *>.initializeWith(savedStateHandle: SavedStateHandle, noinline initialState: () -> S) {
+    initializeWith(savedStateHandle, serializer<S>(), initialState)
 }
 
 @PublishedApi
-internal fun <S : Any> serializableStateHolder(savedStateHandle: SavedStateHandle, serializer: KSerializer<S>, initialState: () -> S): StateHolder<S> {
-    return SerializableSavedStateHandleStateHolder(savedStateHandle, serializer, initialState)
+@OptIn(ExperimentalCoroutinesApi::class)
+internal fun <S : Any> FlowReduxStateMachineFactory<S, *>.initializeWith(savedStateHandle: SavedStateHandle, serializer: KSerializer<S>, initialState: () -> S) {
+    stateHolder = SerializableSavedStateHandleStateHolder(savedStateHandle, serializer, initialState)
 }
 
 public interface SaveableState {

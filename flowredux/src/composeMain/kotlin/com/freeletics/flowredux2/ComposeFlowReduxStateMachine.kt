@@ -6,7 +6,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import com.freeletics.flowredux2.FlowReduxStateMachineFactory.Companion.lossyStateHolder
+import com.freeletics.flowredux2.LossyStateHolder
 import com.freeletics.flowredux2.sideeffects.SideEffectBuilder
 import com.freeletics.flowredux2.sideeffects.reduxStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,7 +24,9 @@ public fun <S : Any, A : Any> stateMachine(
         FlowReduxBuilder<S, A>().apply(specBlock).sideEffectBuilders
     }
 
-    return stateMachine(lossyStateHolder(initialState), sideEffectBuilders)
+    // use LossyStateHolder because when using this from compose the caller can use
+    // standard compose mechanisms for keeping/saving the state
+    return stateMachine(LossyStateHolder({ initialState }), sideEffectBuilders)
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
