@@ -16,22 +16,6 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
     internal lateinit var stateHolder: StateHolder<S>
     internal lateinit var sideEffectBuilders: List<SideEffectBuilder<*, S, A>>
 
-    protected fun initializeWith(initialState: S, reuseLastEmittedStateOnLaunch: Boolean = true) {
-        stateHolder = if (reuseLastEmittedStateOnLaunch) {
-            InMemoryStateHolder({ initialState })
-        } else {
-            LossyStateHolder({ initialState })
-        }
-    }
-
-    protected fun initializeWith(reuseLastEmittedStateOnLaunch: Boolean = true, initialState: () -> S) {
-        stateHolder = if (reuseLastEmittedStateOnLaunch) {
-            InMemoryStateHolder(initialState)
-        } else {
-            LossyStateHolder(initialState)
-        }
-    }
-
     protected fun spec(specBlock: FlowReduxBuilder<S, A>.() -> Unit) {
         check(!::sideEffectBuilders.isInitialized) {
             "State machine spec has already been set. It's only allowed to call spec {...} once."
@@ -89,6 +73,24 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
             }
             """.trimIndent()
         }
+    }
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+public fun <S : Any> FlowReduxStateMachineFactory<S, *>.initializeWith(initialState: S, reuseLastEmittedStateOnLaunch: Boolean = true) {
+    stateHolder = if (reuseLastEmittedStateOnLaunch) {
+        InMemoryStateHolder({ initialState })
+    } else {
+        LossyStateHolder({ initialState })
+    }
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+public fun <S : Any> FlowReduxStateMachineFactory<S, *>.initializeWith(reuseLastEmittedStateOnLaunch: Boolean = true, initialState: () -> S) {
+    stateHolder = if (reuseLastEmittedStateOnLaunch) {
+        InMemoryStateHolder(initialState)
+    } else {
+        LossyStateHolder(initialState)
     }
 }
 
