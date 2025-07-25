@@ -95,8 +95,6 @@ public abstract class com/freeletics/flowredux2/FlowReduxStateMachineFactory {
 	protected final fun initializeWith (ZLkotlin/jvm/functions/Function0;)V
 	public static synthetic fun initializeWith$default (Lcom/freeletics/flowredux2/FlowReduxStateMachineFactory;Ljava/lang/Object;ZILjava/lang/Object;)V
 	public static synthetic fun initializeWith$default (Lcom/freeletics/flowredux2/FlowReduxStateMachineFactory;ZLkotlin/jvm/functions/Function0;ILjava/lang/Object;)V
-	protected final fun initializeWithOnEachLaunch (Ljava/lang/Object;)V
-	protected final fun initializeWithOnEachLaunch (Lkotlin/jvm/functions/Function0;)V
 	public final fun launchIn (Lkotlinx/coroutines/CoroutineScope;)Lcom/freeletics/flowredux2/FlowReduxStateMachine;
 	protected final fun spec (Lkotlin/jvm/functions/Function1;)V
 }

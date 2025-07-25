@@ -16,14 +16,6 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
     internal lateinit var stateHolder: StateHolder<S>
     internal lateinit var sideEffectBuilders: List<SideEffectBuilder<*, S, A>>
 
-    protected fun initializeWithOnEachLaunch(initialState: S) {
-        stateHolder = LossyStateHolder({ initialState })
-    }
-
-    protected fun initializeWithOnEachLaunch(initialState: () -> S) {
-        stateHolder = LossyStateHolder(initialState)
-    }
-
     protected fun initializeWith(initialState: S, reuseLastEmittedStateOnLaunch: Boolean = true) {
         stateHolder = if (reuseLastEmittedStateOnLaunch) {
             InMemoryStateHolder({ initialState })
