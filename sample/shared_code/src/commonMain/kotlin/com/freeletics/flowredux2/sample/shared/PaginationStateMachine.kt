@@ -23,7 +23,7 @@ class InternalPaginationStateMachineFactory(
     private val githubApi: GithubApi,
 ) : FlowReduxStateMachineFactory<PaginationState, Action>() {
     init {
-        initializeWith(LoadFirstPagePaginationState)
+        initializeWith { LoadFirstPagePaginationState }
         spec {
             inState<LoadFirstPagePaginationState> {
                 onEnter { loadFirstPage() }

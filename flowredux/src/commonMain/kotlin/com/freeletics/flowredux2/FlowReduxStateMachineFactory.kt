@@ -77,15 +77,6 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-public fun <S : Any> FlowReduxStateMachineFactory<S, *>.initializeWith(initialState: S, reuseLastEmittedStateOnLaunch: Boolean = true) {
-    stateHolder = if (reuseLastEmittedStateOnLaunch) {
-        InMemoryStateHolder({ initialState })
-    } else {
-        LossyStateHolder({ initialState })
-    }
-}
-
-@OptIn(ExperimentalCoroutinesApi::class)
 public fun <S : Any> FlowReduxStateMachineFactory<S, *>.initializeWith(reuseLastEmittedStateOnLaunch: Boolean = true, initialState: () -> S) {
     stateHolder = if (reuseLastEmittedStateOnLaunch) {
         InMemoryStateHolder(initialState)

@@ -92,9 +92,7 @@ public abstract class com/freeletics/flowredux2/FlowReduxStateMachineFactory {
 }
 
 public final class com/freeletics/flowredux2/FlowReduxStateMachineFactoryKt {
-	public static final fun initializeWith (Lcom/freeletics/flowredux2/FlowReduxStateMachineFactory;Ljava/lang/Object;Z)V
 	public static final fun initializeWith (Lcom/freeletics/flowredux2/FlowReduxStateMachineFactory;ZLkotlin/jvm/functions/Function0;)V
-	public static synthetic fun initializeWith$default (Lcom/freeletics/flowredux2/FlowReduxStateMachineFactory;Ljava/lang/Object;ZILjava/lang/Object;)V
 	public static synthetic fun initializeWith$default (Lcom/freeletics/flowredux2/FlowReduxStateMachineFactory;ZLkotlin/jvm/functions/Function0;ILjava/lang/Object;)V
 }
 
