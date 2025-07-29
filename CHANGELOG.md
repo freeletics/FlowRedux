@@ -1,6 +1,16 @@
 Change Log
 ==========
 
+## 2.0.0-alpha3 *(2024-07-29)*
+
+- Changed all `initializeWith` methods to be extension functions to prevent the compose and
+  Android specific extension fucntions from being hidden.
+- Removed `initializeWith(S, Boolean)` for consistency, use `initializeWith(Boolean, () -> S)`
+  instead.
+- Removed `initializeWithOnEachLaunch` which was already replaced with the boolean parameter on
+  `initializeWith(Boolean, () -> S)`.
+
+
 ## 2.0.0-alpha2 *(2024-07-24)*
 
 - `FlowReduxStateMachineFactory` now has several `initializeWith` functions, each matching one
