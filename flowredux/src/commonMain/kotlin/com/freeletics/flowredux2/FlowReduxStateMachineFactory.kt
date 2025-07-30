@@ -5,10 +5,13 @@ import com.freeletics.flowredux2.sideeffects.reduxStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 
 @ExperimentalCoroutinesApi
@@ -33,6 +36,20 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
             .reduxStore(initialState, sideEffectBuilders)
             .onEach { stateHolder.saveState(it) }
             .stateIn(scope, SharingStarted.Lazily, initialState)
+
+        return FlowReduxStateMachine(state, inputActions, scope)
+    }
+
+    public fun shareIn(scope: CoroutineScope): FlowReduxStateMachine<SharedFlow<S>, A> {
+        checkInitialized()
+
+        val inputActions = Channel<A>(Channel.BUFFERED)
+        val initialState = stateHolder.getState()
+        val state = inputActions
+            .receiveAsFlow()
+            .reduxStore(initialState, sideEffectBuilders)
+            .onEach { stateHolder.saveState(it) }
+            .shareIn(scope, SharingStarted.Lazily, replay = 1)
 
         return FlowReduxStateMachine(state, inputActions, scope)
     }

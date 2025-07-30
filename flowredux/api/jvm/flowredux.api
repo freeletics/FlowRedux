@@ -88,6 +88,7 @@ public abstract class com/freeletics/flowredux2/FlowReduxStateMachineFactory {
 	public static final field $stable I
 	public fun <init> ()V
 	public final fun launchIn (Lkotlinx/coroutines/CoroutineScope;)Lcom/freeletics/flowredux2/FlowReduxStateMachine;
+	public final fun shareIn (Lkotlinx/coroutines/CoroutineScope;)Lcom/freeletics/flowredux2/FlowReduxStateMachine;
 	protected final fun spec (Lkotlin/jvm/functions/Function1;)V
 }
 
