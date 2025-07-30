@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+## 2.0.0-alpha4 *(2024-07-30)*
+
+- Added `shareIn` to `FlowReduxStateMachineFactory` to create a `FlowReduxStateMachine`
+  that uses `SharedFlow` instead of `StateFlow`. The main purpose is testing where it's useful
+  to not have the value conflation of `StateFlow`.
+
+
 ## 2.0.0-alpha3 *(2024-07-29)*
 
 - Changed all `initializeWith` methods to be extension functions to prevent the compose and
