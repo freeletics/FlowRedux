@@ -16,17 +16,8 @@ ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true
 
 #
-# ktlint specific options
-#
-
-# allow test methods with back ticked names to be longer than the line limit
-ktlint_ignore_back_ticked_identifier = true
-# allow composable functions to be capitalized
-ktlint_function_naming_ignore_when_annotated_with = Composable
-#
 # ktlint disabled rules
 #
-ktlint_standard_annotation = disabled
 ktlint_standard_function-expression-body = disabled
 ktlint_standard_binary-expression-wrapping = disabled
 ktlint_standard_multiline-expression-wrapping = disabled
