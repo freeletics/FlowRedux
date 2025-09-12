@@ -3,6 +3,7 @@ package com.freeletics.flowredux2.sideeffects
 import app.cash.turbine.awaitItem
 import app.cash.turbine.test
 import com.freeletics.flowredux2.StateMachine
+import com.freeletics.flowredux2.StateMachineFactory
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
 import kotlin.test.Test
@@ -17,10 +18,10 @@ internal class OnActionStartStateMachineTest {
     @Test
     fun childStateMachineEmitsInitialStateToParentStateMachine() = runTest {
         var childStateChanged = 0
-        val child = StateMachine(initialState = TestState.S3)
+        val child = StateMachineFactory(initialState = TestState.S3)
         val parentStateMachine = StateMachine {
             inState<TestState.Initial> {
-                onActionStartStateMachine<TestAction.A1, TestState>(child) { childState ->
+                onActionStartStateMachine<TestAction.A1, TestState>({ child }) { childState ->
                     childStateChanged++
                     override { childState }
                 }
@@ -37,39 +38,13 @@ internal class OnActionStartStateMachineTest {
     }
 
     @Test
-    fun childStateMachineStopsAfterLeavingWhileInState() = runTest {
-        var childStateChanged = 0
-        val child = StateMachine(initialState = TestState.S3)
-        val parentStateMachine = StateMachine {
-            inState<TestState.Initial> {
-                onActionStartStateMachine<TestAction.A1, TestState>(child) {
-                    childStateChanged++
-                    override { TestState.S1 }
-                }
-            }
-        }
-
-        parentStateMachine.state.test {
-            assertEquals(TestState.Initial, awaitItem()) // parent initial state
-            assertEquals(0, child.stateFlowStarted)
-            assertEquals(0, child.stateFlowCompleted)
-            parentStateMachine.dispatch(TestAction.A1)
-            assertEquals(TestState.S1, awaitItem()) // child initial state causes state transition
-            assertEquals(1, child.stateFlowStarted)
-            assertEquals(1, child.stateFlowCompleted)
-            assertEquals(1, childStateChanged)
-            expectNoEvents()
-        }
-    }
-
-    @Test
     fun actionsAreForwardedToTheSubStateMachineAndSubStateIsPropagatedBackONLYWhileInState() = runTest {
         var childStateChanged = 0
         var childS3A2Handled = 0
         var childS1A2Handled = 0
         val recordedSubStates = mutableListOf<TestState>()
 
-        val child = StateMachine(initialState = TestState.S3) {
+        val child = StateMachineFactory(initialState = TestState.S3) {
             inState<TestState.S3> {
                 on<TestAction.A2> {
                     childS3A2Handled++
@@ -88,7 +63,7 @@ internal class OnActionStartStateMachineTest {
 
         val parentStateMachine = StateMachine(initialState = TestState.CounterState(0)) {
             inState<TestState.CounterState> {
-                onActionStartStateMachine<TestAction.A1, TestState>(child) { childState ->
+                onActionStartStateMachine<TestAction.A1, TestState>({ child }) { childState ->
                     childStateChanged++
                     recordedSubStates += childState
                     mutate { copy(counter = this.counter + 1) }
@@ -141,13 +116,13 @@ internal class OnActionStartStateMachineTest {
     }
 
     @Test
-    fun subStateMachineFactoryIsInvokedOnReEnterAndActionAndStateMapperAreInvoked() = runTest {
+    fun subStateMachineFactoryIsInvokedOnReEnterAndActionAndHandlerAreInvoked() = runTest {
         val actionMapperRecordings = mutableListOf<TestAction>()
         val factoryParamsRecordings = mutableListOf<Pair<TestAction, TestState>>()
-        val stateMapperRecordings = mutableListOf<Pair<TestState, TestState>>()
+        val handlerRecordings = mutableListOf<Pair<TestState, TestState>>()
         val initialState = TestState.CounterState(0)
 
-        val child = StateMachine(initialState = TestState.S1) {
+        val child = StateMachineFactory(initialState = TestState.S1) {
             inState<TestState.S1> {
                 on<TestAction.A3> { override { TestState.S2 } }
             }
@@ -162,16 +137,16 @@ internal class OnActionStartStateMachineTest {
             }
             inState<TestState.CounterState> {
                 onActionStartStateMachine<TestAction.A4, TestState, TestAction>(
-                    stateMachineFactory = { action, inputState ->
-                        factoryParamsRecordings += pairOf(action, inputState)
+                    stateMachineFactoryBuilder = { action ->
+                        factoryParamsRecordings += pairOf(action, snapshot)
                         child
                     },
                     actionMapper = {
                         actionMapperRecordings += it
                         it
                     },
-                    stateMapper = { subState ->
-                        stateMapperRecordings += pairOf(snapshot, subState)
+                    handler = { subState ->
+                        handlerRecordings += pairOf(snapshot, subState)
                         if (subState is TestState.S3) {
                             override { TestState.S3 }
                         } else {
@@ -190,7 +165,6 @@ internal class OnActionStartStateMachineTest {
             //
             assertEquals(TestState.CounterState(0), awaitItem()) // initial state
             assertEquals(emptyList(), factoryParamsRecordings) // factory should not have been invoked
-            assertEquals(0, child.stateFlowStarted)
 
             //
             // Dispatch action to start child state machine and check factory
@@ -204,14 +178,12 @@ internal class OnActionStartStateMachineTest {
                 ),
                 factoryParamsRecordings,
             )
-            assertEquals(1, child.stateFlowStarted)
-            assertEquals(0, child.stateFlowCompleted)
             assertEquals(emptyList(), actionMapperRecordings)
             assertEquals(
                 listOf<Pair<TestState, TestState>>(
                     pairOf(initialState, TestState.S1),
                 ),
-                stateMapperRecordings,
+                handlerRecordings,
             )
 
             //
@@ -225,14 +197,12 @@ internal class OnActionStartStateMachineTest {
                     pairOf(initialState, TestState.S1),
                     pairOf(TestState.CounterState(1), TestState.S2),
                 ),
-                stateMapperRecordings,
+                handlerRecordings,
             )
             // action mapper checks
             assertEquals(listOf<TestAction>(TestAction.A3), actionMapperRecordings)
             // factory checks
             assertEquals(1, factoryParamsRecordings.size) // factory not invoked
-            assertEquals(1, child.stateFlowStarted)
-            assertEquals(0, child.stateFlowCompleted)
 
             //
             // Dispatch another action that is forwarded to child state machine which
@@ -247,22 +217,19 @@ internal class OnActionStartStateMachineTest {
                     pairOf(TestState.CounterState(1), TestState.S2),
                     pairOf(TestState.CounterState(2), TestState.S3),
                 ),
-                stateMapperRecordings,
+                handlerRecordings,
             )
             // action mapper checks
             assertEquals(listOf(TestAction.A3, TestAction.A2), actionMapperRecordings)
             // factory checks
             assertEquals(1, factoryParamsRecordings.size) // factory not invoked
-            // child should be canceled because inState condition does not hold anymore
-            assertEquals(1, child.stateFlowStarted)
-            assertEquals(1, child.stateFlowCompleted)
 
             //
             // Clear up stuff for validation of next re-entrance and child state machine starts
             //
             factoryParamsRecordings.clear()
             actionMapperRecordings.clear()
-            stateMapperRecordings.clear()
+            handlerRecordings.clear()
 
             //
             // Re-enter the state again
@@ -273,9 +240,6 @@ internal class OnActionStartStateMachineTest {
             assertEquals(emptyList(), actionMapperRecordings)
             // factory checks
             assertEquals(emptyList(), factoryParamsRecordings) // factory not invoked
-            // child should not have changed since before
-            assertEquals(1, child.stateFlowStarted)
-            assertEquals(1, child.stateFlowCompleted)
 
             //
             // Dispatch action to start child state machine
@@ -290,8 +254,6 @@ internal class OnActionStartStateMachineTest {
                 ),
                 factoryParamsRecordings,
             )
-            assertEquals(2, child.stateFlowStarted)
-            assertEquals(1, child.stateFlowCompleted)
             // check action mapper (not changed since last check)
             assertEquals(emptyList(), actionMapperRecordings)
             // check state mapper
@@ -299,7 +261,7 @@ internal class OnActionStartStateMachineTest {
                 listOf<Pair<TestState, TestState>>(
                     pairOf(TestState.CounterState(10), TestState.S1),
                 ),
-                stateMapperRecordings,
+                handlerRecordings,
             )
 
             //
@@ -313,14 +275,12 @@ internal class OnActionStartStateMachineTest {
                     pairOf(TestState.CounterState(10), TestState.S1),
                     pairOf(TestState.CounterState(11), TestState.S2),
                 ),
-                stateMapperRecordings,
+                handlerRecordings,
             )
             // action mapper checks
             assertEquals(listOf<TestAction>(TestAction.A3), actionMapperRecordings)
             // factory checks
             assertEquals(1, factoryParamsRecordings.size) // factory not invoked
-            assertEquals(2, child.stateFlowStarted)
-            assertEquals(1, child.stateFlowCompleted)
         }
     }
 
@@ -329,7 +289,7 @@ internal class OnActionStartStateMachineTest {
         val childActionInvocations = Channel<Unit>(Channel.UNLIMITED)
         val parentActionInvocations = Channel<Unit>(Channel.UNLIMITED)
 
-        val child = StateMachine(initialState = TestState.S1) {
+        val child = StateMachineFactory(initialState = TestState.S1) {
             inState<TestState> {
                 on<TestAction> {
                     childActionInvocations.send(Unit)
@@ -341,9 +301,7 @@ internal class OnActionStartStateMachineTest {
         val parent = StateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
                 onActionStartStateMachine<TestAction.A4, TestState, TestAction>(
-                    stateMachineFactory = { _, _ ->
-                        child
-                    },
+                    stateMachineFactoryBuilder = { child },
                     actionMapper = {
                         when (it) {
                             TestAction.A1 -> it
@@ -371,8 +329,6 @@ internal class OnActionStartStateMachineTest {
             // dispatch action to start child state machine and check factory
             //
             parent.dispatch(TestAction.A4(1))
-            assertEquals(1, child.stateFlowStarted)
-            assertEquals(0, child.stateFlowCompleted)
 
             // dispatch mapped A1 action
             parent.dispatch(TestAction.A1)
