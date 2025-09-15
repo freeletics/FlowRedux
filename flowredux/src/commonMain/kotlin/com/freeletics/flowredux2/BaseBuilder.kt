@@ -8,7 +8,6 @@ import com.freeletics.flowredux2.sideeffects.OnEnterStartStateMachine
 import com.freeletics.flowredux2.sideeffects.SideEffect
 import com.freeletics.flowredux2.sideeffects.SideEffectBuilder
 import com.freeletics.flowredux2.util.FlowReduxDsl
-import com.freeletics.khonshu.statemachine.StateMachine
 import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -223,107 +222,70 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     }
 
     public fun <SubStateMachineState : Any> onEnterStartStateMachine(
-        stateMachine: StateMachine<SubStateMachineState, A>,
-        @Suppress("UNCHECKED_CAST")
-        stateMapper: ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S> = { OverrideState(it as S) },
+        stateMachineFactoryBuilder: State<InputState>.() -> FlowReduxStateMachineFactory<SubStateMachineState, A>,
+        handler: suspend ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
     ) {
         onEnterStartStateMachine(
-            stateMachineFactory = { stateMachine },
+            stateMachineFactoryBuilder = stateMachineFactoryBuilder,
             actionMapper = { it },
-            stateMapper = stateMapper,
-        )
-    }
-
-    public fun <SubStateMachineState : Any> onEnterStartStateMachine(
-        stateMachineFactory: (InputState) -> StateMachine<SubStateMachineState, A>,
-        @Suppress("UNCHECKED_CAST")
-        stateMapper: ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S> = { OverrideState(it as S) },
-    ) {
-        onEnterStartStateMachine(
-            stateMachineFactory = stateMachineFactory,
-            actionMapper = { it },
-            stateMapper = stateMapper,
+            handler = handler,
         )
     }
 
     public fun <SubStateMachineState : Any, SubStateMachineAction : Any> onEnterStartStateMachine(
-        stateMachine: StateMachine<SubStateMachineState, SubStateMachineAction>,
+        stateMachineFactoryBuilder: State<InputState>.() -> FlowReduxStateMachineFactory<SubStateMachineState, SubStateMachineAction>,
         actionMapper: (A) -> SubStateMachineAction?,
-        @Suppress("UNCHECKED_CAST")
-        stateMapper: ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S> = { OverrideState(it as S) },
-    ) {
-        onEnterStartStateMachine(
-            stateMachineFactory = { stateMachine },
-            actionMapper = actionMapper,
-            stateMapper = stateMapper,
-        )
-    }
-
-    public fun <SubStateMachineState : Any, SubStateMachineAction : Any> onEnterStartStateMachine(
-        stateMachineFactory: (InputState) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
-        actionMapper: (A) -> SubStateMachineAction?,
-        @Suppress("UNCHECKED_CAST")
-        stateMapper: ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S> = { OverrideState(it as S) },
+        handler: suspend ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) { initialState ->
             OnEnterStartStateMachine(
                 isInState = sideEffectIsInState(initialState),
-                subStateMachine = stateMachineFactory(initialState),
+                subStateMachineFactory = ChangeableState(initialState).stateMachineFactoryBuilder(),
                 actionMapper = actionMapper,
-                stateMapper = stateMapper,
+                handler = handler,
             )
         }
     }
 
     public inline fun <reified SubAction : A, SubStateMachineState : Any> onActionStartStateMachine(
-        stateMachine: StateMachine<SubStateMachineState, A>,
-        noinline stateMapper: ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
+        noinline stateMachineFactoryBuilder: State<InputState>.(SubAction) -> FlowReduxStateMachineFactory<SubStateMachineState, A>,
+        noinline handler: suspend ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
     ) {
         onActionStartStateMachine(
-            stateMachineFactory = { _: SubAction, _: InputState -> stateMachine },
+            actionClass = SubAction::class,
+            stateMachineFactoryBuilder = stateMachineFactoryBuilder,
             actionMapper = { it },
-            stateMapper = stateMapper,
-        )
-    }
-
-    public inline fun <reified SubAction : A, SubStateMachineState : Any> onActionStartStateMachine(
-        noinline stateMachineFactory: (SubAction, InputState) -> StateMachine<SubStateMachineState, A>,
-        noinline stateMapper: ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
-    ) {
-        onActionStartStateMachine(
-            stateMachineFactory = stateMachineFactory,
-            actionMapper = { it },
-            stateMapper = stateMapper,
+            handler = handler,
         )
     }
 
     public inline fun <reified SubAction : A, SubStateMachineState : Any, SubStateMachineAction : Any> onActionStartStateMachine(
-        noinline stateMachineFactory: (SubAction, InputState) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
+        noinline stateMachineFactoryBuilder: State<InputState>.(SubAction) -> FlowReduxStateMachineFactory<SubStateMachineState, SubStateMachineAction>,
         noinline actionMapper: (A) -> SubStateMachineAction?,
-        noinline stateMapper: ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
+        noinline handler: suspend ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
     ) {
         onActionStartStateMachine(
             actionClass = SubAction::class,
-            stateMachineFactory = stateMachineFactory,
+            stateMachineFactoryBuilder = stateMachineFactoryBuilder,
             actionMapper = actionMapper,
-            stateMapper = stateMapper,
+            handler = handler,
         )
     }
 
     @PublishedApi
     internal fun <SubAction : A, SubStateMachineState : Any, SubStateMachineAction : Any> onActionStartStateMachine(
         actionClass: KClass<out SubAction>,
-        stateMachineFactory: (SubAction, InputState) -> StateMachine<SubStateMachineState, SubStateMachineAction>,
+        stateMachineFactoryBuilder: State<InputState>.(SubAction) -> FlowReduxStateMachineFactory<SubStateMachineState, SubStateMachineAction>,
         actionMapper: (A) -> SubStateMachineAction?,
-        stateMapper: ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
+        handler: suspend ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) {
             OnActionStartStateMachine(
                 isInState = sideEffectIsInState(it),
-                subStateMachineFactory = stateMachineFactory,
+                stateMachineFactoryBuilder = stateMachineFactoryBuilder,
                 subActionClass = actionClass,
                 actionMapper = actionMapper,
-                stateMapper = stateMapper,
+                handler = handler,
             )
         }
     }

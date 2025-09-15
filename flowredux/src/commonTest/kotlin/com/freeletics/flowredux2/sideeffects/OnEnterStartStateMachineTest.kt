@@ -1,12 +1,14 @@
 package com.freeletics.flowredux2.sideeffects
 
+import app.cash.turbine.Turbine
 import app.cash.turbine.awaitItem
 import app.cash.turbine.test
 import com.freeletics.flowredux2.FlowReduxBuilder
-import com.freeletics.flowredux2.LegacyFlowReduxStateMachine
+import com.freeletics.flowredux2.FlowReduxStateMachineFactory
 import com.freeletics.flowredux2.StateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
+import com.freeletics.flowredux2.initializeWith
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -22,7 +24,7 @@ internal class OnEnterStartStateMachineTest {
         val child = childStateMachine(initialState = TestState.S3) { }
         val stateMachine = StateMachine {
             inState<TestState.Initial> {
-                onEnterStartStateMachine(child)
+                onEnterStartStateMachine({ child }) { override { it } }
             }
         }
 
@@ -58,7 +60,7 @@ internal class OnEnterStartStateMachineTest {
         val parent = StateMachine {
             inState<TestState.Initial> {
                 onEnterStartStateMachine(
-                    stateMachine = child,
+                    stateMachineFactoryBuilder = { child },
                     actionMapper = { it },
                 ) { subStateMachineState ->
                     receivedChildStateUpdates += subStateMachineState
@@ -87,6 +89,8 @@ internal class OnEnterStartStateMachineTest {
             parent.dispatchAsync(TestAction.A1)
             assertEquals(TestState.S2, awaitItem())
 
+            parent.dispatch(TestAction.A1)
+
             assertEquals(1, inS3onA1Action)
             assertEquals(0, inS2OnA1Action)
             assertEquals(listOf(TestState.S3, TestState.S1), receivedChildStateUpdates)
@@ -113,14 +117,14 @@ internal class OnEnterStartStateMachineTest {
         val sm = StateMachine(initialState = TestState.GenericState("generic", 0)) {
             inState<TestState.GenericState> {
                 onEnterStartStateMachine(
-                    stateMachineFactory = {
+                    stateMachineFactoryBuilder = {
                         launch {
                             factoryInvocations.send(Unit)
                         }
                         child
                     },
                     actionMapper = { it },
-                    stateMapper = { noChange() },
+                    handler = { noChange() },
                 )
 
                 on<TestAction.A1> {
@@ -162,14 +166,14 @@ internal class OnEnterStartStateMachineTest {
         val sm = StateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
                 onEnterStartStateMachine(
-                    stateMachineFactory = {
+                    stateMachineFactoryBuilder = {
                         launch {
                             factoryInvocations.send(Unit)
                         }
                         child
                     },
                     actionMapper = { it },
-                    stateMapper = { noChange() },
+                    handler = { noChange() },
                 )
 
                 on<TestAction.A1> {
@@ -224,7 +228,7 @@ internal class OnEnterStartStateMachineTest {
 
         val sm = StateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
-                onEnterStartStateMachine(child)
+                onEnterStartStateMachine({ child }) { override { it } }
                 on<TestAction.A2> { override { TestState.S2 } }
             }
             inState<TestState.S2> {
@@ -273,7 +277,7 @@ internal class OnEnterStartStateMachineTest {
         val sm = StateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
                 onEnterStartStateMachine(
-                    stateMachine = child,
+                    stateMachineFactoryBuilder = { child },
                     actionMapper = {
                         when (it) {
                             TestAction.A1 -> it
@@ -282,7 +286,7 @@ internal class OnEnterStartStateMachineTest {
                             is TestAction.A4 -> null
                         }
                     },
-                )
+                ) { override { it } }
                 on<TestAction> {
                     parentActionInvocations.send(Unit)
                     noChange()
@@ -319,20 +323,20 @@ internal class OnEnterStartStateMachineTest {
     }
 
     @Test
-    fun reenteringStateSoThatSubStateMachineTriggersWorksWithSameChildInstate() = runTest {
-        var childOnEnterS2 = 0
-        var childActionA2 = 0
-        var parentS2 = 0
-        var childFactory = 0
+    fun reenteringStateSoThatSubStateMachineTriggersWorksWithSameChildInState() = runTest {
+        val childOnEnterS2 = Turbine<Unit>()
+        val childActionA2 = Turbine<Unit>()
+        val parentS2 = Turbine<Unit>()
+        val childFactory = Turbine<Unit>()
 
         val child = childStateMachine(initialState = TestState.S2) {
             inState<TestState.S2> {
                 onEnter {
-                    childOnEnterS2++
+                    childOnEnterS2.add(Unit)
                     noChange()
                 }
                 on<TestAction.A2> {
-                    childActionA2++
+                    childActionA2.add(Unit)
                     override { TestState.S1 }
                 }
             }
@@ -343,14 +347,14 @@ internal class OnEnterStartStateMachineTest {
                 on<TestAction.A1> { override { TestState.S2 } }
             }
             inState<TestState.S2> {
-                onEnterEffect { parentS2++ }
+                onEnterEffect { parentS2.add(Unit) }
                 onEnterStartStateMachine(
-                    stateMachineFactory = {
-                        childFactory++
+                    stateMachineFactoryBuilder = {
+                        childFactory.add(Unit)
                         child
                     },
                     actionMapper = { it },
-                    stateMapper = { childState -> override { childState } },
+                    handler = { childState -> override { childState } },
                 )
             }
         }
@@ -363,15 +367,15 @@ internal class OnEnterStartStateMachineTest {
                 // move to S2
                 sm.dispatch(TestAction.A1)
                 assertEquals(TestState.S2, awaitItem())
-                assertEquals(i, parentS2)
-                assertEquals(i, childOnEnterS2)
-                assertEquals(i, childFactory)
+                assertEquals(Unit, parentS2.awaitItem())
+                assertEquals(Unit, childFactory.awaitItem())
+                assertEquals(Unit, childOnEnterS2.awaitItem())
 
                 // dispatch action to child and move back to S1
                 sm.dispatch(TestAction.A2)
                 assertEquals(TestState.S1, awaitItem())
-                assertEquals(i, childActionA2)
-                assertEquals(i, childOnEnterS2)
+                assertEquals(Unit, childActionA2.awaitItem())
+                childFactory.expectNoEvents()
             }
         }
     }
@@ -379,9 +383,10 @@ internal class OnEnterStartStateMachineTest {
     private fun childStateMachine(
         initialState: TestState = TestState.Initial,
         builderBlock: FlowReduxBuilder<TestState, TestAction>.() -> Unit,
-    ): LegacyFlowReduxStateMachine<TestState, TestAction> {
-        return object : LegacyFlowReduxStateMachine<TestState, TestAction>(initialState) {
+    ): FlowReduxStateMachineFactory<TestState, TestAction> {
+        return object : FlowReduxStateMachineFactory<TestState, TestAction>() {
             init {
+                initializeWith(reuseLastEmittedStateOnLaunch = false) { initialState }
                 spec(builderBlock)
             }
         }

@@ -48,21 +48,21 @@ class InternalPaginationStateMachineFactory(
                     onEnter { showPaginationErrorFor3SecsThenReset() }
                 }
 
-                onActionStartStateMachine(
-                    stateMachineFactory = { action: ToggleFavoriteAction, state: ShowContentPaginationState ->
-                        val repo = state.items.find { it.id == action.id }!!
+                onActionStartStateMachine<ToggleFavoriteAction, GithubRepository>(
+                    stateMachineFactoryBuilder = { action ->
+                        val repo = snapshot.items.find { it.id == action.id }!!
                         MarkAsFavoriteStateMachine(
                             githubApi = githubApi,
                             repository = repo,
                         )
                     },
-                ) { childState: GithubRepository ->
+                ) {
                     mutate {
                         copy(
                             items = items
                                 .map { repoItem ->
-                                    if (repoItem.id == childState.id) {
-                                        childState
+                                    if (repoItem.id == it.id) {
+                                        it
                                     } else {
                                         repoItem
                                     }
