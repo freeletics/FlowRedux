@@ -1,7 +1,7 @@
 package com.freeletics.flowredux2.sideeffects
 
 import app.cash.turbine.test
-import com.freeletics.flowredux2.StateMachine
+import com.freeletics.flowredux2.stateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
 import kotlin.test.Test
@@ -20,7 +20,7 @@ internal class CollectWhileEffectTest {
     fun doesNotEmitState() = runTest {
         val values = MutableSharedFlow<Int>()
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 collectWhileInStateEffect(values) { v ->
                 }
@@ -43,7 +43,7 @@ internal class CollectWhileEffectTest {
         val values = MutableSharedFlow<Int>()
         val recordedValues = Channel<Int>(Channel.UNLIMITED)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 collectWhileInStateEffect(values) { v ->
                     recordedValues.send(v)
@@ -74,7 +74,7 @@ internal class CollectWhileEffectTest {
         val values = MutableSharedFlow<Int>()
         val recordedValues = Channel<String>(Channel.UNLIMITED)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 onEnter {
                     override { TestState.GenericState("a", 0) }

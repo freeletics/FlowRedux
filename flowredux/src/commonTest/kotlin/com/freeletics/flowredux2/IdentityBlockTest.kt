@@ -19,7 +19,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericState("asd", 1)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -65,7 +65,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericState("asd", 1)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -109,7 +109,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericState("asd", 1)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -176,7 +176,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericState("asd", 1)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -229,7 +229,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericNullableState(null, null)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -273,7 +273,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericNullableState(null, null)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -317,7 +317,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericNullableState(null, null)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -384,7 +384,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericNullableState(null, null)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }

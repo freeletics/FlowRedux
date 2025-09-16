@@ -2,7 +2,7 @@ package com.freeletics.flowredux2.sideeffects
 
 import app.cash.turbine.awaitItem
 import app.cash.turbine.test
-import com.freeletics.flowredux2.StateMachine
+import com.freeletics.flowredux2.stateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
 import com.freeletics.flowredux2.dispatchAsync
@@ -22,7 +22,7 @@ internal class OnEnterTest {
         val blockEntered = Channel<Boolean>(Channel.UNLIMITED)
         var cancellation: Throwable? = null
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 onEnter {
                     blockEntered.send(true)
@@ -54,7 +54,7 @@ internal class OnEnterTest {
         var genericStateEntered = 0
         var a1Received = 0
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 onEnter {
                     override { TestState.GenericState("from initial", 0) }

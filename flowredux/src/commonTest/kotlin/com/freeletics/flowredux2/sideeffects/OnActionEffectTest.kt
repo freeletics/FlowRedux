@@ -3,7 +3,7 @@ package com.freeletics.flowredux2.sideeffects
 import app.cash.turbine.awaitComplete
 import app.cash.turbine.awaitItem
 import app.cash.turbine.test
-import com.freeletics.flowredux2.StateMachine
+import com.freeletics.flowredux2.stateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
 import com.freeletics.flowredux2.dispatchAsync
@@ -20,7 +20,7 @@ import kotlinx.coroutines.test.runTest
 internal class OnActionEffectTest {
     @Test
     fun doesNotEmitState() = runTest {
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 onActionEffect<TestAction.A1> {
                 }
@@ -38,7 +38,7 @@ internal class OnActionEffectTest {
         val blockEntered = Channel<Boolean>(Channel.UNLIMITED)
         var cancellation: Throwable? = null
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 onActionEffect<TestAction.A1> {
                     blockEntered.send(true)
@@ -71,7 +71,7 @@ internal class OnActionEffectTest {
         val signal = Channel<Unit>()
         val triggered = Channel<Boolean>(Channel.UNLIMITED)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 onActionEffect<TestAction.A1> {
                     triggered.send(true)

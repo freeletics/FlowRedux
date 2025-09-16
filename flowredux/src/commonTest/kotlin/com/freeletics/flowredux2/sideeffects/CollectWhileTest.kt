@@ -1,7 +1,7 @@
 package com.freeletics.flowredux2.sideeffects
 
 import app.cash.turbine.test
-import com.freeletics.flowredux2.StateMachine
+import com.freeletics.flowredux2.stateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
 import com.freeletics.flowredux2.dispatchAsync
@@ -22,7 +22,7 @@ internal class CollectWhileTest {
         val values = MutableSharedFlow<Int>()
         val recordedValues = Channel<Int>(Channel.UNLIMITED)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 collectWhileInState(values) { v ->
                     recordedValues.send(v)
@@ -49,7 +49,7 @@ internal class CollectWhileTest {
         val values = MutableSharedFlow<Int>()
         val recordedValues = Channel<Int>(Channel.UNLIMITED)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 collectWhileInState({ values }) { v ->
                     recordedValues.send(v)
@@ -73,7 +73,7 @@ internal class CollectWhileTest {
 
     @Test
     fun moveFromCollectWhileInStateToNextStateWithAction() = runTest {
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 collectWhileInState(flowOf(1)) {
                     override { TestState.S1 }
@@ -113,7 +113,7 @@ internal class CollectWhileTest {
 
     @Test
     fun moveFromCollectWhileInStateWithBuilderToNextStateWithAction() = runTest {
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 collectWhileInState({ flowOf(1) }) {
                     override { TestState.S1 }
@@ -153,7 +153,7 @@ internal class CollectWhileTest {
 
     @Test
     fun collectWhileInStateWithBuilderReceivesInitialState() = runTest {
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 onEnter {
                     override { TestState.GenericState("", 1) }

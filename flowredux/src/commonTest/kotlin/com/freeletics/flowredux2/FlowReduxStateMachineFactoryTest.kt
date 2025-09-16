@@ -3,19 +3,15 @@ package com.freeletics.flowredux2
 import app.cash.turbine.test
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.fail
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class FlowReduxStateMachineFactoryTest {
     @Test
     fun emptyStateMachineJustEmitsInitialState() = runTest {
-        val sm = StateMachine { }
+        val sm = stateMachine { }
         sm.state.test {
             assertEquals(TestState.Initial, awaitItem())
         }
@@ -33,7 +29,8 @@ internal class FlowReduxStateMachineFactoryTest {
             sm.launchIn(backgroundScope)
             fail("Exception expected to be thrown")
         } catch (e: IllegalStateException) {
-            val expected = """
+            val expected =
+                """
                 No initial state for the state machine was specified, did you call one of the initializeWith()
                 methods?
 
@@ -46,7 +43,7 @@ internal class FlowReduxStateMachineFactoryTest {
                         }
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
             assertEquals(expected, e.message)
         }
     }
@@ -86,7 +83,8 @@ internal class FlowReduxStateMachineFactoryTest {
             sm.launchIn(backgroundScope)
             fail("Exception expected to be thrown")
         } catch (e: IllegalStateException) {
-            val expected = """
+            val expected =
+                """
                 No state machine specs are defined. Did you call spec { ... } in init {...}?
                 Example usage:
 
@@ -102,7 +100,7 @@ internal class FlowReduxStateMachineFactoryTest {
                         }
                     }
                 }
-            """.trimIndent()
+                """.trimIndent()
             assertEquals(expected, e.message)
         }
     }

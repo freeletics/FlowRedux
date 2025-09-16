@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal fun TestScope.StateMachine(
+internal fun TestScope.stateMachine(
     initialState: TestState = TestState.Initial,
     specBlock: FlowReduxBuilder<TestState, TestAction>.() -> Unit = {},
 ): FlowReduxStateMachine<SharedFlow<TestState>, TestAction> {

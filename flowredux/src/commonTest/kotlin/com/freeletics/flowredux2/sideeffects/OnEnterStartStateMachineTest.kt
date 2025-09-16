@@ -5,7 +5,7 @@ import app.cash.turbine.awaitItem
 import app.cash.turbine.test
 import com.freeletics.flowredux2.FlowReduxBuilder
 import com.freeletics.flowredux2.FlowReduxStateMachineFactory
-import com.freeletics.flowredux2.StateMachine
+import com.freeletics.flowredux2.stateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
 import com.freeletics.flowredux2.dispatchAsync
@@ -23,7 +23,7 @@ internal class OnEnterStartStateMachineTest {
     @Test
     fun childStateMachineEmitsInitialStateToParentStateMachine() = runTest {
         val child = childStateMachine(initialState = TestState.S3) { }
-        val stateMachine = StateMachine {
+        val stateMachine = stateMachine {
             inState<TestState.Initial> {
                 onEnterStartStateMachine({ child }) { override { it } }
             }
@@ -58,7 +58,7 @@ internal class OnEnterStartStateMachineTest {
             }
         }
 
-        val parent = StateMachine {
+        val parent = stateMachine {
             inState<TestState.Initial> {
                 onEnterStartStateMachine(
                     stateMachineFactoryBuilder = { child },
@@ -115,7 +115,7 @@ internal class OnEnterStartStateMachineTest {
             }
         }
 
-        val sm = StateMachine(initialState = TestState.GenericState("generic", 0)) {
+        val sm = stateMachine(initialState = TestState.GenericState("generic", 0)) {
             inState<TestState.GenericState> {
                 onEnterStartStateMachine(
                     stateMachineFactoryBuilder = {
@@ -164,7 +164,7 @@ internal class OnEnterStartStateMachineTest {
             }
         }
 
-        val sm = StateMachine(initialState = TestState.S1) {
+        val sm = stateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
                 onEnterStartStateMachine(
                     stateMachineFactoryBuilder = {
@@ -227,7 +227,7 @@ internal class OnEnterStartStateMachineTest {
             }
         }
 
-        val sm = StateMachine(initialState = TestState.S1) {
+        val sm = stateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
                 onEnterStartStateMachine({ child }) { override { it } }
                 on<TestAction.A2> { override { TestState.S2 } }
@@ -275,7 +275,7 @@ internal class OnEnterStartStateMachineTest {
             }
         }
 
-        val sm = StateMachine(initialState = TestState.S1) {
+        val sm = stateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
                 onEnterStartStateMachine(
                     stateMachineFactoryBuilder = { child },
@@ -343,7 +343,7 @@ internal class OnEnterStartStateMachineTest {
             }
         }
 
-        val sm = StateMachine(initialState = TestState.S1) {
+        val sm = stateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
                 on<TestAction.A1> { override { TestState.S2 } }
             }

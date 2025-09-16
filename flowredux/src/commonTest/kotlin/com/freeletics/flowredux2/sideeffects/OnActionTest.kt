@@ -4,7 +4,7 @@ import app.cash.turbine.awaitItem
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
 import com.freeletics.flowredux2.ExecutionPolicy
-import com.freeletics.flowredux2.StateMachine
+import com.freeletics.flowredux2.stateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
 import com.freeletics.flowredux2.dispatchAsync
@@ -30,7 +30,7 @@ internal class OnActionTest {
         val blockEntered = Channel<Boolean>()
         var cancellation: Throwable? = null
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     blockEntered.send(true)
@@ -60,7 +60,7 @@ internal class OnActionTest {
 
     @Test
     fun onActionGetsTriggeredAndMovesToNextState() = runTest {
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { TestState.S1 }
@@ -86,7 +86,7 @@ internal class OnActionTest {
     @Test
     fun onActionOrdered() = runTest {
         turbineScope {
-            val sm = StateMachine(TestState.GenericNullableState(null, null)) {
+            val sm = stateMachine(TestState.GenericNullableState(null, null)) {
                 inState<TestState.GenericNullableState> {
                     on<TestAction.A1>(executionPolicy = ExecutionPolicy.Ordered) {
                         mutate { copy(aString = "1") }
@@ -115,7 +115,7 @@ internal class OnActionTest {
     fun onActionThrottled() = runTest {
         val timeSource = TestTimeSource()
         turbineScope {
-            val sm = StateMachine(TestState.GenericNullableState(null, null)) {
+            val sm = stateMachine(TestState.GenericNullableState(null, null)) {
                 inState<TestState.GenericNullableState> {
                     on<TestAction.A1>(executionPolicy = ExecutionPolicy.Throttled(500.milliseconds, timeSource)) {
                         mutate { copy(aString = (aString ?: "") + "1") }
@@ -173,7 +173,7 @@ internal class OnActionTest {
         val timeSource = TestTimeSource()
         val startTime = timeSource.markNow()
         turbineScope {
-            val sm = StateMachine(TestState.GenericNullableState(null, null)) {
+            val sm = stateMachine(TestState.GenericNullableState(null, null)) {
                 inState<TestState.GenericNullableState> {
                     on<TestAction.A1>(executionPolicy = ExecutionPolicy.Throttled(500.milliseconds, timeSource)) {
                         while (startTime.elapsedNow() < 600.milliseconds) {
