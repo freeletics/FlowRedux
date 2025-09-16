@@ -31,8 +31,6 @@ kotlin {
                 get(it).dependsOn(compose)
             }
         }
-
-        get("androidMain").dependsOn(get("jvmMain"))
     }
 }
 
