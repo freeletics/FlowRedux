@@ -1,30 +1,9 @@
-@font-face {
-    font-family: aktiv-grotesk;
-    src: url("https://assets.freeletics.com/packages/web-package-particle/fonts-v1/aktivgrotesk/aktivgrotesk-rg.woff2") format("woff2");
-    font-weight: 400;
-    font-style: normal
-}
-
-@font-face {
-    font-family: aktiv-grotesk;
-    src: url("https://assets.freeletics.com/packages/web-package-particle/fonts-v1/aktivgrotesk/aktivgrotesk-md.woff2") format("woff2");
-    font-weight: 500;
-    font-style: normal
-}
-
-@font-face {
-    font-family: aktiv-grotesk;
-    src: url("https://assets.freeletics.com/packages/web-package-particle/fonts-v1/aktivgrotesk/aktivgrotesk-bd.woff2") format("woff2");
-    font-weight: 700;
-    font-style: normal
-}
-
 body, input {
-    font-family: aktiv-grotesk,"Helvetica Neue",helvetica,sans-serif;
+    font-family: "Helvetica Neue",helvetica,sans-serif;
 }
 
 .md-typeset h1, .md-typeset h2, .md-typeset h3, .md-typeset h4 {
-    font-family: aktiv-grotesk,"Helvetica Neue",helvetica,sans-serif;
+    font-family: "Helvetica Neue",helvetica,sans-serif;
     line-height: normal;
     font-weight: bold;
     color: #283237;
