@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.freeletics.flowredux2.StateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
+import com.freeletics.flowredux2.dispatchAsync
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs

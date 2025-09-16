@@ -38,7 +38,6 @@ kotlin {
 
 dependencies {
     commonMainApi(libs.coroutines.core)
-    commonMainApi(libs.statemachine)
     "composeMainApi"(libs.jetbrains.compose.runtime)
     "composeMainCompileOnly"(libs.androidx.viewmodel.savedstate)
 
