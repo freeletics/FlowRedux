@@ -14,17 +14,11 @@ public abstract class com/freeletics/flowredux2/BaseBuilder {
 	public static synthetic fun collectWhileInStateEffect$default (Lcom/freeletics/flowredux2/BaseBuilder;Lkotlinx/coroutines/flow/Flow;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
 	public final fun on (Lkotlin/reflect/KClass;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;)V
 	public final fun onActionEffect (Lkotlin/reflect/KClass;Lcom/freeletics/flowredux2/ExecutionPolicy;Lkotlin/jvm/functions/Function3;)V
-	public final fun onActionStartStateMachine (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V
+	public final fun onActionStartStateMachine (Lkotlin/reflect/KClass;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)V
 	public final fun onEnter (Lkotlin/jvm/functions/Function2;)V
 	public final fun onEnterEffect (Lkotlin/jvm/functions/Function2;)V
-	public final fun onEnterStartStateMachine (Lcom/freeletics/khonshu/statemachine/StateMachine;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V
-	public final fun onEnterStartStateMachine (Lcom/freeletics/khonshu/statemachine/StateMachine;Lkotlin/jvm/functions/Function2;)V
-	public final fun onEnterStartStateMachine (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V
-	public final fun onEnterStartStateMachine (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;)V
-	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux2/BaseBuilder;Lcom/freeletics/khonshu/statemachine/StateMachine;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
-	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux2/BaseBuilder;Lcom/freeletics/khonshu/statemachine/StateMachine;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
-	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux2/BaseBuilder;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
-	public static synthetic fun onEnterStartStateMachine$default (Lcom/freeletics/flowredux2/BaseBuilder;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
+	public final fun onEnterStartStateMachine (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)V
+	public final fun onEnterStartStateMachine (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;)V
 }
 
 public final class com/freeletics/flowredux2/ChangeableState : com/freeletics/flowredux2/State {

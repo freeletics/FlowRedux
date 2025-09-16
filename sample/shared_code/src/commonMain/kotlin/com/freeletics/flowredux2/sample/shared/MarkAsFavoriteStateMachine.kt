@@ -2,7 +2,8 @@ package com.freeletics.flowredux2.sample.shared
 
 import com.freeletics.flowredux2.ChangeableState
 import com.freeletics.flowredux2.ChangedState
-import com.freeletics.flowredux2.LegacyFlowReduxStateMachine
+import com.freeletics.flowredux2.FlowReduxStateMachineFactory
+import com.freeletics.flowredux2.initializeWith
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 
@@ -10,12 +11,14 @@ import kotlinx.coroutines.delay
 class MarkAsFavoriteStateMachine(
     private val githubApi: GithubApi,
     repository: GithubRepository,
-) : LegacyFlowReduxStateMachine<GithubRepository, Action>(
-        initialState = repository.copy(favoriteStatus = FavoriteStatus.OPERATION_IN_PROGRESS),
-    ) {
+) : FlowReduxStateMachineFactory<GithubRepository, Action>() {
     private val favoriteStatusWhenStarting: FavoriteStatus = repository.favoriteStatus
 
     init {
+        initializeWith(reuseLastEmittedStateOnLaunch = false) {
+            repository.copy(favoriteStatus = FavoriteStatus.OPERATION_IN_PROGRESS)
+        }
+
         spec {
             inState<GithubRepository> {
                 condition({ it.favoriteStatus == FavoriteStatus.OPERATION_IN_PROGRESS }) {
