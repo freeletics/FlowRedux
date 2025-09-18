@@ -5,10 +5,10 @@ import app.cash.turbine.awaitItem
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
 import com.freeletics.flowredux2.ExecutionPolicy
-import com.freeletics.flowredux2.stateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
 import com.freeletics.flowredux2.dispatchAsync
+import com.freeletics.flowredux2.stateMachine
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs

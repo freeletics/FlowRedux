@@ -1,10 +1,10 @@
 package com.freeletics.flowredux2.sideeffects
 
 import app.cash.turbine.test
-import com.freeletics.flowredux2.stateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
 import com.freeletics.flowredux2.dispatchAsync
+import com.freeletics.flowredux2.stateMachine
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi

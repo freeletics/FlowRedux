@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.onEach
 
 /**
  * Internal operator to work with [ExecutionPolicy] more fluently
