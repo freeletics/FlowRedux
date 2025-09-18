@@ -3,6 +3,7 @@ package com.freeletics.flowredux2
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -31,4 +32,6 @@ internal class StateMachineFactory(
         initializeWith(reuseLastEmittedStateOnLaunch = false) { initialState }
         spec(specBlock)
     }
+
+    override val actionChannelCapacity: Int = Channel.RENDEZVOUS
 }
