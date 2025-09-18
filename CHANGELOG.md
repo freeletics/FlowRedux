@@ -1,6 +1,20 @@
 Change Log
 ==========
 
+## 2.0.0-alpha5 *(2024-09-22)*
+
+- `onEnterStartStateMachine` and `onActionStartStateMachine` have been updated to use
+  `FlowReduxStateMachineFactory` instead of `StateMachine`.
+- Simplified available overloads for `onEnterStartStateMachine` and `onActionStartStateMachine`.
+- Removed `LegacyFlowReduxStateMachine`.
+- Added new artifact `com.freeletics.flowredux2:flowredux-extensions:<version>` which initially
+  contains `onEnterLoadSmoothly`. This extension allows loading data while skipping showing a
+  loading indicator for fast loads and if a loading indicator is shown it will show it at least
+  for a minimum amount of time. This avoids the loading indicator just quickly flashing.
+- Updated Kotlin to 2.2.20.
+- Updated Compose to 1.9.0.
+
+
 ## 2.0.0-alpha4 *(2024-07-30)*
 
 - Added `shareIn` to `FlowReduxStateMachineFactory` to create a `FlowReduxStateMachine`
@@ -11,7 +25,7 @@ Change Log
 ## 2.0.0-alpha3 *(2024-07-29)*
 
 - Changed all `initializeWith` methods to be extension functions to prevent the compose and
-  Android specific extension fucntions from being hidden.
+  Android specific extension functions from being hidden.
 - Removed `initializeWith(S, Boolean)` for consistency, use `initializeWith(Boolean, () -> S)`
   instead.
 - Removed `initializeWithOnEachLaunch` which was already replaced with the boolean parameter on
