@@ -130,10 +130,10 @@ internal class OnActionTest {
     @Test
     fun onActionOrdered() = runTest {
         // longer timeouts for the wait signals because we want the received signal to actually fail and timeout
-        val firstActionWaitSignal = Turbine<Unit>(10.seconds)
-        val secondActionWaitSignal = Turbine<Unit>(10.seconds)
-        val firstActionReceivedSignal = Turbine<Unit>()
-        val secondActionReceivedSignal = Turbine<Unit>()
+        val firstActionWaitSignal = Turbine<Unit>(3.seconds)
+        val secondActionWaitSignal = Turbine<Unit>(3.seconds)
+        val firstActionReceivedSignal = Turbine<Unit>(3.seconds)
+        val secondActionReceivedSignal = Turbine<Unit>(1.seconds)
 
         turbineScope {
             val sm = stateMachine(TestState.GenericNullableState(null, null)) {
@@ -162,7 +162,7 @@ internal class OnActionTest {
                 secondActionReceivedSignal.awaitItem()
                 fail("Should never be reached")
             } catch (e: AssertionError) {
-                assertEquals("No value produced in 3s", e.message)
+                assertEquals("No value produced in 1s", e.message)
             }
             firstActionWaitSignal.add(Unit)
             secondActionReceivedSignal.awaitItem()
