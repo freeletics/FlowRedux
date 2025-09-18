@@ -1,5 +1,6 @@
 package com.freeletics.flowredux2.sideeffects
 
+import app.cash.turbine.Turbine
 import app.cash.turbine.awaitItem
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
@@ -172,10 +173,12 @@ internal class OnActionTest {
     fun onActionThrottledWithSlowHandlers() = runTest {
         val timeSource = TestTimeSource()
         val startTime = timeSource.markNow()
+        val receivedActionSignal = Turbine<Unit>()
         turbineScope {
             val sm = stateMachine(TestState.GenericNullableState(null, null)) {
                 inState<TestState.GenericNullableState> {
                     on<TestAction.A1>(executionPolicy = ExecutionPolicy.Throttled(500.milliseconds, timeSource)) {
+                        receivedActionSignal.add(Unit)
                         while (startTime.elapsedNow() < 600.milliseconds) {
                             delay(100)
                         }
@@ -189,12 +192,14 @@ internal class OnActionTest {
 
                 // immediately handles first actions
                 sm.dispatch(TestAction.A1)
+                receivedActionSignal.awaitItem()
 
                 timeSource += 500.milliseconds
                 sm.dispatch(TestAction.A1)
 
                 timeSource += 100.milliseconds
                 assertEquals(TestState.GenericNullableState("1", null), awaitItem())
+                ensureAllEventsConsumed()
 
                 sm.dispatch(TestAction.A1)
                 assertEquals(TestState.GenericNullableState("11", null), awaitItem())
