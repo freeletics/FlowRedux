@@ -1,17 +1,21 @@
 package com.freeletics.flowredux2.sideeffects
 
+import app.cash.turbine.Turbine
 import app.cash.turbine.awaitItem
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
 import com.freeletics.flowredux2.ExecutionPolicy
-import com.freeletics.flowredux2.StateMachine
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
+import com.freeletics.flowredux2.dispatchAsync
+import com.freeletics.flowredux2.stateMachine
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TestTimeSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +33,7 @@ internal class OnActionTest {
         val blockEntered = Channel<Boolean>()
         var cancellation: Throwable? = null
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     blockEntered.send(true)
@@ -59,7 +63,7 @@ internal class OnActionTest {
 
     @Test
     fun onActionGetsTriggeredAndMovesToNextState() = runTest {
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { TestState.S1 }
@@ -83,16 +87,25 @@ internal class OnActionTest {
     }
 
     @Test
-    fun onActionOrdered() = runTest {
-        turbineScope {
-            val sm = StateMachine(TestState.GenericNullableState(null, null)) {
-                inState<TestState.GenericNullableState> {
-                    on<TestAction.A1>(executionPolicy = ExecutionPolicy.Ordered) {
-                        mutate { copy(aString = "1") }
-                    }
+    fun onActionUnordered() = runTest {
+        val firstActionWaitSignal = Turbine<Unit>()
+        val secondActionWaitSignal = Turbine<Unit>()
+        val firstActionReceivedSignal = Turbine<Unit>()
+        val secondActionReceivedSignal = Turbine<Unit>()
 
-                    on<TestAction.A2>(executionPolicy = ExecutionPolicy.Ordered) {
-                        mutate { copy(anInt = 2) }
+        turbineScope {
+            val sm = stateMachine(TestState.GenericNullableState(null, null)) {
+                inState<TestState.GenericNullableState> {
+                    on<TestAction>(executionPolicy = ExecutionPolicy.Unordered) {
+                        if (it is TestAction.A1) {
+                            firstActionReceivedSignal.add(Unit)
+                            firstActionWaitSignal.awaitItem()
+                            mutate { copy(aString = "1") }
+                        } else {
+                            secondActionReceivedSignal.add(Unit)
+                            secondActionWaitSignal.awaitItem()
+                            mutate { copy(anInt = 2) }
+                        }
                     }
                 }
             }
@@ -100,9 +113,60 @@ internal class OnActionTest {
             val scope = CoroutineScope(context = Dispatchers.Unconfined)
             val turbine = sm.state.testIn(scope)
             scope.launch {
-                sm.dispatch(TestAction.A2)
                 sm.dispatch(TestAction.A1)
+                firstActionReceivedSignal.awaitItem()
+                sm.dispatch(TestAction.A2)
+                secondActionReceivedSignal.awaitItem()
+                secondActionWaitSignal.add(Unit)
+                firstActionWaitSignal.add(Unit)
             }
+
+            assertEquals(TestState.GenericNullableState(null, null), turbine.awaitItem())
+            assertEquals(TestState.GenericNullableState(null, 2), turbine.awaitItem())
+            assertEquals(TestState.GenericNullableState("1", 2), turbine.awaitItem())
+        }
+    }
+
+    @Test
+    fun onActionOrdered() = runTest {
+        // longer timeouts for the wait signals because we want the received signal to actually fail and timeout
+        val firstActionWaitSignal = Turbine<Unit>(3.seconds)
+        val secondActionWaitSignal = Turbine<Unit>(3.seconds)
+        val firstActionReceivedSignal = Turbine<Unit>(3.seconds)
+        val secondActionReceivedSignal = Turbine<Unit>(1.seconds)
+
+        turbineScope {
+            val sm = stateMachine(TestState.GenericNullableState(null, null)) {
+                inState<TestState.GenericNullableState> {
+                    on<TestAction>(executionPolicy = ExecutionPolicy.Ordered) {
+                        if (it is TestAction.A1) {
+                            firstActionReceivedSignal.add(Unit)
+                            firstActionWaitSignal.awaitItem()
+                            mutate { copy(aString = "1") }
+                        } else {
+                            secondActionReceivedSignal.add(Unit)
+                            secondActionWaitSignal.awaitItem()
+                            mutate { copy(anInt = 2) }
+                        }
+                    }
+                }
+            }
+
+            val scope = CoroutineScope(context = Dispatchers.Unconfined)
+            val turbine = sm.state.testIn(scope)
+            sm.dispatch(TestAction.A1)
+            firstActionReceivedSignal.awaitItem()
+            sm.dispatch(TestAction.A2)
+            // test that A2 is not received until A1 is done, this is what is guaranteed by Ordered
+            try {
+                secondActionReceivedSignal.awaitItem()
+                fail("Should never be reached")
+            } catch (e: AssertionError) {
+                assertEquals("No value produced in 1s", e.message)
+            }
+            firstActionWaitSignal.add(Unit)
+            secondActionReceivedSignal.awaitItem()
+            secondActionWaitSignal.add(Unit)
 
             assertEquals(TestState.GenericNullableState(null, null), turbine.awaitItem())
             assertEquals(TestState.GenericNullableState("1", null), turbine.awaitItem())
@@ -114,7 +178,7 @@ internal class OnActionTest {
     fun onActionThrottled() = runTest {
         val timeSource = TestTimeSource()
         turbineScope {
-            val sm = StateMachine(TestState.GenericNullableState(null, null)) {
+            val sm = stateMachine(TestState.GenericNullableState(null, null)) {
                 inState<TestState.GenericNullableState> {
                     on<TestAction.A1>(executionPolicy = ExecutionPolicy.Throttled(500.milliseconds, timeSource)) {
                         mutate { copy(aString = (aString ?: "") + "1") }
@@ -171,10 +235,12 @@ internal class OnActionTest {
     fun onActionThrottledWithSlowHandlers() = runTest {
         val timeSource = TestTimeSource()
         val startTime = timeSource.markNow()
+        val receivedActionSignal = Turbine<Unit>()
         turbineScope {
-            val sm = StateMachine(TestState.GenericNullableState(null, null)) {
+            val sm = stateMachine(TestState.GenericNullableState(null, null)) {
                 inState<TestState.GenericNullableState> {
                     on<TestAction.A1>(executionPolicy = ExecutionPolicy.Throttled(500.milliseconds, timeSource)) {
+                        receivedActionSignal.add(Unit)
                         while (startTime.elapsedNow() < 600.milliseconds) {
                             delay(100)
                         }
@@ -188,12 +254,14 @@ internal class OnActionTest {
 
                 // immediately handles first actions
                 sm.dispatch(TestAction.A1)
+                receivedActionSignal.awaitItem()
 
                 timeSource += 500.milliseconds
                 sm.dispatch(TestAction.A1)
 
                 timeSource += 100.milliseconds
                 assertEquals(TestState.GenericNullableState("1", null), awaitItem())
+                ensureAllEventsConsumed()
 
                 sm.dispatch(TestAction.A1)
                 assertEquals(TestState.GenericNullableState("11", null), awaitItem())

@@ -101,15 +101,6 @@ public final class com/freeletics/flowredux2/InStateBuilder : com/freeletics/flo
 	public final fun untilIdentityChanges (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V
 }
 
-public abstract class com/freeletics/flowredux2/LegacyFlowReduxStateMachine : com/freeletics/khonshu/statemachine/StateMachine {
-	public static final field $stable I
-	public fun <init> (Ljava/lang/Object;)V
-	public fun <init> (Lkotlin/jvm/functions/Function0;)V
-	public fun dispatch (Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public fun getState ()Lkotlinx/coroutines/flow/Flow;
-	protected final fun spec (Lkotlin/jvm/functions/Function1;)V
-}
-
 public abstract interface class com/freeletics/flowredux2/SaveableState {
 	public fun save (Landroidx/lifecycle/SavedStateHandle;)V
 }

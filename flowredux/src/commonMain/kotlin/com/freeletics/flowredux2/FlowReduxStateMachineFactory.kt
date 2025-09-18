@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.stateIn
 
 @ExperimentalCoroutinesApi
 public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
+    // exposed internally for testing where RENDEZVOUS results in more predictable tests
+    internal open val actionChannelCapacity = Channel.BUFFERED
+
     internal lateinit var stateHolder: StateHolder<S>
     internal lateinit var sideEffectBuilders: List<SideEffectBuilder<*, S, A>>
 
@@ -28,7 +31,7 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
     public fun launchIn(scope: CoroutineScope): FlowReduxStateMachine<StateFlow<S>, A> {
         checkInitialized()
 
-        val inputActions = Channel<A>(Channel.BUFFERED)
+        val inputActions = Channel<A>(actionChannelCapacity)
         val initialState = stateHolder.getState()
         val state = inputActions
             .receiveAsFlow()
@@ -42,7 +45,7 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
     public fun shareIn(scope: CoroutineScope): FlowReduxStateMachine<SharedFlow<S>, A> {
         checkInitialized()
 
-        val inputActions = Channel<A>(Channel.BUFFERED)
+        val inputActions = Channel<A>(actionChannelCapacity)
         val initialState = stateHolder.getState()
         val state = inputActions
             .receiveAsFlow()

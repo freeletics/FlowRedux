@@ -20,7 +20,7 @@ internal class ConditionBlockTest {
         val gs1 = TestState.GenericState("asd", 1)
         val gs2 = TestState.GenericState("foo", 2)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -65,7 +65,7 @@ internal class ConditionBlockTest {
         val gs1 = TestState.GenericState("asd", 1)
         val gs2 = TestState.GenericState("2", 2)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }

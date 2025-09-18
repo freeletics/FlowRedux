@@ -2,10 +2,11 @@ package com.freeletics.flowredux2.sideeffects
 
 import app.cash.turbine.awaitItem
 import app.cash.turbine.test
-import com.freeletics.flowredux2.StateMachine
 import com.freeletics.flowredux2.StateMachineFactory
 import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
+import com.freeletics.flowredux2.dispatchAsync
+import com.freeletics.flowredux2.stateMachine
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -19,7 +20,7 @@ internal class OnActionStartStateMachineTest {
     fun childStateMachineEmitsInitialStateToParentStateMachine() = runTest {
         var childStateChanged = 0
         val child = StateMachineFactory(initialState = TestState.S3)
-        val parentStateMachine = StateMachine {
+        val parentStateMachine = stateMachine {
             inState<TestState.Initial> {
                 onActionStartStateMachine<TestAction.A1, TestState>({ child }) { childState ->
                     childStateChanged++
@@ -61,7 +62,7 @@ internal class OnActionStartStateMachineTest {
             }
         }
 
-        val parentStateMachine = StateMachine(initialState = TestState.CounterState(0)) {
+        val parentStateMachine = stateMachine(initialState = TestState.CounterState(0)) {
             inState<TestState.CounterState> {
                 onActionStartStateMachine<TestAction.A1, TestState>({ child }) { childState ->
                     childStateChanged++
@@ -131,7 +132,7 @@ internal class OnActionStartStateMachineTest {
                 on<TestAction.A2> { override { TestState.S3 } }
             }
         }
-        val parent = StateMachine(initialState = initialState) {
+        val parent = stateMachine(initialState = initialState) {
             inState<TestState.S3> {
                 on<TestAction.A1> { override { TestState.CounterState(10) } }
             }
@@ -298,7 +299,7 @@ internal class OnActionStartStateMachineTest {
             }
         }
 
-        val parent = StateMachine(initialState = TestState.S1) {
+        val parent = stateMachine(initialState = TestState.S1) {
             inState<TestState.S1> {
                 onActionStartStateMachine<TestAction.A4, TestState, TestAction>(
                     stateMachineFactoryBuilder = { child },

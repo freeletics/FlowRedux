@@ -5,7 +5,6 @@ import com.freeletics.flowredux2.sideeffects.StateChangeCancellationException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlin.test.assertIsNot
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
@@ -19,7 +18,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericState("asd", 1)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -65,7 +64,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericState("asd", 1)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -109,7 +108,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericState("asd", 1)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -156,7 +155,7 @@ internal class IdentityBlockTest {
             signal.receive()
         }
 
-        assertEquals(5, cancellations.size)
+        assertEquals(4, cancellations.size)
         assertEquals(1, cancellations[0].first)
         assertIs<StateChangeCancellationException>(cancellations[0].second)
         assertEquals(2, cancellations[1].first)
@@ -165,9 +164,6 @@ internal class IdentityBlockTest {
         assertIs<StateChangeCancellationException>(cancellations[2].second)
         assertEquals(4, cancellations[3].first)
         assertIs<StateChangeCancellationException>(cancellations[3].second)
-        // this last cancellation comes when the state machine shuts down
-        assertEquals(5, cancellations[4].first)
-        assertIsNot<StateChangeCancellationException>(cancellations[4].second)
     }
 
     @Test
@@ -176,7 +172,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericState("asd", 1)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -217,10 +213,7 @@ internal class IdentityBlockTest {
             assertEquals(0, cancellations.size)
         }
 
-        assertEquals(1, cancellations.size)
-        // this cancellation comes when the state machine shuts down
-        assertEquals(1, cancellations[0].first)
-        assertIsNot<StateChangeCancellationException>(cancellations[0].second)
+        assertEquals(0, cancellations.size)
     }
 
     @Test
@@ -229,7 +222,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericNullableState(null, null)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -273,7 +266,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericNullableState(null, null)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -317,7 +310,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericNullableState(null, null)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -364,7 +357,7 @@ internal class IdentityBlockTest {
             signal.receive()
         }
 
-        assertEquals(5, cancellations.size)
+        assertEquals(4, cancellations.size)
         assertEquals(null, cancellations[0].first)
         assertIs<StateChangeCancellationException>(cancellations[0].second)
         assertEquals(1, cancellations[1].first)
@@ -373,9 +366,6 @@ internal class IdentityBlockTest {
         assertIs<StateChangeCancellationException>(cancellations[2].second)
         assertEquals(3, cancellations[3].first)
         assertIs<StateChangeCancellationException>(cancellations[3].second)
-        // this last cancellation comes when the state machine shuts down
-        assertEquals(4, cancellations[4].first)
-        assertIsNot<StateChangeCancellationException>(cancellations[4].second)
     }
 
     @Test
@@ -384,7 +374,7 @@ internal class IdentityBlockTest {
 
         val gs1 = TestState.GenericNullableState(null, null)
 
-        val sm = StateMachine {
+        val sm = stateMachine {
             inState<TestState.Initial> {
                 on<TestAction.A1> {
                     override { gs1 }
@@ -425,9 +415,6 @@ internal class IdentityBlockTest {
             assertEquals(0, cancellations.size)
         }
 
-        assertEquals(1, cancellations.size)
-        // this cancellation comes when the state machine shuts down
-        assertEquals(null, cancellations[0].first)
-        assertIsNot<StateChangeCancellationException>(cancellations[0].second)
+        assertEquals(0, cancellations.size)
     }
 }
