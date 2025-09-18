@@ -13,7 +13,9 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import kotlin.test.fail
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TestTimeSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -85,16 +87,25 @@ internal class OnActionTest {
     }
 
     @Test
-    fun onActionOrdered() = runTest {
+    fun onActionUnordered() = runTest {
+        val firstActionWaitSignal = Turbine<Unit>()
+        val secondActionWaitSignal = Turbine<Unit>()
+        val firstActionReceivedSignal = Turbine<Unit>()
+        val secondActionReceivedSignal = Turbine<Unit>()
+
         turbineScope {
             val sm = stateMachine(TestState.GenericNullableState(null, null)) {
                 inState<TestState.GenericNullableState> {
-                    on<TestAction.A1>(executionPolicy = ExecutionPolicy.Ordered) {
-                        mutate { copy(aString = "1") }
-                    }
-
-                    on<TestAction.A2>(executionPolicy = ExecutionPolicy.Ordered) {
-                        mutate { copy(anInt = 2) }
+                    on<TestAction>(executionPolicy = ExecutionPolicy.Unordered) {
+                        if (it is TestAction.A1) {
+                            firstActionReceivedSignal.add(Unit)
+                            firstActionWaitSignal.awaitItem()
+                            mutate { copy(aString = "1") }
+                        } else {
+                            secondActionReceivedSignal.add(Unit)
+                            secondActionWaitSignal.awaitItem()
+                            mutate { copy(anInt = 2) }
+                        }
                     }
                 }
             }
@@ -102,9 +113,60 @@ internal class OnActionTest {
             val scope = CoroutineScope(context = Dispatchers.Unconfined)
             val turbine = sm.state.testIn(scope)
             scope.launch {
-                sm.dispatch(TestAction.A2)
                 sm.dispatch(TestAction.A1)
+                firstActionReceivedSignal.awaitItem()
+                sm.dispatch(TestAction.A2)
+                secondActionReceivedSignal.awaitItem()
+                secondActionWaitSignal.add(Unit)
+                firstActionWaitSignal.add(Unit)
             }
+
+            assertEquals(TestState.GenericNullableState(null, null), turbine.awaitItem())
+            assertEquals(TestState.GenericNullableState(null, 2), turbine.awaitItem())
+            assertEquals(TestState.GenericNullableState("1", 2), turbine.awaitItem())
+        }
+    }
+
+    @Test
+    fun onActionOrdered() = runTest {
+        // longer timeouts for the wait signals because we want the received signal to actually fail and timeout
+        val firstActionWaitSignal = Turbine<Unit>(10.seconds)
+        val secondActionWaitSignal = Turbine<Unit>(10.seconds)
+        val firstActionReceivedSignal = Turbine<Unit>()
+        val secondActionReceivedSignal = Turbine<Unit>()
+
+        turbineScope {
+            val sm = stateMachine(TestState.GenericNullableState(null, null)) {
+                inState<TestState.GenericNullableState> {
+                    on<TestAction>(executionPolicy = ExecutionPolicy.Ordered) {
+                        if (it is TestAction.A1) {
+                            firstActionReceivedSignal.add(Unit)
+                            firstActionWaitSignal.awaitItem()
+                            mutate { copy(aString = "1") }
+                        } else {
+                            secondActionReceivedSignal.add(Unit)
+                            secondActionWaitSignal.awaitItem()
+                            mutate { copy(anInt = 2) }
+                        }
+                    }
+                }
+            }
+
+            val scope = CoroutineScope(context = Dispatchers.Unconfined)
+            val turbine = sm.state.testIn(scope)
+            sm.dispatch(TestAction.A1)
+            firstActionReceivedSignal.awaitItem()
+            sm.dispatch(TestAction.A2)
+            // test that A2 is not received until A1 is done, this is what is guaranteed by Ordered
+            try {
+                secondActionReceivedSignal.awaitItem()
+                fail("Should never be reached")
+            } catch (e: AssertionError) {
+                assertEquals("No value produced in 3s", e.message)
+            }
+            firstActionWaitSignal.add(Unit)
+            secondActionReceivedSignal.awaitItem()
+            secondActionWaitSignal.add(Unit)
 
             assertEquals(TestState.GenericNullableState(null, null), turbine.awaitItem())
             assertEquals(TestState.GenericNullableState("1", null), turbine.awaitItem())
