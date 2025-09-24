@@ -1,4 +1,11 @@
+public abstract interface class com/freeletics/flowredux2/extensions/LoadingState {
+	public abstract fun getShowLoadingIndicator ()Z
+	public abstract fun withShowLoadingIndicatorEnabled ()Lcom/freeletics/flowredux2/extensions/LoadingState;
+}
+
 public final class com/freeletics/flowredux2/extensions/OnEnterLoadSmoothlyKt {
+	public static final fun getDefaultLoadingIndicatorDelay ()J
+	public static final fun getDefaultMinimumLoadingIndicatorDisplayTime ()J
 	public static final fun onEnterLoadSmoothly-2AWqQcw (Lcom/freeletics/flowredux2/BaseBuilder;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;JJLkotlin/time/TimeSource$WithComparableMarks;Lkotlin/jvm/functions/Function2;)V
 	public static synthetic fun onEnterLoadSmoothly-2AWqQcw$default (Lcom/freeletics/flowredux2/BaseBuilder;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;JJLkotlin/time/TimeSource$WithComparableMarks;Lkotlin/jvm/functions/Function2;ILjava/lang/Object;)V
 }

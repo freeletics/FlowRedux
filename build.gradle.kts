@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.android.library).apply(false)
     alias(libs.plugins.compose).apply(false)
     alias(libs.plugins.dependency.analysis).apply(false)
+    alias(libs.plugins.burst).apply(false)
     alias(libs.plugins.dokka).apply(false)
     alias(libs.plugins.publish).apply(false)
 
