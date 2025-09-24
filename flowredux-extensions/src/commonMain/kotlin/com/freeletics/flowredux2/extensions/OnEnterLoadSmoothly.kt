@@ -10,8 +10,11 @@ import kotlin.time.measureTimedValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 
-private val defaultLoadingIndicatorDelay = 500L.milliseconds
-private val defaultMinimumLoadingIndicatorDisplayTime = 500L.milliseconds
+@PublishedApi
+internal val defaultLoadingIndicatorDelay: Duration = 500L.milliseconds
+
+@PublishedApi
+internal val defaultMinimumLoadingIndicatorDisplayTime: Duration = 500L.milliseconds
 
 /**
  * A custom [BaseBuilder.onEnter] implementation to load data.
