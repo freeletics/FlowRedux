@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-## 2.0.0-alpha5 *(2024-09-22)*
+## 2.0.0-alpha5 *(2024-09-24)*
 
 - `onEnterStartStateMachine` and `onActionStartStateMachine` have been updated to use
   `FlowReduxStateMachineFactory` instead of `StateMachine`.
