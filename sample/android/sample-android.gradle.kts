@@ -3,7 +3,6 @@ plugins {
 }
 
 freeletics {
-    optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
     useCompose()
 
     android {

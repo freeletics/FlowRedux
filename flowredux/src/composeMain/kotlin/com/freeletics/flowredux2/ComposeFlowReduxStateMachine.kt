@@ -6,7 +6,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import com.freeletics.flowredux2.LossyStateHolder
 import com.freeletics.flowredux2.sideeffects.SideEffectBuilder
 import com.freeletics.flowredux2.sideeffects.reduxStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,7 +28,6 @@ public fun <S : Any, A : Any> stateMachine(
     return stateMachine(LossyStateHolder({ initialState }), sideEffectBuilders)
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 public fun <S : Any, A : Any> FlowReduxStateMachineFactory<S, A>.produceStateMachine(): FlowReduxStateMachine<State<S>, A> {
     checkInitialized()

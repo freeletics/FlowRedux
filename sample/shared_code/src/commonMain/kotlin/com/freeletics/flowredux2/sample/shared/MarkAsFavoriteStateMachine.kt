@@ -7,7 +7,6 @@ import com.freeletics.flowredux2.initializeWith
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class MarkAsFavoriteStateMachine(
     private val githubApi: GithubApi,
     repository: GithubRepository,
@@ -19,6 +18,7 @@ class MarkAsFavoriteStateMachine(
             repository.copy(favoriteStatus = FavoriteStatus.OPERATION_IN_PROGRESS)
         }
 
+        @OptIn(ExperimentalCoroutinesApi::class)
         spec {
             inState<GithubRepository> {
                 condition({ it.favoriteStatus == FavoriteStatus.OPERATION_IN_PROGRESS }) {
