@@ -13,7 +13,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 
 @Burst
-@OptIn(ExperimentalCoroutinesApi::class)
 class OnEnterLoadSmoothlyTest(
     val stateMachine: StateMachine = StateMachine.REGULAR,
 ) {
@@ -122,31 +121,28 @@ enum class StateMachine {
     WITH_LOADING_STATE,
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 fun StateMachine.create(resultSignal: Turbine<Unit>, timeSource: TimeSource.WithComparableMarks, defaultShowLoadingIndicator: Boolean = false): FlowReduxStateMachineFactory<*, *> = when (this) {
     StateMachine.REGULAR -> TestStateMachine(resultSignal, timeSource, TestState.Loading(defaultShowLoadingIndicator))
     StateMachine.WITH_LOADING_STATE -> LoadingTestStateMachine(resultSignal, timeSource, LoadingTestState.Loading(defaultShowLoadingIndicator))
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 fun StateMachine.loadingState(showLoadingIndicator: Boolean): Any = when (this) {
     StateMachine.REGULAR -> TestState.Loading(showLoadingIndicator)
     StateMachine.WITH_LOADING_STATE -> LoadingTestState.Loading(showLoadingIndicator)
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 fun StateMachine.successState(value: String): Any = when (this) {
     StateMachine.REGULAR -> TestState.Success(value)
     StateMachine.WITH_LOADING_STATE -> LoadingTestState.Success(value)
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class TestStateMachine(
     resultSignal: Turbine<Unit>,
     timeSource: TimeSource.WithComparableMarks,
     initialState: TestState,
 ) : FlowReduxStateMachineFactory<TestState, Any>() {
     init {
+        @OptIn(ExperimentalCoroutinesApi::class)
         spec {
             initializeWith { initialState }
 
@@ -170,13 +166,13 @@ sealed class TestState {
     data class Success(val value: Any) : TestState()
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class LoadingTestStateMachine(
     resultSignal: Turbine<Unit>,
     timeSource: TimeSource.WithComparableMarks,
     initialState: LoadingTestState,
 ) : FlowReduxStateMachineFactory<LoadingTestState, Any>() {
     init {
+        @OptIn(ExperimentalCoroutinesApi::class)
         spec {
             initializeWith { initialState }
 
@@ -192,7 +188,7 @@ class LoadingTestStateMachine(
 
 sealed class LoadingTestState {
     data class Loading(override val showLoadingIndicator: Boolean) : LoadingTestState(), LoadingState<Loading> {
-        override fun withShowLoadingIndicatorEnabled(): LoadingTestState.Loading = copy(showLoadingIndicator = true)
+        override fun withShowLoadingIndicatorEnabled() = copy(showLoadingIndicator = true)
     }
 
     data class Success(val value: Any) : LoadingTestState()

@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 
-@ExperimentalCoroutinesApi
 public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
     // exposed internally for testing where RENDEZVOUS results in more predictable tests
     internal open val actionChannelCapacity = Channel.BUFFERED
@@ -21,6 +20,7 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
     internal lateinit var stateHolder: StateHolder<S>
     internal lateinit var sideEffectBuilders: List<SideEffectBuilder<*, S, A>>
 
+    @ExperimentalCoroutinesApi
     protected fun spec(specBlock: FlowReduxBuilder<S, A>.() -> Unit) {
         check(!::sideEffectBuilders.isInitialized) {
             "State machine spec has already been set. It's only allowed to call spec {...} once."
@@ -95,7 +95,6 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
     }
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 public fun <S : Any> FlowReduxStateMachineFactory<S, *>.initializeWith(reuseLastEmittedStateOnLaunch: Boolean = true, initialState: () -> S) {
     stateHolder = if (reuseLastEmittedStateOnLaunch) {
         InMemoryStateHolder(initialState)

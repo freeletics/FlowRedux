@@ -18,12 +18,13 @@ import kotlinx.coroutines.launch
  * Instead the "wrapper class" [PaginationStateMachine] should be used which hides `Flow` etc.
  * but uses traditional "callbacks". That way it is easier to use on iOS.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 class InternalPaginationStateMachineFactory(
     private val githubApi: GithubApi,
 ) : FlowReduxStateMachineFactory<PaginationState, Action>() {
     init {
         initializeWith { LoadFirstPagePaginationState }
+
+        @OptIn(ExperimentalCoroutinesApi::class)
         spec {
             inState<LoadFirstPagePaginationState> {
                 onEnter { loadFirstPage() }

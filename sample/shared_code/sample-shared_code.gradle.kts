@@ -3,8 +3,6 @@ plugins {
 }
 
 freeletics {
-    optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
-
     multiplatform {
         addJvmTarget()
         addIosTargetsWithXcFramework("shared")

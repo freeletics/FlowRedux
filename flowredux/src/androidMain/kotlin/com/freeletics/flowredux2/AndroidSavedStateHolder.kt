@@ -2,9 +2,7 @@ package com.freeletics.flowredux2
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@OptIn(ExperimentalCoroutinesApi::class)
 public fun <S : Parcelable> FlowReduxStateMachineFactory<S, *>.initializeWith(savedStateHandle: SavedStateHandle, initialState: () -> S) {
     stateHolder = ParcelableSavedStateHandleStateHolder(savedStateHandle, initialState)
 }
