@@ -36,7 +36,7 @@ fgp = "0.32.0"
 publish = "0.34.0"
 dokka = "2.1.0"
 binarycompatibility = "0.18.1"
-dependency-analysis = "3.3.0"
+dependency-analysis = "3.4.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
