@@ -1,5 +1,6 @@
 package com.freeletics.flowredux2.sideeffects
 
+import app.cash.turbine.Turbine
 import app.cash.turbine.awaitItem
 import app.cash.turbine.test
 import com.freeletics.flowredux2.StateMachineFactory
@@ -7,10 +8,13 @@ import com.freeletics.flowredux2.TestAction
 import com.freeletics.flowredux2.TestState
 import com.freeletics.flowredux2.dispatchAsync
 import com.freeletics.flowredux2.stateMachine
+import kotlin.collections.plusAssign
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.runTest
 
@@ -347,6 +351,58 @@ internal class OnActionStartStateMachineTest {
             // assert that child state machine was not triggered after first two initial actions
             assertEquals(Unit, parentActionInvocations.awaitItem())
             assertTrue(childActionInvocations.isEmpty)
+        }
+    }
+
+    @Test
+    fun `sub state machine is cancelled when receiving same action`() = runTest {
+        val onEnterCalled = Turbine<TestState>()
+        val stateMachineCancelled = Turbine<TestState>()
+
+        fun child(initial: TestState) = StateMachineFactory(initialState = initial) {
+            inState<TestState.CounterState> {
+                onEnter {
+                    onEnterCalled.add(snapshot)
+                    try {
+                        awaitCancellation()
+                    } catch (e: CancellationException) {
+                        stateMachineCancelled.add(snapshot)
+                        throw e
+                    }
+                }
+            }
+        }
+
+        val parent = stateMachine(initialState = TestState.CounterState(0)) {
+            inState<TestState.CounterState> {
+                onActionStartStateMachine<TestAction.A4, TestState>(
+                    stateMachineFactoryBuilder = { action ->
+                        child(TestState.CounterState(action.i))
+                    },
+                    handler = { subState ->
+                        override { subState }
+                    },
+                )
+            }
+        }
+
+        parent.state.test {
+            assertEquals(TestState.CounterState(0), awaitItem())
+
+            parent.dispatch(TestAction.A4(1))
+            assertEquals(TestState.CounterState(1), awaitItem())
+            assertEquals(TestState.CounterState(1), onEnterCalled.awaitItem())
+            stateMachineCancelled.expectNoEvents()
+
+            parent.dispatch(TestAction.A4(2))
+            assertEquals(TestState.CounterState(2), awaitItem())
+            assertEquals(TestState.CounterState(2), onEnterCalled.awaitItem())
+            stateMachineCancelled.expectNoEvents()
+
+            parent.dispatch(TestAction.A4(1))
+            assertEquals(TestState.CounterState(1), awaitItem())
+            assertEquals(TestState.CounterState(1), stateMachineCancelled.awaitItem())
+            assertEquals(TestState.CounterState(1), onEnterCalled.awaitItem())
         }
     }
 
