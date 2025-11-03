@@ -13,6 +13,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
@@ -23,6 +26,7 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
     private val stateMachineFactoryBuilder: State<InputState>.(action: TriggerAction) -> FlowReduxStateMachineFactory<SubStateMachineState, SubStateMachineAction>,
     internal val subActionClass: KClass<TriggerAction>,
     private val actionMapper: (A) -> SubStateMachineAction?,
+    private val cancelOnState: (SubStateMachineState) -> Boolean,
     private val handler: suspend ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
 ) : ActionBasedSideEffect<InputState, S, A>() {
     override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
@@ -44,30 +48,32 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
                                 .launchIn(scope)
 
                             val awaitActionCollection = Channel<Unit>()
-                            launch {
+                            scope.launch {
                                 actionBroadcast
                                     .onStart { awaitActionCollection.send(Unit) }
-                                    .collect {
+                                    .onEach {
+                                        // cancel because same action was received again
                                         if (it == action) {
-                                            // cancel because same action was received again
                                             scope.cancel()
-                                        } else if (!subActionClass.isInstance(it)) {
-                                            actionMapper(it)?.let {
-                                                stateMachine.dispatch(it)
-                                            }
                                         }
                                     }
+                                    .filter { !subActionClass.isInstance(it) }
+                                    .mapNotNull(actionMapper)
+                                    .collect { stateMachine.dispatch(it) }
                             }
                             // wait for the actionBroadcast to be collected to avoid following actions being dropped
                             // due to a race condition between the launch starting and the collect here already handling
                             // the next action
                             awaitActionCollection.receive()
 
-                            launch {
+                            scope.launch {
                                 stateMachine.state.collect {
                                     runOnlyIfInInputState(getState) { parentState ->
                                         val changedState = ChangeableState(parentState).handler(it)
                                         send(changedState)
+                                        if (cancelOnState(it)) {
+                                            scope.cancel()
+                                        }
                                     }
                                 }
                             }

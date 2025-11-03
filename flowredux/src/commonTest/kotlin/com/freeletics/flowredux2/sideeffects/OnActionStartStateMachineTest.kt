@@ -406,5 +406,66 @@ internal class OnActionStartStateMachineTest {
         }
     }
 
+    @Test
+    fun `sub state machine is cancelled when emitting certain state`() = runTest {
+        val onEnterCalled = Turbine<TestState>()
+        val stateMachineCancelled = Turbine<TestState>()
+
+        fun child(initial: TestState) = StateMachineFactory(initialState = initial) {
+            inState<TestState.CounterState> {
+                onEnter {
+                    onEnterCalled.add(snapshot)
+                    mutate { copy(counter + 10) }
+                }
+                condition({ it.counter > 10 }) {
+                    onEnter {
+                        try {
+                            awaitCancellation()
+                        } catch (e: CancellationException) {
+                            stateMachineCancelled.add(snapshot)
+                            throw e
+                        }
+                    }
+                }
+            }
+        }
+
+        val parent = stateMachine(initialState = TestState.CounterState(0)) {
+            inState<TestState.CounterState> {
+                onActionStartStateMachine<TestAction.A4, TestState>(
+                    stateMachineFactoryBuilder = { action ->
+                        child(TestState.CounterState(action.i))
+                    },
+                    cancelOnState = { it == TestState.CounterState(11) },
+                    handler = { subState ->
+                        override { subState }
+                    },
+                )
+            }
+        }
+
+        parent.state.test {
+            assertEquals(TestState.CounterState(0), awaitItem())
+
+            parent.dispatch(TestAction.A4(1))
+            assertEquals(TestState.CounterState(1), awaitItem())
+            assertEquals(TestState.CounterState(1), onEnterCalled.awaitItem())
+            assertEquals(TestState.CounterState(11), awaitItem())
+            assertEquals(TestState.CounterState(11), stateMachineCancelled.awaitItem())
+
+            parent.dispatch(TestAction.A4(2))
+            assertEquals(TestState.CounterState(2), awaitItem())
+            assertEquals(TestState.CounterState(2), onEnterCalled.awaitItem())
+            assertEquals(TestState.CounterState(12), awaitItem())
+            stateMachineCancelled.expectNoEvents()
+
+            parent.dispatch(TestAction.A4(1))
+            assertEquals(TestState.CounterState(1), awaitItem())
+            assertEquals(TestState.CounterState(1), onEnterCalled.awaitItem())
+            assertEquals(TestState.CounterState(11), awaitItem())
+            assertEquals(TestState.CounterState(11), stateMachineCancelled.awaitItem())
+        }
+    }
+
     private fun <A, B> pairOf(a: A, b: B): Pair<A, B> = a to b
 }
