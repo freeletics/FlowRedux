@@ -223,11 +223,13 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
 
     public fun <SubStateMachineState : Any> onEnterStartStateMachine(
         stateMachineFactoryBuilder: State<InputState>.() -> FlowReduxStateMachineFactory<SubStateMachineState, A>,
+        cancelOnState: (SubStateMachineState) -> Boolean = { false },
         handler: suspend ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
     ) {
         onEnterStartStateMachine(
             stateMachineFactoryBuilder = stateMachineFactoryBuilder,
             actionMapper = { it },
+            cancelOnState = cancelOnState,
             handler = handler,
         )
     }
@@ -235,6 +237,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     public fun <SubStateMachineState : Any, SubStateMachineAction : Any> onEnterStartStateMachine(
         stateMachineFactoryBuilder: State<InputState>.() -> FlowReduxStateMachineFactory<SubStateMachineState, SubStateMachineAction>,
         actionMapper: (A) -> SubStateMachineAction?,
+        cancelOnState: (SubStateMachineState) -> Boolean = { false },
         handler: suspend ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) { initialState ->
@@ -242,6 +245,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
                 isInState = sideEffectIsInState(initialState),
                 subStateMachineFactory = ChangeableState(initialState).stateMachineFactoryBuilder(),
                 actionMapper = actionMapper,
+                cancelOnState = cancelOnState,
                 handler = handler,
             )
         }
@@ -249,12 +253,14 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
 
     public inline fun <reified SubAction : A, SubStateMachineState : Any> onActionStartStateMachine(
         noinline stateMachineFactoryBuilder: State<InputState>.(SubAction) -> FlowReduxStateMachineFactory<SubStateMachineState, A>,
+        noinline cancelOnState: (SubStateMachineState) -> Boolean = { false },
         noinline handler: suspend ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
     ) {
         onActionStartStateMachine(
             actionClass = SubAction::class,
             stateMachineFactoryBuilder = stateMachineFactoryBuilder,
             actionMapper = { it },
+            cancelOnState = cancelOnState,
             handler = handler,
         )
     }
@@ -262,12 +268,14 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     public inline fun <reified SubAction : A, SubStateMachineState : Any, SubStateMachineAction : Any> onActionStartStateMachine(
         noinline stateMachineFactoryBuilder: State<InputState>.(SubAction) -> FlowReduxStateMachineFactory<SubStateMachineState, SubStateMachineAction>,
         noinline actionMapper: (A) -> SubStateMachineAction?,
+        noinline cancelOnState: (SubStateMachineState) -> Boolean = { false },
         noinline handler: suspend ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
     ) {
         onActionStartStateMachine(
             actionClass = SubAction::class,
             stateMachineFactoryBuilder = stateMachineFactoryBuilder,
             actionMapper = actionMapper,
+            cancelOnState = cancelOnState,
             handler = handler,
         )
     }
@@ -277,6 +285,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
         actionClass: KClass<out SubAction>,
         stateMachineFactoryBuilder: State<InputState>.(SubAction) -> FlowReduxStateMachineFactory<SubStateMachineState, SubStateMachineAction>,
         actionMapper: (A) -> SubStateMachineAction?,
+        cancelOnState: (SubStateMachineState) -> Boolean = { false },
         handler: suspend ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
     ) {
         sideEffectBuilders += SideEffectBuilder(isInState) {
@@ -285,6 +294,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
                 stateMachineFactoryBuilder = stateMachineFactoryBuilder,
                 subActionClass = actionClass,
                 actionMapper = actionMapper,
+                cancelOnState = cancelOnState,
                 handler = handler,
             )
         }
