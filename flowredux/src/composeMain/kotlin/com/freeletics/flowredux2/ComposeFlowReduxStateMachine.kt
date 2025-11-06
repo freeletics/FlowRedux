@@ -28,6 +28,12 @@ public fun <S : Any, A : Any> stateMachine(
     return stateMachine(LossyStateHolder({ initialState }), sideEffectBuilders)
 }
 
+/**
+ * Create and start running a [FlowReduxStateMachine] that exposes a compose [State]. The state machine
+ * will stay active as long as this method stays in the current composition.
+ *
+ * Note: [initializeWith] and [FlowReduxStateMachineFactory.spec] need to be called before this method.
+ */
 @Composable
 public fun <S : Any, A : Any> FlowReduxStateMachineFactory<S, A>.produceStateMachine(): FlowReduxStateMachine<State<S>, A> {
     checkInitialized()

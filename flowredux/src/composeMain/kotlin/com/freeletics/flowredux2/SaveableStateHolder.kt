@@ -7,10 +7,22 @@ import androidx.savedstate.serialization.encodeToSavedState
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
 
+/**
+ * Sets the initial state for the state machine with a state class that implements [SaveableState]. The implementation can save
+ * values of the state into the [SavedStateHandle]. The [SavedStateHandle] is passed to [initialState] on each state machine
+ * launch so that previously saved values, if present, can be used to construct the initial state.
+ */
 public fun <S : SaveableState> FlowReduxStateMachineFactory<S, *>.initializeWith(savedStateHandle: SavedStateHandle, initialState: (SavedStateHandle) -> S) {
     stateHolder = SavedStateHandleStateHolder(savedStateHandle, initialState)
 }
 
+/**
+ * Sets the initial state for the state machine with a [kotlinx.serialization.Serializable] state class.
+ *
+ * The first time a state machine is launched from this [FlowReduxStateMachineFactory] instance, [initialState] is called to produce the
+ * initial state. Any emitted state from a state machine will be saved to the [savedStateHandle] and subsequent launches will read
+ * the state from there instead of calling [initialState].
+ */
 public inline fun <reified S : Any> FlowReduxStateMachineFactory<S, *>.initializeWith(savedStateHandle: SavedStateHandle, noinline initialState: () -> S) {
     initializeWith(savedStateHandle, serializer<S>(), initialState)
 }
