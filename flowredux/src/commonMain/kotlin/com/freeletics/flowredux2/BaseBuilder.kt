@@ -107,6 +107,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     public fun onEnter(
         handler: suspend ChangeableState<InputState>.() -> ChangedState<S>,
     ) {
+        val logger = logger?.wrap("onEnter")
         sideEffectBuilders += SideEffectBuilder(isInState, logger) { initialState ->
             OnEnter(
                 isInState = sideEffectIsInState(initialState),
@@ -128,6 +129,7 @@ public abstract class BaseBuilder<InputState : S, S : Any, A : Any> internal con
     public fun onEnterEffect(
         handler: suspend State<InputState>.() -> Unit,
     ) {
+        val logger = logger?.wrap("onEnterEffect")
         sideEffectBuilders += SideEffectBuilder(isInState, logger) { initialState ->
             OnEnter(
                 isInState = sideEffectIsInState(initialState),
