@@ -75,16 +75,13 @@ kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collec
 [plugins]
 fgp-android = { id = "com.freeletics.gradle.android", version.ref = "fgp" }
 fgp-android-app = { id = "com.freeletics.gradle.android.app", version.ref = "fgp" }
-fgp-jvm = { id = "com.freeletics.gradle.jvm", version.ref = "fgp" }
 fgp-multiplatform = { id = "com.freeletics.gradle.multiplatform", version.ref = "fgp" }
 fgp-publish = { id = "com.freeletics.gradle.publish.oss", version.ref = "fgp" }
 fgp-root = { id = "com.freeletics.gradle.root", version.ref = "fgp" }
 fgp-settings = { id = "com.freeletics.gradle.settings", version.ref = "fgp" }
 
 android-app = { id = "com.android.application", version.ref = "android-gradle" }
-android-library = { id = "com.android.library", version.ref = "android-gradle" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 burst = { id = "app.cash.burst", version = "2.10.2" }
 publish = { id = "com.vanniktech.maven.publish", version.ref = "publish" }
