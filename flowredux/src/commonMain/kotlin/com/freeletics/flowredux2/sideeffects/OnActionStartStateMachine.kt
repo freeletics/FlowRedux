@@ -4,6 +4,10 @@ import com.freeletics.flowredux2.ChangeableState
 import com.freeletics.flowredux2.ChangedState
 import com.freeletics.flowredux2.FlowReduxStateMachineFactory
 import com.freeletics.flowredux2.State
+import com.freeletics.flowredux2.TaggedLogger
+import com.freeletics.flowredux2.logD
+import com.freeletics.flowredux2.logI
+import com.freeletics.flowredux2.logV
 import kotlin.reflect.KClass
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,6 +32,7 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
     private val actionMapper: (A) -> SubStateMachineAction?,
     private val cancelOnState: (SubStateMachineState) -> Boolean,
     private val handler: suspend ChangeableState<InputState>.(SubStateMachineState) -> ChangedState<S>,
+    override val logger: TaggedLogger?,
 ) : ActionBasedSideEffect<InputState, S, A>() {
     override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
         return channelFlow {
@@ -42,6 +47,7 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
                         runOnlyIfInInputState(getState) { currentState ->
                             val scope = CoroutineScope(coroutineContext + SupervisorJob(coroutineContext.job))
 
+                            logger.logD { "Starting sub state machine" }
                             @Suppress("UNCHECKED_CAST")
                             val stateMachine = ChangeableState(currentState)
                                 .stateMachineFactoryBuilder(action as TriggerAction)
@@ -54,10 +60,12 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
                                     .onEach {
                                         // cancel because same action was received again
                                         if (it == action) {
+                                            logger.logD { "Cancelling sub state machine" }
                                             scope.cancel()
                                         }
                                     }
                                     .filter { !subActionClass.isInstance(it) }
+                                    .onEach { logger.logV { "Forwarding $it" } }
                                     .mapNotNull(actionMapper)
                                     .collect { stateMachine.dispatch(it) }
                             }
@@ -69,9 +77,11 @@ internal class OnActionStartStateMachine<SubStateMachineState : Any, SubStateMac
                             scope.launch {
                                 stateMachine.state.collect {
                                     runOnlyIfInInputState(getState) { parentState ->
+                                        logger.logI { "Received sub state machine state $parentState" }
                                         val changedState = ChangeableState(parentState).handler(it)
                                         send(changedState)
                                         if (cancelOnState(it)) {
+                                            logger.logD { "Cancelling sub state machine" }
                                             scope.cancel()
                                         }
                                     }

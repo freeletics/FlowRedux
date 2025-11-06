@@ -3,7 +3,10 @@ package com.freeletics.flowredux2.sideeffects
 import com.freeletics.flowredux2.ChangedState
 import com.freeletics.flowredux2.NoStateChange
 import com.freeletics.flowredux2.NoStateChangeSkipEmission
+import com.freeletics.flowredux2.TaggedLogger
 import com.freeletics.flowredux2.UnsafeMutateState
+import com.freeletics.flowredux2.logD
+import com.freeletics.flowredux2.logV
 import com.freeletics.flowredux2.reduce
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -21,6 +24,8 @@ internal abstract class SideEffect<InputState : S, S, A> {
     }
 
     abstract val isInState: IsInState<S>
+
+    abstract val logger: TaggedLogger?
 
     abstract fun produceState(getState: GetState<S>): Flow<ChangedState<S>>
 
@@ -48,7 +53,7 @@ internal abstract class SideEffect<InputState : S, S, A> {
             val inputState = try {
                 @Suppress("UNCHECKED_CAST")
                 currentState as InputState
-            } catch (e: ClassCastException) {
+            } catch (_: ClassCastException) {
                 // it is ok to to swallow the exception as if there is a typecast exception,
                 // then a state transition did happen between triggering this side effect (isInState condition)
                 // and actually executing this block. This is an expected behavior as it can happen in a
@@ -72,6 +77,7 @@ internal abstract class ActionBasedSideEffect<InputState : S, S, A> : SideEffect
 
 internal class SideEffectBuilder<InputState : S, S, A>(
     val isInState: IsInState<S>,
+    val logger: TaggedLogger?,
     private val builder: (InputState) -> SideEffect<InputState, S, A>,
 ) {
     fun interface IsInState<S> {
@@ -90,30 +96,40 @@ internal class ManagedSideEffect<InputState : S, S, A>(
 ) {
     private var currentlyActiveSideEffect: CurrentlyActiveSideEffect? = null
 
-    suspend fun startIfNeeded(state: S) {
+    fun startIfNeeded(state: S) {
+        builder.logger.logV { "Checking if side effect needs to be started for state $state" }
         if (builder.isInState.check(state)) {
             var current = currentlyActiveSideEffect
             if (current == null) {
+                builder.logger.logD { "Side effect start $state" }
                 val currentSideEffect = builder.build(state)
                 val currentJob = scope.launch {
                     currentSideEffect.produceState(getState).collect {
                         // the side effect is in state might be more specific than the one in the builder
-                        stateChanges.send(guardWithIsInState(it, currentSideEffect))
+                        stateChanges.send(guardWithIsInState(it, currentSideEffect, builder.logger))
                     }
                 }
                 current = CurrentlyActiveSideEffect(currentJob, currentSideEffect)
                 this.currentlyActiveSideEffect = current
+            } else {
+                builder.logger.logV { "Side effect already active" }
             }
+        } else {
+            builder.logger.logV { "Side effect should not be active" }
         }
     }
 
     suspend fun cancelIfNeeded(state: S) {
         val current = currentlyActiveSideEffect
         if (current != null) {
+            builder.logger.logV { "Checking if side effect needs to be cancelled for state $state" }
             if (!current.sideEffect.isInState.check(state)) {
+                builder.logger.logD { "Side effect cancellation $state" }
                 current.job.cancel(StateChangeCancellationException())
                 current.job.join()
                 this.currentlyActiveSideEffect = null
+            } else {
+                builder.logger.logV { "Side effect should continue running" }
             }
         }
     }
@@ -121,6 +137,7 @@ internal class ManagedSideEffect<InputState : S, S, A>(
     suspend fun sendAction(action: A, state: S) {
         val current = currentlyActiveSideEffect
         if (current != null && current.sideEffect.isInState.check(state)) {
+            builder.logger.logV { "Sending $action" }
             current.sideEffect.sendAction(action)
         }
     }
@@ -135,14 +152,17 @@ internal class StateChangeCancellationException : CancellationException("StateMa
 
 internal typealias GetState<S> = () -> S
 
-private fun <InputState : S, S> guardWithIsInState(changedState: ChangedState<S>, sideEffect: SideEffect<InputState, S, *>): ChangedState<S> {
+private fun <InputState : S, S> guardWithIsInState(changedState: ChangedState<S>, sideEffect: SideEffect<InputState, S, *>, logger: TaggedLogger?): ChangedState<S> {
     if (changedState is NoStateChange || changedState is NoStateChangeSkipEmission) {
         return changedState
     }
     return UnsafeMutateState<S, S> {
         if (sideEffect.isInState.check(this)) {
-            changedState.reduce(this)
+            changedState.reduce(this).also {
+                logger.logV { "ChangedState $this -> $it" }
+            }
         } else {
+            logger.logV { "ChangedState skipped because of state change" }
             this
         }
     }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 public class IdentityBuilder<InputState : S, S : Any, A : Any> internal constructor(
     override val isInState: SideEffectBuilder.IsInState<S>,
     private val identity: (InputState) -> Any?,
+    override val logger: TaggedLogger?,
 ) : BaseBuilder<InputState, S, A>() {
     @Suppress("UNCHECKED_CAST")
     override fun sideEffectIsInState(initialState: InputState) = SideEffect.IsInState<S> {

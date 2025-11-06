@@ -7,7 +7,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 @FlowReduxDsl
-public class FlowReduxBuilder<S : Any, A : Any> internal constructor() {
+public class FlowReduxBuilder<S : Any, A : Any> internal constructor(
+    private val logger: TaggedLogger?,
+) {
     private val sideEffectBuilderList: MutableList<SideEffectBuilder<out S, S, A>> = ArrayList()
     internal val sideEffectBuilders: List<SideEffectBuilder<out S, S, A>> get() = sideEffectBuilderList
 
@@ -28,6 +30,7 @@ public class FlowReduxBuilder<S : Any, A : Any> internal constructor() {
     ) {
         sideEffectBuilderList += InStateBuilder<SubState, S, A>(
             isInState = { state -> subStateClass.isInstance(state) },
+            logger = logger?.wrap("inState<${subStateClass.simpleName}"),
         ).apply(block).sideEffectBuilders
     }
 }

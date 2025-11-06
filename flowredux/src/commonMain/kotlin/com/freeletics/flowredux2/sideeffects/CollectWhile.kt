@@ -3,6 +3,8 @@ package com.freeletics.flowredux2.sideeffects
 import com.freeletics.flowredux2.ChangeableState
 import com.freeletics.flowredux2.ChangedState
 import com.freeletics.flowredux2.ExecutionPolicy
+import com.freeletics.flowredux2.TaggedLogger
+import com.freeletics.flowredux2.logI
 import com.freeletics.flowredux2.util.flatMapWithExecutionPolicy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -13,9 +15,11 @@ internal class CollectWhile<T, InputState : S, S : Any, A : Any>(
     private val flow: Flow<T>,
     private val executionPolicy: ExecutionPolicy,
     private val handler: suspend ChangeableState<InputState>.(item: T) -> ChangedState<S>,
+    override val logger: TaggedLogger?,
 ) : SideEffect<InputState, S, A>() {
     override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
         return flow.flatMapWithExecutionPolicy(executionPolicy) { item ->
+            logger.logI { "Received item $item" }
             changeState(getState) { inputState ->
                 ChangeableState(inputState).handler(item)
             }

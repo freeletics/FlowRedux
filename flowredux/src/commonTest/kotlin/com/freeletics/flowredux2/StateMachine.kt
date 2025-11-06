@@ -30,6 +30,7 @@ internal class StateMachineFactory(
 ) : FlowReduxStateMachineFactory<TestState, TestAction>() {
     init {
         initializeWith(reuseLastEmittedStateOnLaunch = false) { initialState }
+        installLogger(SimpleLogger(Logger.Level.Verbose), "TestStateMachine")
         spec(specBlock)
     }
 
