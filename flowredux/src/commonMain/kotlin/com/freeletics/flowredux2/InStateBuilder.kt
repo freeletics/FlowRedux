@@ -8,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @FlowReduxDsl
 public class InStateBuilder<InputState : S, S : Any, A : Any> internal constructor(
     override val isInState: SideEffectBuilder.IsInState<S>,
+    override val logger: TaggedLogger?,
 ) : BaseBuilder<InputState, S, A>() {
     /**
      * Allows handling certain actions or events only while an extra condition is `true`
@@ -15,12 +16,16 @@ public class InStateBuilder<InputState : S, S : Any, A : Any> internal construct
      */
     public fun condition(
         condition: (InputState) -> Boolean,
+        name: String? = null,
         block: ConditionBuilder<InputState, S, A>.() -> Unit,
     ) {
-        sideEffectBuilders += ConditionBuilder<InputState, S, A> {
-            @Suppress("UNCHECKED_CAST")
-            isInState.check(it) && condition(it as InputState)
-        }.apply(block).sideEffectBuilders
+        sideEffectBuilders += ConditionBuilder<InputState, S, A>(
+            isInState = {
+                @Suppress("UNCHECKED_CAST")
+                isInState.check(it) && condition(it as InputState)
+            },
+            logger = logger?.wrap("condition<${name ?: "?"}>"),
+        ).apply(block).sideEffectBuilders
     }
 
     /**
@@ -33,10 +38,13 @@ public class InStateBuilder<InputState : S, S : Any, A : Any> internal construct
      */
     public fun untilIdentityChanges(
         identity: (InputState) -> Any?,
+        name: String? = null,
         block: IdentityBuilder<InputState, S, A>.() -> Unit,
     ) {
-        sideEffectBuilders += IdentityBuilder<InputState, S, A>(isInState, identity)
-            .apply(block)
-            .sideEffectBuilders
+        sideEffectBuilders += IdentityBuilder<InputState, S, A>(
+            isInState = isInState,
+            identity = identity,
+            logger = logger?.wrap("untilIdentityChanges<${name ?: "?"}>"),
+        ).apply(block).sideEffectBuilders
     }
 }

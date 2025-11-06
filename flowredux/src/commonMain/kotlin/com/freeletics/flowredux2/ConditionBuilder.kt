@@ -8,6 +8,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @FlowReduxDsl
 public class ConditionBuilder<InputState : S, S : Any, A : Any> internal constructor(
     override val isInState: SideEffectBuilder.IsInState<S>,
+    override val logger: TaggedLogger?,
 ) : BaseBuilder<InputState, S, A>() {
     /**
      * Anything inside this block will only run while the [identity] of the current state
@@ -19,10 +20,13 @@ public class ConditionBuilder<InputState : S, S : Any, A : Any> internal constru
      */
     public fun untilIdentityChanges(
         identity: (InputState) -> Any?,
+        name: String? = null,
         block: IdentityBuilder<InputState, S, A>.() -> Unit,
     ) {
-        sideEffectBuilders += IdentityBuilder<InputState, S, A>(isInState, identity)
-            .apply(block)
-            .sideEffectBuilders
+        sideEffectBuilders += IdentityBuilder<InputState, S, A>(
+            isInState = isInState,
+            identity = identity,
+            logger = logger?.wrap("untilIdentityChanges<${name ?: "?"}>"),
+        ).apply(block).sideEffectBuilders
     }
 }

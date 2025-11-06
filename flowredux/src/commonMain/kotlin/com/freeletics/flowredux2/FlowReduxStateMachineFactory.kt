@@ -20,12 +20,25 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
     internal lateinit var stateHolder: StateHolder<S>
     internal lateinit var sideEffectBuilders: List<SideEffectBuilder<*, S, A>>
 
+    internal var logger: TaggedLogger? = null
+
+    /**
+     * Install a [logger] to observe actions in a [FlowReduxStateMachine] produced by this
+     * factory.
+     */
+    public fun installLogger(logger: Logger, name: String = this::class.simpleName!!) {
+        check(!::sideEffectBuilders.isInitialized) {
+            "State machine spec has already been set. Logger should be installed before."
+        }
+        this.logger = TaggedLogger(logger, name)
+    }
+
     @ExperimentalCoroutinesApi
     protected fun spec(specBlock: FlowReduxBuilder<S, A>.() -> Unit) {
         check(!::sideEffectBuilders.isInitialized) {
             "State machine spec has already been set. It's only allowed to call spec {...} once."
         }
-        sideEffectBuilders = FlowReduxBuilder<S, A>().apply(specBlock).sideEffectBuilders
+        sideEffectBuilders = FlowReduxBuilder<S, A>(logger).apply(specBlock).sideEffectBuilders
     }
 
     public fun launchIn(scope: CoroutineScope): FlowReduxStateMachine<StateFlow<S>, A> {
@@ -35,7 +48,7 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
         val initialState = stateHolder.getState()
         val state = inputActions
             .receiveAsFlow()
-            .reduxStore(initialState, sideEffectBuilders)
+            .reduxStore(initialState, sideEffectBuilders, logger)
             .onEach { stateHolder.saveState(it) }
             .stateIn(scope, SharingStarted.Lazily, initialState)
 
@@ -49,7 +62,7 @@ public abstract class FlowReduxStateMachineFactory<S : Any, A : Any>() {
         val initialState = stateHolder.getState()
         val state = inputActions
             .receiveAsFlow()
-            .reduxStore(initialState, sideEffectBuilders)
+            .reduxStore(initialState, sideEffectBuilders, logger)
             .onEach { stateHolder.saveState(it) }
             .shareIn(scope, SharingStarted.Lazily, replay = 1)
 
