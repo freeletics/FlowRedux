@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+## 2.0.0-alpha6 *(2024-11-07)*
+
+- Added `cancelOnState` to `onEnterStartStateMachine` and `onActionStartStateMachine`
+  to allow cancellation of the sub state machine when it emits a specific state.
+- Added `Logger` and `installLogger` to allow logging of state changes and state machine events.
+- Move `@ExperimentalCoroutinesApi` from `FlowReduxStateMachineFactory` to `spec` so
+  that extensions don't need to opt-in.
+
+
 ## 2.0.0-alpha5 *(2024-09-24)*
 
 - `onEnterStartStateMachine` and `onActionStartStateMachine` have been updated to use
