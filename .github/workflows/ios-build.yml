@@ -59,7 +59,7 @@ jobs:
             ${{ runner.os }}-konan-
 
       - name: Build
-        uses: sersoft-gmbh/xcodebuild-action@v3.2.0
+        uses: sersoft-gmbh/xcodebuild-action@v4.0.0
         with:
           project: sample/ios/ios.xcodeproj
           scheme: ios
