@@ -9,9 +9,9 @@ You can run the formatter by using these commands:
 
 ```shell
 # This runs the lint formatter
- ./kotlinw .kts/ktlint.main.kts
+ ./kotlinw scripts/ktlint.main.kts
 
 # This runs the lint checker
- ./kotlinw .kts/ktlint.main.kts --fail-on-changes
+ ./kotlinw scripts/ktlint.main.kts --fail-on-changes
 ```
 The CI runs the check, too.

@@ -1,35 +1,35 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - '**'
-  pull_request:
+    push:
+        branches:
+            - "**"
+    pull_request:
 
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
+    build:
+        name: Build
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v5
 
-      - name: Install JDK
-        uses: actions/setup-java@v5
-        with:
-          distribution: zulu
-          java-version: 24
+            - name: Install JDK
+              uses: actions/setup-java@v5
+              with:
+                  distribution: zulu
+                  java-version: 24
 
-      - uses: gradle/actions/setup-gradle@v5
-        with:
-          validate-wrappers: true
+            - uses: gradle/actions/setup-gradle@v5
+              with:
+                  validate-wrappers: true
 
-      - name: Install Android SDK
-        run: ./.github/android-sdk.sh
+            - name: Install Android SDK
+              run: ./.github/android-sdk.sh
 
-      - name: Lint check with Ktlint
-        run: ./kotlinw .kts/ktlint.main.kts
+            - name: Lint check with Ktlint
+              run: ./kotlinw scripts/ktlint.main.kts
 
-      - name: Build with Gradle
-        run: ./gradlew build --stacktrace
+            - name: Build with Gradle
+              run: ./gradlew build --stacktrace
