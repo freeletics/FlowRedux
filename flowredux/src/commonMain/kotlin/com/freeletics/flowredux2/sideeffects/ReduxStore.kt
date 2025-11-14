@@ -1,7 +1,6 @@
 package com.freeletics.flowredux2.sideeffects
 
 import com.freeletics.flowredux2.ChangedState
-import com.freeletics.flowredux2.Logger
 import com.freeletics.flowredux2.NoStateChangeSkipEmission
 import com.freeletics.flowredux2.TaggedLogger
 import com.freeletics.flowredux2.logI

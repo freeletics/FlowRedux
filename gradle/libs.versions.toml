@@ -32,10 +32,9 @@ timber = "5.0.1"
 turbine = "1.2.1"
 kotlinx-collections-immutable= "0.4.0"
 
-fgp = "0.33.1"
+fgp = "0.34.1"
 publish = "0.35.0"
 dokka = "2.1.0"
-binarycompatibility = "0.18.1"
 dependency-analysis = "3.4.1"
 
 [libraries]
@@ -76,7 +75,6 @@ kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collec
 fgp-android = { id = "com.freeletics.gradle.android", version.ref = "fgp" }
 fgp-android-app = { id = "com.freeletics.gradle.android.app", version.ref = "fgp" }
 fgp-multiplatform = { id = "com.freeletics.gradle.multiplatform", version.ref = "fgp" }
-fgp-publish = { id = "com.freeletics.gradle.publish.oss", version.ref = "fgp" }
 fgp-root = { id = "com.freeletics.gradle.root", version.ref = "fgp" }
 fgp-settings = { id = "com.freeletics.gradle.settings", version.ref = "fgp" }
 
@@ -86,5 +84,4 @@ compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 burst = { id = "app.cash.burst", version = "2.10.2" }
 publish = { id = "com.vanniktech.maven.publish", version.ref = "publish" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-binarycompatibility = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binarycompatibility" }
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependency-analysis" }

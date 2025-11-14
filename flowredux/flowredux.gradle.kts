@@ -1,10 +1,10 @@
 plugins {
     id("com.freeletics.gradle.multiplatform")
-    id("com.freeletics.gradle.publish.oss")
 }
 
 freeletics {
     useCompose()
+    enableOssPublishing()
 
     multiplatform {
         // TODO stop limiting when it's possible to properly exclude targets from compose

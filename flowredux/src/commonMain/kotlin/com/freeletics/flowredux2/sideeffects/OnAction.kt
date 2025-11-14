@@ -10,7 +10,6 @@ import kotlin.reflect.KClass
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.mapNotNull
 
 @ExperimentalCoroutinesApi
 internal class OnAction<InputState : S, SubAction : A, S : Any, A : Any>(
