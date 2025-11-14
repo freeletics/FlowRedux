@@ -4,11 +4,9 @@ import com.freeletics.flowredux2.ChangeableState
 import com.freeletics.flowredux2.ChangedState
 import com.freeletics.flowredux2.TaggedLogger
 import com.freeletics.flowredux2.logI
-import com.freeletics.flowredux2.logV
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onEach
 
 @ExperimentalCoroutinesApi
 internal class OnEnter<InputState : S, S : Any, A : Any>(

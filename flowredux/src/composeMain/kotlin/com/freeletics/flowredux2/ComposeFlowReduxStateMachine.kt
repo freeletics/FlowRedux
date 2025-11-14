@@ -8,7 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import com.freeletics.flowredux2.sideeffects.SideEffectBuilder
 import com.freeletics.flowredux2.sideeffects.reduxStore
-import kotlin.math.log
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.onEach
@@ -45,7 +44,7 @@ public fun <S : Any, A : Any> FlowReduxStateMachineFactory<S, A>.produceStateMac
 internal fun <S : Any, A : Any> stateMachine(
     stateHolder: StateHolder<S>,
     sideEffectBuilders: List<SideEffectBuilder<*, S, A>>,
-    logger: TaggedLogger?
+    logger: TaggedLogger?,
 ): FlowReduxStateMachine<State<S>, A> {
     val inputActions = remember(sideEffectBuilders) { Channel<A>() }
     val state = produceState(stateHolder.getState(), sideEffectBuilders, inputActions) {
