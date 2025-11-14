@@ -1,0 +1,22 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, watchosArm32, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <flowredux-library:flowredux-extensions>
+abstract interface <#A: com.freeletics.flowredux2.extensions/LoadingState<#A>> com.freeletics.flowredux2.extensions/LoadingState { // com.freeletics.flowredux2.extensions/LoadingState|null[0]
+    abstract val showLoadingIndicator // com.freeletics.flowredux2.extensions/LoadingState.showLoadingIndicator|{}showLoadingIndicator[0]
+        abstract fun <get-showLoadingIndicator>(): kotlin/Boolean // com.freeletics.flowredux2.extensions/LoadingState.showLoadingIndicator.<get-showLoadingIndicator>|<get-showLoadingIndicator>(){}[0]
+
+    abstract fun withShowLoadingIndicatorEnabled(): #A // com.freeletics.flowredux2.extensions/LoadingState.withShowLoadingIndicatorEnabled|withShowLoadingIndicatorEnabled(){}[0]
+}
+
+final val com.freeletics.flowredux2.extensions/defaultLoadingIndicatorDelay // com.freeletics.flowredux2.extensions/defaultLoadingIndicatorDelay|{}defaultLoadingIndicatorDelay[0]
+    final fun <get-defaultLoadingIndicatorDelay>(): kotlin.time/Duration // com.freeletics.flowredux2.extensions/defaultLoadingIndicatorDelay.<get-defaultLoadingIndicatorDelay>|<get-defaultLoadingIndicatorDelay>(){}[0]
+final val com.freeletics.flowredux2.extensions/defaultMinimumLoadingIndicatorDisplayTime // com.freeletics.flowredux2.extensions/defaultMinimumLoadingIndicatorDisplayTime|{}defaultMinimumLoadingIndicatorDisplayTime[0]
+    final fun <get-defaultMinimumLoadingIndicatorDisplayTime>(): kotlin.time/Duration // com.freeletics.flowredux2.extensions/defaultMinimumLoadingIndicatorDisplayTime.<get-defaultMinimumLoadingIndicatorDisplayTime>|<get-defaultMinimumLoadingIndicatorDisplayTime>(){}[0]
+
+final fun <#A: #B, #B: kotlin/Any> (com.freeletics.flowredux2/BaseBuilder<#A, #B, *>).com.freeletics.flowredux2.extensions/onEnterLoadSmoothly(kotlin/Function1<#A, #A>, kotlin/Function1<#A, kotlin/Boolean> = ..., kotlin.time/Duration = ..., kotlin.time/Duration = ..., kotlin.time/TimeSource.WithComparableMarks = ..., kotlin.coroutines/SuspendFunction1<com.freeletics.flowredux2/ChangeableState<#A>, com.freeletics.flowredux2/ChangedState<#B>>) // com.freeletics.flowredux2.extensions/onEnterLoadSmoothly|onEnterLoadSmoothly@com.freeletics.flowredux2.BaseBuilder<0:0,0:1,*>(kotlin.Function1<0:0,0:0>;kotlin.Function1<0:0,kotlin.Boolean>;kotlin.time.Duration;kotlin.time.Duration;kotlin.time.TimeSource.WithComparableMarks;kotlin.coroutines.SuspendFunction1<com.freeletics.flowredux2.ChangeableState<0:0>,com.freeletics.flowredux2.ChangedState<0:1>>){0§<0:1>;1§<kotlin.Any>}[0]
+final inline fun <#A: #B & com.freeletics.flowredux2.extensions/LoadingState<#A>, #B: kotlin/Any> (com.freeletics.flowredux2/BaseBuilder<#A, #B, *>).com.freeletics.flowredux2.extensions/onEnterLoadSmoothly(kotlin.time/Duration = ..., kotlin.time/Duration = ..., kotlin.time/TimeSource.WithComparableMarks = ..., noinline kotlin.coroutines/SuspendFunction1<com.freeletics.flowredux2/ChangeableState<#A>, com.freeletics.flowredux2/ChangedState<#B>>) // com.freeletics.flowredux2.extensions/onEnterLoadSmoothly|onEnterLoadSmoothly@com.freeletics.flowredux2.BaseBuilder<0:0,0:1,*>(kotlin.time.Duration;kotlin.time.Duration;kotlin.time.TimeSource.WithComparableMarks;kotlin.coroutines.SuspendFunction1<com.freeletics.flowredux2.ChangeableState<0:0>,com.freeletics.flowredux2.ChangedState<0:1>>){0§<0:1&com.freeletics.flowredux2.extensions.LoadingState<0:0>>;1§<kotlin.Any>}[0]

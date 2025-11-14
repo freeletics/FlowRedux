@@ -1,0 +1,161 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, watchosArm32, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <flowredux-library:flowredux>
+abstract interface com.freeletics.flowredux2/Logger { // com.freeletics.flowredux2/Logger|null[0]
+    abstract var minLevel // com.freeletics.flowredux2/Logger.minLevel|{}minLevel[0]
+        abstract fun <get-minLevel>(): com.freeletics.flowredux2/Logger.Level // com.freeletics.flowredux2/Logger.minLevel.<get-minLevel>|<get-minLevel>(){}[0]
+        abstract fun <set-minLevel>(com.freeletics.flowredux2/Logger.Level) // com.freeletics.flowredux2/Logger.minLevel.<set-minLevel>|<set-minLevel>(com.freeletics.flowredux2.Logger.Level){}[0]
+
+    abstract fun log(kotlin/String, com.freeletics.flowredux2/Logger.Level, kotlin/String?, kotlin/Throwable?) // com.freeletics.flowredux2/Logger.log|log(kotlin.String;com.freeletics.flowredux2.Logger.Level;kotlin.String?;kotlin.Throwable?){}[0]
+
+    final enum class Level : kotlin/Enum<com.freeletics.flowredux2/Logger.Level> { // com.freeletics.flowredux2/Logger.Level|null[0]
+        enum entry Debug // com.freeletics.flowredux2/Logger.Level.Debug|null[0]
+        enum entry Error // com.freeletics.flowredux2/Logger.Level.Error|null[0]
+        enum entry Info // com.freeletics.flowredux2/Logger.Level.Info|null[0]
+        enum entry Verbose // com.freeletics.flowredux2/Logger.Level.Verbose|null[0]
+        enum entry Warn // com.freeletics.flowredux2/Logger.Level.Warn|null[0]
+
+        final val entries // com.freeletics.flowredux2/Logger.Level.entries|#static{}entries[0]
+            final fun <get-entries>(): kotlin.enums/EnumEntries<com.freeletics.flowredux2/Logger.Level> // com.freeletics.flowredux2/Logger.Level.entries.<get-entries>|<get-entries>#static(){}[0]
+
+        final fun valueOf(kotlin/String): com.freeletics.flowredux2/Logger.Level // com.freeletics.flowredux2/Logger.Level.valueOf|valueOf#static(kotlin.String){}[0]
+        final fun values(): kotlin/Array<com.freeletics.flowredux2/Logger.Level> // com.freeletics.flowredux2/Logger.Level.values|values#static(){}[0]
+    }
+}
+
+abstract interface com.freeletics.flowredux2/SaveableState { // com.freeletics.flowredux2/SaveableState|null[0]
+    open fun save(androidx.lifecycle/SavedStateHandle) // com.freeletics.flowredux2/SaveableState.save|save(androidx.lifecycle.SavedStateHandle){}[0]
+}
+
+sealed interface com.freeletics.flowredux2/ExecutionPolicy { // com.freeletics.flowredux2/ExecutionPolicy|null[0]
+    final class Throttled : com.freeletics.flowredux2/ExecutionPolicy { // com.freeletics.flowredux2/ExecutionPolicy.Throttled|null[0]
+        constructor <init>(kotlin.time/Duration) // com.freeletics.flowredux2/ExecutionPolicy.Throttled.<init>|<init>(kotlin.time.Duration){}[0]
+    }
+
+    final object CancelPrevious : com.freeletics.flowredux2/ExecutionPolicy // com.freeletics.flowredux2/ExecutionPolicy.CancelPrevious|null[0]
+
+    final object Ordered : com.freeletics.flowredux2/ExecutionPolicy // com.freeletics.flowredux2/ExecutionPolicy.Ordered|null[0]
+
+    final object Unordered : com.freeletics.flowredux2/ExecutionPolicy // com.freeletics.flowredux2/ExecutionPolicy.Unordered|null[0]
+}
+
+abstract class <#A: #B, #B: kotlin/Any, #C: kotlin/Any> com.freeletics.flowredux2/BaseBuilder { // com.freeletics.flowredux2/BaseBuilder|null[0]
+    final fun <#A1: #C, #B1: kotlin/Any, #C1: kotlin/Any> onActionStartStateMachine(kotlin.reflect/KClass<out #A1>, kotlin/Function2<com.freeletics.flowredux2/State<#A>, #A1, com.freeletics.flowredux2/FlowReduxStateMachineFactory<#B1, #C1>>, kotlin/Function1<#C, #C1?>, kotlin/Function1<#B1, kotlin/Boolean> = ..., kotlin/String? = ..., kotlin.coroutines/SuspendFunction2<com.freeletics.flowredux2/ChangeableState<#A>, #B1, com.freeletics.flowredux2/ChangedState<#B>>) // com.freeletics.flowredux2/BaseBuilder.onActionStartStateMachine|onActionStartStateMachine(kotlin.reflect.KClass<out|0:0>;kotlin.Function2<com.freeletics.flowredux2.State<1:0>,0:0,com.freeletics.flowredux2.FlowReduxStateMachineFactory<0:1,0:2>>;kotlin.Function1<1:2,0:2?>;kotlin.Function1<0:1,kotlin.Boolean>;kotlin.String?;kotlin.coroutines.SuspendFunction2<com.freeletics.flowredux2.ChangeableState<1:0>,0:1,com.freeletics.flowredux2.ChangedState<1:1>>){0§<1:2>;1§<kotlin.Any>;2§<kotlin.Any>}[0]
+    final fun <#A1: #C> on(kotlin.reflect/KClass<#A1>, com.freeletics.flowredux2/ExecutionPolicy, kotlin.coroutines/SuspendFunction2<com.freeletics.flowredux2/ChangeableState<#A>, #A1, com.freeletics.flowredux2/ChangedState<#B>>) // com.freeletics.flowredux2/BaseBuilder.on|on(kotlin.reflect.KClass<0:0>;com.freeletics.flowredux2.ExecutionPolicy;kotlin.coroutines.SuspendFunction2<com.freeletics.flowredux2.ChangeableState<1:0>,0:0,com.freeletics.flowredux2.ChangedState<1:1>>){0§<1:2>}[0]
+    final fun <#A1: #C> onActionEffect(kotlin.reflect/KClass<#A1>, com.freeletics.flowredux2/ExecutionPolicy, kotlin.coroutines/SuspendFunction2<com.freeletics.flowredux2/State<#A>, #A1, kotlin/Unit>) // com.freeletics.flowredux2/BaseBuilder.onActionEffect|onActionEffect(kotlin.reflect.KClass<0:0>;com.freeletics.flowredux2.ExecutionPolicy;kotlin.coroutines.SuspendFunction2<com.freeletics.flowredux2.State<1:0>,0:0,kotlin.Unit>){0§<1:2>}[0]
+    final fun <#A1: kotlin/Any, #B1: kotlin/Any> onEnterStartStateMachine(kotlin/Function1<com.freeletics.flowredux2/State<#A>, com.freeletics.flowredux2/FlowReduxStateMachineFactory<#A1, #B1>>, kotlin/Function1<#C, #B1?>, kotlin/Function1<#A1, kotlin/Boolean> = ..., kotlin/String? = ..., kotlin.coroutines/SuspendFunction2<com.freeletics.flowredux2/ChangeableState<#A>, #A1, com.freeletics.flowredux2/ChangedState<#B>>) // com.freeletics.flowredux2/BaseBuilder.onEnterStartStateMachine|onEnterStartStateMachine(kotlin.Function1<com.freeletics.flowredux2.State<1:0>,com.freeletics.flowredux2.FlowReduxStateMachineFactory<0:0,0:1>>;kotlin.Function1<1:2,0:1?>;kotlin.Function1<0:0,kotlin.Boolean>;kotlin.String?;kotlin.coroutines.SuspendFunction2<com.freeletics.flowredux2.ChangeableState<1:0>,0:0,com.freeletics.flowredux2.ChangedState<1:1>>){0§<kotlin.Any>;1§<kotlin.Any>}[0]
+    final fun <#A1: kotlin/Any> onEnterStartStateMachine(kotlin/Function1<com.freeletics.flowredux2/State<#A>, com.freeletics.flowredux2/FlowReduxStateMachineFactory<#A1, #C>>, kotlin/Function1<#A1, kotlin/Boolean> = ..., kotlin/String? = ..., kotlin.coroutines/SuspendFunction2<com.freeletics.flowredux2/ChangeableState<#A>, #A1, com.freeletics.flowredux2/ChangedState<#B>>) // com.freeletics.flowredux2/BaseBuilder.onEnterStartStateMachine|onEnterStartStateMachine(kotlin.Function1<com.freeletics.flowredux2.State<1:0>,com.freeletics.flowredux2.FlowReduxStateMachineFactory<0:0,1:2>>;kotlin.Function1<0:0,kotlin.Boolean>;kotlin.String?;kotlin.coroutines.SuspendFunction2<com.freeletics.flowredux2.ChangeableState<1:0>,0:0,com.freeletics.flowredux2.ChangedState<1:1>>){0§<kotlin.Any>}[0]
+    final fun <#A1: kotlin/Any?> collectWhileInState(kotlin/Function1<#A, kotlinx.coroutines.flow/Flow<#A1>>, com.freeletics.flowredux2/ExecutionPolicy = ..., kotlin/String? = ..., kotlin.coroutines/SuspendFunction2<com.freeletics.flowredux2/ChangeableState<#A>, #A1, com.freeletics.flowredux2/ChangedState<#B>>) // com.freeletics.flowredux2/BaseBuilder.collectWhileInState|collectWhileInState(kotlin.Function1<1:0,kotlinx.coroutines.flow.Flow<0:0>>;com.freeletics.flowredux2.ExecutionPolicy;kotlin.String?;kotlin.coroutines.SuspendFunction2<com.freeletics.flowredux2.ChangeableState<1:0>,0:0,com.freeletics.flowredux2.ChangedState<1:1>>){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> collectWhileInState(kotlinx.coroutines.flow/Flow<#A1>, com.freeletics.flowredux2/ExecutionPolicy = ..., kotlin/String? = ..., kotlin.coroutines/SuspendFunction2<com.freeletics.flowredux2/ChangeableState<#A>, #A1, com.freeletics.flowredux2/ChangedState<#B>>) // com.freeletics.flowredux2/BaseBuilder.collectWhileInState|collectWhileInState(kotlinx.coroutines.flow.Flow<0:0>;com.freeletics.flowredux2.ExecutionPolicy;kotlin.String?;kotlin.coroutines.SuspendFunction2<com.freeletics.flowredux2.ChangeableState<1:0>,0:0,com.freeletics.flowredux2.ChangedState<1:1>>){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> collectWhileInStateEffect(kotlin/Function1<#A, kotlinx.coroutines.flow/Flow<#A1>>, com.freeletics.flowredux2/ExecutionPolicy = ..., kotlin/String? = ..., kotlin.coroutines/SuspendFunction2<com.freeletics.flowredux2/State<#A>, #A1, kotlin/Unit>) // com.freeletics.flowredux2/BaseBuilder.collectWhileInStateEffect|collectWhileInStateEffect(kotlin.Function1<1:0,kotlinx.coroutines.flow.Flow<0:0>>;com.freeletics.flowredux2.ExecutionPolicy;kotlin.String?;kotlin.coroutines.SuspendFunction2<com.freeletics.flowredux2.State<1:0>,0:0,kotlin.Unit>){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> collectWhileInStateEffect(kotlinx.coroutines.flow/Flow<#A1>, com.freeletics.flowredux2/ExecutionPolicy = ..., kotlin/String? = ..., kotlin.coroutines/SuspendFunction2<com.freeletics.flowredux2/State<#A>, #A1, kotlin/Unit>) // com.freeletics.flowredux2/BaseBuilder.collectWhileInStateEffect|collectWhileInStateEffect(kotlinx.coroutines.flow.Flow<0:0>;com.freeletics.flowredux2.ExecutionPolicy;kotlin.String?;kotlin.coroutines.SuspendFunction2<com.freeletics.flowredux2.State<1:0>,0:0,kotlin.Unit>){0§<kotlin.Any?>}[0]
+    final fun onEnter(kotlin.coroutines/SuspendFunction1<com.freeletics.flowredux2/ChangeableState<#A>, com.freeletics.flowredux2/ChangedState<#B>>) // com.freeletics.flowredux2/BaseBuilder.onEnter|onEnter(kotlin.coroutines.SuspendFunction1<com.freeletics.flowredux2.ChangeableState<1:0>,com.freeletics.flowredux2.ChangedState<1:1>>){}[0]
+    final fun onEnterEffect(kotlin.coroutines/SuspendFunction1<com.freeletics.flowredux2/State<#A>, kotlin/Unit>) // com.freeletics.flowredux2/BaseBuilder.onEnterEffect|onEnterEffect(kotlin.coroutines.SuspendFunction1<com.freeletics.flowredux2.State<1:0>,kotlin.Unit>){}[0]
+    final inline fun <#A1: reified #C, #B1: kotlin/Any, #C1: kotlin/Any> onActionStartStateMachine(noinline kotlin/Function2<com.freeletics.flowredux2/State<#A>, #A1, com.freeletics.flowredux2/FlowReduxStateMachineFactory<#B1, #C1>>, noinline kotlin/Function1<#C, #C1?>, noinline kotlin/Function1<#B1, kotlin/Boolean> = ..., kotlin/String? = ..., noinline kotlin.coroutines/SuspendFunction2<com.freeletics.flowredux2/ChangeableState<#A>, #B1, com.freeletics.flowredux2/ChangedState<#B>>) // com.freeletics.flowredux2/BaseBuilder.onActionStartStateMachine|onActionStartStateMachine(kotlin.Function2<com.freeletics.flowredux2.State<1:0>,0:0,com.freeletics.flowredux2.FlowReduxStateMachineFactory<0:1,0:2>>;kotlin.Function1<1:2,0:2?>;kotlin.Function1<0:1,kotlin.Boolean>;kotlin.String?;kotlin.coroutines.SuspendFunction2<com.freeletics.flowredux2.ChangeableState<1:0>,0:1,com.freeletics.flowredux2.ChangedState<1:1>>){0§<1:2>;1§<kotlin.Any>;2§<kotlin.Any>}[0]
+    final inline fun <#A1: reified #C, #B1: kotlin/Any> onActionStartStateMachine(noinline kotlin/Function2<com.freeletics.flowredux2/State<#A>, #A1, com.freeletics.flowredux2/FlowReduxStateMachineFactory<#B1, #C>>, noinline kotlin/Function1<#B1, kotlin/Boolean> = ..., kotlin/String? = ..., noinline kotlin.coroutines/SuspendFunction2<com.freeletics.flowredux2/ChangeableState<#A>, #B1, com.freeletics.flowredux2/ChangedState<#B>>) // com.freeletics.flowredux2/BaseBuilder.onActionStartStateMachine|onActionStartStateMachine(kotlin.Function2<com.freeletics.flowredux2.State<1:0>,0:0,com.freeletics.flowredux2.FlowReduxStateMachineFactory<0:1,1:2>>;kotlin.Function1<0:1,kotlin.Boolean>;kotlin.String?;kotlin.coroutines.SuspendFunction2<com.freeletics.flowredux2.ChangeableState<1:0>,0:1,com.freeletics.flowredux2.ChangedState<1:1>>){0§<1:2>;1§<kotlin.Any>}[0]
+    final inline fun <#A1: reified #C> on(com.freeletics.flowredux2/ExecutionPolicy = ..., noinline kotlin.coroutines/SuspendFunction2<com.freeletics.flowredux2/ChangeableState<#A>, #A1, com.freeletics.flowredux2/ChangedState<#B>>) // com.freeletics.flowredux2/BaseBuilder.on|on(com.freeletics.flowredux2.ExecutionPolicy;kotlin.coroutines.SuspendFunction2<com.freeletics.flowredux2.ChangeableState<1:0>,0:0,com.freeletics.flowredux2.ChangedState<1:1>>){0§<1:2>}[0]
+    final inline fun <#A1: reified #C> onActionEffect(com.freeletics.flowredux2/ExecutionPolicy = ..., noinline kotlin.coroutines/SuspendFunction2<com.freeletics.flowredux2/State<#A>, #A1, kotlin/Unit>) // com.freeletics.flowredux2/BaseBuilder.onActionEffect|onActionEffect(com.freeletics.flowredux2.ExecutionPolicy;kotlin.coroutines.SuspendFunction2<com.freeletics.flowredux2.State<1:0>,0:0,kotlin.Unit>){0§<1:2>}[0]
+}
+
+abstract class <#A: kotlin/Any, #B: kotlin/Any> com.freeletics.flowredux2/FlowReduxStateMachineFactory { // com.freeletics.flowredux2/FlowReduxStateMachineFactory|null[0]
+    constructor <init>() // com.freeletics.flowredux2/FlowReduxStateMachineFactory.<init>|<init>(){}[0]
+
+    final fun installLogger(com.freeletics.flowredux2/Logger, kotlin/String = ...) // com.freeletics.flowredux2/FlowReduxStateMachineFactory.installLogger|installLogger(com.freeletics.flowredux2.Logger;kotlin.String){}[0]
+    final fun launchIn(kotlinx.coroutines/CoroutineScope): com.freeletics.flowredux2/FlowReduxStateMachine<kotlinx.coroutines.flow/StateFlow<#A>, #B> // com.freeletics.flowredux2/FlowReduxStateMachineFactory.launchIn|launchIn(kotlinx.coroutines.CoroutineScope){}[0]
+    final fun shareIn(kotlinx.coroutines/CoroutineScope): com.freeletics.flowredux2/FlowReduxStateMachine<kotlinx.coroutines.flow/SharedFlow<#A>, #B> // com.freeletics.flowredux2/FlowReduxStateMachineFactory.shareIn|shareIn(kotlinx.coroutines.CoroutineScope){}[0]
+    final fun spec(kotlin/Function1<com.freeletics.flowredux2/FlowReduxBuilder<#A, #B>, kotlin/Unit>) // com.freeletics.flowredux2/FlowReduxStateMachineFactory.spec|spec(kotlin.Function1<com.freeletics.flowredux2.FlowReduxBuilder<1:0,1:1>,kotlin.Unit>){}[0]
+}
+
+final class <#A: #B, #B: kotlin/Any, #C: kotlin/Any> com.freeletics.flowredux2/ConditionBuilder : com.freeletics.flowredux2/BaseBuilder<#A, #B, #C> { // com.freeletics.flowredux2/ConditionBuilder|null[0]
+    final fun untilIdentityChanges(kotlin/Function1<#A, kotlin/Any?>, kotlin/String? = ..., kotlin/Function1<com.freeletics.flowredux2/IdentityBuilder<#A, #B, #C>, kotlin/Unit>) // com.freeletics.flowredux2/ConditionBuilder.untilIdentityChanges|untilIdentityChanges(kotlin.Function1<1:0,kotlin.Any?>;kotlin.String?;kotlin.Function1<com.freeletics.flowredux2.IdentityBuilder<1:0,1:1,1:2>,kotlin.Unit>){}[0]
+}
+
+final class <#A: #B, #B: kotlin/Any, #C: kotlin/Any> com.freeletics.flowredux2/IdentityBuilder : com.freeletics.flowredux2/BaseBuilder<#A, #B, #C> // com.freeletics.flowredux2/IdentityBuilder|null[0]
+
+final class <#A: #B, #B: kotlin/Any, #C: kotlin/Any> com.freeletics.flowredux2/InStateBuilder : com.freeletics.flowredux2/BaseBuilder<#A, #B, #C> { // com.freeletics.flowredux2/InStateBuilder|null[0]
+    final fun condition(kotlin/Function1<#A, kotlin/Boolean>, kotlin/String? = ..., kotlin/Function1<com.freeletics.flowredux2/ConditionBuilder<#A, #B, #C>, kotlin/Unit>) // com.freeletics.flowredux2/InStateBuilder.condition|condition(kotlin.Function1<1:0,kotlin.Boolean>;kotlin.String?;kotlin.Function1<com.freeletics.flowredux2.ConditionBuilder<1:0,1:1,1:2>,kotlin.Unit>){}[0]
+    final fun untilIdentityChanges(kotlin/Function1<#A, kotlin/Any?>, kotlin/String? = ..., kotlin/Function1<com.freeletics.flowredux2/IdentityBuilder<#A, #B, #C>, kotlin/Unit>) // com.freeletics.flowredux2/InStateBuilder.untilIdentityChanges|untilIdentityChanges(kotlin.Function1<1:0,kotlin.Any?>;kotlin.String?;kotlin.Function1<com.freeletics.flowredux2.IdentityBuilder<1:0,1:1,1:2>,kotlin.Unit>){}[0]
+}
+
+final class <#A: kotlin/Any, #B: kotlin/Any> com.freeletics.flowredux2/FlowReduxBuilder { // com.freeletics.flowredux2/FlowReduxBuilder|null[0]
+    final fun <#A1: #A> inState(kotlin.reflect/KClass<#A1>, kotlin/Function1<com.freeletics.flowredux2/InStateBuilder<#A1, #A, #B>, kotlin/Unit>) // com.freeletics.flowredux2/FlowReduxBuilder.inState|inState(kotlin.reflect.KClass<0:0>;kotlin.Function1<com.freeletics.flowredux2.InStateBuilder<0:0,1:0,1:1>,kotlin.Unit>){0§<1:0>}[0]
+    final inline fun <#A1: reified #A> inState(noinline kotlin/Function1<com.freeletics.flowredux2/InStateBuilder<#A1, #A, #B>, kotlin/Unit>) // com.freeletics.flowredux2/FlowReduxBuilder.inState|inState(kotlin.Function1<com.freeletics.flowredux2.InStateBuilder<0:0,1:0,1:1>,kotlin.Unit>){0§<1:0>}[0]
+}
+
+final class <#A: kotlin/Any, #B: kotlin/Any> com.freeletics.flowredux2/FlowReduxStateMachine { // com.freeletics.flowredux2/FlowReduxStateMachine|null[0]
+    final val dispatchAction // com.freeletics.flowredux2/FlowReduxStateMachine.dispatchAction|{}dispatchAction[0]
+        final fun <get-dispatchAction>(): kotlin/Function1<#B, kotlin/Unit> // com.freeletics.flowredux2/FlowReduxStateMachine.dispatchAction.<get-dispatchAction>|<get-dispatchAction>(){}[0]
+    final val state // com.freeletics.flowredux2/FlowReduxStateMachine.state|{}state[0]
+        final fun <get-state>(): #A // com.freeletics.flowredux2/FlowReduxStateMachine.state.<get-state>|<get-state>(){}[0]
+
+    final suspend fun dispatch(#B) // com.freeletics.flowredux2/FlowReduxStateMachine.dispatch|dispatch(1:1){}[0]
+}
+
+final class <#A: kotlin/Any> com.freeletics.flowredux2/ChangeableState : com.freeletics.flowredux2/State<#A> { // com.freeletics.flowredux2/ChangeableState|null[0]
+    constructor <init>(#A) // com.freeletics.flowredux2/ChangeableState.<init>|<init>(1:0){}[0]
+
+    final fun <#A1: kotlin/Any> noChange(): com.freeletics.flowredux2/ChangedState<#A1> // com.freeletics.flowredux2/ChangeableState.noChange|noChange(){0§<kotlin.Any>}[0]
+    final fun <#A1: kotlin/Any> override(kotlin/Function1<#A, #A1>): com.freeletics.flowredux2/ChangedState<#A1> // com.freeletics.flowredux2/ChangeableState.override|override(kotlin.Function1<1:0,0:0>){0§<kotlin.Any>}[0]
+    final fun mutate(kotlin/Function1<#A, #A>): com.freeletics.flowredux2/ChangedState<#A> // com.freeletics.flowredux2/ChangeableState.mutate|mutate(kotlin.Function1<1:0,1:0>){}[0]
+}
+
+final class com.freeletics.flowredux2/SimpleLogger : com.freeletics.flowredux2/Logger { // com.freeletics.flowredux2/SimpleLogger|null[0]
+    constructor <init>(com.freeletics.flowredux2/Logger.Level) // com.freeletics.flowredux2/SimpleLogger.<init>|<init>(com.freeletics.flowredux2.Logger.Level){}[0]
+
+    final var minLevel // com.freeletics.flowredux2/SimpleLogger.minLevel|{}minLevel[0]
+        final fun <get-minLevel>(): com.freeletics.flowredux2/Logger.Level // com.freeletics.flowredux2/SimpleLogger.minLevel.<get-minLevel>|<get-minLevel>(){}[0]
+        final fun <set-minLevel>(com.freeletics.flowredux2/Logger.Level) // com.freeletics.flowredux2/SimpleLogger.minLevel.<set-minLevel>|<set-minLevel>(com.freeletics.flowredux2.Logger.Level){}[0]
+
+    final fun log(kotlin/String, com.freeletics.flowredux2/Logger.Level, kotlin/String?, kotlin/Throwable?) // com.freeletics.flowredux2/SimpleLogger.log|log(kotlin.String;com.freeletics.flowredux2.Logger.Level;kotlin.String?;kotlin.Throwable?){}[0]
+}
+
+sealed class <#A: kotlin/Any> com.freeletics.flowredux2/State { // com.freeletics.flowredux2/State|null[0]
+    final val snapshot // com.freeletics.flowredux2/State.snapshot|{}snapshot[0]
+        final fun <get-snapshot>(): #A // com.freeletics.flowredux2/State.snapshot.<get-snapshot>|<get-snapshot>(){}[0]
+}
+
+sealed class <#A: out kotlin/Any?> com.freeletics.flowredux2/ChangedState // com.freeletics.flowredux2/ChangedState|null[0]
+
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_BaseBuilder$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_BaseBuilder$stableprop|#static{}com_freeletics_flowredux2_BaseBuilder$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_ChangeableState$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_ChangeableState$stableprop|#static{}com_freeletics_flowredux2_ChangeableState$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_ChangedState$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_ChangedState$stableprop|#static{}com_freeletics_flowredux2_ChangedState$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_ConditionBuilder$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_ConditionBuilder$stableprop|#static{}com_freeletics_flowredux2_ConditionBuilder$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_CancelPrevious$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_CancelPrevious$stableprop|#static{}com_freeletics_flowredux2_ExecutionPolicy_CancelPrevious$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_Ordered$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_Ordered$stableprop|#static{}com_freeletics_flowredux2_ExecutionPolicy_Ordered$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_Throttled$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_Throttled$stableprop|#static{}com_freeletics_flowredux2_ExecutionPolicy_Throttled$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_Unordered$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_Unordered$stableprop|#static{}com_freeletics_flowredux2_ExecutionPolicy_Unordered$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_FlowReduxBuilder$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_FlowReduxBuilder$stableprop|#static{}com_freeletics_flowredux2_FlowReduxBuilder$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_FlowReduxStateMachine$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_FlowReduxStateMachine$stableprop|#static{}com_freeletics_flowredux2_FlowReduxStateMachine$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_FlowReduxStateMachineFactory$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_FlowReduxStateMachineFactory$stableprop|#static{}com_freeletics_flowredux2_FlowReduxStateMachineFactory$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_IdentityBuilder$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_IdentityBuilder$stableprop|#static{}com_freeletics_flowredux2_IdentityBuilder$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_InStateBuilder$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_InStateBuilder$stableprop|#static{}com_freeletics_flowredux2_InStateBuilder$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_SimpleLogger$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_SimpleLogger$stableprop|#static{}com_freeletics_flowredux2_SimpleLogger$stableprop[0]
+final val com.freeletics.flowredux2/com_freeletics_flowredux2_State$stableprop // com.freeletics.flowredux2/com_freeletics_flowredux2_State$stableprop|#static{}com_freeletics_flowredux2_State$stableprop[0]
+
+final fun <#A: com.freeletics.flowredux2/SaveableState> (com.freeletics.flowredux2/FlowReduxStateMachineFactory<#A, *>).com.freeletics.flowredux2/initializeWith(androidx.lifecycle/SavedStateHandle, kotlin/Function1<androidx.lifecycle/SavedStateHandle, #A>) // com.freeletics.flowredux2/initializeWith|initializeWith@com.freeletics.flowredux2.FlowReduxStateMachineFactory<0:0,*>(androidx.lifecycle.SavedStateHandle;kotlin.Function1<androidx.lifecycle.SavedStateHandle,0:0>){0§<com.freeletics.flowredux2.SaveableState>}[0]
+final fun <#A: kotlin/Any, #B: kotlin/Any> (com.freeletics.flowredux2/FlowReduxStateMachineFactory<#A, #B>).com.freeletics.flowredux2/produceStateMachine(androidx.compose.runtime/Composer?, kotlin/Int): com.freeletics.flowredux2/FlowReduxStateMachine<androidx.compose.runtime/State<#A>, #B> // com.freeletics.flowredux2/produceStateMachine|produceStateMachine@com.freeletics.flowredux2.FlowReduxStateMachineFactory<0:0,0:1>(androidx.compose.runtime.Composer?;kotlin.Int){0§<kotlin.Any>;1§<kotlin.Any>}[0]
+final fun <#A: kotlin/Any, #B: kotlin/Any> com.freeletics.flowredux2/stateMachine(#A, kotlin/Function1<com.freeletics.flowredux2/FlowReduxBuilder<#A, #B>, kotlin/Unit>, androidx.compose.runtime/Composer?, kotlin/Int): com.freeletics.flowredux2/FlowReduxStateMachine<androidx.compose.runtime/State<#A>, #B> // com.freeletics.flowredux2/stateMachine|stateMachine(0:0;kotlin.Function1<com.freeletics.flowredux2.FlowReduxBuilder<0:0,0:1>,kotlin.Unit>;androidx.compose.runtime.Composer?;kotlin.Int){0§<kotlin.Any>;1§<kotlin.Any>}[0]
+final fun <#A: kotlin/Any> (com.freeletics.flowredux2/FlowReduxStateMachineFactory<#A, *>).com.freeletics.flowredux2/initializeWith(androidx.lifecycle/SavedStateHandle, kotlinx.serialization/KSerializer<#A>, kotlin/Function0<#A>) // com.freeletics.flowredux2/initializeWith|initializeWith@com.freeletics.flowredux2.FlowReduxStateMachineFactory<0:0,*>(androidx.lifecycle.SavedStateHandle;kotlinx.serialization.KSerializer<0:0>;kotlin.Function0<0:0>){0§<kotlin.Any>}[0]
+final fun <#A: kotlin/Any> (com.freeletics.flowredux2/FlowReduxStateMachineFactory<#A, *>).com.freeletics.flowredux2/initializeWith(kotlin/Boolean = ..., kotlin/Function0<#A>) // com.freeletics.flowredux2/initializeWith|initializeWith@com.freeletics.flowredux2.FlowReduxStateMachineFactory<0:0,*>(kotlin.Boolean;kotlin.Function0<0:0>){0§<kotlin.Any>}[0]
+final fun <#A: kotlin/Any?> (com.freeletics.flowredux2/ChangedState<#A>).com.freeletics.flowredux2/reduce(#A): #A // com.freeletics.flowredux2/reduce|reduce@com.freeletics.flowredux2.ChangedState<0:0>(0:0){0§<kotlin.Any?>}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_BaseBuilder$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_BaseBuilder$stableprop_getter|com_freeletics_flowredux2_BaseBuilder$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_ChangeableState$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_ChangeableState$stableprop_getter|com_freeletics_flowredux2_ChangeableState$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_ChangedState$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_ChangedState$stableprop_getter|com_freeletics_flowredux2_ChangedState$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_ConditionBuilder$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_ConditionBuilder$stableprop_getter|com_freeletics_flowredux2_ConditionBuilder$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_CancelPrevious$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_CancelPrevious$stableprop_getter|com_freeletics_flowredux2_ExecutionPolicy_CancelPrevious$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_Ordered$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_Ordered$stableprop_getter|com_freeletics_flowredux2_ExecutionPolicy_Ordered$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_Throttled$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_Throttled$stableprop_getter|com_freeletics_flowredux2_ExecutionPolicy_Throttled$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_Unordered$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_ExecutionPolicy_Unordered$stableprop_getter|com_freeletics_flowredux2_ExecutionPolicy_Unordered$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_FlowReduxBuilder$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_FlowReduxBuilder$stableprop_getter|com_freeletics_flowredux2_FlowReduxBuilder$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_FlowReduxStateMachine$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_FlowReduxStateMachine$stableprop_getter|com_freeletics_flowredux2_FlowReduxStateMachine$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_FlowReduxStateMachineFactory$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_FlowReduxStateMachineFactory$stableprop_getter|com_freeletics_flowredux2_FlowReduxStateMachineFactory$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_IdentityBuilder$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_IdentityBuilder$stableprop_getter|com_freeletics_flowredux2_IdentityBuilder$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_InStateBuilder$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_InStateBuilder$stableprop_getter|com_freeletics_flowredux2_InStateBuilder$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_SimpleLogger$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_SimpleLogger$stableprop_getter|com_freeletics_flowredux2_SimpleLogger$stableprop_getter(){}[0]
+final fun com.freeletics.flowredux2/com_freeletics_flowredux2_State$stableprop_getter(): kotlin/Int // com.freeletics.flowredux2/com_freeletics_flowredux2_State$stableprop_getter|com_freeletics_flowredux2_State$stableprop_getter(){}[0]
+final inline fun <#A: reified kotlin/Any> (com.freeletics.flowredux2/FlowReduxStateMachineFactory<#A, *>).com.freeletics.flowredux2/initializeWith(androidx.lifecycle/SavedStateHandle, noinline kotlin/Function0<#A>) // com.freeletics.flowredux2/initializeWith|initializeWith@com.freeletics.flowredux2.FlowReduxStateMachineFactory<0:0,*>(androidx.lifecycle.SavedStateHandle;kotlin.Function0<0:0>){0§<kotlin.Any>}[0]
