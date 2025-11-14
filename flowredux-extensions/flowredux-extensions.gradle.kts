@@ -3,11 +3,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     id("com.freeletics.gradle.multiplatform")
-    id("com.freeletics.gradle.publish.oss")
     id("app.cash.burst")
 }
 
 freeletics {
+    enableOssPublishing()
+
     multiplatform {
         // TODO stop limiting when it's possible to properly exclude targets from compose
         addCommonTargets(limitToComposeTargets = true)
