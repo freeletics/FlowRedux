@@ -4,9 +4,11 @@ plugins {
 
 freeletics {
     useCompose()
+}
 
-    android {
-        enableViewBinding()
+android {
+    buildFeatures {
+        viewBinding = true
     }
 }
 
