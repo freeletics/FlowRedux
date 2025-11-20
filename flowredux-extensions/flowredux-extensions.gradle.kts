@@ -3,10 +3,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     id("com.freeletics.gradle.multiplatform")
-    id("app.cash.burst")
 }
 
 freeletics {
+    useBurst()
     enableOssPublishing()
 
     multiplatform {
