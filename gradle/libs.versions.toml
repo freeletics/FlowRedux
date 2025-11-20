@@ -6,7 +6,7 @@ java-target = "11"
 java-toolchain = "24"
 
 android-gradle = "8.13.1"
-android-min = "21"
+android-min = "23"
 android-target = "36"
 android-compile = "36"
 
@@ -17,7 +17,7 @@ androidx-compose-material = "1.9.5"
 androidx-compose-material3 = "1.4.0"
 jetbrains-compose = "1.9.3"
 
-androidx-activity = "1.11.0"
+androidx-activity = "1.12.0"
 androidx-annotation = "1.9.1"
 androidx-appcompat = "1.7.1"
 androidx-constraintlayout = "2.2.1"
