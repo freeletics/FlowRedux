@@ -6,7 +6,7 @@ java-target = "11"
 java-toolchain = "24"
 
 android-gradle = "8.13.1"
-android-min = "21"
+android-min = "23"
 android-target = "36"
 android-compile = "36"
 
