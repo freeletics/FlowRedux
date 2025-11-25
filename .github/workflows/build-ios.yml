@@ -28,8 +28,13 @@ jobs:
 
       - name: Prepare and open Simulator
         run: |
+          echo "Listing available simulators"
+          xcrun simctl list
+          echo "Creating simulator"
           xcrun simctl create iphone-16-pro "iPhone 16 Pro" "iOS26.1"
+          echo "Booting simulator"
           xcrun simctl boot iphone-16-pro
+          echo "Opening simulator"
           open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
 
       - name: Cache gradle, wrapper and buildSrc
