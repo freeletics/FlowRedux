@@ -28,9 +28,10 @@ jobs:
 
       - name: Prepare and open Simulator
         run: |
-          xcrun simctl create iphone-16-pro "iPhone 16 Pro"
+          xcrun simctl create iphone-16-pro "iPhone 16 Pro" "iOS26.0"
           xcrun simctl boot iphone-16-pro
           open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
+
       - name: Cache gradle, wrapper and buildSrc
         uses: actions/cache@v4.3.0
         with:
@@ -40,6 +41,7 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
       - name: Cache konan
         uses: actions/cache@v4.3.0
         with:
@@ -65,6 +67,6 @@ jobs:
           scheme: ios
           action: build
           sdk: iphonesimulator
-          destination: platform=iOS Simulator,name=iphone-16-pro
+          destination: platform=iOS Simulator,name=iphone-16-pro,OS=iOS26.0
           configuration: Debug
           build-settings: CODE_SIGNING_REQUIRED=NO
