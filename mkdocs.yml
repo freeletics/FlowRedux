@@ -21,7 +21,7 @@ theme:
 nav:
   - 'Getting Started': index.md
   - 'User Guide':
-    - 'State and Action': user-guide/1_FlowReduxStateMachine.md
+    - 'State and Action': user-guide/1_basics.md
     - 'inState block': user-guide/2_inState.md
     - 'onEnter block': user-guide/3_onEnter.md
     - 'State and ChangedState': user-guide/4_State-ChangedState.md

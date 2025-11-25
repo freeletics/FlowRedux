@@ -49,9 +49,8 @@ jobs:
         run: pip install mkdocs-material
 
       - name: Build docs
-        # need to set the version name because for the default committed snapshot version
-        # dokkaHtml tasks get skipped
-        run: ./gradlew dokkaHtml -PVERSION_NAME=
+        # need to set the version name because for the default committed snapshot version dokka tasks get skipped
+        run: ./gradlew dokkaGenerateHtml -PVERSION_NAME=
 
       - name: Copy docs
         run: |
@@ -61,8 +60,8 @@ jobs:
           cp CHANGELOG.md docs/changelog.md
           mkdir -p docs/API/dsl
           cp -R flowredux/build/dokka/html/. docs/API/dsl
-          mkdir -p docs/API/compose
-          cp -R compose/build/dokka/html/. docs/API/compose
+          mkdir -p docs/API/extensions
+          cp -R flowredux-extensions/build/dokka/html/. docs/API/extensions
 
       - name: Build MkDocs
         run: mkdocs build

@@ -3,12 +3,14 @@
 The first concept of the DSL we learn is `inState`:
 
 ```kotlin
-class ItemListStateMachine(
+class ItemListStateMachineFactory(
     private val httpClient: HttpClient
-) : FlowReduxStateMachine<ListState, Action>(initialState = Loading) {
+) : FlowReduxStateMachineFactory<ListState, Action> {
 
     init {
         spec {
+            intializeWith { Loading }
+
             inState<Loading> {
                 ...
             }

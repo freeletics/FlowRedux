@@ -1,17 +1,20 @@
-# State`<T>` and ChangedState`<T>`
-FlowRedux has the concept of a `State<T>` (please note that `T` here is just a placeholder for generics).
-It is used as a parameter for many DSL blocks like `onEnter { state : State<MyState> }` etc.
-With this `State<T>` object you can get access to the actual state of your statemachine with `State.snapshot`.
-Additionally `State<T>` is providing functions to mutate the state or completely override it.
-Here is a summary of the API of `State<T>` (simplified version, we will dive deeper in a bit):
+# ChangeableState`<T>` and ChangedState`<T>`
+FlowRedux has the concept of a `ChangeableState<T>` (please note that `T` here is just a placeholder for generics).
+It is used as a receiver for many DSL blocks like `onEnter {  }`, meaning that the `this` inside the block is of type
+`ChangeableState<T>`.
+
+With this `ChangeableState<T>` object you can get access to the actual state of your state machine with `ChangeableState.snapshot`.
+Additionally `ChangeableState<T>` is providing functions to mutate the state or completely override it.
+Here is a summary of the API of `ChangeableState<T>` (simplified version, we will dive deeper in a bit):
 
 ```kotlin
-class State<T> {
-    // This holds the state value of your state machine
+class ChangeableState<T> {
+    // This holds the state value of your state machine at the time when the DSL block was entered.
+    // It can be used to get something to for example do an API call with parameters based on the current state.
     val snapshot : T
 
     // completely replaces the current state with a new one
-    fun override(newState : T) : ChangedState<T>
+    fun override(newState : () -> T) : ChangedState<T>
 
      // mutates the current state value.
      // This is useful if you want to change just a few properties of your state
@@ -36,14 +39,14 @@ spec {
 
     // DO USE .override() to clearly say you want to move to another type of state
     inState<Loading>{
-        onEnter{ state : State<Loading>  ->
-            state.override { Error() }  // OK: move from Loading to Error state
+        onEnter{
+            override { Error() }  // OK: move from Loading to Error state
         }
     }
 
     // DO NOT USE .mutate()
     inState<Loading>{
-        onEnter{ state : State<Loading>  ->
+        onEnter{
             state.mutate { Error() }  // compiler error!
         }
     }
@@ -60,8 +63,8 @@ spec {
     // DO USE .mutate() to clearly indicate that you just want to
     // change a property but overall stay in same type of state
     inState<ScreenStatisticsState> {
-        onEnter { state : State<ScreenStatisticsState> ->
-            state.mutate { this.copy(visitCounter= this.visitCounter + 1) } // OK: just update a property but stay in ScreenStatisticsState
+        onEnter {
+            mutate { this.copy(visitCounter= this.visitCounter + 1) } // OK: just update a property but stay in ScreenStatisticsState
         }
     }
 
@@ -69,7 +72,7 @@ spec {
     inState<ScreenStatisticsState> {
         onEnter { state : State<ScreenStatisticsState> ->
             state.override {
-                this.copy(visitCounter= this.visitCounter + 1) // compiles but hard to read
+                copy(visitCounter= this.visitCounter + 1) // compiles but hard to read
             }
         }
     }
@@ -77,10 +80,10 @@ spec {
 ```
 
 
-As you see from a `State<T>` you can produce a `ChangedState`.
-`ChangedState` is something that simply tells FlowRedux internally how the reducer of the FlowReduxStateMachine should merge and compute the next state of your statemachine.
+As you see from a `ChangeableState<T>` you can produce a `ChangedState`.
+`ChangedState` is something that simply tells FlowRedux internally how the reducer of the FlowReduxStateMachine should merge and compute the next state of your state machine.
 `ChangedState` is not meant to be used or instantiated by you manually.
 You may wonder "what about writing unit tests?".
 We will cover testing and best practices in a [dedicated section](/testing).
 
-We will dive deeper on `State.override()` and `State.mutate()` as we continue with our `ItemListStateMachine` example.
+We will dive deeper on `ChangeableState.override()` and `ChangeableState.mutate()` as we continue with our `ItemListStateMachineFactory` example.

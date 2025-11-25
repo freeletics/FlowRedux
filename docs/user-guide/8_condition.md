@@ -3,9 +3,9 @@
 We already covered `inState<State>` that builds upon the recommended best practice that every State of your state machine is expressed us it's own type in Kotlin.
 
 Sometimes, however, you need a bit more flexibility than just relaying on types to model state.
-For that use case you can add  `condition( isConditionMet: (State) -> Boolean)` blocks inside your `inState<State>` blocks. 
+For that use case you can add  `condition( isConditionMet: (State) -> Boolean)` blocks inside your `inState<State>` blocks.
 
-Example: One could have also modeled the state for our `ItemListStateMachine` as the following:
+Example: One could have also modeled the state for our `ItemListStateMachineFactory` as the following:
 
 ```kotlin
 // TO MODEL YOUR STATE LIKE THIS IS NOT BEST PRACTICE!
@@ -25,35 +25,37 @@ We just do this for demo purpose to demonstrate a way how to customize `inState`
 Given the state from above, what we  can do now with our DSL is the following:
 
 ```kotlin
-class ItemListStateMachine(
+class ItemListStateMachineFactory(
     private val httpClient: HttpClient
-) : FlowReduxStateMachine<ListState, Action>(
-    initialState = State(
-        loading = true,
-        items = emptyList(),
-        error = null,
-        errorCountDown = null
-    )
-) {
+) : FlowReduxStateMachineFactory<ListState, Action>() {
 
     init {
+        intitializeWith {
+            State(
+                loading = true,
+                items = emptyList(),
+                error = null,
+                errorCountDown = null
+            )
+        }
+
         spec {
             inState<ListState> {
                 condition({ state -> state.loading == true }) {
-                    onEnter { state: State<ListState> ->
+                    onEnter {
                         // we entered the Loading, so let's do the http request
                         try {
                             val items = httpClient.loadItems()
-                            state.mutate {
+                            mutate {
                                 this.copy(loading = false, items = items, error = null, errorCountdown = null)
                             }
                         } catch (t: Throwable) {
-                            state.mutate {
+                            mutate {
                                 this.copy(
-                                    loading = false, 
-                                    items = emptyList(), 
-                                    error = "A network error occurred", 
-                                    errorCountdown = 3
+                                    loading = false,
+                                    items = emptyList(),
+                                    error = "A network error occurred",
+                                    errorCountdown = 3,
                                 )
                             }
                         }
@@ -61,15 +63,15 @@ class ItemListStateMachine(
                 }
 
                 condition({ state -> state.error != null }) {
-                    on<RetryLoadingAction> { action : RetryLoadingAction, state : State<ListState> ->
-                        state.mutate {
+                    on<RetryLoadingAction> { action : RetryLoadingAction ->
+                        mutate {
                             this.copy(loading = true, items = emptyList(), error = null, errorCountdown = null)
                         }
                     }
 
                     val timer : Flow<Int> = timerThatEmitsEverySecond()
-                    collectWhileInState(timer) { value : Int, state : State<ListState> ->
-                        state.mutate {
+                    collectWhileInState(timer) { value : Int ->
+                        mutate {
                             if (errorCountdown!! > 0)
                                 //  decrease the countdown by 1 second
                                 this.copy(errorCountdown = this.errorCountdown!! - 1)

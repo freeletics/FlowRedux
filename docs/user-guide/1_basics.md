@@ -1,4 +1,4 @@
-# FlowReduxStateMachine Basics: State and Action
+# Basics: State and Action
 
 FlowRedux provides a convenient DSL to describe your state machine.
 This page introduces and explains step by step the FlowRedux DSL.
@@ -10,9 +10,13 @@ As we introduce more concepts of the DSL we will extend this example with more f
 This page is meant to be read from top to bottom.
 
 
-## FlowReduxStateMachine
-The base class in FlowRedux is `FlowReduxStateMachine`.
-It has a very simple public API:
+## FlowReduxStateMachineFactory and FlowReduxStateMachine
+
+The 2 base classes in FlowRedux are `FlowReduxStateMachineFactory<State, Action>` and `FlowReduxStateMachine<State, Action>`.
+The `FlowReduxStateMachineFactory` is the class you extend and write your state machine specification in. It can then be used
+to obtain a `FlowReduxStateMachine` instance through the `launchIn`, `shareIn` and `produceStateMachine` functions.
+
+`FlowReduxStateMachine` has a simple public API:
 
 ```kotlin
 class FlowReduxStateMachine<State, Action> {
@@ -23,7 +27,7 @@ class FlowReduxStateMachine<State, Action> {
 
 Every `FlowReduxStateMachine` works on a `State` class.
 How you model your state is up to you and depends on what your app and business logic actually has as requirements.
-You can collect the `FlowReduxStateMachine.state : Flow<State>` (from Kotlin coroutines library) by calling `.collect()` on it.
+You can collect the `FlowReduxStateMachine.state : Flow<State>` by calling `.collect()` on it.
 Whenever the state of the state machine changes, observers get the updated state via this `Flow`.
 
 We also need a way to "input" something to our state machine like a user has clicked on a button in the UI.
@@ -71,16 +75,18 @@ This is how the UI looks like:
 
 ## Initial State
 
-Every `FlowReduxStateMachine` needs an initial state.
+Every `FlowReduxStateMachineFactory` needs an initial state which is provided by the `initializeWith { ... }` block.
 This specifies in which state the state machine starts.
 In our example we start with the `Loading` state.
 
 ```kotlin
-class ItemListStateMachine(
+class ItemListStateMachineFactory(
     private val httpClient: HttpClient
-) : FlowReduxStateMachine<ListState, Action>(initialState = Loading) {
+) : FlowReduxStateMachineFactory<ListState, Action>() {
 
     init {
+        intializeWith { Loading }
+
         spec {
             // will be filled in next section
             ...
@@ -89,5 +95,5 @@ class ItemListStateMachine(
 }
 ```
 
-In FlowRedux we need an `init {...}` block containing a `spec { ... }` block inside.
+In FlowRedux we need an `init {...}` block containing an `initializeWith` and a `spec { ... }` block inside.
 The `spec { ... }` block is actually where we write our state machine specification with the DSL.

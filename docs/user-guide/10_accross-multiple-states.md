@@ -28,7 +28,7 @@ spec {
         // on, onEnter, collectWhileInState specific to ShowContent state only
     }
 
-    ...
+    // ...
 }
 ```
 
