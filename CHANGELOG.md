@@ -17,6 +17,8 @@ General changes:
   By default the each launch of the factory will resume with the last emitted state of a previous
   launch. To always start with a fresh initial state use `initializeWith(reuseLastEmittedStateOnLaunch = false) { initialState }`.
   There are also several overloads of `initializeWith` that allow to use `SavedStateHandle` to persist the previous state.
+  It can also be used to change the initial state in tests by calling `factory.initializeWith { testState }` before launching a
+  state machine.
 
 DSL:
 

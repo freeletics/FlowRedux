@@ -1,7 +1,7 @@
 # Improve readability of your DSL spec
 
 One very important aspect of the DSL is to provide a readable and maintainable way to reason about your state machine.
-Let' take a look at our example state machine:
+Let's take a look at our example state machine:
 
 ```kotlin
 class ItemListStateMachineFactory(
@@ -9,7 +9,7 @@ class ItemListStateMachineFactory(
 ) : FlowReduxStateMachineFactory<ListState, Action>() {
 
     init {
-        intializeWith {
+        initializeWith {
             Loading
         }
 
@@ -51,25 +51,25 @@ class ItemListStateMachineFactory(
 
     private fun timerThatEmitsEverySecond(): Flow<Int> = flow {
         var timeElapsed = 0
-        while (isActive) {  // is Flow still active?
-            delay(1000)     // wait 1 second
+        while (isActive) {  // Is Flow still active?
+            delay(1000)     // Wait 1 second
             timeElapsed++
-            emit(timeElapsed) // Flow Emits value
+            emit(timeElapsed) // Flow emits value
         }
     }
 }
 ```
 
 Do you notice something?
-With more blocks we add the state machine itself gets harder to read, to understand and to maintain.
-What we are aiming for with FlowRedux and it's DSL is to get a readable overview about what the state machine is supposed to do on a high level.
-If you take a look at the example from above, however, you will notice that it isn't easy
-to read and get bloated with implementation details.
+With more blocks we add, the state machine itself gets harder to read, understand, and maintain.
+What we are aiming for with FlowRedux and its DSL is to get a readable overview of what the state machine is supposed to do on a high level.
+If you take a look at the example above, however, you will notice that it isn't easy
+to read and gets bloated with implementation details.
 
 ## Extract logic to functions
 
 We recommend keeping the DSL `spec { ... }` block really short, expressive, readable and maintainable.
-Therefore, instead of having implementation details in your DSL we recommend to extract that to functions instead.
+Therefore, instead of having implementation details in your DSL, we recommend extracting that to functions instead.
 Let's refactor the example above to reflect this idea:
 
 ```kotlin
@@ -80,7 +80,7 @@ class ItemListStateMachineFactory(
     // This is the specification of your state machine.
     // Less implementation details, better readability.
     init {
-        intializeWith {
+        initializeWith {
             Loading // if creating the initial state would require multiple lines it could be moved to a function as well
         }
 
@@ -91,8 +91,8 @@ class ItemListStateMachineFactory(
 
             inState<Error> {
                 on<RetryLoadingAction> { action ->
-                    // For a single line statement it's ok to keep logic inside the block instead
-                    // of extracting it a function (but it also depends on your testing strategy)
+                    // For a single-line statement it's OK to keep logic inside the block instead
+                    // of extracting it to a function (but it also depends on your testing strategy)
                     state.override { Loading }
                 }
 
@@ -139,12 +139,12 @@ class ItemListStateMachineFactory(
 }
 ```
 
-Moreover, have you notice that the extracted function now all get a similar method signature:
+Moreover, have you noticed that the extracted functions now all get a similar method signature:
 
 ```kotlin
 suspend fun ChangeableState<T>.doSomething() : ChangedState<T>
 ```
 
 We are now getting closer to [pure functions](https://en.wikipedia.org/wiki/Pure_function).
-This makes writing unit test easier because for the same input (`ChangeableState`) pure functions return the same output (`ChangedState`).
+This makes writing unit tests easier because, for the same input (`ChangeableState`), pure functions return the same output (`ChangedState`).
 We will talk about that more in detail in the dedicated section about testing best practices.

@@ -5,7 +5,7 @@ To give a concrete example how this is useful let's extend our `ItemListStateMac
 Let's say whenever our state machine is in `Error` state we want
 to retry loading the items after 3 seconds in `Error` state or anytime before the 3 seconds have elapsed if the user clicks the retry button.
 Furthermore the 3 seconds countdown timer should be displayed in our UI as well.
-This is how the UI should look like:
+This is how the UI should look:
 
 ![Automatically Retry](.../images/error-countdown.gif)
 
@@ -26,7 +26,7 @@ class ItemListStateMachineFactory(
 ) : FlowReduxStateMachineFactory<ListState, Action>() {
 
     init {
-        intializeWith { Loading }
+        initializeWith { Loading }
 
         spec {
             inState<Loading> {
@@ -69,27 +69,27 @@ class ItemListStateMachineFactory(
 
     private fun timerThatEmitsEverySecond(): Flow<Int> = flow {
         var timeElapsed = 0
-        while (isActive) {  // is Flow still active?
-            delay(1_000)     // wait 1 second
+        while (isActive) {  // Is the Flow still active?
+            delay(1_000)     // Wait 1 second
             timeElapsed++
-            emit(timeElapsed) // Flow Emits value
+            emit(timeElapsed) // Flow emits value
         }
     }
 }
 ```
 
 Let's look at the source code above step by step.
-What is new is that `Error` state contains now an additional
-field  `countdown : Int` which we set on transitioning from `Loading` to `Error(countdown = 3)` (means 3 seconds left on the countdown clock).
+What is new is that the `Error` state now contains an additional
+field `countdown : Int`, which we set when transitioning from `Loading` to `Error(countdown = 3)` (meaning 3 seconds left on the countdown clock).
 
-We extend ` inState<Error> { ... }` block and add `collectWhileInState(timer)` block.
+We extend the `inState<Error> { ... }` block and add a `collectWhileInState(timer)` block.
 `timer` is a `Flow<Int>` that emits a new (incremented) number every second.
-`collectWhileInState(timer)` internally calls `.collect {...}` on the flow passed as first parameter (in our case the `timer`).
-The second parameter is the a  block with the parameters `timerValue : Int` and `State<Error>`.
+`collectWhileInState(timer)` internally calls `.collect { ... }` on the Flow passed as the first parameter (in our case the `timer`).
+The second parameter is a block with the parameters `timerValue : Int` and `State<Error>`.
 
-In other words: instead of calling `timer.collect { ... }` directly you
+In other words: instead of calling `timer.collect { ... }` directly, you
 call `collectWhileInState(timer) { ... }` to collect the Flow.
 FlowRedux then takes care of canceling the flow once the surrounding `inState { ... }` condition doesn't hold anymore. In our case, the timer is automatically canceled once the state machine transitions from
 `Error` state into another state.
-This happens either when the user clicks on the retry button and which
-triggers `on<RetryLoadingAction>` which causes a state transition to `Loading` or when 3 seconds have elapsed (inside `collectWhileInState(timer)`).
+This happens either when the user clicks the retry button, which
+triggers `on<RetryLoadingAction>` and causes a state transition to `Loading`, or when 3 seconds have elapsed (inside `collectWhileInState(timer)`).

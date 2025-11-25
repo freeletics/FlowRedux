@@ -3,16 +3,16 @@
 FlowRedux provides a convenient DSL to describe your state machine.
 This page introduces and explains step by step the FlowRedux DSL.
 
-Let's build an example app using FlowRedux:
+Let's build an example app using FlowRedux.
 This app loads a list of items from a web service.
-As we introduce more concepts of the DSL we will extend this example with more features.
+As we introduce more concepts of the DSL, we will extend this example with more features.
 
 This page is meant to be read from top to bottom.
 
 
 ## FlowReduxStateMachineFactory and FlowReduxStateMachine
 
-The 2 base classes in FlowRedux are `FlowReduxStateMachineFactory<State, Action>` and `FlowReduxStateMachine<State, Action>`.
+The two base classes in FlowRedux are `FlowReduxStateMachineFactory<State, Action>` and `FlowReduxStateMachine<State, Action>`.
 The `FlowReduxStateMachineFactory` is the class you extend and write your state machine specification in. It can then be used
 to obtain a `FlowReduxStateMachine` instance through the `launchIn`, `shareIn` and `produceStateMachine` functions.
 
@@ -26,11 +26,11 @@ class FlowReduxStateMachine<State, Action> {
 ```
 
 Every `FlowReduxStateMachine` works on a `State` class.
-How you model your state is up to you and depends on what your app and business logic actually has as requirements.
+How you model your state is up to you and depends on what your app and business logic actually require.
 You can collect the `FlowReduxStateMachine.state : Flow<State>` by calling `.collect()` on it.
 Whenever the state of the state machine changes, observers get the updated state via this `Flow`.
 
-We also need a way to "input" something to our state machine like a user has clicked on a button in the UI.
+We also need a way to "input" something to our state machine, like when a user clicks a button in the UI.
 "Inputs" are called `Actions` in FlowRedux.
 An example is `data class LoginSubmittedAction(val username : String, val password : String)`.
 Again, how you model your Actions is up to you.
@@ -39,9 +39,9 @@ You can dispatch an `Action` with `FlowReduxStateMachine.dispatch(action)`.
 
 
 That should be enough information to get started with our example app based on FlowRedux.
-Let's define the `States`for our state machine.
-As said before we load a list of items from a web server (via http) and display that list.
-While loading the list we show a loading indicator on the screen and if an error occurs we show an error message on the screen with a retry button.
+Let's define the `States` for our state machine.
+As said before, we load a list of items from a web server (via HTTP) and display that list.
+While loading the list, we show a loading indicator on the screen, and if an error occurs, we show an error message on the screen with a retry button.
 
 This gives us the following states:
 
@@ -59,7 +59,7 @@ sealed interface ListState {
 }
 ```
 
-If the state machine reaches the `Error` state then we display an error message in our UI but also a button the users of our app can click to retry loading the items.
+If the state machine reaches the `Error` state, then we display an error message in our UI and also a button the users of our app can click to retry loading the items.
 
 This gives us the following `Actions`:
 
@@ -69,13 +69,13 @@ sealed interface Action {
 }
 ```
 
-This is how the UI looks like:
+This is how the UI looks:
 
 ![Sample UI](../images/lce.gif)
 
 ## Initial State
 
-Every `FlowReduxStateMachineFactory` needs an initial state which is provided by the `initializeWith { ... }` block.
+Every `FlowReduxStateMachineFactory` needs an initial state, which is provided by the `initializeWith { ... }` block.
 This specifies in which state the state machine starts.
 In our example we start with the `Loading` state.
 
@@ -85,7 +85,7 @@ class ItemListStateMachineFactory(
 ) : FlowReduxStateMachineFactory<ListState, Action>() {
 
     init {
-        intializeWith { Loading }
+        initializeWith { Loading }
 
         spec {
             // will be filled in next section
@@ -95,5 +95,5 @@ class ItemListStateMachineFactory(
 }
 ```
 
-In FlowRedux we need an `init {...}` block containing an `initializeWith` and a `spec { ... }` block inside.
+In FlowRedux we need an `init { ... }` block containing an `initializeWith { ... }` and a `spec { ... }` block inside.
 The `spec { ... }` block is actually where we write our state machine specification with the DSL.
