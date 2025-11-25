@@ -1,7 +1,51 @@
 Change Log
 ==========
 
-## 2.0.0-alpha6 *(2024-11-07)*
+## 2.0.0 *(2025-11-26)*
+
+- New artifact coordinates: `com.freeletics.flowredux2:flowredux:<version>`.
+- New package name: `com.freeletics.flowredux2`
+
+General changes:
+
+- The main class to define your state machine is now `FlowReduxStateMachineFactory` which
+  can be started with `launchIn`/`shareIn` (Coroutines) or `produceStateMachine` (Compose). Both return
+  an active `FlowReduxStateMachine` that allows dispatching actions to it and observing the
+  current state.
+- The initial state of the `FlowReduxStateMachineFactory` is now provided by calling
+  `initializeWith { initialState }`. Usually this is done in the `init` block of the state machine factory.
+  By default the each launch of the factory will resume with the last emitted state of a previous
+  launch. To always start with a fresh initial state use `initializeWith(reuseLastEmittedStateOnLaunch = false) { initialState }`.
+  There are also several overloads of `initializeWith` that allow to use `SavedStateHandle` to persist the previous state.
+  It can also be used to change the initial state in tests by calling `factory.initializeWith { testState }` before launching a
+  state machine.
+
+DSL:
+
+- The `State` class that has the `override`, `mutate` and `noStateChange` methods is now called `ChangeableState`
+  and is the receiver in each DSL block instead of being passed as a parameter. Like before `ChangeableState`
+  allows access to a `snapshot` state.
+- `...Effect` methods now have a `State` class as receiver that allow accessing `snapshot` instead of
+  receiving `snapshot` as a parameter.
+- It's now forbidden to access `snapshot` in the `override` and `mutate` methods to avoid accidental bugs
+  where outdated state is used to build the new state.
+- Added `ExecutionPolicy.Throttled` that can be used to limit subsequent action handling or Flow
+  emissions (already was part of alpha 1 but not  mentioned in the release notes).
+
+Other:
+
+- The old compose artifact was removed in favor of the previously mentioned `produceStateMachine`
+  which ships as part of the main library.
+- Added new artifact `com.freeletics.flowredux2:flowredux-extensions:<version>` which initially
+  contains `onEnterLoadSmoothly`. This extension allows loading data while skipping showing a
+  loading indicator for fast loads and if a loading indicator is shown it will show it at least
+  for a minimum amount of time. This avoids the loading indicator just quickly flashing.
+- Added `cancelOnState` to `onEnterStartStateMachine` and `onActionStartStateMachine`
+- Added `Logger` and `installLogger` to allow logging of state changes and state machine events.
+- `...Effect` DSL methods won't cause the previous state to be emitted again when they complete.
+
+
+## 2.0.0-alpha6 *(2025-11-07)*
 
 - Added `cancelOnState` to `onEnterStartStateMachine` and `onActionStartStateMachine`
   to allow cancellation of the sub state machine when it emits a specific state.
@@ -10,7 +54,7 @@ Change Log
   that extensions don't need to opt-in.
 
 
-## 2.0.0-alpha5 *(2024-09-24)*
+## 2.0.0-alpha5 *(2025-09-24)*
 
 - `onEnterStartStateMachine` and `onActionStartStateMachine` have been updated to use
   `FlowReduxStateMachineFactory` instead of `StateMachine`.
@@ -24,14 +68,14 @@ Change Log
 - Updated Compose to 1.9.0.
 
 
-## 2.0.0-alpha4 *(2024-07-30)*
+## 2.0.0-alpha4 *(2025-07-30)*
 
 - Added `shareIn` to `FlowReduxStateMachineFactory` to create a `FlowReduxStateMachine`
   that uses `SharedFlow` instead of `StateFlow`. The main purpose is testing where it's useful
   to not have the value conflation of `StateFlow`.
 
 
-## 2.0.0-alpha3 *(2024-07-29)*
+## 2.0.0-alpha3 *(2025-07-29)*
 
 - Changed all `initializeWith` methods to be extension functions to prevent the compose and
   Android specific extension functions from being hidden.
@@ -41,7 +85,7 @@ Change Log
   `initializeWith(Boolean, () -> S)`.
 
 
-## 2.0.0-alpha2 *(2024-07-24)*
+## 2.0.0-alpha2 *(2025-07-24)*
 
 - `FlowReduxStateMachineFactory` now has several `initializeWith` functions, each matching one
   of the `...StateHolder` functions that were introduced in alpha 1. `initializeWith` needs
@@ -54,7 +98,7 @@ Change Log
   (now replaced with an `initializeWith` function for `Parcelable` state) not to be called.
 
 
-## 2.0.0-alpha1 *(2024-07-23)*
+## 2.0.0-alpha1 *(2025-07-23)*
 
 - New artifact coordinates: `com.freeletics.flowredux2:flowredux:<version>`.
 - New package name: `com.freeletics.flowredux2`

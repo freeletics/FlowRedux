@@ -21,20 +21,20 @@ theme:
 nav:
   - 'Getting Started': index.md
   - 'User Guide':
-    - 'State and Action': user-guide/1_FlowReduxStateMachine.md
+    - 'State and Action': user-guide/1_basics.md
     - 'inState block': user-guide/2_inState.md
     - 'onEnter block': user-guide/3_onEnter.md
     - 'State and ChangedState': user-guide/4_State-ChangedState.md
     - 'onAction block': user-guide/5_onAction.md
     - 'collectWhileInState block': user-guide/6_collectWhileInState.md
     - 'Effects': user-guide/7_effects.md
-    - 'Condition block': user-guide/8_condition.md
+    - 'condition block': user-guide/8_condition.md
     - 'untilIdentityChanged block': user-guide/9_untilIdentityChanged.md
     - 'Acting across multiple states': user-guide/10_accross-multiple-states.md
     - 'ExecutionPolicy': user-guide/11_ExecutionPolicy.md
     - 'Improve readability': user-guide/12_improve-readability.md
-    - 'Composing statemachines': user-guide/13_composing-statemachines.md
-    - 'Writing test': user-guide/14_testing.md
+    - 'Composing state machines': user-guide/13_composing-statemachines.md
+    - 'Writing tests': user-guide/14_testing.md
   - 'DSL-Cheatsheet': dsl-cheatsheet.md
   - 'Compose': compose.md
   - 'API':

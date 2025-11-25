@@ -3,62 +3,41 @@
 This package provides some functions that may be useful if you use Jetpack Compose.
 
 
-### `rememberStateAndDispatch()`
+### `produceStateMachine()`
 
-Let's say we have a very basic address book UI build with Jetpack Compose
+Let's say we have a very basic address book UI built with Jetpack Compose
 and with a FlowRedux powered state machine.
 
 Let's take a look at this over-simplified code sample:
 
 ```kotlin
-val stateMachine = AddressBookStateMachine()
+val stateMachineFactory = AddressBookStateMachineFactory()
 
-@Compose
-fun AddressBookUi(){
-  // Extension function that is provided by this artifact
-  val (state, dispatchAction) = stateMachine.rememberStateAndDispatch()
+@Composable
+fun AddressBookUi() {
+  // Extension function that is provided by FlowRedux where the `state` of the
+  // created `StateMachine` is a Compose `State`.
+  val stateMachine = stateMachineFactory.produceStateMachine()
+  val state = stateMachine.state.value
   Column {
     SearchBoxUi(state.searchQuery, dispatch)
   }
 
   LazyColumn {
     items(state.contacts) { contact : Contact ->
-       ContactUi(contact, dispatchAction)
+       ContactUi(contact, stateMachine::dispatch)
     }
   }
 }
 
-@Compose
+@Composable
 fun SearchBoxUi(searchQuery : String, dispatchAction: (AddressBookAction) -> Unit) {
     Column {
       TextField(
         value = searchQuery,
-        // dispatches action async to state machine
-        onValueChange = { text -> dispatchAction(SearchQueryChangedAction(text)) } 
+        // Dispatches an action asynchronously to the state machine
+        onValueChange = { text -> dispatchAction(SearchQueryChangedAction(text)) }
       )
    }
-}
-```
-
-`rememberStateAndDispatch()`, as the name already suggests, is remembered across recompositions.
-
-### `rememberState()`
-
-If you only need state of from your stateMachine but not an async way to dispatch actions
-then `rememberState()` extension is what you are looking for.
-
-```kotlin
-import androidx.compose.runtime.State
-
-val stateMachine = AddressBookStateMachine()
-
-@Compose
-fun MyUi(){
-  val state : State<AddressBookState> = stateMachine.rememberState() // this returns Compose State
-  LazyColumn {
-      items(state.contacts) { contact : Contact ->
-         ContactUi(contact)
-      }
-    }
 }
 ```
