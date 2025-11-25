@@ -32,34 +32,6 @@ jobs:
           xcrun simctl boot iphone-16-pro
           open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
 
-      - name: Cache gradle, wrapper and buildSrc
-        uses: actions/cache@v4.3.0
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Cache konan
-        uses: actions/cache@v4.3.0
-        with:
-          path: |
-            ~/.konan/cache
-            ~/.konan/dependencies
-            ~/.konan/kotlin-native-macos*
-            ~/.konan/kotlin-native-mingw*
-            ~/.konan/kotlin-native-windows*
-            ~/.konan/kotlin-native-linux*
-            ~/.konan/kotlin-native-prebuilt-macos*
-            ~/.konan/kotlin-native-prebuilt-mingw*
-            ~/.konan/kotlin-native-prebuilt-windows*
-            ~/.konan/kotlin-native-prebuilt-linux*
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-konan-
-
       - name: Build
         uses: sersoft-gmbh/xcodebuild-action@v4.0.0
         with:
@@ -67,6 +39,6 @@ jobs:
           scheme: ios
           action: build
           sdk: iphonesimulator
-          destination: platform=iOS Simulator,name=iphone-16-pro,OS=26.0
+          destination: platform=iOS Simulator,name=iphone-16-pro
           configuration: Debug
           build-settings: CODE_SIGNING_REQUIRED=NO
