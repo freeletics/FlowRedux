@@ -28,7 +28,7 @@ jobs:
 
       - name: Prepare and open Simulator
         run: |
-          xcrun simctl create iphone-16-pro "iPhone 16 Pro" "iOS26.0"
+          xcrun simctl create iphone-16-pro "iPhone 16 Pro" "iOS26.1"
           xcrun simctl boot iphone-16-pro
           open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
 
@@ -67,6 +67,6 @@ jobs:
           scheme: ios
           action: build
           sdk: iphonesimulator
-          destination: platform=iOS Simulator,name=iphone-16-pro,OS=iOS26.0
+          destination: platform=iOS Simulator,name=iphone-16-pro,OS=iOS26.1
           configuration: Debug
           build-settings: CODE_SIGNING_REQUIRED=NO
