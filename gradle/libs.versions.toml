@@ -32,7 +32,7 @@ timber = "5.0.1"
 turbine = "1.2.1"
 kotlinx-collections-immutable= "0.4.0"
 
-fgp = "0.36.0"
+fgp = "0.36.1"
 publish = "0.35.0"
 dokka = "2.1.0"
 dependency-analysis = "3.5.0"
