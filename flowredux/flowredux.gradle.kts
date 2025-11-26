@@ -36,7 +36,7 @@ kotlin {
 
 dependencies {
     commonMainApi(libs.coroutines.core)
-    "composeMainApi"(libs.jetbrains.compose.runtime)
+    "composeMainApi"(libs.androidx.compose.runtime)
     "composeMainCompileOnly"(libs.androidx.viewmodel.savedstate)
 
     commonTestImplementation(libs.kotlin.test)
