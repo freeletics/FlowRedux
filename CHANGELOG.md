@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## UNRELEASED
+
+- Added `watchOsDeviceArm64` as target.
+
+
 ## 2.0.0 *(2025-11-26)*
 
 - New artifact coordinates: `com.freeletics.flowredux2:flowredux:<version>`.
