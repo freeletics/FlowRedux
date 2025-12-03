@@ -51,6 +51,8 @@ fun `move from Loading to Error state on error HTTP response`() = runTest {
 }
 ```
 
+#### Custom initial state
+
 We can apply this pattern all the time, but isn't it a bit annoying to always start our state machine from the initial state and have to go through all the state transitions until we reach the state we want to test?
 Well, one nice side effect of using state machines is that you can jump to a certain state right from the beginning, by calling `initializeWith { ... }` before starting the state machine.
 
@@ -60,9 +62,9 @@ Now let's write a test that checks that pressing the retry button works:
 @Test
 fun `from Error state to Loading if RetryLoadingAction is dispatched`() = runTest {
     val initialState = Error(message = "A network error occurred", countdown = 3)
-    val factory = ItemListStateMachineFactory(httpClient, initialState)
+    val factory = ItemListStateMachineFactory(httpClient)
     factory.initializeWith { initialState }
-    val stateMachine = ItemListStateMachineFactory(httpClient).shareIn(backgroundScope)
+    val stateMachine = factory.shareIn(backgroundScope)
 
     stateMachine.state.test {
         assertEquals(initialState, awaitItem())
@@ -78,9 +80,9 @@ fun `from Error state to Loading if RetryLoadingAction is dispatched`() = runTes
 fun `once Error countdown is 0 move to Loading state`() = runTest {
     val msg = "A network error occurred"
     val initialState = Error(message = msg, countdown = 3)
-    val factory = ItemListStateMachineFactory(httpClient, initialState)
+    val factory = ItemListStateMachineFactory(httpClient)
     factory.initializeWith { initialState }
-    val stateMachine = ItemListStateMachineFactory(httpClient).shareIn(backgroundScope)
+    val stateMachine = factory.shareIn(backgroundScope)
 
     stateMachine.state.test {
         assertEquals(initialState, awaitItem())
