@@ -39,6 +39,11 @@ dependencies {
     "composeMainApi"(libs.androidx.compose.runtime)
     "composeMainCompileOnly"(libs.androidx.viewmodel.savedstate)
 
+    constraints {
+        "composeMainImplementation"(libs.androidx.viewmodel.savedstate)
+        "composeMainImplementation"(libs.androidx.savedstate)
+    }
+
     commonTestImplementation(libs.kotlin.test)
     commonTestImplementation(libs.kotlin.test.annotations)
     commonTestImplementation(libs.turbine)
