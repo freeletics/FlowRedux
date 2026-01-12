@@ -39,6 +39,15 @@ dependencies {
     "composeMainApi"(libs.androidx.compose.runtime)
     "composeMainCompileOnly"(libs.androidx.viewmodel.savedstate)
 
+    constraints {
+        "composeMainImplementation"(libs.androidx.viewmodel.savedstate) {
+           because("'androidx.savedstate:savedstate' version newer than 1.4.0 is required")
+        }
+        "composeMainImplementation"(libs.androidx.savedstate) {
+           because("'androidx.savedstate:savedstate' version newer than 1.4.0 is required")
+        }
+    }
+
     commonTestImplementation(libs.kotlin.test)
     commonTestImplementation(libs.kotlin.test.annotations)
     commonTestImplementation(libs.turbine)

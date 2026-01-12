@@ -23,6 +23,7 @@ androidx-constraintlayout = "2.2.1"
 androidx-core = "1.16.0"
 androidx-lifecycle = "2.10.0"
 androidx-recyclerview = "1.4.0"
+androidx-savedstate = "1.4.0"
 
 material = "1.13.0"
 adapterdelegates = "4.3.2"
@@ -60,6 +61,7 @@ androidx-livedata = { module = "androidx.lifecycle:lifecycle-livedata-core", ver
 androidx-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "androidx-lifecycle" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "androidx-recyclerview" }
+androidx-savedstate = { module = "androidx.savedstate:savedstate", version.ref = "androidx-savedstate" }
 
 material = { module = "com.google.android.material:material", version.ref = "material" }
 adapterdelegates = { module = "com.hannesdorfmann:adapterdelegates4", version.ref = "adapterdelegates" }
