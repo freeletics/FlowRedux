@@ -1,9 +1,10 @@
 Change Log
 ==========
 
-## UNRELEASED
+## 2.0.1 *(2026-01-12)*
 
 - Added `watchOsDeviceArm64` as target.
+- Added dependency constraint to ensure at least `androidx.savedstate` version 1.4.0 is used.
 
 
 ## 2.0.0 *(2025-11-26)*
