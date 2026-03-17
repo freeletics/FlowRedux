@@ -45,7 +45,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.MAVEN_SIGNING_PASSWORD }}
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2.5.0
+        uses: softprops/action-gh-release@v2.6.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ env.RELEASE_NOTES }}
