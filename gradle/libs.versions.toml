@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.3.10"
+kotlin = "2.3.21"
 coroutines = "1.11.0"
 
 java-target = "11"
@@ -32,14 +32,13 @@ timber = "5.0.1"
 turbine = "1.2.1"
 kotlinx-collections-immutable= "0.4.0"
 
-fgp = "0.36.5"
+fgp = "0.36.8"
 publish = "0.36.0"
 dokka = "2.2.0"
 dependency-analysis = "3.10.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotlin-test-annotations = { module = "org.jetbrains.kotlin:kotlin-test-annotations-common", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
