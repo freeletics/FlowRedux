@@ -13,4 +13,5 @@ dependencies {
     commonMainApi(projects.flowredux)
     commonMainApi(libs.kotlinx.collections.immutable)
     commonMainApi(libs.androidx.compose.runtime)
+    "jvmMainApi"(libs.coroutines.core)
 }

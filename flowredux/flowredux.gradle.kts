@@ -37,12 +37,10 @@ kotlin {
 dependencies {
     commonMainApi(libs.coroutines.core)
     "composeMainApi"(libs.androidx.compose.runtime)
+    "composeMainCompileOnly"(libs.serialization.core)
     "composeMainCompileOnly"(libs.androidx.viewmodel.savedstate)
 
     constraints {
-        "composeMainImplementation"(libs.androidx.viewmodel.savedstate) {
-           because("'androidx.savedstate:savedstate' version newer than 1.4.0 is required")
-        }
         "composeMainImplementation"(libs.androidx.savedstate) {
            because("'androidx.savedstate:savedstate' version newer than 1.4.0 is required")
         }
