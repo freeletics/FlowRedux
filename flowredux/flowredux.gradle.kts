@@ -49,7 +49,7 @@ dependencies {
     }
 
     commonTestImplementation(libs.kotlin.test)
-    commonTestImplementation(libs.kotlin.test.annotations)
     commonTestImplementation(libs.turbine)
     commonTestImplementation(libs.coroutines.test)
+    "jvmTestImplementation"(libs.kotlin.test.junit)
 }

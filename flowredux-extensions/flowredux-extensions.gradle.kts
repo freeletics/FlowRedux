@@ -20,9 +20,9 @@ dependencies {
     commonMainApi(projects.flowredux)
 
     commonTestImplementation(libs.kotlin.test)
-    commonTestImplementation(libs.kotlin.test.annotations)
     commonTestImplementation(libs.turbine)
     commonTestImplementation(libs.coroutines.test)
+    "jvmTestImplementation"(libs.kotlin.test.junit)
 }
 
 // see the @Suppress("INVISIBLE_REFERENCE")
