@@ -1,11 +1,11 @@
 [versions]
 kotlin = "2.3.21"
-coroutines = "1.10.2"
+coroutines = "1.11.0"
 
 java-target = "11"
 java-toolchain = "24"
 
-android-gradle = "9.1.1"
+android-gradle = "9.2.1"
 android-min = "23"
 android-target = "36"
 android-compile = "36"
@@ -35,7 +35,7 @@ kotlinx-collections-immutable= "0.4.0"
 fgp = "0.36.8"
 publish = "0.36.0"
 dokka = "2.2.0"
-dependency-analysis = "3.9.0"
+dependency-analysis = "3.10.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
