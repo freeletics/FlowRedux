@@ -26,7 +26,7 @@ androidx-lifecycle = "2.10.0"
 androidx-recyclerview = "1.4.0"
 androidx-savedstate = "1.4.0"
 
-material = "1.13.0"
+material = "1.14.0"
 adapterdelegates = "4.3.2"
 timber = "5.0.1"
 
