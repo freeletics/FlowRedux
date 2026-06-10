@@ -31,7 +31,7 @@ adapterdelegates = "4.3.2"
 timber = "5.0.1"
 
 turbine = "1.2.1"
-kotlinx-collections-immutable= "0.4.0"
+kotlinx-collections-immutable= "0.5.0"
 
 fgp = "0.37.0"
 publish = "0.36.0"
