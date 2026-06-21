@@ -34,7 +34,7 @@ turbine = "1.2.1"
 kotlinx-collections-immutable= "0.5.0"
 
 fgp = "0.37.0"
-publish = "0.36.0"
+publish = "0.37.0"
 dokka = "2.2.0"
 dependency-analysis = "3.14.1"
 
