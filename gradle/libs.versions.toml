@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.3.21"
+kotlin = "2.4.0"
 coroutines = "1.11.0"
 serialization = "1.11.0"
 
@@ -33,7 +33,7 @@ timber = "5.0.1"
 turbine = "1.2.1"
 kotlinx-collections-immutable= "0.5.0"
 
-fgp = "0.37.0"
+fgp = "0.38.0"
 publish = "0.37.0"
 dokka = "2.2.0"
 dependency-analysis = "3.15.0"
