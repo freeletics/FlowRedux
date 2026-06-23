@@ -13,7 +13,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v6.0.3
+              uses: actions/checkout@v7.0.0
 
             - name: Install JDK
               uses: actions/setup-java@v5.3.0

@@ -11,10 +11,10 @@ android-min = "23"
 android-target = "36"
 android-compile = "36"
 
-androidx-compose-runtime = "1.11.2"
-androidx-compose-ui = "1.11.2"
-androidx-compose-foundation = "1.11.2"
-androidx-compose-material = "1.11.2"
+androidx-compose-runtime = "1.11.3"
+androidx-compose-ui = "1.11.3"
+androidx-compose-foundation = "1.11.3"
+androidx-compose-material = "1.11.3"
 androidx-compose-material3 = "1.4.0"
 
 androidx-activity = "1.13.0"
@@ -34,9 +34,9 @@ turbine = "1.2.1"
 kotlinx-collections-immutable= "0.5.0"
 
 fgp = "0.37.0"
-publish = "0.36.0"
+publish = "0.37.0"
 dokka = "2.2.0"
-dependency-analysis = "3.14.1"
+dependency-analysis = "3.15.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
