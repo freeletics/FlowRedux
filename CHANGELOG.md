@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+## 2.1.1 *(2026-06-24)*
+
+- Compiled without enabling Kotlin 2.4.0 experimental compiler flags.
+
 ## 2.1.0 *(2026-06-23)*
 
 - Updated Kotlin to 2.4.0.
