@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+## 2.1.0 *(2026-06-23)*
+
+- Updated Kotlin to 2.4.0.
+- Updated Compose to 1.11.3.
+- Updated AGP to 9.2.1.
+- Updated Coroutines to 1.11.0.
+- **Breaking** Drop support for `iosX64`, `macosX64`, `tvosX64`, `watchosX64` targets.
+
 ## 2.0.1 *(2026-01-12)*
 
 - Added `watchOsDeviceArm64` as target.
