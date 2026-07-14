@@ -1,7 +1,7 @@
 buildscript {
     dependencies {
         // Remove when this is resolved: https://github.com/autonomousapps/dependency-analysis-gradle-plugin/issues/1661
-        classpath("org.jetbrains.kotlin:kotlin-metadata-jvm:2.4.0")
+        classpath("org.jetbrains.kotlin:kotlin-metadata-jvm:2.4.10")
     }
 }
 
