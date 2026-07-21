@@ -22,7 +22,7 @@ androidx-annotation = "1.10.0"
 androidx-appcompat = "1.7.1"
 androidx-constraintlayout = "2.2.1"
 androidx-core = "1.16.0"
-androidx-lifecycle = "2.10.0"
+androidx-lifecycle = "2.11.0"
 androidx-recyclerview = "1.4.0"
 androidx-savedstate = "1.5.0"
 
