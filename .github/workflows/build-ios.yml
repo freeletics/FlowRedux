@@ -24,12 +24,12 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1.7.0
         with:
-          xcode-version: '26.3'
+          xcode-version: '26.4'
 
       - name: Prepare and open Simulator
         run: |
-          xcrun simctl create iphone-16-pro "iPhone 16 Pro"
-          xcrun simctl boot iphone-16-pro
+          xcrun simctl create iphone-17-pro "iPhone 17 Pro"
+          xcrun simctl boot iphone-17-pro
           open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
 
       - name: Build
