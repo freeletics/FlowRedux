@@ -42,6 +42,6 @@ jobs:
           scheme: ios
           action: build
           sdk: iphonesimulator
-          destination: platform=iOS Simulator,name=iphone-16-pro
+          destination: platform=iOS Simulator,name=iphone-17-pro
           configuration: Debug
           build-settings: CODE_SIGNING_REQUIRED=NO
