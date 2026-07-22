@@ -7,7 +7,7 @@ pluginManagement {
 }
 
 plugins {
-    id("com.freeletics.gradle.settings").version("0.38.2")
+    id("com.freeletics.gradle.settings").version("0.39.0")
 }
 
 rootProject.name = "flowredux-library"
