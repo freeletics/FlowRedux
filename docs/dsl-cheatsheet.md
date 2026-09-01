@@ -31,6 +31,29 @@ spec {
     onEnterEffect { ... } // You can have multiple onEnterEffect
     collectWhileInStateEffect(flow1) { valueEmittedFromFlow -> ... } // You can have multiple collectWhileInState
 
+    // Scope behavior to a projection of State1. The projection may be one nested property
+    // or a new state assembled from multiple properties.
+    inScopedState(
+      get = { state -> ScopedState(state.firstProperty, state.secondProperty) },
+      set = { scopedState ->
+        copy(
+          firstProperty = scopedState.firstProperty,
+          secondProperty = scopedState.secondProperty,
+        )
+      },
+    ) {
+      // snapshot, mutations, conditions, identities, and flow builders use ScopedState here.
+      // Scoped mutations replace the slice in the latest State1 and preserve sibling properties.
+      on<Action1> { action -> mutate { copy(...) } }
+      onEnter { ... }
+      collectWhileInState(flow) { valueEmittedFromFlow -> ... }
+      onActionEffect<Action2> { action -> ... }
+      onEnterEffect { ... }
+      collectWhileInStateEffect(flow) { valueEmittedFromFlow -> ... }
+      condition({ scopedState -> scopedState.isEnabled }) { ... }
+      untilIdentityChanges({ scopedState -> scopedState.id }) { ... }
+    }
+
     // Hierarchical state machines
     onEnterStartStateMachine(
       stateMachineFactoryBuilder = { stateSnapshot : State1  -> OtherStateMachine() },
