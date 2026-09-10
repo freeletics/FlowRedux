@@ -6,15 +6,15 @@ serialization = "1.11.0"
 java-target = "11"
 java-toolchain = "24"
 
-android-gradle = "9.3.1"
+android-gradle = "9.4.0"
 android-min = "23"
 android-target = "37"
 android-compile = "37"
 
-androidx-compose-runtime = "1.12.0"
-androidx-compose-ui = "1.12.0"
-androidx-compose-foundation = "1.12.0"
-androidx-compose-material = "1.12.0"
+androidx-compose-runtime = "1.12.1"
+androidx-compose-ui = "1.12.1"
+androidx-compose-foundation = "1.12.1"
+androidx-compose-material = "1.12.1"
 androidx-compose-material3 = "1.4.0"
 
 androidx-activity = "1.13.0"
@@ -31,12 +31,12 @@ adapterdelegates = "4.3.2"
 timber = "5.0.1"
 
 turbine = "1.2.1"
-kotlinx-collections-immutable= "0.5.1"
+kotlinx-collections-immutable= "0.5.2"
 
 fgp = "0.39.0"
 publish = "0.37.0"
 dokka = "2.2.0"
-dependency-analysis = "3.18.0"
+dependency-analysis = "3.19.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
