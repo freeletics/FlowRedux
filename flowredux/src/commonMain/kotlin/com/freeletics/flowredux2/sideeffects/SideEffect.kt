@@ -15,6 +15,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -86,6 +87,64 @@ internal class SideEffectBuilder<InputState : S, S, A>(
 
     @Suppress("UNCHECKED_CAST")
     fun build(state: S) = builder(state as InputState)
+}
+
+internal fun <InputState : S, S : Any, A : Any, ScopedState : Any> SideEffectBuilder<ScopedState, ScopedState, A>.inScopedState(
+    parentIsInState: SideEffectBuilder.IsInState<S>,
+    get: (InputState) -> ScopedState,
+    set: InputState.(ScopedState) -> InputState,
+): SideEffectBuilder<InputState, S, A> {
+    val scopedBuilder = this
+    val isInScopedState = SideEffectBuilder.IsInState<S> { state ->
+        if (!parentIsInState.check(state)) {
+            false
+        } else {
+            @Suppress("UNCHECKED_CAST")
+            scopedBuilder.isInState.check(get(state as InputState))
+        }
+    }
+
+    return SideEffectBuilder(isInScopedState, logger) { inputState ->
+        val scopedSideEffect = scopedBuilder.build(get(inputState))
+        object : SideEffect<InputState, S, A>() {
+            override val isInState = IsInState<S> { state ->
+                if (!parentIsInState.check(state)) {
+                    false
+                } else {
+                    @Suppress("UNCHECKED_CAST")
+                    scopedSideEffect.isInState.check(get(state as InputState))
+                }
+            }
+            override val logger = scopedSideEffect.logger
+
+            override fun produceState(getState: GetState<S>): Flow<ChangedState<S>> {
+                return scopedSideEffect.produceState {
+                    val state = getState()
+                    if (!parentIsInState.check(state)) {
+                        throw StateChangeCancellationException()
+                    }
+                    @Suppress("UNCHECKED_CAST")
+                    get(state as InputState)
+                }.map { changedState ->
+                    when (changedState) {
+                        is NoStateChange -> NoStateChange
+
+                        is NoStateChangeSkipEmission -> NoStateChangeSkipEmission
+
+                        else -> UnsafeMutateState<S, S> {
+                            @Suppress("UNCHECKED_CAST")
+                            val inputState = this as InputState
+                            inputState.set(changedState.reduce(get(inputState)))
+                        }
+                    }
+                }
+            }
+
+            override suspend fun sendAction(action: A) {
+                scopedSideEffect.sendAction(action)
+            }
+        }
+    }
 }
 
 internal class ManagedSideEffect<InputState : S, S, A>(

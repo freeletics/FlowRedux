@@ -23,6 +23,7 @@ nav:
   - 'User Guide':
     - 'State and Action': user-guide/1_basics.md
     - 'inState block': user-guide/2_inState.md
+    - 'inScopedState block': user-guide/3_inScopedState.md
     - 'onEnter block': user-guide/3_onEnter.md
     - 'State and ChangedState': user-guide/4_State-ChangedState.md
     - 'onAction block': user-guide/5_onAction.md
