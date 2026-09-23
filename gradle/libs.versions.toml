@@ -18,7 +18,7 @@ androidx-compose-material = "1.12.1"
 androidx-compose-material3 = "1.4.0"
 
 androidx-activity = "1.13.0"
-androidx-annotation = "1.10.0"
+androidx-annotation = "1.11.0"
 androidx-appcompat = "1.8.0"
 androidx-constraintlayout = "2.2.2"
 androidx-core = "1.16.0"
